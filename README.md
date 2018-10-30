@@ -5,11 +5,11 @@ WIP
 
 Start playback:
 ```
-sox -v -r 48000 -c 2 -n -b 32 -t alsa hw:CARD synth 1000000 sine 1k gain -3
+sox -V -r 48000 -c 2 -n -b 32 -t alsa hw:CARD synth 1000000 sine 1k gain -3
 ```
 Start capture while playback is running:
 ```
-sox -v -b 32 -t alsa hw:CARD recorded.wav
+sox -V -b 32 -t alsa hw:CARD recorded.wav
 ```
 Make sure no clipping occurs while recording.
 
