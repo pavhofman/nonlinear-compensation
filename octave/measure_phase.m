@@ -1,7 +1,7 @@
 
 # at least 2 secs of recording, stereo or mono
 wavPath = "/home/hestia/tmp/octave/wavs/juli/recorded.wav";
-# 1 = right, 2 = left
+# 1 = left, 2 = right
 channel = 2;
 
 
