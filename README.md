@@ -1,4 +1,5 @@
 # Compensation of nonlinear sound card distortions for audio measurements
+WIP
 ## Generating and Configuring the Compensation Polynom:
 1. Record closed-loop stereo wav
 
