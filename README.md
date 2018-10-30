@@ -7,21 +7,21 @@ Start playback:
 ```
 sox -v -r 48000 -c 2 -n -b 32 -t alsa hw:CARD synth 1000000 sine 1k gain -3
 ```
-While playback is running start capture:
+Start capture while playback is running:
 ```
 sox -v -b 32 -t alsa hw:CARD recorded.wav
 ```
-Make sure no clipping while recording occurs.
+Make sure no clipping occurs while recording.
 
 2. Determine phase shift and check frequency
 * octave, script measure_phase.m 
-* put correct recorded wav path
-* output - phaseshift, offset, resp. precise frequency (at least 6 decimal points)
+* enter correct path to the recorded wav
+* output - phaseshift, offset, resp. precise frequency (at least to 6 decimal points)
 * check for both channels - should generate identical values
 
 3. Calculate compensation polynomial
 * octave, script gen_compen_polynom.m
-* put correct recorded wav path
+* enter correct path to the recorded wav
 * put measured phaseshift and offset, resp. precise frequency
 * adjust refGain value to fit reference first harmonic to recorded first harmonic + keep the linear gain (second polynomial coeff) < 1 to avoid clipping
 * output - polynomial coeffs - run for each channel
@@ -44,9 +44,9 @@ pcm.calibrated_in {
 
 The repository contains pre-compiled libasound.2.0.0 file (both amd64 and i386) for 
 * alsa-lib v. 1.0.27 (Ubuntu 14.04 and derivates)
-* alsa-lib v. 1.1.0 (Ubuntu 14.04 and derivates)
+* alsa-lib v. 1.1.0 (Ubuntu 16.04 and derivates)
 
-Just copy the library to /usr/lib/x86_64-linux-gnu (resp. i386-linux-gnu). You can check the patched version with
+Just copy the library to /usr/lib/x86_64-linux-gnu (i386-linux-gnu resp.). You can check the patched version with
 ```
 strings libasound.so.2.0.0 | grep poly
 polynom
