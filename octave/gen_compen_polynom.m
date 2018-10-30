@@ -20,6 +20,10 @@ wavPath = "/home/hestia/tmp/octave/wavs/juli/recorded.wav";
 # 1 = right, 2 = left
 channel = 1;
 
+
+# the polynomial will transform recorded to reference. Adjust gain of the generated reference sine to fit the recorded first harmonics.
+refGain = db2mag(-3.5);
+
 # calculating FFT + first 10 harmonics
 # return: peaks [ freq , power, angle ]
 function [peaks, x, y] = getHarmonics(samples, fs)
@@ -97,7 +101,7 @@ end
 t = 0:1/fs:length(recorded)/fs;
 t = t(1:length(recorded));
 
-refGain = db2mag(-2);
+
 reference = cos(2*pi * measfreq * t + phaseshift) * refGain;
 reference = reference';
 
