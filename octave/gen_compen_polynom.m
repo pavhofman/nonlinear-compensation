@@ -112,21 +112,3 @@ showFFT(recovered, "Recovered", 2, fs, plotsCnt);
 printf("Compensation Polynomial (copy to capture route 'polynom [ xx xx xx ...]'):\n");
 disp(fliplr(polyCoeff));
 return;
-
-
-#  arx identification
-xin = reference(1:100000);
-yout = recorded(1:100000);
-# TODO - this is incorrect, we need the other direction
-z=iddata(yout, xin, 1/48000);
-[sys, x0] = arx(z,"na", 5, "nb", 1);
-
-
-[yA,tA,xA] = lsim(sys,xin);
-plotOffset=1000;
-plot(yout(plotOffset+1:plotOffset+50),'k;measured output;',yA(plotOffset+1:plotOffset+50),'r;simulated output;')
-
-sys
-showFFT(yA(1000:end), "Model", 2, fs, plotsCnt);
-
-return;
