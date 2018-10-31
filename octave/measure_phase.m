@@ -1,5 +1,8 @@
 #!/usr/bin/octave -qf
 
+% load functions from a directory of this script
+addpath(fileparts(mfilename('fullpath')));
+
 arg_list = argv();
 
 if (length(arg_list) < 1)
