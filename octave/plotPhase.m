@@ -30,9 +30,9 @@ function plotPhase(recorded, fs, measfreq, refGain, phaseShift, ys, bins)
 
   % finding end of arrays
   samplesPlotted = 1000;
-  % just in case the final samples of the wav are garbled
-  offsetFromEnd = 1000;
-  endPos = length(recorded) - offsetFromEnd;
+  endPos = length(recorded);
+  % align to have a nice graph
+  endPos = endPos - mod(endPos, samplesPlotted);
   lowT = endPos - samplesPlotted;
   highT = endPos;
 

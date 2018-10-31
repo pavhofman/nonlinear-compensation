@@ -37,7 +37,7 @@ offset = 0.2 * fs;
 
 if columns(recorded) > 1
     % convert to mono
-    recorded = recorded(offset + 1:end, channel);
+    recorded = recorded(offset + 1:end - offset, channel);
 end
 
 % refGain:
