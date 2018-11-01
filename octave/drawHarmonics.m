@@ -1,8 +1,8 @@
-function drawHarmonics(x, y, label, plotID, plotsCnt)
+function drawHarmonics(x, y, label, plotID, plotsCnt, use_ylim = [-140 0])
   subplot(plotsCnt,1,plotID);
   semilogx(x, y, 'linewidth', 1.5, 'color', 'black');
   grid('on');
-  ylim([-180 0])
+  ylim(use_ylim)
   axis([900 10000]);
   xlabel('Frequency (Hz)', 'fontsize', 10);
   ylabel('Magnitude (dB)', 'fontsize', 10);

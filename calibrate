@@ -4,7 +4,7 @@ export AUDIODRIVER=alsa
 export AUDIODEV=hw:0,0
 
 RATE=96000
-FILE=cal-in.wav
+FILE=cal.wav
 VOL=${1:-0dB}
 POLYDEG=${2:-5}
 FREQ=${3:-1000}
@@ -26,8 +26,8 @@ C1=$(grep -c "^pcm.calibrated_in.ttable.0.0 {.*}" ~/.asoundrc) || { echo "Error:
 C2=$(grep -c "^pcm.calibrated_in.ttable.1.1 {.*}" ~/.asoundrc) || { echo "Error: missing ttable.1.1 line in .asoundrc" >&2; exit 1; }
 
 sed -i \
-	-e "/^pcm.calibrated_in.ttable.0.0 {.*}/s/ .*/ { $(cat cal-in.polycoeff1) }/" \
-	-e "/^pcm.calibrated_in.ttable.1.1 {.*}/s/ .*/ { $(cat cal-in.polycoeff2) }/" \
+	-e "/^pcm.calibrated_in.ttable.0.0 {.*}/s/ .*/ { $(cat ${FILE%.wav}.polycoeff1) }/" \
+	-e "/^pcm.calibrated_in.ttable.1.1 {.*}/s/ .*/ { $(cat ${FILE%.wav}.polycoeff2) }/" \
 	~/.asoundrc
 
 grep "^pcm.calibrated_in.ttable" ~/.asoundrc
