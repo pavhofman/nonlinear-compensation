@@ -6,7 +6,7 @@ addpath(fileparts(mfilename('fullpath')));
 arg_list = argv();
 
 if (length(arg_list) < 1)
-    printf('Usage: %s INPUT_FILE [channel:1|2] [frequency:1000]\n', program_name());
+    printf('Usage: %s INPUT_FILE [channel:1|2] [polydeg:5] [frequency:1000] [|q|w]\n', program_name());
     return
 end
 
@@ -14,17 +14,31 @@ end
 wavPath = arg_list{1};
 
 % 1 = left, 2 = right
-if (length(arg_list) > 1)
+if (length(arg_list) >= 2)
     channel = str2num(arg_list{2});
 else
     channel = 1;
 end
 
+% polynome degree
+if (length(arg_list) >= 3)
+    polyDeg = str2num(arg_list{3});
+else
+    polyDeg = 5;
+end
+
 % measured frequency (TODO - detect/adjust automatically by measuring relative phaseShift of reference and recorded at the end of recorded/reference)
-if (length(arg_list) > 2)
-    measfreq = str2num(arg_list{3});
+if (length(arg_list) >= 4)
+    measfreq = str2num(arg_list{4});
 else
     measfreq = 1000.0;
+end
+
+% show or not to show graphs
+if (length(arg_list) >= 5)
+    show = arg_list{5};
+else
+    show = '';
 end
 
 format long e;
@@ -51,7 +65,19 @@ t = 0:1/fs:length(recorded)/fs;
 t = t(1:length(recorded))';
 reference = cos(2*pi * measfreq * t + phaseShift) * refGain;
 
-polyCoeff = polyfit(recorded, reference, 5);
+polyCoeff = polyfit(recorded, reference, polyDeg);
+
+polyCoeffPath = regexprep(wavPath, '(.*).wav', strcat('$1.polycoeff', num2str(channel)));
+f = fopen(polyCoeffPath, 'w');
+fprintf(f, 'polynom [');
+fprintf(f, ' %e', fliplr(polyCoeff));
+fprintf(f, ' ]\n');
+fclose(f);
+
+if (show == 'q')
+    return;
+end
+
 plotsCnt = 2;
 showFFT(recorded, "Recorded", 1, fs, plotsCnt);
 
@@ -61,4 +87,7 @@ showFFT(recovered, "Recovered", 2, fs, plotsCnt);
 printf("Compensation Polynomial (copy to capture route 'polynom [ xx xx xx ...]'):\n");
 disp(fliplr(polyCoeff)');
 
-waitforbuttonpress();
+if (show == 'w')
+    waitforbuttonpress();
+end
+
