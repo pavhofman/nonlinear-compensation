@@ -1,0 +1,18 @@
+#!/bin/bash -eu
+
+export AUDIODRIVER=alsa
+export AUDIODEV=hw:0,0
+
+RATE=96000
+FILE=ver-in.wav
+VOL=${1:-0dB}
+FREQ=${2:-1000}
+LEN=${3:-15}
+
+if [[ "$LEN" != 0 ]]; then
+	pasuspender sleep $((LEN+3)) || err=$? &
+	AUDIODEV=calibrated_in sox -R -r $RATE -b 32 -c 2 -d "$FILE" trim 1 $LEN &
+	sleep 0.5
+	play -q -R -r $RATE -b 32 -n synth $((LEN+2)) sin $FREQ vol $VOL
+	wait
+fi
