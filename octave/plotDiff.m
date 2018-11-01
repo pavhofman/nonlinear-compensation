@@ -1,12 +1,7 @@
-function plotDiff(recorded, fs, measfreq, refGain, phaseShift, ys, bins, plotID, plotsCnt, name)
+function plotDiff(recorded, reference, fs, bins, plotID, plotsCnt, name)
   f = linspace(1, fs/2, bins);
 
   % plotting phase alignment of calculated reference sine and recorded at the end of the array
-
-  % generating the reference sine
-  t = 0:1/fs:length(recorded)/fs;
-  t = t(1:length(recorded))';
-  reference = cos(2*pi * measfreq * t + phaseShift)* refGain;
 
   % finding end of arrays
   samplesPlotted = 1000;

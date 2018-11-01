@@ -4,7 +4,7 @@ export AUDIODRIVER=alsa
 export AUDIODEV=hw:0,0
 
 RATE=96000
-FILE=ver-in.wav
+FILE=ver.wav
 VOL=${1:-0dB}
 FREQ=${2:-1000}
 LEN=${3:-15}
@@ -16,3 +16,6 @@ if [[ "$LEN" != 0 ]]; then
 	play -q -R -r $RATE -b 32 -n synth $((LEN+2)) sin $FREQ vol $VOL
 	wait
 fi
+
+octave/compareRecovery.m cal.wav ver.wav 1 p
+octave/compareRecovery.m cal.wav ver.wav 2 p
