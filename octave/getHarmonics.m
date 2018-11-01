@@ -2,7 +2,7 @@
 # return: peaks [ freq , power, angle ]
 function [peaks, x, y] = getHarmonics(samples, fs)
   # fft length (must be 2^n)
-  nfft = 2^16;
+  nfft = 2^17;
   
   data = samples(1:nfft);
   winlen = length(data);
