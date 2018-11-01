@@ -16,3 +16,5 @@ showFFTwithDiff('cal-in.wav', channel, 'Recorded', 1, 4);
 showFFTwithDiff('ver-in.wav', channel, 'Recovered', 3, 4);
 
 waitforbuttonpress();
+
+print(strcat('cmp-in', num2str(channel), '.pdf'))
