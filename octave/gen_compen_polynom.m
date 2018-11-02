@@ -42,17 +42,7 @@ else
 end
 
 format long e;
-[recorded, fs] = audioread(wavPath);
-
-% Offset must be large enough to skip samples from the first alsa period where some garbled data appears.
-% Alsa period size could be read precisely from /proc/asound/cardXXX/pcmXc/sub0/hw_params
-% Safe bet is 200ms.
-offset = 0.2 * fs;
-
-if columns(recorded) > 1
-    % convert to mono
-    recorded = recorded(offset + 1:end - offset, channel);
-end
+[recorded, fs] = audioreadAndCut(wavPath, channel);
 
 % refGain:
 %   the polynomial will transform recorded to reference. Adjust gain of the generated reference sine to fit the recorded first harmonics.
@@ -87,7 +77,4 @@ showFFT(recovered, "Recovered", 2, fs, plotsCnt);
 printf("Compensation Polynomial (copy to capture route 'polynom [ xx xx xx ...]'):\n");
 disp(fliplr(polyCoeff)');
 
-if (show == 'w')
-    waitforbuttonpress();
-end
-
+waitOrPrint(show, wavPath, '', channel);
