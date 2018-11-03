@@ -14,8 +14,7 @@ function plotDiff(signal, plotID, plotsCnt, name)
     (1:samplesPlotted), signal(1:samplesPlotted),
     (1:samplesPlotted), signal(lowT:highT)
   );
-  t = strcat(name, ' - Reference (difference)');
   ylabel (ax(1), "Begin");
   ylabel (ax(2), "End");
-  title(t);
+  title(name);
 endfunction
