@@ -13,6 +13,9 @@ end
 % at least 2 secs of recording, stereo or mono
 wavPath = arg_list{1};
 
+# or fixed path for GUI
+wavPath = "/home/pavel/recorded.wav";
+
 % 1 = left, 2 = right
 if (length(arg_list) >= 2)
     channel = str2num(arg_list{2});
@@ -34,12 +37,19 @@ else
     measfreq = 1000.0;
 end
 
-% show or not to show graphs
+% show or not to show charts
 if (length(arg_list) >= 5)
     show = arg_list{5};
 else
+    # no charts
     show = '';
 end
+
+if (show == 'q')
+  shortCharts = false;
+ else
+  showCharts = true;
+endif
 
 format long e;
 [recorded, fs] = audioread(wavPath);
@@ -59,11 +69,13 @@ end
 % phaseShift:
 %   polynomial can be generated only when the phase shift is correctly detected
 %   (i.e. only one peak, recorded and reference waveforms are at the end properly aligned!
-[refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq);
+[refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq, showCharts);
 
 t = 0:1/fs:length(recorded)/fs;
 t = t(1:length(recorded))';
 reference = cos(2*pi * measfreq * t + phaseShift) * refGain;
+
+
 
 polyCoeff = polyfit(recorded, reference, polyDeg);
 
@@ -90,4 +102,3 @@ disp(fliplr(polyCoeff)');
 if (show == 'w')
     waitforbuttonpress();
 end
-

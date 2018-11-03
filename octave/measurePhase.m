@@ -1,4 +1,4 @@
-function [refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq)
+function [refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq, showCharts)
   % For the phase detection to work precisely, fft must be applied to number of samples corresponding exctly to whole measfreq periods (to the sample)
   % Too many periods can result in imprecise phase detection due to instable fs lock. Just a few periods actually suffice.
 
@@ -20,4 +20,37 @@ function [refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq)
   [max_fft, index] =max(ys);
   refGain = abs(max_fft) / bins;
   phaseShift = angle(max_fft);
+  if (!showCharts)
+    return;
+  endif
+
+  # plotting abs(fft)
+  f = linspace(1, fs/2, bins);
+
+  subplot(2,1,1);
+  stem(f,abs(ys));
+  xlabel 'Frequency (Hz)';
+  ylabel '|y|';
+  grid;
+
+
+  # generating the reference sine
+  t = 0:1/fs:length(recorded)/fs;
+  t = t(1:length(recorded));
+  refGain = db2mag(-12);
+  reference = cos(2*pi * measfreq * t + phaseShift)* refGain;
+
+  # finding end of arrays
+  samplesPlotted = 100;
+  # just in case the final samples of the wav are garbled
+  offsetFromEnd = 100;
+  endPos = length(recorded) - offsetFromEnd;
+  lowT = endPos - samplesPlotted;
+  highT = endPos;
+
+  # the curves must be exactly phase-aligned!!!
+  subplot(2,1,2);
+  plot((lowT:highT), recorded(lowT:highT), "-", (lowT:highT), reference(lowT:highT), "*");
+  waitforbuttonpress();
+
 endfunction
