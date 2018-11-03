@@ -1,4 +1,4 @@
-function showFFT(series, label, plotID, fs, plotsCnt)
+function peaks = showFFT(series, label, plotID, fs, plotsCnt)
   [ peaks, x, y ] = getHarmonics(series, fs);
   drawHarmonics(x, y, label, plotID, plotsCnt);
 
