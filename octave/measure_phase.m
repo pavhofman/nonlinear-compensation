@@ -37,7 +37,7 @@ end
 format long;
 [recorded, fs] = audioreadAndCut(wavPath, channel);
 
-[refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq);
+[refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq, true);
 y = 20 * log10(refGain)
 phaseShift
 

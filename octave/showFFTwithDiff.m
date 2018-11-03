@@ -4,7 +4,7 @@ function showFFTwithDiff(wavPath, channel, label, plotID, plotsCnt)
 
     measfreq = 1000;
 
-    [refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq);
+    [refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq, true);
 
     % generating the reference sine
     t = 0:1/fs:length(recorded)/fs;
