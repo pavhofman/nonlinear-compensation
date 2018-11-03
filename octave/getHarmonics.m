@@ -1,9 +1,9 @@
-# calculating FFT + first 10 harmonics
-# return: peaks [ freq , power, angle ]
+% calculating FFT + first 10 harmonics
+% return: peaks [ freq , power, angle ]
 function [peaks, x, y] = getHarmonics(samples, fs)
-  # fft length (must be 2^n)
-  nfft = 2^17;
-  
+  % fft length - even number
+  nfft = min(floor(length(samples)/2) * 2, 2^17);
+
   data = samples(1:nfft);
   winlen = length(data);
   winfun = hanning(winlen);
@@ -13,6 +13,7 @@ function [peaks, x, y] = getHarmonics(samples, fs)
   nffto2 = nfft / 2;
   # fft normalization and window compensation
   y = abs(yf(1:nffto2)) / (nffto2 * mean(winfun));
+  y(y == 0) = 10^-10;
   # logarithmic y-axis
   y = 20 * log10(y);
   x = linspace(1, fs/2, nffto2);
