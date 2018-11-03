@@ -1,6 +1,4 @@
-function plotDiff(signal, fs, bins, plotID, plotsCnt, name)
-  f = linspace(1, fs/2, bins);
-
+function plotDiff(signal, plotID, plotsCnt, name)
   % plotting phase alignment of calculated reference sine and recorded at the end of the array
 
   % finding end of arrays

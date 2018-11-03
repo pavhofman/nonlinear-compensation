@@ -23,6 +23,6 @@ function showFFTwithDiff(wavPath, channel, label, plotID, plotsCnt)
     [ peaks, x, y ] = getHarmonics(recorded - reference, fs);
     drawHarmonics(x, y, label2, plotID, plotsCnt, [-140, -70]);
 
-    plotDiff(recorded - reference, fs, bins, plotID + 1, plotsCnt, label);
+    plotDiff(recorded - reference, plotID + 1, plotsCnt, label);
 
 endfunction
