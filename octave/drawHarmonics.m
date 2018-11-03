@@ -10,4 +10,10 @@ function drawHarmonics(x, y, label, plotID, plotsCnt, use_ylim = [-140 0])
   % change the tick labels of the graph from scientific notation to floating point:
   xt = get(gca,'XTick');
   set(gca,'XTickLabel', sprintf('%.0f|',xt))
+  addlistener(gca, 'xlim', @logXTickZoomHandler)
+endfunction
+
+function logXTickZoomHandler(h)
+  xt = get(h,'XTick');
+  set(h,'XTickLabel', sprintf('%4.0f|',xt))
 endfunction
