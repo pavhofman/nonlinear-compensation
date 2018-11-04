@@ -2,7 +2,7 @@ function [filtered] = filterHarmonic(signal, fs, fundamental, nharmonic, taps=50
     % more taps, better band rejection, but much more slower
     taps = 500;
     % filter computes output from previous outputs, drop early values
-    skip = 2 * taps;
+    skip = 3 * taps;
     % frequency in Hz to (0,1) range
     nf = fundamental / (fs / 2);
     % width of filter borders in Hz to (0,1) range
