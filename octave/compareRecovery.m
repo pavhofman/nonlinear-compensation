@@ -31,14 +31,5 @@ end
 showFFTwithDiff(recordedPath, channel, 'Recorded', 1, 4);
 showFFTwithDiff(recoveredPath, channel, 'Recovered', 3, 4);
 
-if (show == 'w')
-    waitforbuttonpress();
-end
-
-if (show == 'p')
-    [dir, name1, ext] = fileparts(recordedPath);
-    [dir, name2, ext] = fileparts(recoveredPath);
-
-    print(strcat(name1, '-', name2, '-ch', num2str(channel), '.pdf'))
-end
-
+[dir, name2, ext] = fileparts(recoveredPath);
+waitOrPrint(show, recordedPath, strcat('-', name2), channel);
