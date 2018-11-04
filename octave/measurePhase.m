@@ -37,7 +37,6 @@ function [refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq, 
   # generating the reference sine
   t = 0:1/fs:length(recorded)/fs;
   t = t(1:length(recorded));
-  refGain = db2mag(-12);
   reference = cos(2*pi * measfreq * t + phaseShift)* refGain;
 
   # finding end of arrays
