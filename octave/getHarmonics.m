@@ -23,7 +23,6 @@ function [peaks, x, y] = getHarmonics(samples, fs)
 
   % compute fft again with rectangle window
   data = samples(1:nfft);
-  length(data)
   yf = fft(data);
   nffto2 = nfft / 2;
   % fft normalization and window compensation
