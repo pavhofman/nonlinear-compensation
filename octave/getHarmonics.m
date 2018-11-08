@@ -24,34 +24,18 @@ function [peaks, x, y] = getHarmonics(samples, Fs, precise_amplitude = 0)
   end
   waudio = data .* winfun;
   yf = fft(waudio);
-  binwidth = Fs / nfft;
   nffto2 = (nfft / 2) + 1;
 
   x = double(Fs/2) * linspace(0, 1, nffto2);
-  y = 20 * log10(abs(yf(1:nffto2)) / (nffto2 * mean(winfun)));
-  [ymax, iymax] = max(y);
-  fundfreq = (iymax - 1) * binwidth;
-  peaks = [];
-  for nh = 1:floor(Fs/2/fundfreq)
-      i = (nh * (iymax - 1)) + 1;
-      hp = arg(yf(i)) * 180/pi;
-      if (nh > 1)
-          hp = mod(hp - fp, 360);
-      else
-          fp = hp;
-          hp = 0;
-      end
-      if (i + 1 < nffto2) && y(i) > -130 && (y(i - 1) < (y(i))) && ((y(i)) > y(i + 1))
-          peaks(nh, :) = [x(i), y(i), hp];
-      else
-          % do not report frequency if it is not a peak
-          if (i + 1 < nffto2)
-              nhy = [y(i-1),y(i),y(i+1)];
-          else
-              % skip y(nffto2) as it requires special weighting
-              nhy = [y(i-1)];
-          end
-          peaks(nh, :) = [0, max(nhy), hp];
-      end
-  end
+  yf = yf(1:nffto2) / (nffto2 * mean(winfun));
+  ya = abs(yf);
+  y = 20 * log10(ya);
+
+  peaks = findHarmonics(Fs, nfft, x, yf, ya);
+
+  disp(peaks);
+
+  peaks(:,2) = 20 * log10(peaks(:,2));
+  p1 = peaks(1,3);
+  peaks(:,3) = mod((peaks(:,3) - p1) * 180/pi, 360);
 endfunction
