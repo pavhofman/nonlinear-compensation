@@ -1,0 +1,8 @@
+#!/usr/bin/octave -qf
+
+wavPath = '/home/pavel/recorded.wav';
+
+channel = 1;
+
+# no charts
+showCharts = false;
