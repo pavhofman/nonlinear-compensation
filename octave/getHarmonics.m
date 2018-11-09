@@ -10,9 +10,9 @@
 % the most close to the expected frequency of the harmonics
 %
 % returns:
-%   peaks [ frequency , amplitude_in_dB, angle_in_degrees ]
+%   peaks [ frequency , amplitude_in_abs_value, angle_in_radians ]
 %   x - freqencies
-%   y - amplitudes_in_dB
+%   y - amplitudes_in_abs_value
 %
 function [peaks, x, y] = getHarmonics(samples, Fs, precise_amplitude = 0)
   nfft = Fs * floor(length(samples)/Fs);
@@ -29,13 +29,6 @@ function [peaks, x, y] = getHarmonics(samples, Fs, precise_amplitude = 0)
   x = double(Fs/2) * linspace(0, 1, nffto2);
   yf = yf(1:nffto2) / (nffto2 * mean(winfun));
   ya = abs(yf);
-  y = 20 * log10(ya);
 
-  peaks = findHarmonics(Fs, nfft, x, yf, ya);
-
-  disp(peaks);
-
-  peaks(:,2) = 20 * log10(peaks(:,2));
-  p1 = peaks(1,3);
-  peaks(:,3) = mod((peaks(:,3) - p1) * 180/pi, 360);
+  peaks = findHarmonicsFromFFT(Fs, nfft, x, yf, ya);
 endfunction

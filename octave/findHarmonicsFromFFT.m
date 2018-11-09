@@ -12,9 +12,9 @@
 %   ya - absolute value of yf (optional)
 %
 % returns:
-%   peaks [ frequency , amplitude_in_mag, angle_in_radians ]
+%   peaks [ frequency , amplitude_in_absolute_values, angle_in_radians ]
 %
-function [peaks] = findHarmonics(Fs, nfft, x, yc, y=abs(yc))
+function [peaks] = findHarmonicsFromFFT(Fs, nfft, x, yc, y=abs(yc))
   binwidth = Fs / nfft;
   nffto2 = length(y);
   [ymax, iymax] = max(y);

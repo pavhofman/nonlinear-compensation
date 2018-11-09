@@ -156,7 +156,7 @@ while(ishandle(fftFigure) || ishandle(timeFigure) || ishandle(infoFigure))
         end
         if ishandle(infoFigure)
             for i=1:length(chanList)
-                peaks = findHarmonics(Fs, winlen, fftXAxisData, yc(i,:), y(i,:));
+                peaks = findHarmonicsFromFFT(Fs, winlen, fftXAxisData, yc(i,:), y(i,:));
                 peaks2 = [ peaks(:,1), 20 * log10(peaks(:,2)), peaks(:,3) * 180/pi ];
                 set(infoText(i), 'String', sprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', peaks2'));
             end
