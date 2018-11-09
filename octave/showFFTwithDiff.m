@@ -9,7 +9,7 @@ function showFFTwithDiff(wavPath, channel, label, plotID, plotsCnt)
     [ peaks, x, y ] = getHarmonics(recorded, fs);
 
     fprintf([label ':\n']);
-    fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', peaks');
+    fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', convertPeaksToPrintable(peaks)');
 
     label2 = cstrcat(label, ' (fundamental ~',
         num2str(peaks(1,1), '%.2f'), ' kHz, ',

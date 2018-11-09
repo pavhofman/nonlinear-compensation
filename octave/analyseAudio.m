@@ -41,21 +41,16 @@ end
 [ peaks, x, y ] = getHarmonics(recorded, fs);
 
 fprintf(['Signal:\n']);
-fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', peaks');
-
-label2 = cstrcat('Signal with filterred fundamental (fundamental ~',
-    num2str(peaks(1,1), '%.2f'), ' kHz, ',
-    num2str(peaks(1,2), '%.2f'), ' dB)');
+fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', convertPeaksToPrintable(peaks)');
 
 plotsCnt = 5;
 
+drawHarmonics(x, y, 'Signal', 1, plotsCnt, [-150, -70]);
+
 reference = getReferenceSignal(recorded, fs, measfreq);
+
 diff = recorded - reference;
-
-[ peaks, x, y ] = getHarmonics(diff, fs);
-drawHarmonics(x, y, label2, 1, plotsCnt, [-150, -70]);
-
-plotDiff(diff, 2, plotsCnt, label2);
+plotDiff(diff, 2, plotsCnt, 'difference from the reference');
 
 h1 = filterHarmonic(diff, fs, measfreq, 1);
 plotDiff(h1, 3, plotsCnt, 'fundamental residual');

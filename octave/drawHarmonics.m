@@ -1,4 +1,5 @@
 function drawHarmonics(x, y, label, plotID, plotsCnt, use_ylim = [-150 0])
+  y = 20 * log10(y);
   subplot(plotsCnt,1,plotID);
   % semilogx requires values > 0
   x(x == 0) = 10^-10;

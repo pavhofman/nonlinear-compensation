@@ -54,7 +54,7 @@ end
 
 % TODO implement phase alignment
 
-signalPath = sprintf('signal_%dHz%s.wav', fundfreq, fn);
+signalPath = sprintf('signal-dist_%dHz%s.wav', fundfreq, fn);
 audiowrite(signalPath, real(signal), fs, 'BitsPerSample', 32);
 
 
@@ -62,7 +62,7 @@ audiowrite(signalPath, real(signal), fs, 'BitsPerSample', 32);
 
 [ peaks, x, y ] = getHarmonics(signal, fs);
 fprintf(['Signal:\n']);
-fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', peaks');
+fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', convertPeaksToPrintable(peaks)');
 
 plotsCnt = 2;
 
@@ -80,7 +80,7 @@ signal2 = filter(a, b, signal);
 
 [ peaks, x, y ] = getHarmonics(signal2, fs);
 fprintf(['Signal:\n']);
-fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', peaks');
+fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', convertPeaksToPrintable(peaks)');
 
 h2 = filterHarmonic(signal2, fs, fundfreq, 2);
 plotDiff(h2, 2, plotsCnt, '2nd harmonic aligned');
