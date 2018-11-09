@@ -7,7 +7,7 @@ else
   [ wavPath, channel, showCharts ] = loadCalibArgv(argv());
 endif
   
-load 'cal.dat' calRec;
+load(calFile);
 
 peaks = calRec.peaks;
 disp(convertPeaksToPrintable(peaks));
