@@ -14,8 +14,8 @@
 %   x - freqencies
 %   y - amplitudes_in_abs_value
 %
-function [peaks, x, y] = getHarmonics(samples, Fs, precise_amplitude = 0)
-  nfft = Fs * floor(length(samples)/Fs);
+function [peaks, x, yf] = getHarmonics(samples, Fs, precise_amplitude = 0)
+   nfft = Fs * floor(length(samples)/Fs);
   data = samples(1:nfft);
   if precise_amplitude == 0
       winfun = flattopwin(length(data));
