@@ -14,21 +14,27 @@
 %   x - freqencies
 %   y - amplitudes_in_abs_value
 %
-function [peaks, x, yf] = getHarmonics(samples, Fs, precise_amplitude = 0)
-   nfft = Fs * floor(length(samples)/Fs);
+function [peaks, x, ya] = getHarmonics(samples, Fs, window_name = 'hanning')
+  nfft = Fs * floor(length(samples)/Fs);
   data = samples(1:nfft);
-  if precise_amplitude == 0
-      winfun = flattopwin(length(data));
-  else
-      winfun = hanning(length(data));
-  end
-  waudio = data .* winfun;
-  yf = fft(waudio);
+  switch (window_name)
+      case { 'rect', 'rectangular' }
+          winweight = 1;
+      case { 'hann', 'hanning' }
+          winfun = hanning(length(data));
+          winweight = mean(winfun);
+          data = data .* winfun;
+      case { 'flattop' }
+          winfun = flattopwin(length(data));
+          winweight = mean(winfun);
+          data = data .* winfun;
+      otherwise
+          error(sprintf('unknown window %s\n', window_name));
+  endswitch
+  yf = fft(data);
   nffto2 = (nfft / 2) + 1;
-
   x = double(Fs/2) * linspace(0, 1, nffto2);
-  yf = yf(1:nffto2) / (nffto2 * mean(winfun));
-  ya = abs(yf);
-
-  peaks = findHarmonicsFromFFT(Fs, nfft, x, yf, ya);
+  yf = yf(1:nffto2) / (nffto2 * winweight);
+  y = abs(yf);
+  peaks = findHarmonicsFromFFT(Fs, nfft, x, yf, y);
 endfunction

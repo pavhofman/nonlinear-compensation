@@ -17,14 +17,18 @@
 function [peaks] = findHarmonicsFromFFT(Fs, nfft, x, yc, y=abs(yc))
   binwidth = Fs / nfft;
   nffto2 = length(y);
-  [ymax, iymax] = max(y);
-  fundfreq = (iymax - 1) * binwidth;
-  peaks = [];
-  if fundfreq < 1
+  % skip frequencies under 10Hz
+  skip_bins = ceil(10 / binwidth);
+  [ymax, iymax] = max(y(skip_bins:end));
+  peaks = [0, 0, 0];
+  if iymax < 1
       return
   end
-  for nh = 1:floor(Fs/2/fundfreq)
-      i = (nh * (iymax - 1)) + 1;
+  fundfreq = (skip_bins + iymax - 1) * binwidth;
+  % find at most 20 harmonics
+  lasth = min(20, floor(Fs/2/fundfreq));
+  for nh = 1:lasth
+      i = (nh * (skip_bins + iymax - 1)) + 1;
       hp = arg(yc(i));
       if (i + 1 < nffto2) && y(i) > -130 && (y(i - 1) < (y(i))) && ((y(i)) > y(i + 1))
           peaks(nh, :) = [x(i), y(i), hp];
