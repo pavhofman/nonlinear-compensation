@@ -15,5 +15,15 @@ peaks = getHarmonics(samples, fs);
 
 format short;
 disp(convertPeaksToPrintable(peaks));
-% WIP
-return;
+
+calRec.time = time();
+calRec.direction = 'capture';
+calRec.device = wavPath;
+calRec.channel = channel;
+calRec.freq = peaks(1,1);
+calRec.level = peaks(1,2);
+calRec.peaks = peaks(1:10,:);
+
+disp(calRec);
+
+save(calFile, "calRec");

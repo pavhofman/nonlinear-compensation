@@ -6,3 +6,5 @@ channel = 1;
 
 # no charts
 showCharts = false;
+
+calFile = 'cal.dat';
