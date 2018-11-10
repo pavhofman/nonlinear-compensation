@@ -10,23 +10,29 @@
 %   x - (non-negative) frequencies
 %   yc - complex DFT value of (non-negative) frequencies
 %   ya - absolute value of yf (optional)
+%   fundFreq - frequency of fundamental to search harmonics for
+%       (0 for autodetect)
 %
 % returns:
 %   peaks [ frequency , amplitude_in_absolute_values, angle_in_radians ]
 %
-function [peaks] = findHarmonicsFromFFT(Fs, nfft, x, yc, fuzzy=0, y=abs(yc))
+function [peaks] = findHarmonicsFromFFT(Fs, nfft, x, yc, fuzzy=0, y=abs(yc), fundFreq=0)
   binwidth = Fs / nfft;
   nffto2 = length(y);
   % skip frequencies under 10Hz
   skip_bins = ceil(10 / binwidth);
-  [ymax, iymax] = max(y(skip_bins:end));
-  peaks = [0, 0, 0];
-  if iymax < 1
-      return
+  if fundFreq == 0
+      [ymax, iymax] = max(y(skip_bins:end));
+      peaks = [0, 0, 0];
+      if iymax < 1
+          return
+      end
+      fundFreq = (skip_bins + iymax - 2) * binwidth;
+  else
+      iymax = round((fundFreq / binwidth) + 2 - skip_bins);
   end
-  fundfreq = (skip_bins + iymax - 2) * binwidth;
   % find at most 20 harmonics
-  lasth = min(20, floor(Fs/2/fundfreq));
+  lasth = min(20, floor(Fs/2/fundFreq));
   for nh = 1:lasth
       i = (nh * (skip_bins + iymax - 2)) + 1;
       hp = arg(yc(i));

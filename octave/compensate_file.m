@@ -33,11 +33,11 @@ recorded = recorded(lowerLimit:lowerLimit + cnt - 1);
 refFragment = genCompenReference(peaks(1:10, :), phase, ampl, fs, periodLength);
 reference = repmat(refFragment, periods, 1);
 
-showFFT(reference, "Reference", 1, fs, 2);
+showFFT(reference, "Reference", 1, fs, 2, measfreq);
 
 
 
-showFFT(recorded + reference, "Recovered", 2, fs, 2);
+showFFT(recorded + reference, "Recovered", 2, fs, 2, measfreq);
 
 
 

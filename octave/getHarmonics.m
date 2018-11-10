@@ -14,7 +14,7 @@
 %   x - freqencies
 %   y - amplitudes_in_abs_value
 %
-function [peaks, x, y] = getHarmonics(samples, Fs, window_name = 'hanning', fuzzy = 0)
+function [peaks, x, y] = getHarmonics(samples, Fs, window_name = 'hanning', fuzzy = 0, fundFreq=0)
   nfft = Fs * floor(length(samples)/Fs);
   data = samples(1:nfft);
   switch (window_name)
@@ -36,5 +36,5 @@ function [peaks, x, y] = getHarmonics(samples, Fs, window_name = 'hanning', fuzz
   x = double(Fs/2) * linspace(0, 1, nffto2);
   yf = yf(1:nffto2) / (nffto2 * winweight);
   y = abs(yf);
-  peaks = findHarmonicsFromFFT(Fs, nfft, x, yf, fuzzy, y);
+  peaks = findHarmonicsFromFFT(Fs, nfft, x, yf, fuzzy, y, fundFreq);
 endfunction
