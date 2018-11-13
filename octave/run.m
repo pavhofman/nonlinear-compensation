@@ -112,11 +112,12 @@ while(true)
     if (result == 1)
       % finished
       % from now on only compensation
-      status = COMPENSATING;
+      % status = COMPENSATING;
+      % or could start new analysis right away
+      status = bitor(COMPENSATING, ANALYSING);
+
       % next buffer length must match compenReference - the two vectors are added!
       readCnt = length(compenReference);
-      % or could start new analysis right away
-      % status = COMPENSATING | ANALYSING;
     endif
   endif
   
