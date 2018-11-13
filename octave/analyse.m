@@ -1,7 +1,10 @@
 function [compenReference, result] = analyse(buffer, fs, restart)
   persistent analysisBuffer = [];
-  global calRec;
-  global periodLength;
+  persistent peaks = [];
+  persistent measfreq = 0;
+  persistent periodLength = 0;
+  persistent calRec = struct;
+  
   
   if (restart)
     analysisBuffer = [];
@@ -9,8 +12,8 @@ function [compenReference, result] = analyse(buffer, fs, restart)
 
   if (isempty(analysisBuffer))
     % first run
-    global calFile;    
-    % loading calRec
+    global calFile;
+    % loading calRec, initialising persistent vars
     load(calFile);
     peaks = calRec.peaks;
     printf('Peaks read from calibration file:\n');

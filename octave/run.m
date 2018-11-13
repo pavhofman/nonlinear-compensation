@@ -27,11 +27,6 @@ COMPENSATING = 8;
 cmd = PAUSE;
 
 
-% global variables in functions
-
-global calRec = struct;
-global periodLength = 0;
-% end global vars
 
 compHarmonics = [];
 compenReference = [];
