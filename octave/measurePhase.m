@@ -5,10 +5,14 @@ function [refGain, phaseShift, ys, bins] = measurePhase(recorded, fs, measfreq, 
   % Warning - 44100Hz FS requires multiples of 10 for measfreq = 1kHz (10 * 44100/1000  => integer )
 
   % number of measfreq periods for phase detection
-  periods = 10;
+  % max 10 or whatever fits recorded
+  
+  periodLength = uint32(fs/measfreq);
+  
+  periods = min(10, floor(length(recorded)/periodLength));
 
-  samplesInPeriods = periods * uint32(fs/measfreq);
-  x = recorded(1:samplesInPeriods);
+  totalSamples = periods * periodLength;
+  x = recorded(1:totalSamples);
 
   ys = fft(x);
   ys = fftshift(ys);
