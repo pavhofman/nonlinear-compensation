@@ -43,7 +43,7 @@ readCnt = -1;
 
 while(true)
   % checking command file for new commands
-  if (exist(cmdFile))
+  if (exist(cmdFile, 'file'))
     cmd = textread(cmdFile, '%s');
     delete(cmdFile);
   endif;
