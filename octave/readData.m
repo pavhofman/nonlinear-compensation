@@ -8,6 +8,7 @@ function [ buffer, fs] = readData(cnt, fs, restart)
   
   if (restart)
     allSamples = [];
+    readPtr = 1;
   endif
 
   if (isempty(allSamples))
@@ -29,7 +30,7 @@ function [ buffer, fs] = readData(cnt, fs, restart)
     % works only for cnt < length(allSamples)!
     % crossing boundary, repetition
     newPtr -= length(allSamples);
-    buffer = [allSamples(readPtr:end), allSamples(1:newPtr)];
+    buffer = [allSamples(readPtr:end); allSamples(1:newPtr)];
   endif
   readPtr = newPtr + 1;
   
