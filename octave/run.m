@@ -36,6 +36,7 @@ fs = 0;
 restartReading = true;
 restartCal = true;
 restartAnalysis = true;
+restartWriting = true;
 
 % at first we do not know how many samples to read. readData will determine
 readCnt = -1;
@@ -92,7 +93,8 @@ while(true)
     endif
   endif
   % not stopped, always writing
-  writeData(buffer);
+  writeData(buffer, fs, restartWriting);
+  restartWriting = false;
   
   
   % do additional processing - calibration or analysis
