@@ -30,6 +30,7 @@ cmd = PAUSE;
 
 compHarmonics = [];
 compenReference = [];
+compenPos = 1;
 fs = 0;
 
 % first run -> restart
@@ -86,11 +87,20 @@ while(true)
   readCnt = length(buffer);
   if (bitand(status, COMPENSATING))
     % compensation running
-    if (length(buffer) == length(compenReference))
-      buffer = buffer + compenReference;
-    else
-      printf("WARN: buffer length differes from compHarmonics: %d vs. %d", length(buffer), length(compHarmonics));
-    endif
+    bufLen = length(buffer) + 1;
+    compenLen = length(compenReference) + 1;
+    bufPos = 1;
+    while bufPos < bufLen
+        bufRem = bufLen - bufPos;
+        compenRem = compenLen - compenPos;
+        step = min(bufRem, compenRem);
+        buffer(bufPos:bufPos+step-1) += compenReference(compenPos:compenPos+step-1);
+        bufPos += step;
+        compenPos += step;
+        if step == compenRem
+            compenPos = 1;
+        end
+    endwhile
   endif
   % not stopped, always writing
   writeData(buffer, fs, restartWriting);
@@ -108,6 +118,7 @@ while(true)
     endif 
   elseif (bitand(status, ANALYSING))
     [compenReference, result] = analyse(buffer, fs, restartAnalysis);
+    compenPos = 1;
     restartAnalysis = false;
     if (result == 1)
       % finished
@@ -115,9 +126,6 @@ while(true)
       % status = COMPENSATING;
       % or could start new analysis right away
       status = bitor(COMPENSATING, ANALYSING);
-
-      % next buffer length must match compenReference - the two vectors are added!
-      readCnt = length(compenReference);
     endif
   endif
   
