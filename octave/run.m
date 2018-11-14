@@ -98,9 +98,9 @@ while(true)
   restartReading = false;
   readCnt = length(buffer);
   
-  if (bitand(status, DISTORTING))
+  if (bitand(status, DISTORTING) && (bitand(status, PASSING) || bitand(status, COMPENSATING)))
     % introduce distortion to buffer
-    buffer = polyval(distortPolynom, buffer);
+    buffer = polyval(distortPol, buffer);
   endif
   
   if (bitand(status, COMPENSATING))
@@ -141,9 +141,9 @@ while(true)
     if (result == 1)
       % finished
       % from now on only compensation
-      status = COMPENSATING;
-      % or could start new analysis right away
-      % status = bitor(COMPENSATING, ANALYSING);
+      %status = COMPENSATING;
+      % or could start new analysis right away + keeping DISTORTING flag
+      status = bitor(bitor(COMPENSATING, ANALYSING), bitand(status, DISTORTING));
     endif
   endif
   
