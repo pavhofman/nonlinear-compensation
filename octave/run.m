@@ -4,6 +4,10 @@
 % we cannot call 'clear all' since it clears all funcions => also all breakpoints in funcions
 clear;
 
+pkg load miscellaneous;
+pkg load control;
+
+
 addpath(fileparts(mfilename('fullpath')));
 
 source 'config.m';
@@ -13,6 +17,7 @@ PAUSE = 'pause';
 CALIBRATE = 'cal';
 COMPENSATE = 'comp';
 PASS = 'pass';
+DISTORT = 'distort';
 NO_CMD = '';
 
 % bits for statuses
@@ -21,6 +26,7 @@ PASSING = 1;
 CALIBRATING = 2;
 ANALYSING = 4;
 COMPENSATING = 8;
+DISTORTING = 16;
 
 
 % default initial command
@@ -64,9 +70,15 @@ while(true)
       % start/restart analysis
       status = ANALYSING;
       restartAnalysis = true;
-      
-    elseif (strcmp(cmd, PASS) && status != PASSING)
+    
+    % distortion allowed only for status PASSING and COMPENSATING
+    elseif (strcmp(cmd, DISTORT) && (bitand(status, PASSING) || bitand(status, COMPENSATING)))
+      % enable distortion
+      status = bitor(status, DISTORTING);
+
+    elseif (strcmp(cmd, PASS))
       status = PASSING;
+
     endif
     % clear new command
     cmd = NO_CMD;
@@ -85,6 +97,12 @@ while(true)
   [buffer, fs] = readData(readCnt, fs, restartReading);
   restartReading = false;
   readCnt = length(buffer);
+  
+  if (bitand(status, DISTORTING))
+    % introduce distortion to buffer
+    buffer = polyval(distortPolynom, buffer);
+  endif
+  
   if (bitand(status, COMPENSATING))
     % compensation running
     bufLen = length(buffer) + 1;
@@ -123,9 +141,9 @@ while(true)
     if (result == 1)
       % finished
       % from now on only compensation
-      % status = COMPENSATING;
+      status = COMPENSATING;
       % or could start new analysis right away
-      status = bitor(COMPENSATING, ANALYSING);
+      % status = bitor(COMPENSATING, ANALYSING);
     endif
   endif
   
