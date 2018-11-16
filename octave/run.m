@@ -57,35 +57,11 @@ while(true)
 
   % process new command if any
   if (!strcmp(cmd, NO_CMD))
-    if (strcmp(cmd, PAUSE))
-      status = PAUSED;
-      
-    elseif (strcmp(cmd, CALIBRATE))    
-      % start/restart calibration
-      status = CALIBRATING;
-      % clearing calibration buffer
-      restartCal = true;
-
-    elseif (strcmp(cmd, COMPENSATE))
-      % start/restart analysis
-      status = ANALYSING;
-      restartAnalysis = true;
-    
-    % distortion allowed only for status PASSING and COMPENSATING
-    elseif (strcmp(cmd, DISTORT) && (bitand(status, PASSING) || bitand(status, COMPENSATING)))
-      % enable distortion
-      status = bitor(status, DISTORTING);
-
-    elseif (strcmp(cmd, PASS))
-      status = PASSING;
-
-    endif
-    % clear new command
-    cmd = NO_CMD;
+    source 'run_process_cmd.m';  
   endif
 
   printf('Status: %d\n', status);
-  
+
   if (status == PAUSED)
     % no reading/writing
     pause(0.5);
@@ -99,27 +75,13 @@ while(true)
   readCnt = length(buffer);
   
   if (bitand(status, DISTORTING) && (bitand(status, PASSING) || bitand(status, COMPENSATING)))
-    % introduce distortion to buffer
-    buffer = polyval(distortPol, buffer);
+    source 'run_distortion.m';
   endif
   
   if (bitand(status, COMPENSATING))
-    % compensation running
-    bufLen = length(buffer) + 1;
-    compenLen = length(compenReference) + 1;
-    bufPos = 1;
-    while bufPos < bufLen
-        bufRem = bufLen - bufPos;
-        compenRem = compenLen - compenPos;
-        step = min(bufRem, compenRem);
-        buffer(bufPos:bufPos+step-1) += compenReference(compenPos:compenPos+step-1);
-        bufPos += step;
-        compenPos += step;
-        if step == compenRem
-            compenPos = 1;
-        end
-    endwhile
+    source 'run_compensation.m';
   endif
+  
   % not stopped, always writing
   writeData(buffer, fs, restartWriting);
   restartWriting = false;
@@ -127,24 +89,9 @@ while(true)
   
   % do additional processing - calibration or analysis
   if (status == CALIBRATING)
-    result = calibrate(buffer, fs, restartCal);
-    restartCal = false;
-    if (result == 1)
-      % finished
-      % request compensation
-      cmd = COMPENSATE;
-    endif 
+    source 'run_calibration.m';    
   elseif (bitand(status, ANALYSING))
-    [compenReference, result] = analyse(buffer, fs, restartAnalysis);
-    compenPos = 1;
-    restartAnalysis = false;
-    if (result == 1)
-      % finished
-      % from now on only compensation
-      %status = COMPENSATING;
-      % or could start new analysis right away + keeping DISTORTING flag
-      status = bitor(bitor(COMPENSATING, ANALYSING), bitand(status, DISTORTING));
-    endif
+    source 'run_analysis.m';
   endif
   
   
