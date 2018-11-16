@@ -14,7 +14,7 @@ function result = calibrate(buffer, fs, restart)
     result = 0;
   else
     % enough data, copying only up to calibrationSize data
-    calBuffer = [calBuffer; buffer(1:calibrationSize - currentSize)];
+    calBuffer = [calBuffer; buffer(1:calibrationSize - currentSize, :)];
     global wavPath;
     global channel;
 
@@ -34,9 +34,8 @@ function result = doCalibrate(calBuffer, fs)
   calRec.direction = 'capture';
   calRec.device = wavPath;
   calRec.channel = channel;
-  calRec.freq = peaks(1,1);
-  calRec.level = peaks(1,2);
-  calRec.peaks = peaks(1:10,:);
+  % first ten frequencies
+  calRec.peaks = peaks(1:10, :, :);
 
   disp(calRec);
   save(calFile, 'calRec');

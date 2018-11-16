@@ -3,6 +3,7 @@
 %global wavPath = '/home/hestia/recorded.wav';
 global wavPath = '/home/pavel/recorded.wav';
 
+% specific channel number or -1 = all channels in input
 global channel = 2;
 
 # no charts

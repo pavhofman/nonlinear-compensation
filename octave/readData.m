@@ -25,12 +25,12 @@ function [ buffer, fs] = readData(cnt, fs, restart)
   newPtr = readPtr + cnt - 1;
   if (newPtr <= length(allSamples))
     % no repetition
-    buffer = allSamples(readPtr:newPtr);
+    buffer = allSamples(readPtr:newPtr, :);
   else
     % works only for cnt < length(allSamples)!
     % crossing boundary, repetition
     newPtr -= length(allSamples);
-    buffer = [allSamples(readPtr:end); allSamples(1:newPtr)];
+    buffer = [allSamples(readPtr:end, :); allSamples(1:newPtr, :)];
   endif
   readPtr = newPtr + 1;
   
@@ -51,7 +51,7 @@ endfunction
 function [samples, fs] = loadSamples(wavPath, channel)
     [recorded, fs] = audioreadAndCut(wavPath, channel);
     limit = floor(length(recorded)/fs) * fs;
-    samples = recorded(1:limit);
+    samples = recorded(1:limit, :);
     tic();
 endfunction
 

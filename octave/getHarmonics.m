@@ -16,25 +16,31 @@
 %
 function [peaks, x, y] = getHarmonics(samples, Fs, window_name = 'hanning', fuzzy = 0, fundFreq=0)
   nfft = Fs * floor(length(samples)/Fs);
-  data = samples(1:nfft);
+  data = samples(1:nfft, :);
   switch (window_name)
       case { 'rect', 'rectangular' }
           winweight = 1;
       case { 'hann', 'hanning' }
-          winfun = hanning(length(data));
-          winweight = mean(winfun);
-          data = data .* winfun;
+          [data, winweight] = applyWindow(data, hanning(length(data)));
       case { 'flattop' }
-          winfun = flattopwin(length(data));
-          winweight = mean(winfun);
-          data = data .* winfun;
+          [data, winweight] = applyWindow(data, flattopwin(length(data)));
       otherwise
           error(sprintf('unknown window %s\n', window_name));
   endswitch
   yf = fft(data);
   nffto2 = (nfft / 2) + 1;
   x = double(Fs/2) * linspace(0, 1, nffto2);
-  yf = yf(1:nffto2) / (nffto2 * winweight);
+  yf = yf(1:nffto2, :) / (nffto2 * winweight);
   y = abs(yf);
-  peaks = findHarmonicsFromFFT(Fs, nfft, x, yf, fuzzy, y, fundFreq);
+  peaks = [];
+  for i = 1:columns(yf)
+    columnPeaks = findHarmonicsFromFFT(Fs, nfft, x, yf(:, i), fuzzy, y(:, i), fundFreq);
+    peaks(:, :, i) = columnPeaks;
+  endfor
+endfunction
+
+function [out, winweight] = applyWindow(in, winfun)
+  winfun = repmat(winfun, 1, columns(in));
+  out = in .* winfun;
+  winweight = mean(winfun)(1);
 endfunction

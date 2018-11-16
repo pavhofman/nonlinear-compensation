@@ -10,7 +10,7 @@ endif
 
 [recorded, fs] = audioreadAndCut(wavPath, channel);
 
-samples = recorded(1:fs);
+samples = recorded(1:fs, :);
 peaks = getHarmonics(samples, fs);
 
 format short;

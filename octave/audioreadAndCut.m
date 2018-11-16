@@ -6,11 +6,11 @@ function [audiodata, fs] = audioreadAndCut(wavPath, channel=1, cutFs=0.2);
 
     offset = cutFs * fs;
 
-    if columns(audiodata) > 1
+    if columns(audiodata) > 1 && channel > 0
         % convert to mono and cut
         audiodata = audiodata(offset + 1:end - offset, channel);
     else
         % cut
-        audiodata = audiodata(offset + 1:end - offset);
+        audiodata = audiodata(offset + 1:end - offset, :);
     end
 endfunction

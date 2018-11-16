@@ -13,9 +13,9 @@ function writeData(buffer, fs, restart)
   l = length(writeBuffer);
   if (l >= fs)
     % update FFT figure
-    showFFTFigure(writeBuffer(1:fs), fs)
+    showFFTFigure(writeBuffer(1:fs, :), fs)
     if l >= fs+1
-        writeBuffer = writeBuffer(fs+1:end);
+        writeBuffer = writeBuffer(fs+1:end, :);
     else
         writeBuffer = [];
     end
