@@ -75,7 +75,6 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
       compenReference = [];
       for i = 1:columns(buffer)
         % finding phase
-        % NOTE - length of returned compenReference determines length of buffer read for compensation. 
         % All the figures are aligned to full periods. We must measure the phase for end of analysisBuffer 
         % because next read buffer will continue after the last sample in analysisBuffer
         %
