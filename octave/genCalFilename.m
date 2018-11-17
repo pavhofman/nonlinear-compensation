@@ -1,5 +1,5 @@
-% result: calDir/cal_freq1_freq2_device.dat
-function filename = genCalFilename(freqs)
+% result: calDir/cal_freq1_freq2_FS48000_device.dat
+function filename = genCalFilename(freqs, fs)
   global calDir;
   global deviceName;
   
@@ -9,5 +9,5 @@ function filename = genCalFilename(freqs)
     freqsPart = [freqsPart,  int2str(floor(freqs(i))), '_'];
   endfor
   
-  filename = [calDir filesep() 'cal_' freqsPart deviceName '.dat'];
+  filename = [calDir filesep() 'cal_' freqsPart 'FS' int2str(fs) '_' deviceName '.dat'];
 endfunction

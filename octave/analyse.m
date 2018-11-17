@@ -48,7 +48,7 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
   if (freqs(1) > 0)
     if (restartAnalysis || rereadCalFile)
       % re-reading cal file
-      calFile = genCalFilename(freqs);
+      calFile = genCalFilename(freqs, fs);
       % loading calRec, initialising persistent vars
       load(calFile);
       peaks = calRec.peaks;

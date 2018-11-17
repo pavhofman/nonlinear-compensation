@@ -43,7 +43,7 @@ function [ freqs, result] = doCalibrate(calBuffer, fs)
   % for now only single frequency
   freqs = peaks(1, 1, 1);
 
-  calFile = genCalFilename(freqs);
+  calFile = genCalFilename(freqs, fs);
   save(calFile, 'calRec');
   result = 1;
 endfunction
