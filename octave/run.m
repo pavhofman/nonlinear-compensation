@@ -44,7 +44,7 @@ restartReading = true;
 restartCal = true;
 restartAnalysis = true;
 restartWriting = true;
-% unknown frequencies - measured by calibration
+% unknown frequencies - measured by calibration or by determineFundamentalFreqs() in analysis
 freqs = -1;
 
 % at first we do not know how many samples to read. readData will determine

@@ -1,4 +1,4 @@
-[compenReference, result] = analyse(buffer, fs, freqs, restartAnalysis);
+[compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAnalysis);
 compenPos = 1;
 restartAnalysis = false;
 if (result == 1)
