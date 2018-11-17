@@ -44,9 +44,16 @@ restartReading = true;
 restartCal = true;
 restartAnalysis = true;
 restartWriting = true;
+% unknown frequencies - measured by calibration
+freqs = -1;
 
 % at first we do not know how many samples to read. readData will determine
 readCnt = -1;
+
+% TODO - specific for files only now
+[wavDir, wavName, wavExt] = fileparts(wavPath);
+global deviceName = [wavName wavExt];
+
 
 while(true)
   % checking command file for new commands

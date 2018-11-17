@@ -1,4 +1,4 @@
-function [compenReference, result] = analyse(buffer, fs, restartAnalysis)
+function [compenReference, result] = analyse(buffer, fs, freqs, restartAnalysis)
   persistent analysisBuffer = [];
   persistent peaks = [];
   persistent measfreq = 0;
@@ -7,7 +7,7 @@ function [compenReference, result] = analyse(buffer, fs, restartAnalysis)
 
   if (restartAnalysis)
     % re-reading cal file
-    global calFile;
+    calFile = genCalFilename(freqs);
     % loading calRec, initialising persistent vars
     load(calFile);
     peaks = calRec.peaks;

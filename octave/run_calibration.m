@@ -1,4 +1,4 @@
-result = calibrate(buffer, fs, restartCal);
+[freqs, result] = calibrate(buffer, fs, restartCal);
 restartCal = false;
 if (result == 1)
   % finished

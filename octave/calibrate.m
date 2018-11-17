@@ -1,4 +1,4 @@
-function result = calibrate(buffer, fs, restart)
+function [freqs, result] = calibrate(buffer, fs, restart)
   persistent calBuffer = [];
   calibrationSize = fs; % 1 second
   
@@ -11,6 +11,8 @@ function result = calibrate(buffer, fs, restart)
     % not enough data, copying whole buffer
     calBuffer = [calBuffer; buffer];
     % not finished
+    % unknown frequencies
+    freqs = -1;
     result = 0;
   else
     % enough data, copying only up to calibrationSize data
@@ -18,18 +20,18 @@ function result = calibrate(buffer, fs, restart)
     global wavPath;
     global channel;
 
-    result = doCalibrate(calBuffer, fs);    
+    [freqs, result] = doCalibrate(calBuffer, fs);    
   endif
 endfunction
   
-function result = doCalibrate(calBuffer, fs)
+function [ freqs, result] = doCalibrate(calBuffer, fs)
   peaks = getHarmonics(calBuffer, fs);
   printf('Calibration: Peaks:\n');
   disp(convertPeaksToPrintable(peaks));
 
   global wavPath;
   global channel;
-  global calFile;
+  global calDir;
   calRec.time = time();
   calRec.direction = 'capture';
   calRec.device = wavPath;
@@ -38,6 +40,10 @@ function result = doCalibrate(calBuffer, fs)
   calRec.peaks = peaks(1:10, :, :);
 
   disp(calRec);
+  % for now only single frequency
+  freqs = peaks(1, 1, 1);
+
+  calFile = genCalFilename(freqs);
   save(calFile, 'calRec');
   result = 1;
 endfunction
