@@ -39,7 +39,7 @@ compenReference = [];
 compenPos = 1;
 fs = 0;
 
-% first run -> restart
+% first run -> restart, reading all files
 restartReading = true;
 restartCal = true;
 restartAnalysis = true;

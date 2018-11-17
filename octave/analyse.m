@@ -1,17 +1,12 @@
-function [compenReference, result] = analyse(buffer, fs, restart)
+function [compenReference, result] = analyse(buffer, fs, restartAnalysis)
   persistent analysisBuffer = [];
   persistent peaks = [];
   persistent measfreq = 0;
   persistent periodLength = 0;
   persistent calRec = struct;
-  
-  
-  if (restart)
-    analysisBuffer = [];
-  endif
 
-  if (isempty(analysisBuffer))
-    % first run
+  if (restartAnalysis)
+    % re-reading cal file
     global calFile;
     % loading calRec, initialising persistent vars
     load(calFile);
@@ -20,6 +15,8 @@ function [compenReference, result] = analyse(buffer, fs, restart)
     disp(convertPeaksToPrintable(peaks));
     measfreq = peaks(1, 1, 1);
     periodLength = fs/measfreq;
+    % new start - clearing the buffer
+    analysisBuffer = [];
   endif
   
   analysisBuffer = [analysisBuffer; buffer];
@@ -28,7 +25,7 @@ function [compenReference, result] = analyse(buffer, fs, restart)
   analysisCnt = periodLength * 10;
   if (rows(analysisBuffer) < analysisCnt)
     % not enough data, run again, send more data
-    compenReference = [];
+    compenReference = [];    
     readCnt = rows(buffer);
     result = 0;
     return;
@@ -48,7 +45,9 @@ function [compenReference, result] = analyse(buffer, fs, restart)
       rowCompenReference = repmat(refFragment, periods, 1);
       compenReference = [compenReference, rowCompenReference];
     endfor
-    % finished OK
+    % finished OK    
+    % clearing the buffer for next run
+    analysisBuffer = [];
     result = 1;
   endif
 endfunction
