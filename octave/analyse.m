@@ -3,7 +3,8 @@
 % if result == 1, compenReference contains generated compensation samples for all channels in buffer
 function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAnalysis)
   persistent analysisBuffer = [];
-  persistent peaks = [];
+  persistent fundPeaks = [];
+  persistent distortPeaks = [];
   persistent measfreq = 0;
   persistent periodLength = 0;
   persistent phaseAnalysisSize = 0;
@@ -38,8 +39,8 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
       result = 0;
       return;
     else
-      % enough data, determine frequencies
-      freqs = determineFundamentalFreqs(analysisBuffer, fs);
+      % enough data, determine freqs, peaks are ignored (not calibration signal)
+      [freqs, fundPeaks, distortPeaks] = measurePeaks(analysisBuffer, fs);
       % continue with phase analysis
       rereadCalFile = true;
     endif
@@ -51,10 +52,13 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
       calFile = genCalFilename(freqs, fs);
       % loading calRec, initialising persistent vars
       load(calFile);
-      peaks = calRec.peaks;
-      printf('Peaks read from calibration file %s:\n', calFile);
-      disp(convertPeaksToPrintable(peaks));
-      measfreq = peaks(1, 1, 1);
+      fundPeaks = calRec.fundPeaks;
+      distortPeaks = calRec.distortPeaks;
+      printf('Distortion peaks read from calibration file %s:\n', calFile);
+      disp(convertPeaksToPrintable(distortPeaks));
+      
+      % for now only single frequency is supported
+      measfreq = fundPeaks(1, 1, 1);
       periodLength = fs/measfreq;
       % phase analysis requires at least 10 periods
       phaseAnalysisSize = periodLength * 10;      
@@ -79,8 +83,8 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
         % because next read buffer will continue after the last sample in analysisBuffer
         %
         [ampl, phase] = measurePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, measfreq, false);
-        % only first 10 harmonics
-        refFragment = genCompenReference(peaks(1:10, :, i), phase, ampl, fs, periodLength);
+        % only first 9 distortion harmonics
+        refFragment = genCompenReference(fundPeaks, distortPeaks(1:9, :, i), phase, ampl, fs, periodLength);
         rowCompenReference = repmat(refFragment, periods, 1);
         compenReference = [compenReference, rowCompenReference];
       endfor
@@ -91,14 +95,4 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
       return;
     endif
   endif
-endfunction
-
-% Determining fundamental frequencies in buffer. Returns array of frequencies
-function freqs = determineFundamentalFreqs(buffer, fs)
-  peaks = getHarmonics(buffer, fs);
-  printf('Determined fundamental freqs:\n');
-  % for now only single frequency
-  freqs = peaks(1, 1, 1);
-  disp(freqs);
-  printf('\n');
 endfunction

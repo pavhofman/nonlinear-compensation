@@ -25,24 +25,20 @@ function [freqs, result] = calibrate(buffer, fs, restart)
 endfunction
   
 function [ freqs, result] = doCalibrate(calBuffer, fs)
-  peaks = getHarmonics(calBuffer, fs);
-  printf('Calibration: Peaks:\n');
-  disp(convertPeaksToPrintable(peaks));
+  [freqs, fundPeaks, distortPeaks] = measurePeaks(calBuffer, fs);
 
   global wavPath;
   global channel;
   global calDir;
+
   calRec.time = time();
   calRec.direction = 'capture';
   calRec.device = wavPath;
-  calRec.channel = channel;
-  % first ten frequencies
-  calRec.peaks = peaks(1:10, :, :);
+  calRec.fundPeaks = fundPeaks;
+  calRec.distortPeaks = distortPeaks;
 
   disp(calRec);
-  % for now only single frequency
-  freqs = peaks(1, 1, 1);
-
+  
   calFile = genCalFilename(freqs, fs);
   save(calFile, 'calRec');
   result = 1;
