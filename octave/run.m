@@ -48,7 +48,7 @@ restartWriting = true;
 freqs = -1;
 
 global deviceName;
-if wavPath ~= ''
+if exist('wavPath', 'var') && !isempty(wavPath)
     [wavDir, wavName, wavExt] = fileparts(wavPath);
     deviceName = [wavName wavExt];
 else
@@ -79,8 +79,8 @@ while(true)
   endif
 
   % not stopped, will need data
-  if wavPath ~= ''
-    [buffer, fs] = readData(-1, restartReading);
+  if exist('wavPath', 'var') && !isempty(wavPath)
+    [buffer, fs] = readData(-1, fs, restartReading);
   else
     [buffer, fs] = readDataPlayrec(-1, restartReading);
   end

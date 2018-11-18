@@ -1,4 +1,4 @@
-function [buffer, fs] = readData(cnt, restart)
+function [buffer, fs] = readData(cnt, fs, restart)
   persistent allSamples = [];
   persistent readPtr = 1;
   

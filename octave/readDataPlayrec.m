@@ -2,7 +2,7 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
     global playRecConfig;
     persistent pageNumList;
 
-    if isstruct(playRecConfig) && isfield(playRecConfig, 'deviceID')
+    if isstruct(playRecConfig) && isfield(playRecConfig, 'recDeviceID')
         recDeviceID = playRecConfig.recDeviceID;
     else
         recDeviceID = 0;
