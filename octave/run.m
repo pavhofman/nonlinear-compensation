@@ -47,13 +47,14 @@ restartWriting = true;
 % unknown frequencies - measured by calibration or by determineFundamentalFreqs() in analysis
 freqs = -1;
 
-% at first we do not know how many samples to read. readData will determine
-readCnt = -1;
-
-% TODO - specific for files only now
-[wavDir, wavName, wavExt] = fileparts(wavPath);
-global deviceName = [wavName wavExt];
-
+global deviceName;
+if wavPath ~= ''
+    [wavDir, wavName, wavExt] = fileparts(wavPath);
+    deviceName = [wavName wavExt];
+else
+    global playRecConfig;
+    deviceName = sprintf('rec%d', playRecConfig.recDeviceID);
+end
 
 while(true)
   % checking command file for new commands
@@ -67,7 +68,8 @@ while(true)
     source 'run_process_cmd.m';  
   endif
 
-  printf('Status: %d\n', status);
+%  printf('Status: %d\n', status);
+  drawnow();
 
   if (status == PAUSED)
     % no reading/writing
@@ -77,10 +79,13 @@ while(true)
   endif
 
   % not stopped, will need data
-  [buffer, fs] = readData(readCnt, fs, restartReading);
+  if wavPath ~= ''
+    [buffer, fs] = readData(-1, restartReading);
+  else
+    [buffer, fs] = readDataPlayrec(-1, restartReading);
+  end
   restartReading = false;
-  readCnt = length(buffer);
-  
+
   if (bitand(status, DISTORTING) && (bitand(status, PASSING) || bitand(status, COMPENSATING)))
     source 'run_distortion.m';
   endif

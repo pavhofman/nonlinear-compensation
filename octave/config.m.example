@@ -25,3 +25,10 @@ global distortPol = [0, 0, 0, 0, chebyshevpoly(1, 1)] ...
   + db2mag(-110) * [0, chebyshevpoly(1, 4)] ...
   + db2mag(-110) * [chebyshevpoly(1, 5)];
 
+% configuration of audio interface
+global playRecConfig = struct();
+playRecConfig.recDeviceID = 0;
+playRecConfig.sampleRate = 48000;
+playRecConfig.chanList = [1 2];
+playRecConfig.pageBufCount = 5;
+
