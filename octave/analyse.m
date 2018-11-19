@@ -83,8 +83,7 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
         % because next read buffer will continue after the last sample in analysisBuffer
         %
         [ampl, phase] = measurePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, measfreq, false);
-        % only first 9 distortion harmonics
-        refFragment = genCompenReference(fundPeaks, distortPeaks(1:9, :, i), phase, ampl, fs, periodLength);
+        refFragment = genCompenReference(fundPeaks, distortPeaks(:, :, i), phase, ampl, fs, periodLength);
         rowCompenReference = repmat(refFragment, periods, 1);
         compenReference = [compenReference, rowCompenReference];
       endfor
