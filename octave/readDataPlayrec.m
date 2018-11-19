@@ -48,7 +48,10 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
     end
 
     %Initialise if not initialised
-    if(restart || ~playrec('isInitialised'))
+    if(restart || !playrec('isInitialised'))
+        if (playrec('isInitialised'))
+          playrec('reset');
+        endif
         fprintf('Initialising playrec to use sample rate: %d, recDeviceID: %d and no play device\n', fs, recDeviceID);
         playrec('init', fs, -1, recDeviceID)
         if(~playrec('isInitialised'))
