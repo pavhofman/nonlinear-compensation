@@ -4,9 +4,7 @@ function [ampl, phaseShift] = measurePhaseCurvefit(recorded, fs, measfreq, fundA
   % even a fraction of period will do, but the more periods, the better when larger distortion is involved (more data for curve fitting)
   periods = min(2, floor(length(recorded)/periodLength));
   totalSamples = periods * periodLength;
-
-  t = 0:1/fs:totalSamples/fs;
-  t = t(1:totalSamples)';
+  t = linspace(0, (totalSamples - 1)/fs, totalSamples)';
   % curve - phaseshifted cosine
   f = @(p, x) cos(2*pi * measfreq * x + p(2))* p(1);
   % curve fitting init - amplitude should be close to fundAmpl, phaseShift is unknown
