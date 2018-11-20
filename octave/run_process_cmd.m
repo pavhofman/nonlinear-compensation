@@ -8,7 +8,7 @@ elseif (strcmp(cmd, CALIBRATE))
   restartCal = true;
 
 elseif (strcmp(cmd, COMPENSATE))
-  % start/restart analysis
+  % start/restart analysis first, compensation will run after measuring current stream parameters
   status = ANALYSING;
   restartAnalysis = true;
 

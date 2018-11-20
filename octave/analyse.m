@@ -1,7 +1,10 @@
 % analysis incoming data. If freqs unknown (< 0), determines freqs in buffer data first.
 % if result == 0, send more data
-% if result == 1, compenReference contains generated compensation samples for all channels in buffer
-function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAnalysis)
+% if result == 1, then output:
+% measuredParams(channel) = [ampl, peak]
+% paramsAdvanceT - advance time of measuredParams related to the end of buffer (use t = paramsAdvanceT for starting sample of next buffer in compenReference calculation)
+% fundPeaks, distortPeaks - read from calibration file corresponding to current stream freqs
+function [measuredParams, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result] = analyse(buffer, fs, freqs, restartAnalysis)
   persistent analysisBuffer = [];
   persistent fundPeaks = [];
   persistent distortPeaks = [];
@@ -12,16 +15,15 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
   % should reload calFile
   rereadCalFile = false;
   
+  measuredParams = [];
+  paramsAdvanceT = -1;
   
   % buffer was already added to analysisBuffer in this run
   bufferWasAdded = false;
   
-  compenReference = [];
-  
   if (restartAnalysis)
     % new start - clearing the buffer
     analysisBuffer = [];
-    compenReference = [];
     rereadCalFile = true;
   endif
   
@@ -74,20 +76,20 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
       result = 0;
       return;
     else
-      % size of buffer for calibration - full periods within buffer size
-      periods = floor(rows(buffer) / periodLength);    
-      compenReference = [];
+      measuredParams = [];
       for i = 1:columns(buffer)
-        % finding phase
-        % All the figures are aligned to full periods. We must measure the phase for end of analysisBuffer 
+        % finding phase, amplitude
+        % We must measure the phase for end of analysisBuffer
         % because next read buffer will continue after the last sample in analysisBuffer
-        %
-        fundAmpl = fundPeaks(1, 2, 1);
-        [ampl, phase] = measurePhaseCurvefit(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, measfreq, fundAmpl, false);
-        refFragment = genCompenReference(fundPeaks, distortPeaks(:, :, i), phase, ampl, fs, periodLength);
-        rowCompenReference = repmat(refFragment, periods, 1);
-        compenReference = [compenReference, rowCompenReference];
+        fundAmpl = fundPeaks(1, 2, i);
+        %id = tic();
+        [ampl, phaseShift] = measurePhaseCurvefit(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, measfreq, fundAmpl, false);
+        %disp(toc(id));
+        measuredParams(i, 1) = ampl;
+        measuredParams(i, 2) = phaseShift;
       endfor
+      % advance time of measuredParams relative to the end of buffer - the generated compensation reference must be shifted by this to fit beginning of the next buffer
+      paramsAdvanceT = phaseAnalysisSize/fs;
       % finished OK
       % clearing the buffer for next run
       analysisBuffer = [];

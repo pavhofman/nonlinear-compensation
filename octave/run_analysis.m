@@ -1,5 +1,4 @@
-[compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAnalysis);
-compenPos = 1;
+[measuredParams, startingT, fundPeaks, distortPeaks, freqs, result] = analyse(buffer, fs, freqs, restartAnalysis);
 restartAnalysis = false;
 if (result == 1)
   % finished

@@ -32,11 +32,6 @@ DISTORTING = 16;
 % default initial command
 cmd = PAUSE;
 
-
-
-compHarmonics = [];
-compenReference = [];
-compenPos = 1;
 fs = 0;
 
 % first run -> restart, reading all files
@@ -46,6 +41,8 @@ restartAnalysis = true;
 restartWriting = true;
 % unknown frequencies - measured by calibration or by determineFundamentalFreqs() in analysis
 freqs = -1;
+
+startingT = 0;
 
 global deviceName;
 if exist('wavPath', 'var') && !isempty(wavPath)
