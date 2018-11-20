@@ -13,6 +13,12 @@ function [ampl, phaseShift] = measurePhaseCurvefit(recorded, fs, measfreq, fundA
   [p, model_values, cvg, outp] = nonlin_curvefit (f, init, t, y);
   ampl = p(1);
   phaseShift = p(2);
+  % we need ampl > 0. If ampl < 0, we must invert phase
+  if (ampl < 0)
+    ampl = abs(ampl);
+    % inverting phase
+    phaseShift += pi;
+  endif
   
   if (!showCharts)
     return;
