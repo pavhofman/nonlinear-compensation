@@ -6,7 +6,7 @@ clear;
 
 pkg load miscellaneous;
 pkg load control;
-
+pkg load optim;
 
 addpath(fileparts(mfilename('fullpath')));
 

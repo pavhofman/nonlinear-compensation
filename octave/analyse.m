@@ -5,7 +5,7 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
   persistent analysisBuffer = [];
   persistent fundPeaks = [];
   persistent distortPeaks = [];
-  persistent measfreq = 0;
+  persistent measfreq = 0;  
   persistent periodLength = 0;
   persistent phaseAnalysisSize = 0;
   persistent calRec = struct; 
@@ -59,9 +59,9 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
       
       % for now only single frequency is supported
       measfreq = fundPeaks(1, 1, 1);
-      periodLength = fs/measfreq;
-      % phase analysis requires at least 10 periods
-      phaseAnalysisSize = periodLength * 10;      
+      periodLength = floor(fs/measfreq);
+      % phase analysis requires at least 3 periods
+      phaseAnalysisSize = periodLength * 2;      
     endif
     
     if (!bufferWasAdded)
@@ -82,7 +82,8 @@ function [compenReference, freqs, result] = analyse(buffer, fs, freqs, restartAn
         % All the figures are aligned to full periods. We must measure the phase for end of analysisBuffer 
         % because next read buffer will continue after the last sample in analysisBuffer
         %
-        [ampl, phase] = measurePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, measfreq, false);
+        fundAmpl = fundPeaks(1, 2, 1);
+        [ampl, phase] = measurePhaseCurvefit(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, measfreq, fundAmpl, false);
         refFragment = genCompenReference(fundPeaks, distortPeaks(:, :, i), phase, ampl, fs, periodLength);
         rowCompenReference = repmat(refFragment, periods, 1);
         compenReference = [compenReference, rowCompenReference];
