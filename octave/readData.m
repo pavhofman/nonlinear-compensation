@@ -18,7 +18,7 @@ function [buffer, fs] = readData(cnt, fs, restart)
   if (cnt == -1)
     % requested to determine count internally
     % 200ms
-    cnt = fs * 0.2;
+    cnt = fs * 0.4;
   endif
   
 

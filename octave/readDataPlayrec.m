@@ -26,7 +26,7 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
     if (cnt == -1)
         % requested to determine count internally
         % 200ms
-        cnt = fs * 0.2;
+        cnt = fs * 0.4;
     endif
 
     if((ndims(chanList)~=2) || (size(chanList, 1)~=1))
@@ -66,6 +66,7 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
         for page=1:pageBufCount
             pageNumList = [pageNumList playrec('rec', cnt, chanList)];
         end
+        tic();
     end
 
     playrec('block', pageNumList(1));
@@ -79,4 +80,15 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
         playrec('resetSkippedSampleCount');
         fprintf('playrec input: %d samples skipped!!\n', skipped);
     end
+    bufferTime = length(buffer)/fs;
+    delay = toc();
+    if (delay > bufferTime)
+      printf("XRUN: delay: %f, bufferTime %f\n", delay, bufferTime);
+    else
+      % sleep for the remaining time
+      sleepTime = bufferTime - delay;
+      printf("Sleeping for %f\n", sleepTime);
+      pause(sleepTime);
+    endif  
+    tic();
 endfunction
