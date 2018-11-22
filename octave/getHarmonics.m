@@ -36,6 +36,8 @@ function [peaks, x, y] = getHarmonics(samples, Fs, window_name = 'hanning', fuzz
   for i = 1:columns(yf)
     columnPeaks = findHarmonicsFromFFT(Fs, nfft, x, yf(:, i), fuzzy, y(:, i), fundFreq);
     peaks(:, :, i) = columnPeaks;
+    columnPeaks2 = findHarmonicsFromFFT(Fs, nfft, x, yf(:, i), fuzzy, y(:, i), -columnPeaks(1, 1));
+    peaks(:, :, columns(yf) + i) = columnPeaks2;
   endfor
 endfunction
 

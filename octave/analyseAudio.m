@@ -40,8 +40,10 @@ end
 
 [ peaks, x, y ] = getHarmonics(recorded, fs);
 
-fprintf(['Signal:\n']);
-fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', convertPeaksToPrintable(peaks)');
+for dim = 1:size(peaks,3)
+    fprintf('Signal #%d.%d:\n', mod(dim - 1, columns(y)) + 1, floor((dim - 1) / columns(y)) + 1);
+    fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', convertPeaksToPrintable(peaks(:,:,dim))');
+end
 
 plotsCnt = 5;
 

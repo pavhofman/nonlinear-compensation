@@ -7,7 +7,7 @@ function drawHarmonics(x, y, label, plotID, plotsCnt, use_ylim = [-150 0], use_x
       skip++;
   endwhile
   % semilogx requires values > 0
-  x(x == 0) = 10^-10;
+  x(x <= 0) = 10^-10;
   semilogx(x(skip:end), y(skip:end), 'linewidth', 1.5, 'color', 'black');
   grid('on');
   ylim(use_ylim)
