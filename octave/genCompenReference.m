@@ -11,6 +11,13 @@ function compenSignal = genCompenReference(fundPeaks, distortPeaks, measuredPeak
   currFundPhase = measuredPeaks(1, 3);
   
   currFundPhaseShift = currFundPhase - origFundPhase;
+  % we need the phase shift within interval <0, 2*pi>
+  if (currFundPhaseShift < 0)
+    currFundPhaseShift += 2 * pi;
+  endif
+  % time offset between current time and calibration time within single period of the signal
+  timeOffset = currFundPhaseShift/(2 * pi * measFreq);
+
   scale = currFundAmpl / origFundAmpl;
   step = 1/fs;
   t = linspace(startingT, startingT + (samplesCnt - 1) * step, samplesCnt)';
@@ -19,10 +26,9 @@ function compenSignal = genCompenReference(fundPeaks, distortPeaks, measuredPeak
     origDistortGain = distortPeaks(i, 2);
     if (origDistortGain > 1e-8)
       distortFreq = distortPeaks(i, 1);
-      distortFreqRatio = distortFreq/measFreq;
       origDistortPhase = distortPeaks(i, 3);
-      % current phase distortion
-      currentDistortPhase = origDistortPhase + currFundPhaseShift * distortFreqRatio;
+      % current phase distortion = original distortion phase + additional phase accumulated in timeOffset
+      currentDistortPhase = origDistortPhase + 2 * pi * distortFreq * timeOffset;
       % inverted phase
       compenDistortPhase = currentDistortPhase - pi;
       compenDistortGain = origDistortGain * scale;
