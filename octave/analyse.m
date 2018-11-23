@@ -1,10 +1,10 @@
 % analysis incoming data. If freqs unknown (< 0), determines freqs in buffer data first.
 % if result == 0, send more data
 % if result == 1, then output:
-% measuredParams(channel) = [ampl, peak]
+% measuredPeaks - measured fundamental peaks
 % paramsAdvanceT - advance time of measuredParams related to the end of buffer (use t = paramsAdvanceT for starting sample of next buffer in compenReference calculation)
 % fundPeaks, distortPeaks - read from calibration file corresponding to current stream freqs
-function [measuredParams, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result] = analyse(buffer, fs, freqs, restartAnalysis)
+function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result] = analyse(buffer, fs, freqs, restartAnalysis)
   persistent analysisBuffer = [];
   persistent fundPeaks = [];
   persistent distortPeaks = [];
@@ -15,7 +15,7 @@ function [measuredParams, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result
   % should reload calFile
   rereadCalFile = false;
   
-  measuredParams = [];
+  measuredPeaks = [];
   paramsAdvanceT = -1;
   
   % buffer was already added to analysisBuffer in this run
@@ -76,7 +76,7 @@ function [measuredParams, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result
       result = 0;
       return;
     else
-      measuredParams = [];
+      measuredPeaks = [];
       for i = 1:columns(buffer)
         % finding phase, amplitude
         % We must measure the phase for end of analysisBuffer
@@ -85,8 +85,9 @@ function [measuredParams, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result
         %id = tic();
         [ampl, phaseShift] = measurePhaseCurvefit(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, measfreq, fundAmpl, false);
         %disp(toc(id));
-        measuredParams(i, 1) = ampl;
-        measuredParams(i, 2) = phaseShift;
+        measuredPeaks(1, 1, i) = measfreq;
+        measuredPeaks(1, 2, i) = ampl;
+        measuredPeaks(1, 3, i) = phaseShift;
       endfor
       % advance time of measuredParams relative to the end of buffer - the generated compensation reference must be shifted by this to fit beginning of the next buffer
       paramsAdvanceT = phaseAnalysisSize/fs;

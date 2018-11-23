@@ -1,11 +1,15 @@
 % Generates compensation reference (distortion peaks with inverted phase). Supports only single fundamental frequency, for now.
-function reference = genCompenReference(fundPeaks, distortPeaks, currPhase, currAmpl, fs, startingT, samplesCnt)
+function reference = genCompenReference(fundPeaks, distortPeaks, measuredPeaks, fs, startingT, samplesCnt)
   % first harmonics = zero
   reference = zeros(samplesCnt, 1);
   % for now only single fundamental frequency
-  measfreq = fundPeaks(1, 1);
+  measfreq = measuredPeaks(1, 1);
   origAmpl = fundPeaks(1, 2);
   origPhase = fundPeaks(1, 3);
+  
+  currAmpl = measuredPeaks(1, 2);
+  currPhase = measuredPeaks(1, 3);
+  
   compenPhase = currPhase - origPhase;
   scale = currAmpl / origAmpl;
   step = 1/fs;
