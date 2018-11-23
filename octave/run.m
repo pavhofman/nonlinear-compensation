@@ -4,6 +4,8 @@
 % we cannot call 'clear all' since it clears all funcions => also all breakpoints in funcions
 clear;
 
+more off;
+
 pkg load miscellaneous;
 pkg load control;
 pkg load optim;
