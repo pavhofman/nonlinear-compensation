@@ -1,57 +1,53 @@
-% find harmonics of the strongest signal up to Fs
-%
-% frequency in peaks is non-zero only if the harmonics is a peak
-% if there is no peak peaks.amplitude is maximum of 3 bins which are
-% the most close to the expected frequency of the harmonics
+% find fundamental frequencies and their distortion products
 %
 % params:
-%   Fs - sampling rate of signal
-%   nfft - point used for computing x and y
-%   x - (non-negative) frequencies
 %   yc - complex DFT value of (non-negative) frequencies
-%   fuzzy - set 1 to allow fuzzy harmonics detection
-%           (for frequencies that do not fall exactly into bins)
-%   ya - absolute value of yf (optional)
-%   fundFreq - frequency of fundamental to search harmonics for
-%       (0 for autodetect)
-%       (-freq for autodetect of second fundamental around freq)
+%   y - absolute value of yf (optional)
+%   x - (non-negative) frequencies
+%   binwidth - Fs / nfft
 %
 % returns:
-%   peaks [ frequency , amplitude_in_absolute_values, angle_in_radians ]
+%   fundPeaks [ frequency , amplitude_in_absolute_values, angle_in_radians ]
+%   disgtortPeaks [ frequency , amplitude_in_absolute_values, angle_in_radians ]
 %
-function [fundPeaks, distortPeaks, errorMsg] = findHarmonicsFromFFT(Fs, nfft, x, yc, fuzzy=0, y=abs(yc), fundFreq=0)
+function [fundPeaks, distortPeaks, errorMsg] = findHarmonicsFromFFT(yc, y, x, binwidth=1)
   fundPeaks = zeros(0, 3);
   distortPeaks = zeros(0, 3);
   errorMsg = '';
 
-  nffto2 = length(y);
-  binwidth = Fs / nfft;
+  nffto2 = rows(y);
 
-  % skip frequencies under 10Hz
-  skip_bins = ceil(10 / binwidth);
-
-  [ymax, iymax] = max(y(skip_bins:end));
+  [ymax, iymax] = max(y);
   if isempty(iymax) || (ymax < 1e-5)
       errorMsg = 'no peaks stronger than -100dBFS';
       return
   end
 
-  fundPeakBins = [];
-  for b = find(y(skip_bins:end) >= ymax/10)'
-      bb = skip_bins + b - 1;
-      if ((bb < nffto2) && (y(bb) < y(bb+1))) || (y(bb-1) > y(bb))
+  for b = find(y >= ymax/10)'
+      bb = b - 1;
+      if (x(bb) < 10) || ((bb < nffto2) && (y(bb) < y(bb+1))) || (y(bb-1) > y(bb))
+          % skip frequencies under 10Hz and those which are not a local maximum
           continue
       end
       if rows(fundPeaks) > 2
           errorMsg = 'too many fundamental peaks';
           break
       end
-      fundPeakBins = [fundPeakBins; bb];
       fundPeaks = [fundPeaks; x(bb), y(bb), arg(yc(bb))];
-      lasth = min(20, floor(Fs / 2 / x(bb)));
-      for nh = 1:lasth
+  end
+
+  fundPeakBins = [];
+  for f = fundPeaks(:, 1)'
+      bb = round(f / binwidth) + 1;
+      fundPeakBins = [fundPeakBins; bb];
+      for nh = 1:20
           i = (nh * (bb - 1)) + 1;
-          if y(i) >= (ymax / 10)
+          if i > nffto2
+              % ignore aliased frequencies
+              break
+          end
+          if (y(i) >= (ymax / 10))
+              % ignore frequencies stronger than 1/10 (-20dB) of the strongest one
               continue
           end
           distortPeaks = [distortPeaks; x(i), y(i), arg(yc(i))];
@@ -66,8 +62,10 @@ function [fundPeaks, distortPeaks, errorMsg] = findHarmonicsFromFFT(Fs, nfft, x,
               i1 = o1 * (fundPeakBins(1) - 1);
               i2 = o2 * (fundPeakBins(2) - 1);
               for i = [ i1 + i2 + 1, i1 - i2 + 1, i2 - i1 + 1 ];
-                  if (i < 1) || (i > nffto2) || (y(i) >= (ymax / 10))
-                      % ignore aliased frequencies and stronger than 1/10 of the strongest one
+                  if (i < 1) || (i > nffto2) || (y(i) >= (ymax / 10)) || (y(i) < 3.1623e-08)
+                      % ignore aliased frequencies
+                      % ignore frequencies stronger than 1/10 (-20dB) of the strongest one
+                      % ignore frequencies waker than -150dBFS
                       continue
                   end
                   distortPeaks = [distortPeaks; x(i), y(i), arg(yc(i))];
