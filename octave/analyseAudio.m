@@ -38,7 +38,8 @@ end
 
 [recorded, fs] = audioreadAndCut(wavPath, channel);
 
-[ peaks, x, y ] = getHarmonics(recorded, fs);
+[fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(recorded, fs);
+peaks = [fundPeaks; distortPeaks];
 
 for dim = 1:size(peaks,3)
     fprintf('Signal #%d.%d:\n', mod(dim - 1, columns(y)) + 1, floor((dim - 1) / columns(y)) + 1);

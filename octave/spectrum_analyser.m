@@ -145,18 +145,19 @@ while(ishandle(fftFigure) || ishandle(timeFigure) || ishandle(infoFigure))
         if ishandle(fftFigure) || ishandle(infoFigure)
             winlen = length(recSampleBuffer);
             winfun = hanning(winlen);
-            recFFT = fft(recSampleBuffer .* winfun)';
-            yc = recFFT(:, 1:fftSize/2 + 1) / (winlen/2 * mean(winfun));
+            recFFT = fft(recSampleBuffer .* winfun);
+            yc = recFFT(1:fftSize/2 + 1, :) / (winlen/2 * mean(winfun));
             y = abs(yc);
         end
         if ishandle(fftFigure)
             for i=1:length(chanList)
-                set(fftLine(i), 'YData', 20*log10(y(i,:)));
+                set(fftLine(i), 'YData', 20*log10(y(:,i)));
             end
         end
         if ishandle(infoFigure)
             for i=1:length(chanList)
-                peaks = findHarmonicsFromFFT(Fs, winlen, fftXAxisData, yc(i,:), 0, y(i,:));
+                [fundPeaks, distortPeaks, errorMsg] = findHarmonicsFromFFT(Fs, winlen, fftXAxisData, yc(:,i), 0, y(:,i));
+                peaks = [fundPeaks; distortPeaks];
                 peaks2 = convertPeaksToPrintable(peaks);
                 set(infoText(i), 'String', sprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', peaks2'));
             end

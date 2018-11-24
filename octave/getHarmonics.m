@@ -14,7 +14,7 @@
 %   x - freqencies
 %   y - amplitudes_in_abs_value
 %
-function [peaks, x, y] = getHarmonics(samples, Fs, window_name = 'hanning', fuzzy = 0, fundFreq=0)
+function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, window_name = 'hanning', fuzzy = 0, fundFreq=0)
   nfft = Fs * floor(length(samples)/Fs);
   data = samples(1:nfft, :);
   switch (window_name)
@@ -32,13 +32,27 @@ function [peaks, x, y] = getHarmonics(samples, Fs, window_name = 'hanning', fuzz
   x = double(Fs/2) * linspace(0, 1, nffto2);
   yf = yf(1:nffto2, :) / (nffto2 * winweight);
   y = abs(yf);
-  peaks = [];
+  fundPeaks = [];
+  distortPeaks = [];
   for i = 1:columns(yf)
-    columnPeaks = findHarmonicsFromFFT(Fs, nfft, x, yf(:, i), fuzzy, y(:, i), fundFreq);
-    peaks(:, :, i) = columnPeaks;
-    columnPeaks2 = findHarmonicsFromFFT(Fs, nfft, x, yf(:, i), fuzzy, y(:, i), -columnPeaks(1, 1));
-    peaks(:, :, columns(yf) + i) = columnPeaks2;
+    [fundPeaks1, distortPeaks1, errorMsg1] = findHarmonicsFromFFT(Fs, nfft, x, yf(:, i), fuzzy, y(:, i), 0);
+    % resize to common (=fixed) size for both channels (2 rows)
+    fundPeaks(:, :, i) = resize(fundPeaks1,2,3);
+    % resize to common (=fixed) size for both channels (20 rows)
+    if rows(distortPeaks1) > 20
+        % take 20 strongest harmonics sorted by frequencies
+        distortPeaks1 = sortrows(distortPeaks1,-2);
+        distortPeaks1 = resize(distortPeaks1,20,3);
+        distortPeaks1 = sortrows(distortPeaks1,1);
+    else
+        % harmonics sorted by frequencies
+        distortPeaks1 = sortrows(distortPeaks1,1);
+        distortPeaks1 = resize(distortPeaks1,20,3);;
+    end
+    distortPeaks(:, :, i) = distortPeaks1;
+    errorMsg(:, i) = cellstr(errorMsg1);
   endfor
+  disp(distortPeaks);
 endfunction
 
 function [out, winweight] = applyWindow(in, winfun)

@@ -1,5 +1,6 @@
 function peaks = showFFT(series, label, plotID, fs, plotsCnt, fundFreq=0)
-  [ peaks, x, y ] = getHarmonics(series, fs, 'hanning', 0, fundFreq);
+  [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(series, fs, 'hanning', 0, fundFreq);
+  peaks = [fundPeaks; distortPeaks];
   drawHarmonics(x, y, label, plotID, plotsCnt);
   format short;
   fprintf([label ':\n']);

@@ -60,7 +60,8 @@ audiowrite(signalPath, real(signal), fs, 'BitsPerSample', 32);
 
 %%% TODO work-in-progress (display graphs)
 
-[ peaks, x, y ] = getHarmonics(signal, fs);
+[fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(signal, fs);
+peaks = [fundPeaks; distortPeaks];
 fprintf(['Signal:\n']);
 fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', convertPeaksToPrintable(peaks)');
 
@@ -69,7 +70,8 @@ plotsCnt = 2;
 reference = getReferenceSignal(signal, fs, fundfreq);
 diff = signal - reference;
 
-[ peaks, x, y ] = getHarmonics(diff, fs);
+[fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(diff, fs);
+peaks = [fundPeaks; distortPeaks];
 drawHarmonics(x, y, '', 1, plotsCnt, [-150, -0]);
 
 h2 = filterHarmonic(signal, fs, fundfreq, 2);
@@ -78,7 +80,8 @@ plotDiff(h2, 1, plotsCnt, '2nd harmonic');
 [a,b] = allpass(1, x=2000+10, x, 1-1/200, 44100);
 signal2 = filter(a, b, signal);
 
-[ peaks, x, y ] = getHarmonics(signal2, fs);
+[fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(signal2, fs);
+peaks = [fundPeaks; distortPeaks];
 fprintf(['Signal:\n']);
 fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', convertPeaksToPrintable(peaks)');
 
