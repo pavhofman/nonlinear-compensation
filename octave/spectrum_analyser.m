@@ -67,7 +67,7 @@ colors = {'red';'blue'};
 
 fftFigure = figure;
 fftAxes = axes('parent', fftFigure, 'xlimmode', 'manual', 'ylimmode', 'manual', 'xscale', 'log', 'yscale', 'linear', 'xlim', [10 Fs/2], 'ylim', [-150, 0]);
-fftXAxisData = (0 : (fftSize / 2)) * Fs / fftSize;
+fftXAxisData = (0 : (fftSize / 2))' * Fs / fftSize;
 for i=1:length(chanList)
     fftLine(i) = line(
             'XData', fftXAxisData,
@@ -156,7 +156,10 @@ while(ishandle(fftFigure) || ishandle(timeFigure) || ishandle(infoFigure))
         end
         if ishandle(infoFigure)
             for i=1:length(chanList)
-                [fundPeaks, distortPeaks, errorMsg] = findHarmonicsFromFFT(yc(:,i), y(:,i), fftXAxisData, Fs / fftSize);
+                yc1 = yc(:, i);
+                y1 = y(:, i);
+                [fundPeaks, errorMsg] = findFundPeaks(fftXAxisData, yc1, y1);
+                [distortPeaks] = getDistortionProducts(fundPeaks, fftXAxisData, yc1, y1, Fs / fftSize);
                 peaks = [fundPeaks; distortPeaks];
                 peaks2 = convertPeaksToPrintable(peaks);
                 set(infoText(i), 'String', sprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', peaks2'));

@@ -18,7 +18,10 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, w
   fundPeaks = [];
   distortPeaks = [];
   for i = 1:columns(yc)
-    [fundPeaks1, distortPeaks1, errorMsg1] = findHarmonicsFromFFT(yc(:, i), y(:, i), x, Fs / nfft);
+    yc1 = yc(:, i);
+    y1 = y(:, i);
+    [fundPeaks1, errorMsg1] = findFundPeaks(x, yc1, y1);
+    [distortPeaks1] = getDistortionProducts(fundPeaks1, x, yc1, y1, Fs / nfft);
     % resize to common (=fixed) size for both channels (2 rows)
     fundPeaks(:, :, i) = resize(fundPeaks1,2,3);
     % resize to common (=fixed) size for both channels (20 rows)
@@ -35,5 +38,4 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, w
     distortPeaks(:, :, i) = distortPeaks1;
     errorMsg(:, i) = cellstr(errorMsg1);
   endfor
-  disp(distortPeaks);
 endfunction
