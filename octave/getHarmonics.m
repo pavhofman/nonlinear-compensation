@@ -18,24 +18,24 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, w
   fundPeaks = [];
   distortPeaks = [];
   for i = 1:columns(yc)
-    yc1 = yc(:, i);
-    y1 = y(:, i);
-    [fundPeaks1, errorMsg1] = findFundPeaks(x, yc1, y1);
-    [distortPeaks1] = getDistortionProducts(fundPeaks1, x, yc1, y1, Fs / nfft);
+    ycCh = yc(:, i);
+    yCh = y(:, i);
+    [fundPeaksCh, errorMsgCh] = findFundPeaksCh(x, ycCh, yCh);
+    [distortPeaksCh] = getDistortionProductsCh(fundPeaksCh, x, ycCh, yCh, Fs / nfft);
     % resize to common (=fixed) size for both channels (2 rows)
-    fundPeaks(:, :, i) = resize(fundPeaks1,2,3);
+    fundPeaks(:, :, i) = resize(fundPeaksCh,2,3);
     % resize to common (=fixed) size for both channels (20 rows)
-    if rows(distortPeaks1) > 20
+    if rows(distortPeaksCh) > 20
         % take 20 strongest harmonics sorted by frequencies
-        distortPeaks1 = sortrows(distortPeaks1,-2);
-        distortPeaks1 = resize(distortPeaks1,20,3);
-        distortPeaks1 = sortrows(distortPeaks1,1);
+        distortPeaksCh = sortrows(distortPeaksCh,-2);
+        distortPeaksCh = resize(distortPeaksCh,20,3);
+        distortPeaksCh = sortrows(distortPeaksCh,1);
     else
         % harmonics sorted by frequencies
-        distortPeaks1 = sortrows(distortPeaks1,1);
-        distortPeaks1 = resize(distortPeaks1,20,3);;
+        distortPeaksCh = sortrows(distortPeaksCh,1);
+        distortPeaksCh = resize(distortPeaksCh,20,3);;
     end
-    distortPeaks(:, :, i) = distortPeaks1;
-    errorMsg(:, i) = cellstr(errorMsg1);
+    distortPeaks(:, :, i) = distortPeaksCh;
+    errorMsg(:, i) = cellstr(errorMsgCh);
   endfor
 endfunction
