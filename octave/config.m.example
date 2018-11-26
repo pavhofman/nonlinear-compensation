@@ -35,3 +35,4 @@ playRecConfig.pageBufCount = 5;
 global showFFTFigureConfig = struct();
 showFFTFigureConfig.numAvg = 0;
 showFFTFigureConfig.restartAvg = 0;
+showFFTFigureConfig.fftSize = 2^17;

@@ -2,13 +2,13 @@ function showFFTFigure(samples, fs)
   persistent fftFigure = 0;
   persistent fftLine = [];
   persistent fftSize = 0;
+  persistent fftFs = 0;
   persistent winfun;
   persistent winmean;
   persistent yavg;
   persistent yavgn;
+  persistent sampleBuffer = [];
   global showFFTFigureConfig;
-
-  [nsamples, nchannels] = size(samples);
 
   if fftFigure == 0
     fftFigure = figure;
@@ -20,11 +20,16 @@ function showFFTFigure(samples, fs)
     set(gca,'XTickLabel', sprintf('%.0f|',xt))
     addlistener(gca, 'xlim', @logXTickZoomHandler)
   end
-  if fftSize != fs
-    fftSize = fs;
+  if (showFFTFigureConfig.fftSize != fftSize) ...
+      || (fs != fftFs)
+    fftFs = fs;
+    fftSize = showFFTFigureConfig.fftSize;
     fftXAxisData = (0 : (fftSize / 2)) * fs / fftSize;
     colors = {'red';'blue'};
     for i=1:length(colors)
+        if (i <= length(fftLine)) && ishandle(fftLine(i))
+            delete(fftLine(i))
+        end
         fftLine(i) = line(
                 'XData', fftXAxisData,
                 'YData', ones(1, fftSize/2 + 1),
@@ -33,7 +38,27 @@ function showFFTFigure(samples, fs)
     winfun = hanning(fftSize);
     winmean = mean(winfun);
   end
-  if ishandle(fftFigure) && nsamples >= fftSize
+
+  [nsamples, nchannels] = size(samples);
+  if nsamples == 0
+    sampleBuffer = [];
+    return
+  else
+    sampleBuffer = [sampleBuffer; samples];
+    nsamples = rows(sampleBuffer);
+    if nsamples < showFFTFigureConfig.fftSize
+        return
+    end
+    samples = sampleBuffer(1:showFFTFigureConfig.fftSize, :);
+    if nsamples > showFFTFigureConfig.fftSize
+        sampleBuffer = sampleBuffer(showFFTFigureConfig.fftSize+1:end, :);
+    else
+        sampleBuffer = [];
+    end
+    nsamples = rows(samples);
+  end
+
+  if ishandle(fftFigure)
     recFFT = fft(samples .* winfun)';
     yc = recFFT(:, 1:fftSize/2 + 1) / (fftSize/2 * winmean);
     y = abs(yc);

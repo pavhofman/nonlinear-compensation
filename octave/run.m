@@ -21,6 +21,7 @@ COMPENSATE = 'comp';
 PASS = 'pass';
 DISTORT = 'distort';
 AVG = 'avg';
+FFT = 'fft';
 NO_CMD = '';
 
 % bits for statuses

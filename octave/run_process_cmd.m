@@ -25,6 +25,10 @@ else
         showFFTFigureConfig.numAvg = str2num(cmd{2});
         showFFTFigureConfig.restartAvg = 1;
     end
+    if strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
+        showFFTFigureConfig.fftSize = str2num(cmd{2});
+        showFFTFigureConfig.restartAvg = 1;
+    end
 endif
 % clear new command
 cmd = NO_CMD;
