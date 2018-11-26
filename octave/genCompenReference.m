@@ -16,20 +16,18 @@ function compenSignal = genCompenReference(fundPeaks, distortPeaks, measuredPeak
   scale = currFundAmpl / origFundAmpl;
   step = 1/fs;
   t = linspace(startingT, startingT + (samplesCnt - 1) * step, samplesCnt)';
-
+  pi2 = 2 * pi;
   for i = (1:rows(distortPeaks))
     origDistortGain = distortPeaks(i, 2);
-    if (origDistortGain > 1e-8)
-      distortFreq = distortPeaks(i, 1);
-      origDistortPhase = distortPeaks(i, 3);
-      % current phase distortion = original distortion phase + additional phase accumulated in timeOffset
-      currentDistortPhase = origDistortPhase + 2 * pi * distortFreq * timeOffset;
-      % inverted phase
-      compenDistortPhase = currentDistortPhase - pi;
-      compenDistortGain = origDistortGain * scale;
-      % compensation signal for this distortion
-      compenSignal += cos(2*pi * distortFreq * t + compenDistortPhase) * compenDistortGain;
-     endif
+    distortFreq = distortPeaks(i, 1);
+    origDistortPhase = distortPeaks(i, 3);
+    % current phase distortion = original distortion phase + additional phase accumulated in timeOffset
+    currentDistortPhase = origDistortPhase + pi2 * distortFreq * timeOffset;
+    % inverted phase
+    compenDistortPhase = currentDistortPhase - pi;
+    compenDistortGain = origDistortGain * scale;
+    % compensation signal for this distortion
+    compenSignal += cos(pi2 * distortFreq * t + compenDistortPhase) * compenDistortGain;     
   endfor
 endfunction
 
