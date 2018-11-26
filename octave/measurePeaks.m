@@ -1,5 +1,4 @@
 % Determining fundamental and distortion peaks in buffer.
-% The decision between fundamental and distorion freqs is performed on first channel for now
 function [freqs, fundPeaks, distortPeaks] = measurePeaks(buffer, fs)
   [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(buffer, fs);
 
@@ -8,6 +7,6 @@ function [freqs, fundPeaks, distortPeaks] = measurePeaks(buffer, fs)
   printf('Determined distortion peaks:\n');
   disp(distortPeaks);
 
-  % first column
-  freqs = fundPeaks(:, 1);
+  % freqs read from first channel only
+  freqs = fundPeaks(:, 1, 1);
 endfunction
