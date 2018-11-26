@@ -20,6 +20,11 @@ elseif (strcmp(cmd, DISTORT) && (bitand(status, PASSING) || bitand(status, COMPE
 elseif (strcmp(cmd, PASS))
   status = PASSING;
 
+else
+    if strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
+        showFFTFigureConfig.numAvg = str2num(cmd{2});
+        showFFTFigureConfig.restartAvg = 1;
+    end
 endif
 % clear new command
 cmd = NO_CMD;

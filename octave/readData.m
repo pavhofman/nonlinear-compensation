@@ -54,7 +54,3 @@ function [samples, fs] = loadSamples(wavPath, channel)
     samples = recorded(1:limit, :);
     tic();
 endfunction
-
-function writeData(buffer, fs)  
-  % dropping data
-endfunction

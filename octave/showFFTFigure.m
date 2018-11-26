@@ -4,6 +4,9 @@ function showFFTFigure(samples, fs)
   persistent fftSize = 0;
   persistent winfun;
   persistent winmean;
+  persistent yavg;
+  persistent yavgn;
+  global showFFTFigureConfig;
 
   [nsamples, nchannels] = size(samples);
 
@@ -34,8 +37,24 @@ function showFFTFigure(samples, fs)
     recFFT = fft(samples .* winfun)';
     yc = recFFT(:, 1:fftSize/2 + 1) / (fftSize/2 * winmean);
     y = abs(yc);
+
+    if (showFFTFigureConfig.numAvg > 0) ...
+        && (yavgn >= showFFTFigureConfig.numAvg) ...
+        && (showFFTFigureConfig.restartAvg == 0)
+        return
+    end
+    if (showFFTFigureConfig.restartAvg == 1) ...
+        || (showFFTFigureConfig.numAvg < 2) ...
+        || (size(yavg) != size(y))
+        showFFTFigureConfig.restartAvg = 0;
+        yavg = y;
+        yavgn = 1;
+    else
+        yavg = ((yavg .* yavgn) .+ y) ./ (yavgn + 1);
+        yavgn += 1;
+    end
     for i=1:nchannels
-      set(fftLine(i), 'YData', 20*log10(y(i,:)));
+      set(fftLine(i), 'YData', 20*log10(yavg(i,:)));
     end
   end
 endfunction

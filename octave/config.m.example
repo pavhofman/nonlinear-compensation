@@ -32,3 +32,6 @@ playRecConfig.sampleRate = 48000;
 playRecConfig.chanList = [1 2];
 playRecConfig.pageBufCount = 5;
 
+global showFFTFigureConfig = struct();
+showFFTFigureConfig.numAvg = 0;
+showFFTFigureConfig.restartAvg = 0;

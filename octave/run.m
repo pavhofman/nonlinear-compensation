@@ -20,6 +20,7 @@ CALIBRATE = 'cal';
 COMPENSATE = 'comp';
 PASS = 'pass';
 DISTORT = 'distort';
+AVG = 'avg';
 NO_CMD = '';
 
 % bits for statuses
