@@ -20,15 +20,14 @@ elseif (strcmp(cmd, DISTORT) && (bitand(status, PASSING) || bitand(status, COMPE
 elseif (strcmp(cmd, PASS))
   status = PASSING;
 
-else
-    if strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
-        showFFTFigureConfig.numAvg = str2num(cmd{2});
-        showFFTFigureConfig.restartAvg = 1;
-    end
-    if strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
-        showFFTFigureConfig.fftSize = str2num(cmd{2});
-        showFFTFigureConfig.restartAvg = 1;
-    end
+elseif strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
+  showFFTFigureConfig.numAvg = str2num(cmd{2});
+  showFFTFigureConfig.restartAvg = 1;
+
+elseif strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
+  showFFTFigureConfig.fftSize = str2num(cmd{2});
+  showFFTFigureConfig.restartAvg = 1;
+
 endif
 % clear new command
 cmd = NO_CMD;
