@@ -70,6 +70,10 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
     printf('Sleeping for %f\n', cnt/fs - toc());
     playrec('block', pageNumList(1));
     buffer = playrec('getRec', pageNumList(1));
+    global channel;
+    if (channel > 0)
+      buffer = buffer(:, channel);
+    endif
     playrec('delPage', pageNumList(1));
     tic();
 
