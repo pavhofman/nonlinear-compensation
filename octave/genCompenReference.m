@@ -17,7 +17,7 @@ function compenSignal = genCompenReference(fundPeaks, distortPeaks, measuredPeak
   step = 1/fs;
   t = linspace(startingT, startingT + (samplesCnt - 1) * step, samplesCnt)';
 
-  for i = (1:length(distortPeaks))
+  for i = (1:rows(distortPeaks))
     origDistortGain = distortPeaks(i, 2);
     if (origDistortGain > 1e-8)
       distortFreq = distortPeaks(i, 1);
