@@ -8,8 +8,8 @@
 % returns:
 %   fundPeaks [ frequency , amplitude_in_absolute_values, angle_in_radians ]
 %
-function [fundPeaks, errorMsg] = findFundPeaks(x, yc, y)
-  fundPeaks = zeros(0, 3);
+function [fundPeaksCh, errorMsg] = findFundPeaksCh(x, yc, y)
+  fundPeaksCh = [];
   errorMsg = '';
 
   nffto2 = rows(y);
@@ -20,16 +20,24 @@ function [fundPeaks, errorMsg] = findFundPeaks(x, yc, y)
       return
   end
 
-  for b = find(y >= ymax/10)'
-      bb = b - 1;
-      if (bb < 1) || (x(bb) < 10) || ((bb < nffto2) && (y(bb) < y(bb+1))) || (y(bb-1) > y(bb))
-          % skip frequencies under 10Hz and those which are not a local maximum
+  for idx = find(y >= ymax/10)'
+    % local maximum?
+      if ...
+        % first bin
+        (idx < 2) ...
+        % or frequencies under 10Hz
+        || (x(idx) < 10) ...
+        % or next bin larger while not last
+        || ((idx + 1 < nffto2) && (y(idx) < y(idx + 1))) ...
+        % or previous bin larger
+        || (y(idx) < y(idx - 1))
+          % not local maximum, skipping
           continue
       end
-      if rows(fundPeaks) > 2
-          errorMsg = 'too many fundamental peaks';
+      if rows(fundPeaksCh) > 2
+          errorMsg = 'more than 2 fundamental peaks found';
           break
       end
-      fundPeaks = [fundPeaks; x(bb), y(bb), arg(yc(bb))];
+      fundPeaksCh = [fundPeaksCh; x(idx), y(idx), arg(yc(idx))];
   end
 endfunction

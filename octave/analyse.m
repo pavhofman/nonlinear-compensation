@@ -9,8 +9,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
   persistent fundPeaks = [];
   persistent distortPeaks = [];
   persistent measfreq = 0;  
-  persistent periodLength = 0;
-  persistent phaseAnalysisSize = 0;
+    persistent phaseAnalysisSize = 0;
   persistent calRec = struct; 
   % should reload calFile
   rereadCalFile = false;
@@ -41,7 +40,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
       result = 0;
       return;
     else
-      % enough data, determine freqs, peaks are ignored (not calibration signal)
+      % enough data, determine fundPeaks, distortPeaks are ignored (not calibration signal)
       [freqs, fundPeaks, distortPeaks] = measurePeaks(analysisBuffer, fs);
       % continue with phase analysis
       rereadCalFile = true;
@@ -59,11 +58,8 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
       printf('Distortion peaks read from calibration file %s:\n', calFile);
       disp(convertPeaksToPrintable(distortPeaks));
       
-      % for now only single frequency is supported
-      measfreq = fundPeaks(1, 1, 1);
-      periodLength = floor(fs/measfreq);
-      % phase analysis requires at least 3 periods
-      phaseAnalysisSize = periodLength * 2;      
+      % TODO - determine reasonable nb. of samples
+      phaseAnalysisSize = 200;
     endif
     
     if (!bufferWasAdded)
@@ -81,13 +77,20 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
         % finding phase, amplitude
         % We must measure the phase for end of analysisBuffer
         % because next read buffer will continue after the last sample in analysisBuffer
-        fundAmpl = fundPeaks(1, 2, i);
-        %id = tic();
-        [ampl, phaseShift] = measurePhaseCurvefit(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, measfreq, fundAmpl, false);
-        %disp(toc(id));
-        measuredPeaks(1, 1, i) = measfreq;
-        measuredPeaks(1, 2, i) = ampl;
-        measuredPeaks(1, 3, i) = phaseShift;
+        if (rows(fundPeaks) == 1)
+          % single tone
+          %id = tic();
+          measuredPeaksCh = measurePhaseCurvefit(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, fundPeaks(1, :, i), false);
+          %disp(toc(id));
+          % freq
+        else
+          % assuming two-tone signal
+          %id = tic();
+          % only taking first two fundamentals - more are not supported!
+          measuredPeaksCh = measureTwoTonePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, fundPeaks(1:2, :, i), false);
+          %disp(toc(id));
+        endif
+        measuredPeaks(:, :, i) = measuredPeaksCh;
       endfor
       % advance time of measuredParams relative to the end of buffer - the generated compensation reference must be shifted by this to fit beginning of the next buffer
       paramsAdvanceT = phaseAnalysisSize/fs;

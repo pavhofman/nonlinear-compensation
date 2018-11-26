@@ -7,7 +7,7 @@ function compenSignal = genCompenReference(fundPeaks, distortPeaks, measuredPeak
   origFundAmpl = fundPeaks(1, 2);
   currFundAmpl = measuredPeaks(1, 2);
   % time offset between current time and calibration time within single period of the signal
-  if (fundPeaks(2, 1) == 0)
+  if (rows(fundPeaks) == 1)
     timeOffset = determineSingleToneTimeOffset(fundPeaks, measuredPeaks);
   else
     timeOffset = determineDualToneTimeOffset(fundPeaks(1:2, :), measuredPeaks(1:2, :));
