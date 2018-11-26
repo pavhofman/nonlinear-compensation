@@ -41,7 +41,10 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
       return;
     else
       % enough data, determine fundPeaks, distortPeaks are ignored (not calibration signal)
-      [freqs, fundPeaks, distortPeaks] = measurePeaks(analysisBuffer, fs);
+      fundPeaks = getHarmonics(analysisBuffer, fs, false);
+      % freqs read from first channel only
+      freqs = fundPeaks(:, 1, 1);
+
       % continue with phase analysis
       rereadCalFile = true;
     endif

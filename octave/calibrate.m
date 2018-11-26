@@ -25,7 +25,9 @@ function [freqs, result] = calibrate(buffer, fs, restart)
 endfunction
   
 function [ freqs, result] = doCalibrate(calBuffer, fs)
-  [freqs, fundPeaks, distortPeaks] = measurePeaks(calBuffer, fs);
+  [fundPeaks, distortPeaks] = getHarmonics(calBuffer, fs);
+  % freqs read from first channel only
+  freqs = fundPeaks(:, 1, 1);
 
   global wavPath;
   global channel;
