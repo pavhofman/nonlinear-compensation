@@ -6,11 +6,13 @@ elseif (strcmp(cmd, CALIBRATE))
   status = CALIBRATING;
   % clearing calibration buffer
   restartCal = true;
+  showFFTFigureConfig.restartAvg = 1;
 
 elseif (strcmp(cmd, COMPENSATE))
   % start/restart analysis first, compensation will run after measuring current stream parameters
   status = ANALYSING;
   restartAnalysis = true;
+  showFFTFigureConfig.restartAvg = 1;
 
 % distortion allowed only for status PASSING and COMPENSATING
 elseif (strcmp(cmd, DISTORT) && (bitand(status, PASSING) || bitand(status, COMPENSATING)))
@@ -19,6 +21,7 @@ elseif (strcmp(cmd, DISTORT) && (bitand(status, PASSING) || bitand(status, COMPE
 
 elseif (strcmp(cmd, PASS))
   status = PASSING;
+  showFFTFigureConfig.restartAvg = 1;
 
 elseif strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
   showFFTFigureConfig.numAvg = str2num(cmd{2});
