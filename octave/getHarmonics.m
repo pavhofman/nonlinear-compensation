@@ -16,7 +16,7 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
   [x, yc, nfft] = computeFFT(samples, Fs, window_name);
   y = abs(yc);
   fundPeaks = [];
-  distortPeaks = [];
+  distortPeaks = zeros(20, 3, columns(yc));
   for i = 1:columns(yc)
     ycCh = yc(:, i);
     yCh = y(:, i);
@@ -31,7 +31,7 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
           % take 20 strongest harmonics, keep unsorted
           distortPeaksCh = resize(sortrows(distortPeaksCh,-2), 20,3);
       end
-      distortPeaks(:, :, i) = distortPeaksCh;
+      distortPeaks(1:length(distortPeaksCh), :, i) = distortPeaksCh;
     endif    
   endfor  
  
