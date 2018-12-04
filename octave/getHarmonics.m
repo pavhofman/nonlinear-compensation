@@ -13,10 +13,11 @@
 %   y - amplitudes_in_abs_value
 %
 function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, genDistortPeaks = true, window_name = 'hanning')
+  persistent maxDistortCnt = 40;
   [x, yc, nfft] = computeFFT(samples, Fs, window_name);
   y = abs(yc);
   fundPeaks = [];
-  distortPeaks = zeros(20, 3, columns(yc));
+  distortPeaks = zeros(maxDistortCnt, 3, columns(yc));
   for i = 1:columns(yc)
     ycCh = yc(:, i);
     yCh = y(:, i);
@@ -26,10 +27,10 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
     
     if (genDistortPeaks)
       [distortPeaksCh] = getDistortionProductsCh(fundPeaksCh, x, ycCh, yCh, Fs / nfft);
-      % limit distortPeak to 20 rows
-      if rows(distortPeaksCh) > 20
+      % limit distortPeak to maxDistortCnt rows
+      if rows(distortPeaksCh) > maxDistortCnt
           % take 20 strongest harmonics, keep unsorted
-          distortPeaksCh = resize(sortrows(distortPeaksCh,-2), 20,3);
+          distortPeaksCh = resize(sortrows(distortPeaksCh,-2), maxDistortCnt,3);
       end
       distortPeaks(1:length(distortPeaksCh), :, i) = distortPeaksCh;
     endif    
