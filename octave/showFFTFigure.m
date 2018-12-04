@@ -12,7 +12,7 @@ function showFFTFigure(samples, fs)
 
   if fftFigure == 0
     fftFigure = figure;
-    fftAxes = axes('parent', fftFigure, 'xlimmode', 'manual', 'ylimmode', 'manual', 'xscale', 'log', 'yscale', 'linear', 'xlim', [10 fs/2], 'ylim', [-150, 0]);
+    fftAxes = axes('parent', fftFigure, 'xlimmode', 'manual', 'ylimmode', 'manual', 'xscale', 'log', 'yscale', 'linear', 'xlim', [10 fs/2], 'ylim', [-160, 0]);
     xlabel('Frequency (Hz)', 'fontsize', 10);
     ylabel('Magnitude (dB)', 'fontsize', 10);
     % change the tick labels of the graph from scientific notation to floating point:
