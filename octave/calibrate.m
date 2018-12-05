@@ -31,7 +31,6 @@ function [ freqs, result] = doCalibrate(calBuffer, fs)
 
   global wavPath;
   global channel;
-  global calDir;
 
   calRec.time = time();
   calRec.direction = 'capture';
