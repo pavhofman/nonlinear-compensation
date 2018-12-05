@@ -1,8 +1,7 @@
 #!/usr/bin/octave -qf
 % clearing all variables
 % note - 'clear' clears only local/global variables, not persistent variables in functions!
-% we cannot call 'clear all' since it clears all funcions => also all breakpoints in funcions
-clear;
+
 
 more off;
 
@@ -14,23 +13,14 @@ addpath(fileparts(mfilename('fullpath')));
 
 source 'config.m';
 
-% commands
-PAUSE = 'pause';
-CALIBRATE = 'cal';
-COMPENSATE = 'comp';
-PASS = 'pass';
-DISTORT = 'distort';
-AVG = 'avg';
-FFT = 'fft';
-NO_CMD = '';
-
-% bits for statuses
-PAUSED = 0;
-PASSING = 1;
-CALIBRATING = 2;
-ANALYSING = 4;
-COMPENSATING = 8;
-DISTORTING = 16;
+if direction == DIR_PLAY
+  % overriden playback config values
+  source 'configPlay.m';
+  cmdFile = [varDir filesep() CMD_FILE_PLAY];
+else
+  direction = DIR_REC;
+  cmdFile = [varDir filesep() CMD_FILE_REC];
+endif
 
 
 % default initial command

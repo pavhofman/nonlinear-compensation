@@ -1,0 +1,2 @@
+playRecConfig.recDeviceID = 1; % loopback 1
+playRecConfig.playDeviceID = 8; % quartet analog

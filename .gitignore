@@ -1,4 +1,5 @@
 octave/config.m
+octave/configPlay.m
 octave/playrec.mex
 cal*.dat
 octave-workspace
