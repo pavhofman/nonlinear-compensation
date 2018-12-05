@@ -18,7 +18,6 @@ if direction == DIR_PLAY
   source 'configPlay.m';
   cmdFile = [varDir filesep() CMD_FILE_PLAY];
 else
-  direction = DIR_REC;
   cmdFile = [varDir filesep() CMD_FILE_REC];
 endif
 
@@ -27,6 +26,7 @@ endif
 cmd = PAUSE;
 
 fs = 0;
+genFreq = 0;
 
 % first run -> restart, reading all files
 restartReading = true;
@@ -86,6 +86,11 @@ while(true)
   if (bitand(status, COMPENSATING))
     source 'run_compensation.m';
   endif
+  
+  if (status == GENERATING)
+    source 'run_generator.m';
+  endif
+  
   
   % not stopped, always writing
   writeData(buffer, fs, restartWriting);

@@ -7,6 +7,8 @@ PASS = 'pass';
 DISTORT = 'distort';
 AVG = 'avg';
 FFT = 'fft';
+% sine generator
+GENERATE = 'gen';
 NO_CMD = '';
 
 % bits for statuses
@@ -16,7 +18,7 @@ CALIBRATING = 2;
 ANALYSING = 4;
 COMPENSATING = 8;
 DISTORTING = 16;
-
+GENERATING = 32;
 
 %directions
 DIR_REC = 1;

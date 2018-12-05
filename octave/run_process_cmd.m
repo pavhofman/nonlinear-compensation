@@ -31,6 +31,12 @@ elseif strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
   showFFTFigureConfig.fftSize = str2num(cmd{2});
   showFFTFigureConfig.restartAvg = 1;
 
+elseif strcmp(cmd{1}, GENERATE) && (rows(cmd) > 1)
+  status = GENERATING;
+  genFreq = str2num(cmd{2});
+  % zeroing time
+  startingT = 0;
+  showFFTFigureConfig.restartAvg = 1;
 endif
 % clear new command
 cmd = NO_CMD;
