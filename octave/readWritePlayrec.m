@@ -1,4 +1,4 @@
-function [buffer, fs] = readDataPlayrec(cnt, restart)
+function [buffer, fs] = readWritePlayrec(cnt, playBuffer, restart)
     global playRecConfig;
     persistent pageNumList;
 
@@ -7,16 +7,28 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
     else
         recDeviceID = 0;
     end
+    if isstruct(playRecConfig) && isfield(playRecConfig, 'playDeviceID')
+        playDeviceID = playRecConfig.playDeviceID;
+    else
+        playDeviceID = -1;
+    end
+
     if isstruct(playRecConfig) && isfield(playRecConfig, 'sampleRate')
         fs = playRecConfig.sampleRate;
     else
         fs = 48000;
     end
-    if isstruct(playRecConfig) && isfield(playRecConfig, 'chanList')
-        chanList = playRecConfig.chanList;
+    if isstruct(playRecConfig) && isfield(playRecConfig, 'recChanList')
+        recChanList = playRecConfig.recChanList;
     else
-        chanList = [1 2];
+        recChanList = [1 2];
     end
+        if isstruct(playRecConfig) && isfield(playRecConfig, 'playChanList')
+        playChanList = playRecConfig.playChanList;
+    else
+        playChanList = [1 2];
+    end
+
     if isstruct(playRecConfig) && isfield(playRecConfig, 'pageBufCount')
         pageBufCount = playRecConfig.pageBufCount;
     else
@@ -27,7 +39,7 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
         cnt = fs * 0.4;
     endif
 
-    if((ndims(chanList)~=2) || (size(chanList, 1)~=1))
+    if((ndims(recChanList)~=2) || (size(recChanList, 1)~=1))
         error ('chanList must be a row vector');
     end
 
@@ -39,7 +51,7 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
         elseif(playrec('getRecDevice')~=recDeviceID)
             fprintf('Changing playrec record device from %d to %d\n', playrec('getRecDevice'), recDeviceID);
             playrec('reset');
-        elseif(playrec('getRecMaxChannel')<max(chanList))
+        elseif(playrec('getRecMaxChannel')<max(recChanList))
             fprintf('Resetting playrec to configure device to use more input channels\n');
             playrec('reset');
         end
@@ -50,24 +62,25 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
         if (playrec('isInitialised'))
           playrec('reset');
         endif
-        fprintf('Initialising playrec to use sample rate: %d, recDeviceID: %d and no play device\n', fs, recDeviceID);
-        playrec('init', fs, -1, recDeviceID)
+        fprintf('Initialising playrec to use sample rate: %d, recDeviceID: %d , playDeviceID: %d\n', fs, recDeviceID, playDeviceID);
+          playrec('init', fs, playDeviceID, recDeviceID, 2, 2, 10000)
         if(~playrec('isInitialised'))
             error ('Unable to initialise playrec correctly');
-        elseif(playrec('getRecMaxChannel')<max(chanList))
-            error ('Selected device does not support %d output channels\n', max(chanList));
+        elseif(playrec('getRecMaxChannel')<max(recChanList))
+            error ('Selected device does not support %d output channels\n', max(recChanList));
         end
         %Clear all previous pages
         playrec('delPage');
         playrec('resetSkippedSampleCount');
         pageNumList = [];
         for page=1:pageBufCount
-            pageNumList = [pageNumList playrec('rec', cnt, chanList)];
+            pageNumList = [pageNumList playrec('rec', cnt, recChanList)];
         end
         tic();
     end
 
     printf('Sleeping for %f\n', cnt/fs - toc());
+    % blocking read on recording side
     playrec('block', pageNumList(1));
     buffer = playrec('getRec', pageNumList(1));
     global channel;
@@ -77,7 +90,8 @@ function [buffer, fs] = readDataPlayrec(cnt, restart)
     playrec('delPage', pageNumList(1));
     tic();
 
-    pageNumList = [pageNumList(2:end) playrec('rec', cnt, chanList)];
+    % FIFO - drop first element of pageNumList, read last from recDeviceID
+    pageNumList = [pageNumList(2:end) playrec('playrec', playBuffer, playChanList, cnt, recChanList)];
 
     skipped = playrec('getSkippedSampleCount');
     if(skipped ~= 0)

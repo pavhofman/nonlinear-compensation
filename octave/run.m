@@ -47,6 +47,7 @@ restartWriting = true;
 freqs = -1;
 
 startingT = 0;
+buffer = [0];
 
 global deviceName;
 if exist('wavPath', 'var') && !isempty(wavPath)
@@ -83,7 +84,8 @@ while(true)
   if exist('wavPath', 'var') && !isempty(wavPath)
     [buffer, fs] = readData(-1, fs, restartReading);
   else
-    [buffer, fs] = readDataPlayrec(-1, restartReading);
+    % reading/writing to soundcards
+    [buffer, fs] = readWritePlayrec(-1, buffer, restartReading);
   end
   restartReading = false;
 

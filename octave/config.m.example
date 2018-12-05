@@ -31,6 +31,9 @@ playRecConfig.recDeviceID = 0;
 playRecConfig.sampleRate = 48000;
 playRecConfig.chanList = [1 2];
 playRecConfig.pageBufCount = 5;
+playRecConfig.playDeviceID = 16; % e.g. Loopback 0
+playRecConfig.playChanList = [1 2];
+
 
 global showFFTFigureConfig = struct();
 showFFTFigureConfig.numAvg = 0;
