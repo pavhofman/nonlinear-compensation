@@ -1,4 +1,4 @@
-% Generates compensation reference (distortion peaks with inverted phase). Supports only single fundamental frequency, for now.
+% Generates compensation reference (distortion peaks with inverted phase). Supports single and dual frequencies
 function compenSignal = genCompenReference(fundPeaks, distortPeaks, measuredPeaks, fs, startingT, samplesCnt)
   % first harmonics = zero
   compenSignal = zeros(samplesCnt, 1);
