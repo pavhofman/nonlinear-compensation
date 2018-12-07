@@ -1,5 +1,5 @@
 % determining phase and amplitude with curve fitting - for one tone
-function measuredPeaksCh = measurePhaseCurvefit(samples, fs, fundPeaksCh, showCharts)
+function measuredPeaksCh = measureSingleTonePhase(samples, fs, fundPeaksCh, showCharts)
   fundAmpl = fundPeaksCh(1, 2);
   measfreq = fundPeaksCh(1, 1);
 

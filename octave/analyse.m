@@ -9,7 +9,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
   persistent fundPeaks = [];
   persistent distortPeaks = [];
   persistent measfreq = 0;  
-    persistent phaseAnalysisSize = 0;
+  persistent phaseAnalysisSize = 0;
   persistent calRec = struct; 
   % should reload calFile
   rereadCalFile = false;
@@ -83,7 +83,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
         if (rows(fundPeaks) == 1)
           % single tone
           %id = tic();
-          measuredPeaksCh = measurePhaseCurvefit(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, fundPeaks(1, :, i), false);
+          measuredPeaksCh = measureSingleTonePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, fundPeaks(1, :, i), false);
           %disp(toc(id));
           % freq
         else
