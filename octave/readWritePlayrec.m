@@ -36,7 +36,7 @@ function [buffer, fs] = readWritePlayrec(cnt, playBuffer, restart)
     end
 
     if (cnt == -1)
-        cnt = fs * 0.4;
+        cnt = floor(fs * 0.2);
     endif
 
     if((ndims(recChanList)~=2) || (size(recChanList, 1)~=1))
