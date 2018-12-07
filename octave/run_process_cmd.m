@@ -12,6 +12,8 @@ elseif (strcmp(cmd, COMPENSATE))
   % start/restart analysis first, compensation will run after measuring current stream parameters
   status = ANALYSING;
   restartAnalysis = true;
+  % re-determine freqs in case of change
+  freqs = -1;
   showFFTFigureConfig.restartAvg = 1;
 
 % distortion allowed only for status PASSING and COMPENSATING
