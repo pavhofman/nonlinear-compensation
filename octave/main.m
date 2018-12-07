@@ -45,7 +45,11 @@ if exist('wavPath', 'var') && !isempty(wavPath)
     deviceName = [wavName wavExt];
 else
     global playRecConfig;
-    deviceName = sprintf('rec%d', playRecConfig.recDeviceID);
+    if (direction == DIR_PLAY)
+      deviceName = sprintf('play%d', playRecConfig.playDeviceID);
+    else
+      deviceName = sprintf('rec%d', playRecConfig.recDeviceID);
+    endif
 end
 
 while(true)
