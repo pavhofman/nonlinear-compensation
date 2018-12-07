@@ -17,9 +17,9 @@ elseif (strcmp(cmd, COMPENSATE))
   showFFTFigureConfig.restartAvg = 1;
 
 % distortion allowed only for status PASSING and COMPENSATING
-elseif (strcmp(cmd, DISTORT) && (bitand(status, PASSING) || bitand(status, COMPENSATING)))
+elseif (strcmp(cmd, DISTORT) && (statusContains(status, PASSING) || statusContains(status, COMPENSATING)))
   % enable distortion
-  status = bitor(status, DISTORTING);
+  status = [status, DISTORTING];
 
 elseif (strcmp(cmd, PASS))
   status = PASSING;

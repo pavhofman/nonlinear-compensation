@@ -64,10 +64,11 @@ while(true)
     source 'run_process_cmd.m';  
   endif
 
-%  printf('Status: %d\n', status);
+%  printf('Status: \n');
+%  disp(status);
   drawnow();
 
-  if (status == PAUSED)
+  if (statusIs(status, PAUSED))
     % no reading/writing
     pause(0.5);
     % next cycle
@@ -83,15 +84,15 @@ while(true)
   end
   restartReading = false;
 
-  if (bitand(status, DISTORTING) && (bitand(status, PASSING) || bitand(status, COMPENSATING)))
+  if (statusContains(status, DISTORTING) && (statusContains(status, PASSING) || statusContains(status, COMPENSATING)))
     source 'run_distortion.m';
   endif
   
-  if (bitand(status, COMPENSATING))
+  if (statusContains(status, COMPENSATING))
     source 'run_compensation.m';
   endif
   
-  if (status == GENERATING)
+  if (statusIs(status, GENERATING))
     source 'run_generator.m';
   endif
   
@@ -102,9 +103,9 @@ while(true)
   
   
   % do additional processing - calibration or analysis
-  if (status == CALIBRATING)
+  if (statusIs(status, CALIBRATING))
     source 'run_calibration.m';    
-  elseif (bitand(status, ANALYSING))
+  elseif (statusContains(status, ANALYSING))
     source 'run_analysis.m';
   endif
   

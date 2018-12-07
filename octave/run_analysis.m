@@ -5,5 +5,9 @@ if (result == 1)
   % from now on only compensation
   %status = COMPENSATING;
   % or could start new analysis right away + keeping DISTORTING flag
-  status = bitor(bitor(COMPENSATING, ANALYSING), bitand(status, DISTORTING));
+  isDistorting = statusContains(status, DISTORTING);  
+  status = [COMPENSATING, ANALYSING];
+  if (isDistorting)
+    status = [status, DISTORTING];
+  endif
 endif
