@@ -44,7 +44,10 @@ elseif strcmp(cmd{1}, MEASURE) && (rows(cmd) > 2)
   transfer.freq = str2num(cmd{2});
   % channel ID for transfer measurement. The other channel receives the original signal
   transfer.channel = str2num(cmd{3});
-  restartMeasuring = true;  
+  restartMeasuring = true;
+elseif (strcmp(cmd, CALIB_LP))
+  status = CALIBRATING_LP;
+  
 endif
 % clear new command
 cmd = NO_CMD;

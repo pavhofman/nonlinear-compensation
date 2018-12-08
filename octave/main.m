@@ -103,6 +103,10 @@ while(true)
   if (status == MEASURING)
     source 'run_measuring.m';
   endif
+
+  if (status == CALIBRATING_LP)
+    source 'run_calib_lp.m';
+  endif
   
   % not stopped, always writing
   writeData(buffer, fs, restartWriting);

@@ -11,6 +11,7 @@ FFT = 'fft';
 GENERATE = 'gen';
 % measure transfer at frequency and channel
 MEASURE = 'meas';
+CALIB_LP = 'cal-lp';
 NO_CMD = '';
 
 % bits for statuses
@@ -22,6 +23,7 @@ COMPENSATING = 4;
 DISTORTING = 5;
 GENERATING = 6;
 MEASURING = 7;
+CALIBRATING_LP = 8;
 
 %directions
 DIR_REC = 1;
