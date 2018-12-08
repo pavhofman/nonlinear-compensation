@@ -10,6 +10,7 @@ function measuredPeaksCh = measureSingleTonePhase(samples, fs, fundPeaksCh, show
   % curve fitting init - amplitude should be close to fundAmpl, phaseShift is unknown
   init = [fundAmpl; 0];
   y = samples(1:totalSamples);
+  % unfortunately no lower/upper bounds work
   [p, model_values, cvg, outp] = nonlin_curvefit (f, init, t, y);
   ampl = p(1);
   phaseShift = p(2);
@@ -32,7 +33,7 @@ function measuredPeaksCh = measureSingleTonePhase(samples, fs, fundPeaksCh, show
   # just in case the final samples of the wav are garbled
   offsetFromEnd = 100;
   endPos = length(samples) - offsetFromEnd;
-  lowT = endPos - samplesPlotted;
+  lowT = endPos - samplesPlotted + 1;
   highT = endPos;
 
   # the curves must be exactly phase-aligned!!!
