@@ -39,6 +39,12 @@ elseif strcmp(cmd{1}, GENERATE) && (rows(cmd) > 1)
   % zeroing time
   startingT = 0;
   showFFTFigureConfig.restartAvg = 1;
+elseif strcmp(cmd{1}, MEASURE) && (rows(cmd) > 2)
+  status = MEASURING;
+  transfer.freq = str2num(cmd{2});
+  % channel ID for transfer measurement. The other channel receives the original signal
+  transfer.channel = str2num(cmd{3});
+  restartMeasuring = true;  
 endif
 % clear new command
 cmd = NO_CMD;

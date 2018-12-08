@@ -28,11 +28,15 @@ cmd = PAUSE;
 fs = 0;
 genFreq = 0;
 
+transfer = struct();
+
+
 % first run -> restart, reading all files
 restartReading = true;
 restartCal = true;
 restartAnalysis = true;
 restartWriting = true;
+restartMeasuring = true;
 % unknown frequencies - measured by calibration or by determineFundamentalFreqs() in analysis
 freqs = -1;
 
@@ -96,6 +100,9 @@ while(true)
     source 'run_generator.m';
   endif
   
+  if (status == MEASURING)
+    source 'run_measuring.m';
+  endif
   
   % not stopped, always writing
   writeData(buffer, fs, restartWriting);
