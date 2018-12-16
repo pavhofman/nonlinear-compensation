@@ -6,7 +6,6 @@
 more off;
 
 pkg load miscellaneous;
-pkg load control;
 pkg load optim;
 
 addpath(fileparts(mfilename('fullpath')));
@@ -21,9 +20,8 @@ else
   cmdFile = [varDir filesep() CMD_FILE_REC];
 endif
 
-
 % default initial command
-cmd = PAUSE;
+cmd = cellstr(PAUSE);
 
 fs = 0;
 genFreq = 0;
@@ -50,11 +48,18 @@ if exist('wavPath', 'var') && !isempty(wavPath)
 else
     global playRecConfig;
     if (direction == DIR_PLAY)
-      deviceName = sprintf('play%d', playRecConfig.playDeviceID);
+      deviceName = [DEVICE_PLAY_PREFIX num2str(playRecConfig.playDeviceID)];
+      % output/input device IDs - needed for storing calib files
+      outputDeviceID = playRecConfig.playDeviceID;
+      inputDeviceID = playRecConfig.otherDirectionDeviceID;
     else
-      deviceName = sprintf('rec%d', playRecConfig.recDeviceID);
+      deviceName = [DEVICE_REC_PREFIX num2str(playRecConfig.recDeviceID)];
+      outputDeviceID = playRecConfig.otherDirectionDeviceID;
+      inputDeviceID = playRecConfig.recDeviceID;      
     endif
 end
+
+global jointDeviceName = [DEVICE_REC_PREFIX num2str(inputDeviceID) '_' DEVICE_PLAY_PREFIX num2str(outputDeviceID)];
 
 while(true)
   % checking command file for new commands
@@ -104,8 +109,8 @@ while(true)
     source 'run_measuring.m';
   endif
 
-  if (status == CALIBRATING_LP)
-    source 'run_calib_lp.m';
+  if (status == SPLITTING)
+    source 'run_splitting.m';
   endif
   
   % not stopped, always writing

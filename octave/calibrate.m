@@ -1,4 +1,4 @@
-function [freqs, result] = calibrate(buffer, fs, restart)
+function [freqs, result] = calibrate(buffer, fs, deviceName, extraCircuit, restart)
   persistent calBuffer = [];
   calibrationSize = fs; % 1 second
   
@@ -17,30 +17,9 @@ function [freqs, result] = calibrate(buffer, fs, restart)
   else
     % enough data, copying only up to calibrationSize data
     calBuffer = [calBuffer; buffer(1:calibrationSize - currentSize, :)];
-    global wavPath;
-    global channel;
+    [fundPeaks, distortPeaks] = getHarmonics(calBuffer, fs);
 
-    [freqs, result] = doCalibrate(calBuffer, fs);    
+    % storing joint directions cal file
+    [freqs, result] = saveCalFile(fundPeaks, distortPeaks, fs, deviceName, extraCircuit);
   endif
-endfunction
-  
-function [ freqs, result] = doCalibrate(calBuffer, fs)
-  [fundPeaks, distortPeaks] = getHarmonics(calBuffer, fs);
-  % freqs read from first channel only
-  freqs = fundPeaks(:, 1, 1);
-
-  global wavPath;
-  global channel;
-
-  calRec.time = time();
-  calRec.direction = 'capture';
-  calRec.device = wavPath;
-  calRec.fundPeaks = fundPeaks;
-  calRec.distortPeaks = distortPeaks;
-
-  disp(calRec);
-  
-  calFile = genCalFilename(freqs, fs);
-  save(calFile, 'calRec');
-  result = 1;
 endfunction

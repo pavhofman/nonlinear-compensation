@@ -1,5 +1,5 @@
 % transfer measurement running
-[transfer, result] = measureTransfer(buffer, fs, transfer, restartMeasuring);
+[transfer, result] = measureTransfer(buffer, fs, transfer, genAmpl, restartMeasuring);
 restartMeasuring = false;
 if (result == 1)
   % finished

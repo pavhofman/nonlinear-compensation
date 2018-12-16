@@ -1,3 +1,5 @@
+pkg load control;
+
 % CONSTANTS
 % commands
 PAUSE = 'pause';
@@ -11,7 +13,8 @@ FFT = 'fft';
 GENERATE = 'gen';
 % measure transfer at frequency and channel
 MEASURE = 'meas';
-CALIB_LP = 'cal-lp';
+% splitting joint calibration to DAC and ADC components
+SPLIT = 'split';
 NO_CMD = '';
 
 % bits for statuses
@@ -23,7 +26,7 @@ COMPENSATING = 4;
 DISTORTING = 5;
 GENERATING = 6;
 MEASURING = 7;
-CALIBRATING_LP = 8;
+SPLITTING = 8;
 
 %directions
 DIR_REC = 1;
@@ -32,3 +35,11 @@ DIR_PLAY = 2;
 % direction cmd.info files
 CMD_FILE_REC = 'cmd.info';
 CMD_FILE_PLAY = 'cmd-play.info';
+
+% prefices for device names (used in calibration file names)
+DEVICE_REC_PREFIX = 'rec';
+DEVICE_PLAY_PREFIX = 'play';
+
+
+% fixed generator amplitude for now - used when generating sine (genSine) and calculating split calibration (run_split)
+genAmpl = db2mag(-3);

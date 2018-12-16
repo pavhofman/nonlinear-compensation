@@ -4,7 +4,7 @@
 % measuredPeaks - measured fundamental peaks
 % paramsAdvanceT - advance time of measuredParams related to the end of buffer (use t = paramsAdvanceT for starting sample of next buffer in compenReference calculation)
 % fundPeaks, distortPeaks - read from calibration file corresponding to current stream freqs
-function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result] = analyse(buffer, fs, freqs, restartAnalysis)
+function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result] = analyse(buffer, fs, freqs, calDeviceName, extraCircuit, restartAnalysis)
   persistent analysisBuffer = [];
   persistent fundPeaks = [];
   persistent distortPeaks = [];
@@ -53,7 +53,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
   if (freqs(1) > 0)
     if (restartAnalysis || rereadCalFile)
       % re-reading cal file
-      calFile = genCalFilename(freqs, fs);
+      calFile = genCalFilename(freqs, fs, calDeviceName, extraCircuit);
       % loading calRec, initialising persistent vars
       load(calFile);
       fundPeaks = calRec.fundPeaks;

@@ -27,6 +27,7 @@ playRecConfig.chanList = [1 2];
 playRecConfig.pageBufCount = 5;
 playRecConfig.playDeviceID = 16; % e.g. Loopback 0
 playRecConfig.playChanList = [1 2];
+playRecConfig.otherDirectionDeviceID = 8;
 
 
 global showFFTFigureConfig = struct();

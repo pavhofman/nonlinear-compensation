@@ -32,7 +32,7 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
           % take 20 strongest harmonics, keep unsorted
           distortPeaksCh = resize(sortrows(distortPeaksCh,-2), maxDistortCnt,3);
       end
-      distortPeaks(1:length(distortPeaksCh), :, i) = distortPeaksCh;
+      distortPeaks(1:rows(distortPeaksCh), :, i) = distortPeaksCh;
     endif    
   endfor  
  

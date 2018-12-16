@@ -1,7 +1,6 @@
-% result: calDir/cal_freq1_freq2_FS48000_device.dat
-function filename = genCalFilename(freqs, fs)
+% result: calDir/cal_freq1_freq2_FS48000_deviceName_extracircuit.dat
+function filename = genCalFilename(freqs, fs, deviceName, extraCircuit='')
   global varDir;
-  global deviceName;
   
   % freq1_freq2_...
   freqsPart = '';
@@ -9,5 +8,9 @@ function filename = genCalFilename(freqs, fs)
     freqsPart = [freqsPart,  int2str(floor(freqs(i))), '_'];
   endfor
   
-  filename = [varDir filesep() 'cal_' freqsPart 'FS' int2str(fs) '_' deviceName '.dat'];
+  if (length(extraCircuit) > 0)
+    extraCircuit = ['_' extraCircuit];
+  endif
+  
+  filename = [varDir filesep() 'cal_' freqsPart 'FS' int2str(fs) '_' deviceName extraCircuit '.dat'];
 endfunction
