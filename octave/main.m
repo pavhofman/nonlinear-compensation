@@ -105,25 +105,26 @@ while(true)
     source 'run_generator.m';
   endif
   
-  if (status == MEASURING)
-    source 'run_measuring.m';
-  endif
-
-  if (status == SPLITTING)
-    source 'run_splitting.m';
-  endif
-  
   % not stopped, always writing
   writeData(buffer, fs, restartWriting);
   restartWriting = false;
   
   
-  % do additional processing - calibration or analysis
-  if (statusIs(status, CALIBRATING))
-    source 'run_calibration.m';    
-  elseif (statusContains(status, ANALYSING))
+  % do additional read-only processing on samples
+  if (statusContains(status, CALIBRATING))
+    source 'run_calibration.m';
+  endif
+  
+  if (status == MEASURING)
+    source 'run_measuring.m';
+  endif
+
+  if (statusContains(status, ANALYSING))
     source 'run_analysis.m';
   endif
   
+  if (status == SPLITTING)
+    source 'run_splitting.m';
+  endif
   
 endwhile

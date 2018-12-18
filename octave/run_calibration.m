@@ -1,4 +1,4 @@
-[freqs, result] = calibrate(buffer, fs, jointDeviceName, extraCircuit, restartCal);
+[freqs, result] = calibrate(buffer, fs, jointDeviceName, calExtraCircuit, freqs, restartCal);
 restartCal = false;
 if (result == 1)
   % finished

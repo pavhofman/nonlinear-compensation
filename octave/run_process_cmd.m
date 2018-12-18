@@ -3,13 +3,14 @@ if (strcmp(cmd{1}, PAUSE))
   
 elseif (strcmp(cmd{1}, CALIBRATE))
   % cal extraCircuit
-  % start/restart joint-device calibration 
-  status = CALIBRATING;
+  % start/restart joint-device calibration
+  % add status - e.g. why compensation is running for incremental calibration
+  status = addStatus(status, CALIBRATING);
   % reading optional  extra circuit specifier string (will be stored in cal file name)
   if (rows(cmd) > 1)
-    extraCircuit = cmd{2};
+    calExtraCircuit = cmd{2};
   else
-    extraCircuit = '';
+    calExtraCircuit = '';
   endif
   % clearing calibration buffer
   restartCal = true;
@@ -27,9 +28,9 @@ elseif (strcmp(cmd{1}, COMPENSATE))
   endif
   % reading optional extraCircuit string
   if (rows(cmd) > 2)
-    extraCircuit = cmd{3};
+    compExtraCircuit = cmd{3};
   else
-    extraCircuit = '';
+    compExtraCircuit = '';
   endif
   
   restartAnalysis = true;
@@ -40,7 +41,7 @@ elseif (strcmp(cmd{1}, COMPENSATE))
 % distortion allowed only for status PASSING and COMPENSATING
 elseif (strcmp(cmd{1}, DISTORT) && (statusContains(status, PASSING) || statusContains(status, COMPENSATING)))
   % enable distortion
-  status = [status, DISTORTING];
+  status = addStatus(status, DISTORTING);
 
 elseif (strcmp(cmd{1}, PASS))
   status = PASSING;
