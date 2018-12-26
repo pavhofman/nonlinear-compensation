@@ -11,7 +11,7 @@ function [output] = lpEqs(t, distortF, amplA, phaseA, amplD, phaseD, gainVD, dis
   % phase D was shifted by LP transfer at distortion freq
   sineD_LP = cos(2*pi * distortF * t + phaseD + distortLPPhaseShift)* amplD * distortLPGain;
   % amplitude A was at full scale for the incoming level of fundamental freq
-  sineA_LP = cos(2*pi * distortF * t + phaseA + phaseShiftAByLP)* amplA * fundLPGain;
+  sineA_LP = cos(2*pi * distortF * t + phaseA + phaseShiftAByLP)* amplA* fundLPGain/gainVD;
   
   sineLP = sineD_LP + sineA_LP;
   output = [sineVD; sineLP];
