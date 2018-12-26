@@ -20,6 +20,10 @@ else
   cmdFile = [varDir filesep() CMD_FILE_REC];
 endif
 
+if !exist(varDir, 'dir')
+  mkdir(varDir);
+endif
+
 % default initial command
 cmd = cellstr(PAUSE);
 
