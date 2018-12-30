@@ -1,34 +1,3 @@
-% Generates compensation reference (distortion peaks with inverted phase). Supports single and dual frequencies
-function compenSignal = genCompenReference(fundPeaks, distortPeaks, measuredPeaks, fs, startingT, samplesCnt)
-  % first harmonics = zero
-  compenSignal = zeros(samplesCnt, 1);
-  % for now only single fundamental frequency
-  measFreq = measuredPeaks(1, 1);
-  origFundAmpl = fundPeaks(1, 2);
-  currFundAmpl = measuredPeaks(1, 2);
-  
-  % time offset between current time and calibration time within single period of the signal
-  timeOffset = determineTimeOffset(fundPeaks, measuredPeaks);
-  
-  scale = currFundAmpl / origFundAmpl;
-  step = 1/fs;
-  t = linspace(startingT, startingT + (samplesCnt - 1) * step, samplesCnt)';
-  pi2 = 2 * pi;
-  for i = (1:rows(distortPeaks))
-    origDistortGain = distortPeaks(i, 2);
-    distortFreq = distortPeaks(i, 1);
-    origDistortPhase = distortPeaks(i, 3);
-    % current phase distortion = original distortion phase + additional phase accumulated in timeOffset
-    currentDistortPhase = origDistortPhase + pi2 * distortFreq * timeOffset;
-    % inverted phase
-    compenDistortPhase = currentDistortPhase - pi;
-    compenDistortGain = origDistortGain * scale;
-    % compensation signal for this distortion
-    compenSignal += cos(pi2 * distortFreq * t + compenDistortPhase) * compenDistortGain;     
-  endfor
-endfunction
-
-
 function timeOffset = determineTimeOffset(fundPeaks, measuredPeaks)
   if (rows(fundPeaks) == 1)
     timeOffset = determineSingleToneTimeOffset(fundPeaks, measuredPeaks);
