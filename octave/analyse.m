@@ -76,24 +76,24 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
       return;
     else
       measuredPeaks = [];
-      for i = 1:columns(buffer)
+      for channelID = 1:columns(buffer)
         % finding phase, amplitude
         % We must measure the phase for end of analysisBuffer
         % because next read buffer will continue after the last sample in analysisBuffer
         if (rows(fundPeaks) == 1)
           % single tone
           %id = tic();
-          measuredPeaksCh = measureSingleTonePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, fundPeaks(1, :, i), false);
+          measuredPeaksCh = measureSingleTonePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, channelID), fs, fundPeaks(1, :, channelID), false);
           %disp(toc(id));
           % freq
         else
           % assuming two-tone signal
           %id = tic();
           % only taking first two fundamentals - more are not supported!
-          measuredPeaksCh = measureTwoTonePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, i), fs, fundPeaks(1:2, :, i), false);
+          measuredPeaksCh = measureTwoTonePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, channelID), fs, fundPeaks(1:2, :, channelID), false);
           %disp(toc(id));
         endif
-        measuredPeaks(:, :, i) = measuredPeaksCh;
+        measuredPeaks(:, :, channelID) = measuredPeaksCh;
       endfor
       % advance time of measuredParams relative to the end of buffer - the generated compensation reference must be shifted by this to fit beginning of the next buffer
       paramsAdvanceT = phaseAnalysisSize/fs;
