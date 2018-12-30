@@ -1,23 +1,23 @@
 % Generates compensation reference (distortion peaks with inverted phase). Supports single and dual frequencies
-function compenSignal = genCompenReference(fundPeaks, distortPeaks, measuredPeaks, fs, startingT, samplesCnt)
+function compenSignal = genCompenReference(fundPeaksCh, distortPeaksCh, measuredPeaksCh, fs, startingT, samplesCnt)
   % first harmonics = zero
   compenSignal = zeros(samplesCnt, 1);
   % for now only single fundamental frequency
-  measFreq = measuredPeaks(1, 1);
-  origFundAmpl = fundPeaks(1, 2);
-  currFundAmpl = measuredPeaks(1, 2);
+  measFreq = measuredPeaksCh(1, 1);
+  origFundAmpl = fundPeaksCh(1, 2);
+  currFundAmpl = measuredPeaksCh(1, 2);
   
   % time offset between current time and calibration time within single period of the signal
-  timeOffset = determineTimeOffset(fundPeaks, measuredPeaks);
+  timeOffset = determineTimeOffset(fundPeaksCh, measuredPeaksCh);
   
   scale = currFundAmpl / origFundAmpl;
   step = 1/fs;
   t = linspace(startingT, startingT + (samplesCnt - 1) * step, samplesCnt)';
   pi2 = 2 * pi;
-  for i = (1:rows(distortPeaks))
-    origDistortGain = distortPeaks(i, 2);
-    distortFreq = distortPeaks(i, 1);
-    origDistortPhase = distortPeaks(i, 3);
+  for i = (1:rows(distortPeaksCh))
+    origDistortGain = distortPeaksCh(i, 2);
+    distortFreq = distortPeaksCh(i, 1);
+    origDistortPhase = distortPeaksCh(i, 3);
     % current phase distortion = original distortion phase + additional phase accumulated in timeOffset
     currentDistortPhase = origDistortPhase + pi2 * distortFreq * timeOffset;
     % inverted phase
@@ -29,11 +29,11 @@ function compenSignal = genCompenReference(fundPeaks, distortPeaks, measuredPeak
 endfunction
 
 
-function timeOffset = determineTimeOffset(fundPeaks, measuredPeaks)
-  if (rows(fundPeaks) == 1)
-    timeOffset = determineSingleToneTimeOffset(fundPeaks, measuredPeaks);
+function timeOffset = determineTimeOffset(fundPeaksCh, measuredPeaksCh)
+  if (rows(fundPeaksCh) == 1)
+    timeOffset = determineSingleToneTimeOffset(fundPeaksCh, measuredPeaksCh);
   else
-    timeOffset = determineDualToneTimeOffset(fundPeaks(1:2, :), measuredPeaks(1:2, :));
+    timeOffset = determineDualToneTimeOffset(fundPeaksCh(1:2, :), measuredPeaksCh(1:2, :));
   endif
 endfunction
 
@@ -48,10 +48,10 @@ endfunction
 
 
 % single frequency
-function timeOffset = determineSingleToneTimeOffset(fundPeaks, measuredPeaks)
-  origPhase = fundPeaks(1, 3);
-  currPhase = measuredPeaks(1, 3);
-  measFreq = measuredPeaks(1, 1);
+function timeOffset = determineSingleToneTimeOffset(fundPeaksCh, measuredPeaksCh)
+  origPhase = fundPeaksCh(1, 3);
+  currPhase = measuredPeaksCh(1, 3);
+  measFreq = measuredPeaksCh(1, 1);
   
   currPhaseShift = getPositivePhaseDiff(origPhase, currPhase);
   
@@ -61,17 +61,17 @@ endfunction
 
 % Two frequencies
 % Both peaks have two rows
-% Assuming fundPeaks and measuredPeaks have same frequencies
+% Assuming fundPeaksCh and measuredPeaksCh have same frequencies
 % Time offset can be determined precisely only for this specific case: both frequencies must be integer-divisable by their difference
 % E.g. 13k + 14k OK, 10k + 12k OK, 9960 + 9980 OK, but 9k + 11k FAIL
-function timeOffset = determineDualToneTimeOffset(fundPeaks, measuredPeaks)
+function timeOffset = determineDualToneTimeOffset(fundPeaksCh, measuredPeaksCh)
   % sorting by frequency desc
-  fundPeaks = sortrows(fundPeaks, -1);
-  measuredPeaks = sortrows(measuredPeaks, -1);
+  fundPeaksCh = sortrows(fundPeaksCh, -1);
+  measuredPeaksCh = sortrows(measuredPeaksCh, -1);
   
   % now f1 > f2 => period2 > period1
-  f1 = fundPeaks(1, 1);
-  f2 = fundPeaks(2, 1);
+  f1 = fundPeaksCh(1, 1);
+  f2 = fundPeaksCh(2, 1);
   % periods at secs
   per1 = 1/f1;
   per2 = 1/f2;
@@ -84,15 +84,15 @@ function timeOffset = determineDualToneTimeOffset(fundPeaks, measuredPeaks)
   
   
   % phase diff at calibration time
-  ph1 = fundPeaks(1, 3);
-  ph2 = fundPeaks(2, 3);
+  ph1 = fundPeaksCh(1, 3);
+  ph2 = fundPeaksCh(2, 3);
   % f1 is ahead of f2 by calPhaseDiff at cal time
   calPhaseDiff = getPositivePhaseDiff(ph2, ph1);
  
 
   % phase diff at measurement time
-  mph1 = measuredPeaks(1, 3);
-  mph2 = measuredPeaks(2, 3);
+  mph1 = measuredPeaksCh(1, 3);
+  mph2 = measuredPeaksCh(2, 3);
   % measured f1 is ahead of measured f2 by measuredPhaseDiff at measure time
   measuredPhaseDiff = getPositivePhaseDiff(mph2, mph1);
   

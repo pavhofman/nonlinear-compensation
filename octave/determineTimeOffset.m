@@ -1,8 +1,8 @@
-function timeOffset = determineTimeOffset(fundPeaks, measuredPeaks)
-  if (rows(fundPeaks) == 1)
-    timeOffset = determineSingleToneTimeOffset(fundPeaks, measuredPeaks);
+function timeOffset = determineTimeOffset(firstFundPeaksCh, secondFundPeaksCh)
+  if (rows(firstFundPeaksCh) == 1)
+    timeOffset = determineSingleToneTimeOffset(firstFundPeaksCh, secondFundPeaksCh);
   else
-    timeOffset = determineDualToneTimeOffset(fundPeaks(1:2, :), measuredPeaks(1:2, :));
+    timeOffset = determineDualToneTimeOffset(firstFundPeaksCh(1:2, :), secondFundPeaksCh(1:2, :));
   endif
 endfunction
 
@@ -17,30 +17,31 @@ endfunction
 
 
 % single frequency
-function timeOffset = determineSingleToneTimeOffset(fundPeaks, measuredPeaks)
-  origPhase = fundPeaks(1, 3);
-  currPhase = measuredPeaks(1, 3);
-  measFreq = measuredPeaks(1, 1);
+function timeOffset = determineSingleToneTimeOffset(firstFundPeaksCh, secondFundPeaksCh)
+  firstPhase = firstFundPeaksCh(1, 3);
+  secondPhase = secondFundPeaksCh(1, 3);
+  measFreq = secondFundPeaksCh(1, 1);
   
-  currPhaseShift = getPositivePhaseDiff(origPhase, currPhase);
+  phaseShift = getPositivePhaseDiff(firstPhase, secondPhase);
   
   % time offset between current time and calibration time within single period of the signal
-  timeOffset = currPhaseShift/(2 * pi * measFreq);
+  timeOffset = phaseShift/(2 * pi * measFreq);
 endfunction
 
 % Two frequencies
 % Both peaks have two rows
-% Assuming fundPeaks and measuredPeaks have same frequencies
+% Assuming firstFundPeaksCh and secondFundPeaksCh have same frequencies
+% Typically first = calibration time, second = measure time
 % Time offset can be determined precisely only for this specific case: both frequencies must be integer-divisable by their difference
 % E.g. 13k + 14k OK, 10k + 12k OK, 9960 + 9980 OK, but 9k + 11k FAIL
-function timeOffset = determineDualToneTimeOffset(fundPeaks, measuredPeaks)
+function timeOffset = determineDualToneTimeOffset(firstFundPeaksCh, secondFundPeaksCh)  
   % sorting by frequency desc
-  fundPeaks = sortrows(fundPeaks, -1);
-  measuredPeaks = sortrows(measuredPeaks, -1);
+  firstFundPeaksCh = sortrows(firstFundPeaksCh, -1);
+  secondFundPeaksCh = sortrows(secondFundPeaksCh, -1);
   
   % now f1 > f2 => period2 > period1
-  f1 = fundPeaks(1, 1);
-  f2 = fundPeaks(2, 1);
+  f1 = firstFundPeaksCh(1, 1);
+  f2 = firstFundPeaksCh(2, 1);
   % periods at secs
   per1 = 1/f1;
   per2 = 1/f2;
@@ -52,22 +53,22 @@ function timeOffset = determineDualToneTimeOffset(fundPeaks, measuredPeaks)
   phaseDiffEveryPer1 = fractDelay2AtPer1 * 2 *pi;
   
   
-  % phase diff at calibration time
-  ph1 = fundPeaks(1, 3);
-  ph2 = fundPeaks(2, 3);
+  % phase diff at first time
+  ph1 = firstFundPeaksCh(1, 3);
+  ph2 = firstFundPeaksCh(2, 3);
   % f1 is ahead of f2 by calPhaseDiff at cal time
-  calPhaseDiff = getPositivePhaseDiff(ph2, ph1);
+  firstPhaseDiff = getPositivePhaseDiff(ph2, ph1);
  
 
-  % phase diff at measurement time
-  mph1 = measuredPeaks(1, 3);
-  mph2 = measuredPeaks(2, 3);
-  % measured f1 is ahead of measured f2 by measuredPhaseDiff at measure time
-  measuredPhaseDiff = getPositivePhaseDiff(mph2, mph1);
+  % phase diff at second time
+  mph1 = secondFundPeaksCh(1, 3);
+  mph2 = secondFundPeaksCh(2, 3);
+  % second f1 is ahead of second f2 by secondPhaseDiff at second time
+  secondPhaseDiff = getPositivePhaseDiff(mph2, mph1);
   
   % the difference between them
-  measCalPhaseDiff = getPositivePhaseDiff(calPhaseDiff, measuredPhaseDiff);
+  firstSecondphaseDiff = getPositivePhaseDiff(firstPhaseDiff, secondPhaseDiff);
   
   % it took this long to accummulate this phase difference:
-  timeOffset = (measCalPhaseDiff/phaseDiffEveryPer1) * per1;
+  timeOffset = (phaseDiff/phaseDiffEveryPer1) * per1;
 endfunction
