@@ -2,8 +2,12 @@
 restartCal = false;
 if (result == 1)
   % finished
-  % request compensation
-  cmd = {COMPENSATE; jointDeviceName};
+  % request joint-device compensation for calExtraCircuit
+  if (length(calExtraCircuit) > 0)
+    cmd = {COMPENSATE; jointDeviceName; calExtraCircuit};
+  else
+    cmd = {COMPENSATE; jointDeviceName};
+  endif
   % tell analysis to re-read the updated calibration file
   restartAnalysis = true;
 endif
