@@ -2,7 +2,7 @@
 function writeData(buffer, fs, restart)
   if (restart)
     % re-initialize FFT figure
-    showFFTFigure([], fs)
+    %showFFTFigure([], fs)
   endif
-  showFFTFigure(buffer, fs);
+  %showFFTFigure(buffer, fs);
 endfunction
