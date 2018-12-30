@@ -4,8 +4,8 @@
 % calFileVD - LEFT (1) = direct, RIGHT (2) = voltage divider with gain = LP gain at fundamental freq (3kHz fixed now)
 % calFileLP - LEFT = direct, RIGHT = LP filter (input - resistor 10k -RIGHT- capacitor 10nF - ground)
 
-calFileVD = ['cal_3000_FS48000_' jointDeviceName '.dat'];
-calFileLP = ['cal_3000_FS48000_' jointDeviceName '_filter.dat'];
+calFileVD = genDataPath(['cal_3000_FS48000_' jointDeviceName '.dat']);
+calFileLP = genDataPath(['cal_3000_FS48000_' jointDeviceName '_filter.dat']);
 
 load(calFileVD);
 fundPeaksVD = calRec.fundPeaks;
@@ -33,7 +33,6 @@ fundPhaseDirectVD = fundPeaksVD(1, 3, directCh);
 fundPhaseDirectLP = fundPeaksLP(1, 3, directCh);
 
 % loading filter params from transferFile - array transfers
-transferFile = 'transf.dat';
 load(transferFile);
 
 cnt = 200;

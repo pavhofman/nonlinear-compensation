@@ -3,7 +3,6 @@
 restartMeasuring = false;
 if (result == 1)
   % finished
-  transferFile = 'transf.dat';
   if (exist(transferFile, 'file'))
     % stored variable transfers
     load(transferFile);

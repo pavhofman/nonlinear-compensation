@@ -12,20 +12,23 @@ addpath(fileparts(mfilename('fullpath')));
 
 source 'config.m';
 
+if !exist(dataDir, 'dir')
+  mkdir(dataDir);
+endif
+
+
 if direction == DIR_PLAY
   % overriden playback config values
   source 'configPlay.m';
-  cmdFile = [varDir filesep() CMD_FILE_PLAY];
+  cmdFile = genDataPath(CMD_FILE_PLAY);
 else
-  cmdFile = [varDir filesep() CMD_FILE_REC];
+  cmdFile = genDataPath(CMD_FILE_REC);
 endif
 
-if !exist(varDir, 'dir')
-  mkdir(varDir);
-endif
-
+transferFile = genDataPath('transf.dat');
 % default initial command
 cmd = cellstr(PAUSE);
+status = PAUSED;
 
 fs = 0;
 genFreq = 0;
@@ -130,5 +133,5 @@ while(true)
   if (status == SPLITTING)
     source 'run_splitting.m';
   endif
-  
+
 endwhile

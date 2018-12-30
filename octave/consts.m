@@ -15,6 +15,7 @@ GENERATE = 'gen';
 MEASURE = 'meas';
 % splitting joint calibration to DAC and ADC components
 SPLIT = 'split';
+SPLIT2 = 'split2';
 NO_CMD = '';
 
 % bits for statuses
@@ -33,8 +34,8 @@ DIR_REC = 1;
 DIR_PLAY = 2;
 
 % direction cmd.info files
-CMD_FILE_REC = 'cmd.info';
-CMD_FILE_PLAY = 'cmd-play.info';
+global CMD_FILE_REC = 'cmd.info';
+global CMD_FILE_PLAY = 'cmd-play.info';
 
 % prefices for device names (used in calibration file names)
 DEVICE_REC_PREFIX = 'rec';
