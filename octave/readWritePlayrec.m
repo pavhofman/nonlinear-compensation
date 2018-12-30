@@ -36,7 +36,8 @@ function [buffer, fs] = readWritePlayrec(cnt, playBuffer, restart)
     end
 
     if (cnt == -1)
-        cnt = floor(fs * 0.2);
+      % Intentionally chosen time which is not integer multiple of standard measuring frequencies/harmonics. Integer multiple (e.g. 200ms) hides errors in calculations.
+      cnt = floor(fs * 0.211);
     endif
 
     if((ndims(recChanList)~=2) || (size(recChanList, 1)~=1))
