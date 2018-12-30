@@ -26,9 +26,9 @@ else
 endif
 
 transferFile = genDataPath('transf.dat');
-% default initial command
-cmd = cellstr(PAUSE);
-status = PAUSED;
+% default initial command - PASS
+cmd = cellstr(PASS);
+status = PASSING;
 
 fs = 0;
 genFreq = 0;
