@@ -21,6 +21,6 @@ for k=1:length(devs)
     if(devs(k).inputChans)
         printf(' %2d) %s (%s) %d channels\n', ...
             devs(k).deviceID, devs(k).name, ...
-            devs(k).hostAPI, devs(k).outputChans);
+            devs(k).hostAPI, devs(k).inputChans);
     end
 end
