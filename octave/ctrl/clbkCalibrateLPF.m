@@ -3,7 +3,7 @@ function clbkCalibrateLPF()
   freq = 3000;
   fs = 48000;
 
-  infoDlg('Switch to LP filter now!');
+  infoDlg(sprintf("Switch to LP filter now.\nMake sure the level is same (up to 0.1dB) as VD level at %d.\nInterpolation of calibration at various levels is not implemented yet.", freq));
   clearOutBox();
   printStr(sprintf("Joint-device calibrating LP filter at %dHz", freq));
   global cmdFileRec;

@@ -26,7 +26,6 @@ function clbkSplitCompen()
   
   printStr(sprintf("Split-compensating play side at %dHz", freq));
   writeCmd(sprintf("comp %s", outputDeviceName), cmdFilePlay);
-  printStr(sprintf("Finished, both sides split-compensating at %dHz", freq));
-  
-  infoDlg('Now switch arbitrarily between VD and LPF, both sides are compensating');
+  printStr(sprintf("Finished, play side generating %dHz, both sides split-compensating.", freq));
+  printStr("Now switch arbitrarily between VD and LPF");
 endfunction

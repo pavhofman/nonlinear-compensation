@@ -3,7 +3,7 @@ function clbkCalibrateFreqs()
   global freq;
   global fs;
 
-  infoDlg('Switch to voltage divider now!');
+  infoDlg(sprintf("Switch to voltage divider now.\nMake sure the level is same (up to 0.1dB) as LPF level at %d.\nInterpolation of distortion at various fundamental levels is not implemented yet.", freq));
   clearOutBox();
   printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", freq));;
   global cmdFileRec;
