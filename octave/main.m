@@ -82,6 +82,12 @@ while(true)
   end
   restartReading = false;
 
+    
+  if (statusIs(status, GENERATING))
+    source 'run_generator.m';
+  endif
+ 
+
   if (statusContains(status, DISTORTING) && (statusContains(status, PASSING) || statusContains(status, COMPENSATING)))
     source 'run_distortion.m';
   endif
@@ -89,11 +95,7 @@ while(true)
   if (statusContains(status, COMPENSATING))
     source 'run_compensation.m';
   endif
-  
-  if (statusIs(status, GENERATING))
-    source 'run_generator.m';
-  endif
-  
+
   % not stopped, always writing
   writeData(buffer, fs, restartWriting);
   restartWriting = false;
