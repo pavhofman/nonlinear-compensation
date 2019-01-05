@@ -1,3 +1,3 @@
-playRecConfig.recDeviceID = 1; % loopback 1
+playRecConfig.recDeviceID = 19; % octave_loop
 playRecConfig.playDeviceID = 8; % quartet analog
 playRecConfig.otherDirectionDeviceID = 8;
