@@ -119,8 +119,8 @@ if true
   fundPeaksD(:, :, 2) = [fundF, genAmpl, fundPhaseVD];
 
 
-  saveCalFile(fundPeaksA, distortPeaksA, fs, [DEVICE_REC_PREFIX num2str(inputDeviceID)]);
-  saveCalFile(fundPeaksD, distortPeaksD, fs, [DEVICE_PLAY_PREFIX num2str(outputDeviceID)]);
+  saveCalFile(fundPeaksA, distortPeaksA, fs, inputDeviceName);
+  saveCalFile(fundPeaksD, distortPeaksD, fs, outputDeviceName);
 else
   % testing split of both-side peaks into each side - works OK for VD, but only partially for LP - investigate!!!
   distortPeaksA = distortPeaksLP;
@@ -129,8 +129,8 @@ else
   distortPeaksD = distortPeaksLP;
   distortPeaksD(:, 2, :) *= 0.2;
 
-  saveCalFile(fundPeaksLP, distortPeaksA, fs, [DEVICE_REC_PREFIX num2str(inputDeviceID)]);
-  saveCalFile(fundPeaksLP, distortPeaksD, fs, [DEVICE_PLAY_PREFIX num2str(outputDeviceID)]);
+  saveCalFile(fundPeaksLP, distortPeaksA, fs, inputDeviceName);
+  saveCalFile(fundPeaksLP, distortPeaksD, fs, outputDeviceName);
 endif
 
 
