@@ -1,12 +1,14 @@
 function clbkCalibrateFreqs()
+  % fixed for now
+  global freq;
+  global fs;
+
+  infoDlg('Switch to voltage divider now!');
   clearOutBox();
-  printStr('Calibrating frequencies:');
+  printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", freq));;
   global cmdFileRec;
   global cmdFilePlay;
 
-  % fixed for now
-  freq = 3000;
-  fs = 48000;
 
   writeCmd("pass", cmdFilePlay);
   writeCmd("pass", cmdFileRec);
@@ -18,11 +20,11 @@ function clbkCalibrateFreqs()
     writeCmd(sprintf ("gen %d", f), cmdFilePlay);
     % long pause to let samples propagate through all the buffers
     pause(2);
-    printStr(sprintf("Calibrating at %dHz", f));
+    printStr(sprintf("Joint-device calibrating VD at %dHz", f));
     writeCmd("cal", cmdFileRec);
     pause(1);  
   endfor
   writeCmd("pass", cmdFilePlay);
   writeCmd("pass", cmdFileRec);
-  printStr('Finished');
+  printStr('Finished, both sides passing');
 endfunction

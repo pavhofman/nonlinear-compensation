@@ -1,6 +1,8 @@
-function clbkMeasureFilter()
+function clbkMeasureFilter()  
+  infoDlg('Switch to LP filter now!');
+  
   clearOutBox();
-  printStr('Measuring the filter:');
+  printStr('Measuring the filter trasfer:');
 
   global cmdFileRec;
   global cmdFilePlay;
@@ -26,5 +28,5 @@ function clbkMeasureFilter()
 
   writeCmd("pass", cmdFilePlay);
   writeCmd("pass", cmdFileRec);
-  printStr('Finished');
+  printStr('Finished, both sides passing');
 endfunction
