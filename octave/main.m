@@ -12,11 +12,6 @@ addpath(fileparts(mfilename('fullpath')));
 
 source 'config.m';
 
-if !exist(dataDir, 'dir')
-  mkdir(dataDir);
-endif
-
-
 if direction == DIR_PLAY
   % overriden playback config values
   source 'configPlay.m';
@@ -48,7 +43,7 @@ freqs = -1;
 startingT = 0;
 buffer = [0];
 
-source 'run_device_names.m';
+source 'run_common.m';
 
 while(true)
   % checking command file for new commands

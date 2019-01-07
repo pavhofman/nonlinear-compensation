@@ -1,4 +1,12 @@
-% script defines global device names, requires loaded config.m files
+% script runs common code for mainRec/Play and mainCtrl. Defines global device names, creates required dirs, etc.
+% Requires loaded config.m files
+
+
+if !exist(dataDir, 'dir')
+  mkdir(dataDir);
+endif
+
+
 global deviceName;
 if exist('wavPath', 'var') && !isempty(wavPath)
     [wavDir, wavName, wavExt] = fileparts(wavPath);
