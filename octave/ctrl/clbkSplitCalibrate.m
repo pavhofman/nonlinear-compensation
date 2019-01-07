@@ -1,4 +1,4 @@
-function clbkSplitCal()
+function clbkSplitCalibrate()
   global freq;
   clearOutBox();
   
@@ -10,6 +10,10 @@ function clbkSplitCal()
   writeCmd("split", cmdFileRec);
 
   writeCmd("pass", cmdFilePlay);
+
+  % waiting till rec side finishes splitting
+  % TODO - implement notification about completion from slave processes
+  pause(1);
   writeCmd("pass", cmdFileRec);
   printStr('Finished splitting, both sides passing');
 endfunction
