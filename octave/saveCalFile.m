@@ -10,5 +10,7 @@ function [freqs, result] = saveCalFile(fundPeaks, distortPeaks, fs, deviceName, 
   
   calFile = genCalFilename(freqs, fs, deviceName, extraCircuit);
   save(calFile, 'calRec');
-  result = 1;
+  
+  global FINISHED_RESULT;
+  result = FINISHED_RESULT;
 endfunction

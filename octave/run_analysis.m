@@ -1,6 +1,6 @@
 [measuredPeaks, startingT, fundPeaks, distortPeaks, freqs, result] = analyse(buffer, fs, freqs, calDeviceName, compExtraCircuit, restartAnalysis);
 restartAnalysis = false;
-if (result == 1)
+if result == FINISHED_RESULT
   % finished
   % from now on only compensation
   %status = COMPENSATING;

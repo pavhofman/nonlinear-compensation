@@ -22,7 +22,8 @@ function [transfer, result] = measureTransfer(buffer, fs, transfer, genAmpl, res
     
   if (rows(measBuffer) < phaseAnalysisSize)
     % not enough data, run again, send more data
-    result = 0;
+    global NOT_FINISHED_RESULT;
+    result = NOT_FINISHED_RESULT;
     return;
   else
     % finding phase, amplitude of the direct + transferred signal
@@ -52,7 +53,8 @@ function [transfer, result] = measureTransfer(buffer, fs, transfer, genAmpl, res
     % finished OK
     % clearing the buffer for next run
     measBuffer = [];
-    result = 1;
+    global FINISHED_RESULT;
+    result = FINISHED_RESULT;
     return;    
   endif
 endfunction

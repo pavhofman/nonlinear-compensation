@@ -33,6 +33,11 @@ SPLITTING = 8;
 DIR_REC = 1;
 DIR_PLAY = 2;
 
+% results
+global NOT_FINISHED_RESULT = 0;
+global FINISHED_RESULT = 1;
+
+
 % direction cmd.info files
 global CMD_FILE_REC = 'cmd.info';
 global CMD_FILE_PLAY = 'cmd-play.info';

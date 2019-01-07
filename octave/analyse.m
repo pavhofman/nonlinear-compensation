@@ -10,7 +10,10 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
   persistent distortPeaks = [];
   persistent measfreq = 0;  
   persistent phaseAnalysisSize = 0;
-  persistent calRec = struct; 
+  persistent calRec = struct;
+  
+  global NOT_FINISHED_RESULT;
+  global FINISHED_RESULT;
   % should reload calFile
   rereadCalFile = false;
   
@@ -36,12 +39,15 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
     freqAnalysisSize = fs;
 
     if (rows(analysisBuffer) < freqAnalysisSize)
-      % not enough data, run again, send more data
-      result = 0;
+      % not enough data, run again, send more data      
+      result = NOT_FINISHED_RESULT;
       return;
     else
+      id = tic();
       % enough data, determine fundPeaks, distortPeaks are ignored (not calibration signal)
       fundPeaks = getHarmonics(analysisBuffer, fs, false);
+      passed = toc(id);
+      printf("getHarmonics took %f secs\n", passed);
       % freqs read from first channel only
       freqs = fundPeaks(:, 1, 1);
 
@@ -72,7 +78,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
     
     if (rows(analysisBuffer) < phaseAnalysisSize)
       % not enough data, run again, send more data
-      result = 0;
+      result = NOT_FINISHED_RESULT;
       return;
     else
       measuredPeaks = [];
@@ -82,9 +88,11 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
         % because next read buffer will continue after the last sample in analysisBuffer
         if (rows(fundPeaks) == 1)
           % single tone
-          %id = tic();
+          id = tic();
           measuredPeaksCh = measureSingleTonePhase(analysisBuffer(end - phaseAnalysisSize + 1:end, channelID), fs, fundPeaks(1, :, channelID), false);
-          %disp(toc(id));
+          passed = toc(id);
+          printf("measureSingleTonePhase took %f secs\n", passed);
+
           % freq
         else
           % assuming two-tone signal
@@ -100,7 +108,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, freqs, result]
       % finished OK
       % clearing the buffer for next run
       analysisBuffer = [];
-      result = 1;
+      result = FINISHED_RESULT;
       return;
     endif
   endif

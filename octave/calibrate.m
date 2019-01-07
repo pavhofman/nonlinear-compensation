@@ -1,5 +1,5 @@
 function [freqs, result] = calibrate(buffer, fs, deviceName, extraCircuit, freqs, restart)
-  persistent calBuffer = [];
+  persistent calBuffer = [];  
   calibrationSize = fs; % 1 second
   
   if (restart)
@@ -11,7 +11,8 @@ function [freqs, result] = calibrate(buffer, fs, deviceName, extraCircuit, freqs
     % not enough data, copying whole buffer
     calBuffer = [calBuffer; buffer];
     % not finished
-    result = 0;
+    global NOT_FINISHED_RESULT;
+    result = NOT_FINISHED_RESULT;
   else
     % enough data, copying only up to calibrationSize data
     calBuffer = [calBuffer; buffer(1:calibrationSize - currentSize, :)];
