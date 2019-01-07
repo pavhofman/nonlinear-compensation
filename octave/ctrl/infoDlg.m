@@ -1,7 +1,7 @@
 % plain alert window
 function infoDlg(text)
   h = dialog();
-  textBox = uicontrol(h, 'style', 'text', 'string', text, "position",[100 100 300 300]);
+  textBox = uicontrol(h, 'style', 'text', 'string', text, "position",[100 100 400 300]);
   set(textBox, 'horizontalalignment', 'left');
   set(textBox, 'verticalalignment', 'top');
 
