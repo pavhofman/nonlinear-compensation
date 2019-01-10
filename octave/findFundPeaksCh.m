@@ -34,10 +34,6 @@ function [fundPeaksCh, errorMsg] = findFundPeaksCh(x, yc, y)
           % not local maximum, skipping
           continue
       end
-      if rows(fundPeaksCh) > 2
-          errorMsg = 'more than 2 fundamental peaks found';
-          break
-      end
       fundPeaksCh = [fundPeaksCh; x(idx), y(idx), arg(yc(idx))];
   end
 endfunction

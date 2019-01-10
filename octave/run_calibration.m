@@ -1,6 +1,6 @@
-[freqs, result] = calibrate(buffer, fs, jointDeviceName, calExtraCircuit, freqs, restartCal);
+result = calibrate(buffer, fs, jointDeviceName, calExtraCircuit, restartCal);
 restartCal = false;
-if (result == 1)
+if (result == FINISHED_RESULT)
   % finished
   % request joint-device compensation for calExtraCircuit
   if (length(calExtraCircuit) > 0)

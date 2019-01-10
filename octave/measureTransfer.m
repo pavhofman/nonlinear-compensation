@@ -62,11 +62,14 @@ endfunction
 % determines phase difference between soundcard channels from cal file at freq.
 function phaseDiff = getInterChannelPhaseDiff(fs, freq, directCh, transferCh)
   global jointDeviceName;
-  calFile = genCalFilename(freq, fs, jointDeviceName);    
+  calFile = genCalFilename(freq, fs, directCh, jointDeviceName);  
   load(calFile);
-  fundPeaks = calRec.fundPeaks;
-  directChPhase = fundPeaks(1, 3, directCh);
-  transferChPhase = fundPeaks(1, 3, transferCh);
+  directChPhase = calRec.fundPeaks(1, 3);
+  
+  calFile = genCalFilename(freq, fs, transferCh, jointDeviceName);  
+  load(calFile);  
+  transferChPhase = calRec.fundPeaks(1, 3);
+  
   phaseDiff = transferChPhase - directChPhase;
 endfunction
 

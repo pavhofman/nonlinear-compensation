@@ -100,28 +100,12 @@ endfor
 
 % building calfile peaks
 if true
-  distortPeaksA = [];
-  distortPeaksA(:, :, 1) = distortPeaksACh;
-  distortPeaksA(:, :, 2) = distortPeaksACh;
+  fundPeaksACh = [fundF, fundAmplVD, fundPhaseVD];
+  fundPeaksDCh = [fundF, genAmpl, fundPhaseVD];
 
-  distortPeaksD = [];
-  distortPeaksD(:, :, 1) = distortPeaksDCh;
-  distortPeaksD(:, :, 2) = distortPeaksDCh;
-
-  fundPeaksA = [];
-  % both channels same for now
-  fundPeaksA(:, :, 1) = [fundF, fundAmplVD, fundPhaseVD];
-  fundPeaksA(:, :, 2) = [fundF, fundAmplVD, fundPhaseVD];
-
-  
-  fundPeaksD = [];
-  fundPeaksD(:, :, 1) = [fundF, genAmpl, fundPhaseVD];
-  fundPeaksD(:, :, 2) = [fundF, genAmpl, fundPhaseVD];
-
-
-  saveCalFile(fundPeaksA, distortPeaksA, fs, inputDeviceName);
-  saveCalFile(fundPeaksD, distortPeaksD, fs, outputDeviceName);
+  saveCalFile(fundPeaksACh, distortPeaksACh, fs, attenCh, inputDeviceName);
 else
+  % TODO fixing for new saveCalFile
   % testing split of both-side peaks into each side - works OK for VD, but only partially for LP - investigate!!!
   distortPeaksA = distortPeaksLP;
   distortPeaksA(:, 2, :) *= 0.8;

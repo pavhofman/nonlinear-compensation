@@ -30,7 +30,8 @@ endfunction
 
 
 function timeOffset = determineTimeOffset(fundPeaksCh, measuredPeaksCh)
-  if (rows(fundPeaksCh) == 1)
+  if measuredPeaksCh(2, 1) == 0 || fundPeaksCh(2, 1) == 0
+    % second fundamental frequency is zero
     timeOffset = determineSingleToneTimeOffset(fundPeaksCh, measuredPeaksCh);
   else
     timeOffset = determineDualToneTimeOffset(fundPeaksCh(1:2, :), measuredPeaksCh(1:2, :));

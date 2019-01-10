@@ -34,8 +34,6 @@ elseif (strcmp(cmd{1}, COMPENSATE))
   endif
   
   restartAnalysis = true;
-  % re-determine freqs in case of change
-  freqs = -1;
   showFFTFigureConfig.restartAvg = 1;
 
 % distortion allowed only for status PASSING and COMPENSATING

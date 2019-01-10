@@ -37,8 +37,6 @@ restartCal = true;
 restartAnalysis = true;
 restartWriting = true;
 restartMeasuring = true;
-% unknown frequencies - measured by calibration or by determineFundamentalFreqs() in analysis
-freqs = -1;
 
 startingT = 0;
 buffer = [0];

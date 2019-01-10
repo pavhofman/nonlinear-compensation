@@ -1,4 +1,4 @@
-function [freqs, result] = calibrate(buffer, fs, deviceName, extraCircuit, freqs, restart)
+function result = calibrate(buffer, fs, deviceName, extraCircuit, restart)
   persistent calBuffer = [];  
   calibrationSize = fs; % 1 second
   
@@ -19,6 +19,16 @@ function [freqs, result] = calibrate(buffer, fs, deviceName, extraCircuit, freqs
     [fundPeaks, distortPeaks] = getHarmonics(calBuffer, fs);
 
     % storing joint directions cal file
-    [freqs, result] = saveCalFile(fundPeaks, distortPeaks, fs, deviceName, extraCircuit);
+    % each channel stored separately
+    for channelID = 1:size(fundPeaks, 3)
+      fundPeaksCh = fundPeaks(:, :, channelID);    
+      if hasAnyPeak(fundPeaksCh)
+        saveCalFile(fundPeaksCh, distortPeaks(:, :, channelID), fs, channelID, deviceName, extraCircuit);
+      else
+        printf('No fundaments found for channel ID %d, not storing its calibration file\n', channelID);
+      endif
+    endfor
+    global FINISHED_RESULT;
+    result = FINISHED_RESULT;    
   endif
 endfunction
