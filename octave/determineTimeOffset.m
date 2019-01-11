@@ -1,5 +1,6 @@
 function timeOffset = determineTimeOffset(firstFundPeaksCh, secondFundPeaksCh)
-  if (rows(firstFundPeaksCh) == 1)
+  if firstFundPeaksCh(2, 1) == 0 || secondFundPeaksCh(2, 1) == 0
+    % second fundamental frequency is zero
     timeOffset = determineSingleToneTimeOffset(firstFundPeaksCh, secondFundPeaksCh);
   else
     timeOffset = determineDualToneTimeOffset(firstFundPeaksCh(1:2, :), secondFundPeaksCh(1:2, :));
@@ -70,5 +71,5 @@ function timeOffset = determineDualToneTimeOffset(firstFundPeaksCh, secondFundPe
   firstSecondphaseDiff = getPositivePhaseDiff(firstPhaseDiff, secondPhaseDiff);
   
   % it took this long to accummulate this phase difference:
-  timeOffset = (phaseDiff/phaseDiffEveryPer1) * per1;
+  timeOffset = (firstSecondphaseDiff/phaseDiffEveryPer1) * per1;
 endfunction
