@@ -114,7 +114,7 @@ function isChanged = isChangedAndStable(newFreqs, channelID, channelCnt, clearFr
     % first run, certainly changed
     isChanged = true;
   elseif rows(freqsHistory) < (EQUAL_CYCLES + 1)
-    % now enough rows to decide, no change
+    % not enough rows to decide -> no change
     isChanged = false;
   else
     if rows(freqsHistory) > (EQUAL_CYCLES + 1)
