@@ -1,10 +1,10 @@
-function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, deviceName, extraCircuit = '')
+function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit = '')
       % has fund freqs, storing
-      calRec.time = time();
+      calRec.timestamp = timestamp;
       calRec.fundPeaks = fundPeaksCh;
       calRec.distortPeaks = distortPeaksCh;
       disp(calRec);
-      freqs = getFreqs(fundPeaksCh);
+      freqs =  getFreqs(fundPeaksCh);
       calFile = genCalFilename(freqs, fs, channelID, deviceName, extraCircuit);
       save(calFile, 'calRec');
       printf('Saved calfile %s\n', calFile);

@@ -17,13 +17,14 @@ function result = calibrate(buffer, fs, deviceName, extraCircuit, restart)
     % enough data, copying only up to calibrationSize data
     calBuffer = [calBuffer; buffer(1:calibrationSize - currentSize, :)];
     [fundPeaks, distortPeaks] = getHarmonics(calBuffer, fs);
+    timestamp = time();
 
     % storing joint directions cal file
     % each channel stored separately
     for channelID = 1:size(fundPeaks, 3)
       fundPeaksCh = fundPeaks(:, :, channelID);    
       if hasAnyPeak(fundPeaksCh)
-        saveCalFile(fundPeaksCh, distortPeaks(:, :, channelID), fs, channelID, deviceName, extraCircuit);
+        saveCalFile(fundPeaksCh, distortPeaks(:, :, channelID), fs, channelID, timestamp, deviceName, extraCircuit);
       else
         printf('No fundaments found for channel ID %d, not storing its calibration file\n', channelID);
       endif

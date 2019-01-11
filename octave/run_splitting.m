@@ -103,7 +103,7 @@ if true
   fundPeaksACh = [fundF, fundAmplVD, fundPhaseVD];
   fundPeaksDCh = [fundF, genAmpl, fundPhaseVD];
 
-  saveCalFile(fundPeaksACh, distortPeaksACh, fs, attenCh, inputDeviceName);
+  saveCalFile(fundPeaksACh, distortPeaksACh, fs, attenCh, time(), inputDeviceName);
 else
   % TODO fixing for new saveCalFile
   % testing split of both-side peaks into each side - works OK for VD, but only partially for LP - investigate!!!
