@@ -17,9 +17,9 @@ function [x, yc, nfft] = computeFFT(samples, Fs, window_name = 'hanning')
       case { 'rect', 'rectangular' }
           winweight = 1;
       case { 'hann', 'hanning' }
-          [data, winweight] = applyWindow(data, hanning(length(data)));
+          [data, winweight] = applyWindow(data, hanning(rows(data)));
       case { 'flattop' }
-          [data, winweight] = applyWindow(data, flattopwin(length(data)));
+          [data, winweight] = applyWindow(data, flattopwin(rows(data)));
       otherwise
           error(sprintf('unknown window %s\n', window_name));
   endswitch
