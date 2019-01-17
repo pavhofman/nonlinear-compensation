@@ -33,8 +33,8 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
       fundPeaksCh = zeros(maxFundPeaksCnt, 3);
     elseif rows(fundPeaksCh) > maxFundPeaksCnt
       printf("Found fundPeaks for channel ID %d:\n", channelID);
-      disp(fundPeaksCh);      
-      printf("That is more than %d supported, will send zeros", maxFundPeaksCnt);
+      disp(fundPeaksCh);
+      printf("That is more than %d supported, will send zeros\n", maxFundPeaksCnt);
       fundPeaksCh = zeros(maxFundPeaksCnt, 3);
     endif
     
@@ -44,9 +44,9 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
     if (genDistortPeaks && hasAnyPeak(fundPeaksCh))
       [distortPeaksCh] = getDistortionProductsCh(fundPeaksCh, x, ycCh, yCh, Fs / nfft);
       % limit distortPeak to maxDistortCnt rows
-      if rows(distortPeaksCh) > rows(distortPeaks)
+      if rows(distortPeaksCh) > maxDistortPeaksCnt
           % take distortPeaks strongest harmonics, keep unsorted
-          distortPeaksCh = resize(sortrows(distortPeaksCh,-2), rows(distortPeaks),3);
+          distortPeaksCh = resize(sortrows(distortPeaksCh,-2), maxDistortPeaksCnt,3);
       end
       distortPeaks(1:rows(distortPeaksCh), :, channelID) = distortPeaksCh;
     endif    
