@@ -24,9 +24,9 @@ function [distortPeaks] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidth=
               % ignore aliased frequencies
               break
           end
-          if (y(i) >= (ymax / 10)) || (y(i) < 3.1623e-08)
+          if (y(i) >= (ymax / 10)) || (y(i) < 1.0e-07)
               % ignore frequencies stronger than 1/10 (-20dB) of the strongest one
-              % ignore frequencies waker than -150dBFS
+              % ignore frequencies weaker than -140dBFS
               continue
           end
           distortPeaks = [distortPeaks; x(i), y(i), arg(yc(i))];
