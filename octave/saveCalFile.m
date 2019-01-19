@@ -3,9 +3,6 @@ function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timest
   rowIDs = distortPeaksCh(:, 1) == 0;
   distortPeaksCh(rowIDs, :) = [];
   
-  % time shift distortPeaks to zero phase of fundPeaks
-  distortPeaksCh = phasesAtZeroTimeCh(fundPeaksCh, distortPeaksCh);
-
   freqs =  getFreqs(fundPeaksCh);     
   calFile = genCalFilename(freqs, fs, channelID, deviceName, extraCircuit);
 
