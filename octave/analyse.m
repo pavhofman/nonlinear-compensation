@@ -59,6 +59,10 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
       if isChangedAndStable(freqs, channelID, channelCnt, clearFreqHistory) || restartAnalysis
         % changed incoming frequency
         [distortFreqsCh, complAllPeaksCh] = loadPeaks(measuredPeaksCh, freqs, fs, channelID, calDeviceName, extraCircuit);
+        % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
+        if find(isna(complAllPeaksCh))
+          complAllPeaksCh = fillMissingPeaks(complAllPeaksCh);
+        endif
         % storing to persistent vars
         distortFreqs{channelID} = distortFreqsCh;
         complAllPeaks{channelID} = complAllPeaksCh;
@@ -162,6 +166,7 @@ endfunction
 
 function [fundPeaksCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs, complAllPeaks)
   % complAllPeaks: time, origFundPhase1, origFundPhase2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
+  % WARN: ALL peaks must be known (no NA values!)
   persistent AMPL_IDX = 4;  % = index of fundAmpl1
   persistent PEAKS_START_IDX = 6; 
 
@@ -175,26 +180,37 @@ function [fundPeaksCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, chann
   % interpolate, non-complex output!!!
   
   distortPeaksCh = [];
-  % for each frequency
-  for freqIdx = 1:length(distortFreqs)
-    % values at freq freqIdx for all levels      
-    peaks = allPeaks(:, freqIdx);
-    % interpolation works only for known values
-    knownPeaksIdx = ~isnan(peaks);
-
-    % interpolated complex value for currentLevel, using only known peaks. 
-    % extrapolation not needed since peaks have edge rows at level 0 and 1
-    % but the edge peak can be NA, yet we need the cPeakAtLevel - using extrap for safety (TODO!!!)
-    knownPeaks = peaks(knownPeaksIdx);
-    knownLevels = levels(knownPeaksIdx);
-    cPeakAtLevel = interp1(knownLevels, knownPeaks, currentLevel, 'linear', 'extrap');
-    peakAtLevel = [abs(cPeakAtLevel), angle(cPeakAtLevel)];
-    freqPeak = [distortFreqs(freqIdx), peakAtLevel];
-    distortPeaksCh = [distortPeaksCh; freqPeak];
-  end
-  
+  % interp1 is slow (10ms in internal ppval()), run only once for all freqs
+  peaksAtLevel = interp1(levels, allPeaks , currentLevel);
+  peaksAtLevel = transpose(peaksAtLevel);
+  distortPeaksCh = [transpose(distortFreqs), abs(peaksAtLevel), angle(peaksAtLevel)];
   % since currentPeaksCh are already interpolated to current level, fundPeaks = measuredPeaksCh with zero phase
   fundPeaksCh = measuredPeaksCh;
   fundPeaksCh(:, 3) = 0;
 endfunction
+
+% interpolate all missing (NA) distortion peaks
+% replacement for matlab's fillmissing
+function complAllPeaks = fillMissingPeaks(complAllPeaks)
+  % complAllPeaks: time, origFundPhase1, origFundPhase2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
+  persistent AMPL_IDX = 4;  % = index of fundAmpl1
+ 
+  % levels = AMPL_IDX column
+  levels = complAllPeaks(:, AMPL_IDX);
   
+  % only distort peaks can be missing, it is safe to search whole complAllPeaks
+  missingPeaksIDs = isnan(complAllPeaks);
+  
+  % interpolate for each frequency with missing values
+  % indices of columns with MISSING value
+  colIDs = find(any(missingPeaksIDs));
+  for colID = colIDs
+    missingPeaksIDsInCol = missingPeaksIDs(:, colID);
+    knownLevels = levels(~missingPeaksIDsInCol);
+    missingLevels = levels(missingPeaksIDsInCol);
+    knownPeaks = complAllPeaks(~missingPeaksIDsInCol, colID);
+    peaksAtLevels = interp1(knownLevels, knownPeaks, missingLevels, 'linear', 'extrap');
+    % insert interpolated values into complAllPeaks
+    complAllPeaks(find(missingPeaksIDsInCol), colID) = peaksAtLevels;
+  endfor
+endfunction
