@@ -85,26 +85,29 @@ while(true)
     source 'run_distortion.m';
   endif
   
+  if (statusContains(status, CALIBRATING))
+    source 'run_calibration.m';
+  endif
+
+
+  if (statusContains(status, ANALYSING))
+    %id = tic();
+    source 'run_analysis.m';
+    %printf('Analysis took %f\n', toc(id));
+  endif
+  
   if (statusContains(status, COMPENSATING))
+    %id = tic();
     source 'run_compensation.m';
+    %printf('Compensation took %f\n', toc(id));
   endif
 
   % not stopped, always writing
   writeData(buffer, fs, restartWriting);
   restartWriting = false;
   
-  
-  % do additional read-only processing on samples
-  if (statusContains(status, CALIBRATING))
-    source 'run_calibration.m';
-  endif
-  
   if (status == MEASURING)
     source 'run_measuring.m';
-  endif
-
-  if (statusContains(status, ANALYSING))
-    source 'run_analysis.m';
   endif
   
   if (status == SPLITTING)

@@ -82,8 +82,10 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
     endfor
     
     clearFreqHistory = false;
-    % advance time of measuredParams relative to the end of buffer - the generated compensation reference must be shifted by this to fit beginning of the next buffer        
-    paramsAdvanceT = rows(analysisBuffer)/fs;    
+    % measuredPeaks are calculated for time at start of analysisBuffer
+    % but compensation will work on the current buffer
+    % advance time of measuredPeaks relative to the start of buffer which is located at the end of analysisBuffer [analysisBuffer [ buffer]]
+    paramsAdvanceT = (rows(analysisBuffer) - rows(buffer))/fs;    
     % finished OK
     result = FINISHED_RESULT;
     return;
