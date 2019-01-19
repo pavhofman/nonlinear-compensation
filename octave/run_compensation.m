@@ -2,9 +2,15 @@
 % generating buffer-length of compensation reference
 for channelID = 1:columns(buffer)
   measuredPeaksCh = measuredPeaks(:, :, channelID);
+  distortPeaksCh = distortPeaks(:, :, channelID);
   fundPeaksCh = fundPeaks(:, :, channelID);
   if hasAnyPeak(measuredPeaksCh) && hasAnyPeak(fundPeaksCh)
-    buffer(:, channelID) += genCompenReference(fundPeaksCh, distortPeaks(:, :, channelID), measuredPeaksCh, fs, startingT, rows(buffer));
+    ref = genCompenReference(fundPeaksCh, distortPeaksCh, measuredPeaksCh, fs, startingT, rows(buffer));
+    if find(isna(ref))
+      printf('ERROR - compensation signal contains NA values, investigate!');
+    else
+      buffer(:, channelID) += ref;
+    endif
   endif
 endfor
 
