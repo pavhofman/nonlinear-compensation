@@ -183,7 +183,7 @@ function [fundPeaksCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, chann
   
   distortPeaksCh = [];
   % interp1 is slow (10ms in internal ppval()), run only once for all freqs
-  peaksAtLevel = interp1(levels, allPeaks , currentLevel);
+  peaksAtLevel = interp1(levels, allPeaks , currentLevel, 'linear', 'extrap');
   peaksAtLevel = transpose(peaksAtLevel);
   distortPeaksCh = [transpose(distortFreqs), abs(peaksAtLevel), angle(peaksAtLevel)];
   % since currentPeaksCh are already interpolated to current level, fundPeaks = measuredPeaksCh with zero phase
