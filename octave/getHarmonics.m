@@ -14,7 +14,6 @@
 %
 function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, genDistortPeaks = true, window_name = 'hanning')  
   %consts
-  persistent maxFundPeaksCnt = getMaxFundPeaksCnt();
   persistent maxDistortPeaksCnt = getMaxDistortPeaksCnt();
   
   [x, yc, nfft] = computeFFT(samples, Fs, window_name);
@@ -30,10 +29,10 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
     if rows(fundPeaksCh) == 0
       % error, will PASS
       printf("Did not find any fundPeaks\n");
-    elseif rows(fundPeaksCh) > maxFundPeaksCnt
+    elseif rows(fundPeaksCh) > 2
       printf("Found fundPeaks for channel ID %d:\n", channelID);
       disp(fundPeaksCh);
-      printf("That is more than %d supported, will send no fund peaks\n", maxFundPeaksCnt);
+      printf("That is more than 2 supported, will send no fund peaks\n");
       fundPeaksCh = [];
     endif
     fundPeaks{channelID} = fundPeaksCh;
