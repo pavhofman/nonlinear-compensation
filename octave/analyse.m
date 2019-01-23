@@ -5,14 +5,11 @@
 % paramsAdvanceT - advance time of measuredParams related to the end of buffer (use t = paramsAdvanceT for starting sample of next buffer in compenReference calculation)
 % fundPeaks, distortPeaks - read from calibration file corresponding to current stream freqs
 function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = analyse(buffer, fs, calDeviceName, extraCircuit, restartAnalysis)
-  %consts
-  persistent maxFundPeaksCnt = getMaxFundPeaksCnt();
-  persistent maxDistortPeaksCnt = getMaxDistortPeaksCnt();
 
   persistent analysisBuffer = [];
   persistent channelCnt = columns(buffer);
-  persistent fundPeaks = [];
-  persistent distortPeaks = [];
+  persistent fundPeaks = cell(channelCnt);
+  persistent distortPeaks = cell(channelCnt);
   
   persistent distortFreqs = cell(channelCnt);
   persistent complAllPeaks = cell(channelCnt);
@@ -45,14 +42,10 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
     analysisBuffer = analysisBuffer(rows(analysisBuffer) - freqAnalysisSize + 1: end, :);
     % enough data, measure fundPeaks, distortPeaks are ignored (not calibration signal)
     measuredPeaks = getHarmonics(analysisBuffer, fs, false);
-    
-    % copy to all-channel peaks with fixed length
-    fundPeaks = zeros(maxFundPeaksCnt, 3, channelCnt);
-    distortPeaks = zeros(maxDistortPeaksCnt, 3, channelCnt);
-    
+       
     % each channel handled separately
     for channelID = 1:channelCnt
-      measuredPeaksCh = measuredPeaks(:,:,channelID);
+      measuredPeaksCh = measuredPeaks{channelID};
     
       freqs = getFreqs(measuredPeaksCh);
       % check if new and stable
@@ -74,11 +67,11 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
       else          
         % no signal  
         % zero peaks
-        fundPeaksCh = zeros(maxFundPeaksCnt, 3);
-        distortPeaksCh = zeros(maxDistortPeaksCnt, 3);
+        fundPeaksCh = [];
+        distortPeaksCh = [];
       endif
-      fundPeaks(1: rows(fundPeaksCh), :, channelID) = fundPeaksCh;
-      distortPeaks(1: rows(distortPeaksCh), :, channelID) = distortPeaksCh;
+      fundPeaks{channelID} = fundPeaksCh;
+      distortPeaks{channelID} = distortPeaksCh;
     endfor
     
     clearFreqHistory = false;
@@ -108,7 +101,6 @@ function [distortFreqsCh, complAllPeaksCh] = loadPeaks(measuredPeaksCh, freqs, f
       distortFreqsCh = calRec.distortFreqs;
       complAllPeaksCh = calRec.distortPeaks;
       printf('Distortion peaks for channel ID %d read from calibration file %s\n', channelID, calFile);
-      %disp(convertPeaksToPrintable(distortPeaksCh));
     else
       printf('Did not find calib file %s, channel ID %d PASSING\n', calFile, channelID);
     endif

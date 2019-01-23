@@ -8,18 +8,19 @@
 %   binwidth - Fs / nfft
 %
 % returns:
-%   distortPeaks [ frequency , amplitude_in_absolute_values, angle_in_radians ]
+%   distortPeaksCh [ frequency , amplitude_in_absolute_values, angle_in_radians ]
 %
-function [distortPeaks] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidth=1)
+function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidth=1)
   % consts
   persistent MIN_LEVEL = db2mag(-150);
-  distortPeaks = [];
+  distortPeaksCh = [];
   fundPeakBins = [];
   nffto2 = rows(y);
   ymax = max(fundPeaks(:, 2));
   for f = fundPeaks(:, 1)'
       bb = round(f / binwidth) + 1;
       fundPeakBins = [fundPeakBins; bb];
+      % TODO - fix limits!
       for nh = 1:20
           i = (nh * (bb - 1)) + 1;
           if i > nffto2 - 1
@@ -31,13 +32,14 @@ function [distortPeaks] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidth=
               % ignore frequencies weaker than MIN_LEVEL
               continue
           end
-          distortPeaks = [distortPeaks; x(i), y(i), arg(yc(i))];
+          distortPeaksCh = [distortPeaksCh; x(i), y(i), arg(yc(i))];
       end
   end
   fundPeakBins = sort(fundPeakBins);
 
   if rows(fundPeaks) == 2
       % compute intermodulations between two strongest frequencies
+      % TODO - fix limits!      
       for imd_order = 2:20
           for o1 = 1 : (imd_order-1)
               o2 = imd_order - o1;
@@ -53,10 +55,10 @@ function [distortPeaks] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidth=
                   || (y(i) < MIN_LEVEL)
                   continue
                 end
-                distortPeaks = [distortPeaks; x(i), y(i), arg(yc(i))];
+                distortPeaksCh = [distortPeaksCh; x(i), y(i), arg(yc(i))];
               end
           end
       end
   end
-  distortPeaks = unique(distortPeaks, 'rows');
+  distortPeaksCh = unique(distortPeaksCh, 'rows');
 endfunction

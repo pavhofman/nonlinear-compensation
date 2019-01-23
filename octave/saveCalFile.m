@@ -1,11 +1,17 @@
+% both fundPeaksCh and distortPeaksCh have at least one freq (row)!!
 function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit = '')
+  % consts
+  persistent maxFundPeaksCnt = getMaxFundPeaksCnt();
   % remove zero freq rows from distortPeaksCh
   rowIDs = distortPeaksCh(:, 1) == 0;
   distortPeaksCh(rowIDs, :) = [];
   
-  freqs =  getFreqs(fundPeaksCh);     
+  freqs =  getFreqs(fundPeaksCh);
   calFile = genCalFilename(freqs, fs, channelID, deviceName, extraCircuit);
-
+  
+  %% calFile line contains maxFundPeaksCnt values, therefore fundPeaksCh must contain so many rows!!
+  fundPeaksCh = padWithZeros(fundPeaksCh, maxFundPeaksCnt);
+  
   if exist(calFile, 'file')
     load(calFile);
     complAllPeaks = calRec.distortPeaks;
@@ -185,4 +191,10 @@ function peaks = getEdgePeaks(allPeaks, rowIDs)
     % adding
     peaks = [peaks, peak];
   endfor
+endfunction
+
+
+% pad peaksCh with zero rows up to rowsCnt
+function peaksCh = padWithZeros(peaksCh, rowsCnt)
+  peaksCh = [peaksCh; zeros(rowsCnt - rows(peaksCh), 3)];
 endfunction

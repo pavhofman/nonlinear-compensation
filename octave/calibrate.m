@@ -33,13 +33,12 @@ function result = calibrate(buffer, fs, deviceName, extraCircuit, restart)
     [fundPeaks, distortPeaks] = getHarmonics(calBuffer, fs);
     for channelID = 1:channelCnt
       % shift distortPeaks to zero time of fundPeaks and store to runPeaks
-      fundPeaksCh = fundPeaks(:, :, channelID);
-      distortPeaksCh = distortPeaks(:, :, channelID);
-      if hasAnyPeak(fundPeaksCh)
+      fundPeaksCh = fundPeaks{channelID};
+      distortPeaksCh = distortPeaks{channelID};
+      if hasAnyPeak(fundPeaksCh) && hasAnyPeak(distortPeaksCh)
         % time shift distortPeaks to zero phase of fundPeaks        
         distortPeaksCh = phasesAtZeroTimeCh(fundPeaksCh, distortPeaksCh);
-        % distortPeaks are at zero time, set fund phases to zero
-        fundPeaksCh(:, 3) = 0;
+        % now distortPeaksCh are zero-time based. Phases in fundPeaksCh must be kept for storing into calfile!
       endif
       % store peaks of this run to persistent variable
       runPeaks{FUND_PEAKS_ID, runID, channelID} = fundPeaksCh;
@@ -59,7 +58,7 @@ function result = calibrate(buffer, fs, deviceName, extraCircuit, restart)
       for channelID = 1:channelCnt
         % determine peaks from runs
         [fundPeaksCh, distortPeaksCh] = detAveragePeaks(runPeaks, channelID)
-        if hasAnyPeak(fundPeaksCh)          
+        if hasAnyPeak(fundPeaksCh) && hasAnyPeak(distortPeaksCh)
           saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit);
         else
           printf('No fundaments found for channel ID %d, not storing its calibration file\n', channelID);
@@ -78,10 +77,6 @@ function [avgFundPeaksCh, avgDistortPeaksCh] = detAveragePeaks(runPeaks, channel
   %consts
   persistent FUND_PEAKS_ID = 1;
   persistent DISTORT_PEAKS_ID = 2;;
-
-  persistent maxFundPeaksCnt = getMaxFundPeaksCnt();
-  persistent maxDistortPeaksCnt = getMaxDistortPeaksCnt();
-
   
   avgFundPeaksCh = [];
   allFundPeaksCh = [];
@@ -98,11 +93,8 @@ function [avgFundPeaksCh, avgDistortPeaksCh] = detAveragePeaks(runPeaks, channel
     allDistortPeaksCh = [allDistortPeaksCh; distortPeaksCh];
   endfor
   avgFundPeaksCh = calculateAvgPeaks(allFundPeaksCh);
-  % padding with zeros
-  avgFundPeaksCh = padWithZeros(avgFundPeaksCh, maxFundPeaksCnt);
   
   avgDistortPeaksCh = calculateAvgPeaks(allDistortPeaksCh);  
-  avgDistortPeaksCh = padWithZeros(avgDistortPeaksCh, maxDistortPeaksCnt);
 endfunction
 
 % return average peaks for each frequency found in allPeaksCh
@@ -124,9 +116,4 @@ function avgPeaksCh = calculateAvgPeaks(allPeaksCh);
       avgPeaksCh = [avgPeaksCh; avgPeak];
     endif
   endfor
-endfunction
-
-% pad peaksCh with zero rows up to rowsCnt
-function peaksCh = padWithZeros(peaksCh, rowsCnt)
-  peaksCh = [peaksCh; zeros(rowsCnt - rows(peaksCh), 3)];
 endfunction

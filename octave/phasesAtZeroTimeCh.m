@@ -1,4 +1,5 @@
 % shift all distort phases to time zero (i.e. where all fund phases = 0)
+% fundPeaksCh not empty!
 function distortPeaksCh = phasesAtZeroTimeCh(fundPeaksCh, distortPeaksCh)  
   zeroPhaseFundPeaksCh = fundPeaksCh;
   % zero phase, keep rest

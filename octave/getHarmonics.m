@@ -21,24 +21,22 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
   y = abs(yc);
   % peaks for all channels must have equal row cnt so that can be stored in 3D matrix
   channelCnt = columns(yc);
-  fundPeaks = zeros(maxFundPeaksCnt, 3, channelCnt);
-  distortPeaks = zeros(maxDistortPeaksCnt, 3, channelCnt);
+  fundPeaks = cell(channelCnt);
+  distortPeaks = cell(channelCnt);
   for channelID = 1:channelCnt
     ycCh = yc(:, channelID);
     yCh = y(:, channelID);
     [fundPeaksCh, errorMsgCh] = findFundPeaksCh(x, ycCh, yCh);
     if rows(fundPeaksCh) == 0
       % error, will PASS
-      printf("Did not find any fundPeaks, will send zeros\n");
-      fundPeaksCh = zeros(maxFundPeaksCnt, 3);
+      printf("Did not find any fundPeaks\n");
     elseif rows(fundPeaksCh) > maxFundPeaksCnt
       printf("Found fundPeaks for channel ID %d:\n", channelID);
       disp(fundPeaksCh);
-      printf("That is more than %d supported, will send zeros\n", maxFundPeaksCnt);
-      fundPeaksCh = zeros(maxFundPeaksCnt, 3);
+      printf("That is more than %d supported, will send no fund peaks\n", maxFundPeaksCnt);
+      fundPeaksCh = [];
     endif
-    
-    fundPeaks(1:rows(fundPeaksCh), :, channelID) = fundPeaksCh;
+    fundPeaks{channelID} = fundPeaksCh;
     errorMsg(:, channelID) = cellstr(errorMsgCh);
     
     if (genDistortPeaks && hasAnyPeak(fundPeaksCh))
@@ -48,14 +46,14 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
           % take distortPeaks strongest harmonics, keep unsorted
           distortPeaksCh = resize(sortrows(distortPeaksCh,-2), maxDistortPeaksCnt,3);
       end
-      distortPeaks(1:rows(distortPeaksCh), :, channelID) = distortPeaksCh;
+      distortPeaks{channelID} = distortPeaksCh;
     endif    
   endfor  
  
-  printf('Determined fundamental peaks:\n');
+  printf('Determined fundamental peaks\n');
   %disp(fundPeaks);
   if genDistortPeaks
-    printf('Determined distortion peaks:\n');
+    printf('Determined distortion peaks\n');
     %disp(distortPeaks);
   endif
 endfunction
