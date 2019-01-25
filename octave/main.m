@@ -25,8 +25,12 @@ transferFile = genDataPath('transf.dat');
 cmd = cellstr(PASS);
 
 global info = struct();
-
 info.status = PASSING;
+info.measuredPeaks = NA;
+info.fundPeaks = NA;
+info.distortPeaks = NA;
+info.genAmpl = NA;
+info.genFreq = NA;
 
 fs = 0;
 genFreq = 0;
