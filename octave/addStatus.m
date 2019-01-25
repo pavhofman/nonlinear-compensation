@@ -1,6 +1,9 @@
 % adding new status
-function status = addStatus(status, newStatus)  
-   if !any (status == newStatus)
-     status = [status, newStatus];
-   endif
+function addStatus(newStatus)
+  global info;
+  status = info.status;
+  if !any (status == newStatus)
+   status = [status, newStatus];
+  endif
+  info.status = status;   
 endfunction

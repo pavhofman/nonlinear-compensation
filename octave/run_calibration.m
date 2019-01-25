@@ -2,8 +2,8 @@ result = calibrate(buffer, fs, jointDeviceName, calExtraCircuit, restartCal);
 restartCal = false;
 if (result == FINISHED_RESULT)
   % turn off calibration
-  status = removeFromStatus(status, CALIBRATING);
-  if isempty(status)
+  removeFromStatus(CALIBRATING);
+  if isempty(getStatus())
     cmd = {PASS};
   endif
 endif

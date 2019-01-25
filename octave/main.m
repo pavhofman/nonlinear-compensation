@@ -23,7 +23,10 @@ endif
 transferFile = genDataPath('transf.dat');
 % default initial command - PASS
 cmd = cellstr(PASS);
-status = PASSING;
+
+global info = struct();
+
+info.status = PASSING;
 
 fs = 0;
 genFreq = 0;
@@ -59,7 +62,7 @@ while(true)
 %  disp(status);
   drawnow();
 
-  if (statusIs(status, PAUSED))
+  if (isStatus(PAUSED))
     % no reading/writing
     pause(0.5);
     % next cycle
@@ -76,27 +79,27 @@ while(true)
   restartReading = false;
 
     
-  if (statusIs(status, GENERATING))
+  if (isStatus(GENERATING))
     source 'run_generator.m';
   endif
  
 
-  if (statusContains(status, DISTORTING) && (statusContains(status, PASSING) || statusContains(status, COMPENSATING)))
+  if (statusContains(DISTORTING) && (statusContains(PASSING) || statusContains(COMPENSATING)))
     source 'run_distortion.m';
   endif
   
-  if (statusContains(status, CALIBRATING))
+  if (statusContains(CALIBRATING))
     source 'run_calibration.m';
   endif
 
 
-  if (statusContains(status, ANALYSING))
+  if (statusContains(ANALYSING))
     %id = tic();
     source 'run_analysis.m';
     %printf('Analysis took %f\n', toc(id));
   endif
   
-  if (statusContains(status, COMPENSATING))
+  if (statusContains(COMPENSATING))
     %id = tic();
     source 'run_compensation.m';
     %printf('Compensation took %f\n', toc(id));
@@ -106,11 +109,11 @@ while(true)
   writeData(buffer, fs, restartWriting);
   restartWriting = false;
   
-  if (status == MEASURING)
+  if (isStatus(MEASURING))
     source 'run_measuring.m';
   endif
   
-  if (status == SPLITTING)
+  if (isStatus(SPLITTING))
     source 'run_splitting.m';
   endif
 

@@ -118,4 +118,4 @@ else
 endif
 
 
-status = PASS;
+cmd = {PASS};

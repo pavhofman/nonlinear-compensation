@@ -5,6 +5,6 @@ if result == FINISHED_RESULT
   % from now on only compensation
   %status = COMPENSATING;
   % or could start new analysis right away + keeping DISTORTING flag
-  status = addStatus(status, COMPENSATING);
-  status = addStatus(status, ANALYSING);
+  addStatus(COMPENSATING);
+  addStatus(ANALYSING);
 endif

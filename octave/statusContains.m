@@ -1,3 +1,4 @@
-function result = statusContains (status, testedStatus)
-    result = any (status == testedStatus);
+function result = statusContains(testedStatus)
+  global info;
+  result = any(info.status == testedStatus);
 endfunction
