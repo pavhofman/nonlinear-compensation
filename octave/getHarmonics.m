@@ -20,8 +20,8 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
   y = abs(yc);
   % peaks for all channels must have equal row cnt so that can be stored in 3D matrix
   channelCnt = columns(yc);
-  fundPeaks = cell(channelCnt);
-  distortPeaks = cell(channelCnt);
+  fundPeaks = cell(channelCnt, 1);
+  distortPeaks = cell(channelCnt, 1);
   for channelID = 1:channelCnt
     ycCh = yc(:, channelID);
     yCh = y(:, channelID);

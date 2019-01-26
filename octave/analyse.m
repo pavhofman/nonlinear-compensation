@@ -8,18 +8,18 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
 
   persistent analysisBuffer = [];
   persistent channelCnt = columns(buffer);
-  persistent fundPeaks = cell(channelCnt);
-  persistent distortPeaks = cell(channelCnt);
+  persistent fundPeaks = cell(channelCnt, 1);
+  persistent distortPeaks = cell(channelCnt, 1);
   
-  persistent distortFreqs = cell(channelCnt);
-  persistent complAllPeaks = cell(channelCnt);
+  persistent distortFreqs = cell(channelCnt, 1);
+  persistent complAllPeaks = cell(channelCnt, 1);
   
   persistent clearFreqHistory = true;
   
   global NOT_FINISHED_RESULT;
   global FINISHED_RESULT;
 
-  measuredPeaks = [];
+  measuredPeaks = cell(channelCnt, 1);
   paramsAdvanceT = -1;
   
   if (restartAnalysis)
