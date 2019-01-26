@@ -46,6 +46,8 @@ global CMD_FILE_PLAY = 'cmd-play.info';
 DEVICE_REC_PREFIX = 'rec';
 DEVICE_PLAY_PREFIX = 'play';
 
+ZEROMQ_PORT_REC = 5555;
+ZEROMQ_PORT_PLAY = 5556;
 
 % fixed generator amplitude for now - used when generating sine (genSine) and calculating split calibration (run_split)
 genAmpl = db2mag(-3);

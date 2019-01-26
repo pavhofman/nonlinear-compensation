@@ -120,4 +120,5 @@ while(true)
     source 'run_splitting.m';
   endif
 
+  sendInfo(buildInfo(), zeromqPort);
 endwhile
