@@ -7,6 +7,8 @@ more off;
 
 pkg load miscellaneous;
 pkg load optim;
+pkg load zeromq;
+pkg load database;
 
 addpath(fileparts(mfilename('fullpath')));
 
@@ -24,16 +26,13 @@ transferFile = genDataPath('transf.dat');
 % default initial command - PASS
 cmd = cellstr(PASS);
 
-global info = struct();
-info.status = PASSING;
-info.measuredPeaks = NA;
-info.fundPeaks = NA;
-info.distortPeaks = NA;
-info.genAmpl = NA;
-info.genFreq = NA;
-
-fs = 0;
-genFreq = 0;
+global status = PASSING;
+global measuredPeaks = NA;
+global fundPeaks = NA;
+global distortPeaks = NA;
+global genAmpl = NA;
+global genFreq = NA;
+global fs = NA;
 
 transfer = struct();
 
@@ -79,7 +78,7 @@ while(true)
   else
     % reading/writing to soundcards
     [buffer, fs] = readWritePlayrec(-1, buffer, restartReading);
-  end
+  end  
   restartReading = false;
 
     

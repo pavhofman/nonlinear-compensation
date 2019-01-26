@@ -1,5 +1,5 @@
 % setting status
 function setStatus(newStatus)
-  global info;
-  info.status = newStatus;
+  global status;
+  status = newStatus;
 endfunction

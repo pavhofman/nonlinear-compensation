@@ -1,6 +1,5 @@
 function result = isStatus (testedStatus)
-  global info;
-  status = info.status;
+  global status;
   if (length(status) == 1 && status == testedStatus)
     result = true;
   else

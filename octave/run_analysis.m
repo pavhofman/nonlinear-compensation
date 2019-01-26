@@ -1,4 +1,4 @@
-[info.measuredPeaks, startingT, info.fundPeaks, info.distortPeaks, result] = analyse(buffer, fs, calDeviceName, compExtraCircuit, restartAnalysis);
+[measuredPeaks, startingT, fundPeaks, distortPeaks, result] = analyse(buffer, fs, calDeviceName, compExtraCircuit, restartAnalysis);
 restartAnalysis = false;
 if result == FINISHED_RESULT
   % finished

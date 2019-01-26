@@ -57,8 +57,8 @@ elseif strcmp(cmd{1}, GENERATE) && (rows(cmd) > 1)
   % gen freq
   % start generating sine at freq, at genAmpl level (fixed in consts.m for now)
   setStatus(GENERATING);
-  info.genFreq = str2num(cmd{2});  
-  info.genAmpl = genAmpl;
+  genFreq = str2num(cmd{2});  
+  genAmpl = genAmpl;
   % zeroing time
   startingT = 0;
   showFFTFigureConfig.restartAvg = 1;

@@ -3,7 +3,7 @@ restartCal = false;
 if (result == FINISHED_RESULT)
   % turn off calibration
   removeFromStatus(CALIBRATING);
-  if isempty(getStatus())
+  if isempty(status)
     cmd = {PASS};
   endif
 endif
