@@ -1,3 +1,17 @@
+pkg load zeromq;
+pkg load database;
+
+more off;
+
+% create  PAIR sockets
+recSock = zmq_socket(ZMQ_PAIR);
+playSock = zmq_socket(ZMQ_PAIR);
+
+% bind to corresponding ports
+zmq_bind (recSock, ['tcp://*:' num2str(ZEROMQ_PORT_REC)]);
+zmq_bind (playSock, ['tcp://*:' num2str(ZEROMQ_PORT_PLAY)]);
+  
+
 global cmdFileRec = genDataPath(CMD_FILE_REC);
 global cmdFilePlay = genDataPath(CMD_FILE_PLAY);
 
@@ -36,4 +50,15 @@ set(outBox, 'horizontalalignment', 'left');
 set(outBox, 'verticalalignment', 'top');
 set(outBox, 'max', 1000);
 
-uiwait(f);
+
+%fp = plot(x, 20*log10([0.9 0.8 0.7 0.65 0.6 ]), '>r', 'markerfacecolor', 'r');
+%set(gca,'Xtick',[])
+
+
+% loop forever, waiting for client infos
+while (true)
+  recInfo = rcvInfo(recSock);
+  disp(recInfo);
+  playInfo = rcvInfo(playSock);
+  disp(playInfo);
+endwhile
