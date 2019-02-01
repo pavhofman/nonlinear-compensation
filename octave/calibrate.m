@@ -3,7 +3,7 @@ function result = calibrate(buffer, fs, deviceName, extraCircuit, restart)
   persistent channelCnt = columns(buffer);
   % consts
   persistent FUND_PEAKS_ID = 1;
-  persistent DISTORT_PEAKS_ID = 2;;
+  persistent DISTORT_PEAKS_ID = 2;
   persistent RUNS = 10;
   persistent runPeaks = cell(2, RUNS, channelCnt);
   persistent runID = 0;
@@ -60,8 +60,10 @@ function result = calibrate(buffer, fs, deviceName, extraCircuit, restart)
         [fundPeaksCh, distortPeaksCh] = detAveragePeaks(runPeaks, channelID)
         if hasAnyPeak(fundPeaksCh) && hasAnyPeak(distortPeaksCh)
           saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit);
-        else
+        elseif ~hasAnyPeak(fundPeaksCh) 
           printf('No fundaments found for channel ID %d, not storing its calibration file\n', channelID);
+        else
+          printf('No distortion peaks found for channel ID %d, not storing its calibration file\n', channelID);
         endif
       endfor
       % reset runID for next time
@@ -76,7 +78,7 @@ endfunction
 function [avgFundPeaksCh, avgDistortPeaksCh] = detAveragePeaks(runPeaks, channelID)
   %consts
   persistent FUND_PEAKS_ID = 1;
-  persistent DISTORT_PEAKS_ID = 2;;
+  persistent DISTORT_PEAKS_ID = 2;
   
   avgFundPeaksCh = [];
   allFundPeaksCh = [];
@@ -92,9 +94,12 @@ function [avgFundPeaksCh, avgDistortPeaksCh] = detAveragePeaks(runPeaks, channel
     distortPeaksCh = runPeaks{DISTORT_PEAKS_ID, runID, channelID};
     allDistortPeaksCh = [allDistortPeaksCh; distortPeaksCh];
   endfor
-  avgFundPeaksCh = calculateAvgPeaks(allFundPeaksCh);
   
-  avgDistortPeaksCh = calculateAvgPeaks(allDistortPeaksCh);  
+  % calculate only if some fund and distort peaks are found
+  if hasAnyPeak(allFundPeaksCh) && hasAnyPeak(allDistortPeaksCh)
+    avgFundPeaksCh = calculateAvgPeaks(allFundPeaksCh);
+    avgDistortPeaksCh = calculateAvgPeaks(allDistortPeaksCh);  
+  endif
 endfunction
 
 % return average peaks for each frequency found in allPeaksCh
