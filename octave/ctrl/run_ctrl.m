@@ -20,6 +20,11 @@ function dS = drawDirPanel(fig, x, width, title)
   dS.plotPanel = plotPanel;
 endfunction
 
+function clbkCalibrateFreqs(src, data)
+  % calling scheduler-enabled calibration
+  calibrateFreqsSched();
+endfunction
+
 function drawMidPanel(fig, x, width)
   
   midPanel = uipanel(fig, "title", "Common", "position", [x, 0, width, 1]);
@@ -125,21 +130,27 @@ drawMidPanel(fig, DIR_PANEL_REL_WIDTH, (1 - 2*DIR_PANEL_REL_WIDTH));
 playS = initPlot(playS);
 recS = initPlot(recS);
 
-
+% queue for schedItems
+global schedQueue = cell();
 
 % loop until doQuit, waiting for client infos
 while (~doQuit)
+  % process scheduled callbacks, if any applicable at this time
+  runScheduled();
+  
   recInfo = rcvInfo(recSock);
   if isempty(recInfo)
     printf('Empty rec info\n');
   else
     showInfo(recInfo, recS);
   endif
+
   playInfo = rcvInfo(playSock);
   if isempty(playInfo)
     printf('Empty play info\n');
   else
     showInfo(playInfo, playS);
   endif
+
   drawnow();
 endwhile
