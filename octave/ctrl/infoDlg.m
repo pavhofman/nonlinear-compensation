@@ -7,5 +7,6 @@ function infoDlg(text)
 
   % closing button
   uicontrol(h, 'style', 'pushbutton', 'string', 'OK', "position",[10 10 50 50], 'callback', @() close(h));
+  drawnow();
   uiwait(h);
 endfunction
