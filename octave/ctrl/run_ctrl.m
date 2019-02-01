@@ -3,21 +3,33 @@ pkg load database;
 
 more off;
 
-function dS = createDirStruct();
-  dS = struct();
-  dS.plotPanel = NA;
-  dS.ax = NA;
-  dS.calPlot = NA;
-  dS.measPlot = NA;
-  dS.statusTxt = NA;
-  dS.fundFreqsTxt = NA;
+function dirS = createDirStruct();
+  dirStruct = struct();
+  dirStruct.plotPanel = NA;
+  dirStruct.ax = NA;
+  dirStruct.calPlot = NA;
+  dirStruct.measPlot = NA;
+  dirStruct.statusTxt = NA;
+  dirStruct.fundFreqsTxt = NA;
 endfunction
 
-function dS = drawDirPanel(fig, x, width, title)
-  panel = uipanel (fig, "title", title, "position", [x 0 width 1]);
-  plotPanel = uipanel (panel, "title", "", "position", [0.1 0 0.3 0.8]);
-  dS = createDirStruct();
-  dS.plotPanel = plotPanel;
+function dirStruct = drawDirPanel(fig, x, width, title)
+  panel = uipanel(fig, 
+            "title", title,
+            "position", [x 0 width 1]);
+  plotPanel = uipanel(panel, 
+            "title", "", 
+            "position", [0.1 0 0.3 0.8]);
+  dirStruct = createDirStruct();
+  dirStruct.plotPanel = plotPanel;
+  
+  statusTxt = uicontrol (panel,
+            "style", "text",
+            "units", "normalized",
+            "string", "unknown",
+            "horizontalalignment", "left",
+            "position", [0.05 0.90 1 0.08]);            
+  dirStruct.statusTxt = statusTxt;
 endfunction
 
 function clbkCalibrateFreqs(src, data)
@@ -65,30 +77,14 @@ function drawMidPanel(fig, x, width)
 
 endfunction
 
-function dS = initPlot(dS)
-  ax = axes ('parent', dS.plotPanel);
+function dirStruct = initPlot(dirStruct)
+  ax = axes ('parent', dirStruct.plotPanel);
   x = zeros(1, 5);
-  dS.calPlot = plot(ax, x, 20*log10([0.9 0.8 0.7 0.65 0.6 ]), '>r', 'markerfacecolor', 'r');
+  dirStruct.calPlot = plot(ax, x, 20*log10([0.9 0.8 0.7 0.65 0.6 ]), '>r', 'markerfacecolor', 'r');
   set(ax,'Xtick',[])
   set (ax, "ygrid", "on");
   set(ax, "outerposition",  [0,0, 1, 1])
-  dS.ax = ax;
-endfunction
-
-
-function showInfo(info, dS)
-  %info.id = NA;
-  %info.time = time();
-  %info.status = status;
-  %info.measuredPeaks = measuredPeaks;
-  %info.fundPeaks = fundPeaks;
-  %info.distortPeaks = distortPeaks;
-  %info.genAmpl = genAmpl;
-  %info.genFreq = genFreq;
-  %info.fs = fs;
-  %info.direction = direction;
-  disp(info);
-
+  dirStruct.ax = ax;
 endfunction
 
 % create  PAIR sockets
@@ -123,12 +119,12 @@ endfunction
 fig = figure("toolbar", "none", "menubar", "none",  'position', [100, 100, WIDTH, HEIGHT]);
 set(fig, 'DeleteFcn', @(h, e) doExit(fig));
 
-playS = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Play");
-recS = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "Capture");
+playStruct = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Play");
+recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "Capture");
 drawMidPanel(fig, DIR_PANEL_REL_WIDTH, (1 - 2*DIR_PANEL_REL_WIDTH));
 
-playS = initPlot(playS);
-recS = initPlot(recS);
+playStruct = initPlot(playStruct);
+recStruct = initPlot(recStruct);
 
 % queue for schedItems
 global schedQueue = cell();
@@ -142,14 +138,14 @@ while (~doQuit)
   if isempty(recInfo)
     printf('Empty rec info\n');
   else
-    showInfo(recInfo, recS);
+    processInfo(recInfo, recStruct);
   endif
 
   playInfo = rcvInfo(playSock);
   if isempty(playInfo)
     printf('Empty play info\n');
   else
-    showInfo(playInfo, playS);
+    processInfo(playInfo, playStruct);
   endif
 
   drawnow();
