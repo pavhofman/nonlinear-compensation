@@ -5,31 +5,53 @@ more off;
 
 function dirStruct = createDirStruct();
   dirStruct = struct();
-  dirStruct.plotPanel = NA;
-  dirStruct.ax = NA;
-  dirStruct.calPlot = NA;
-  dirStruct.measPlot = NA;
+  dirStruct.plotPanels = cell(2);
+  dirStruct.axs = cell(2);
+  dirStruct.calPlots = cell(2);
+  dirStruct.measPlots = cell(2);
   dirStruct.statusTxt = NA;
-  dirStruct.fundFreqsTxt = NA;
+  dirStruct.detailTxts = cell(2);
 endfunction
 
-function dirStruct = drawDirPanel(fig, x, width, title)
-  panel = uipanel(fig, 
-            "title", title,
-            "position", [x 0 width 1]);
+function dirStruct = drawChannelPlot(channelID, x, width, title, panel, dirStruct)
   plotPanel = uipanel(panel, 
-            "title", "", 
-            "position", [0.1 0 0.3 0.8]);
-  dirStruct = createDirStruct();
-  dirStruct.plotPanel = plotPanel;
-  
-  statusTxt = uicontrol (panel,
+            "title", title, 
+            "position", [x, 0, width, 0.90]);
+  dirStruct.plotPanels{channelID} = plotPanel;
+  [dirStruct.calPlots{channelID}, dirStruct.axs{channelID}] = initPlot(plotPanel);  
+endfunction
+
+function dirStruct = drawDetailTxt(channelID, x, width, panel, dirStruct)
+    dirStruct.detailTxts{channelID} = uicontrol (panel,
             "style", "text",
             "units", "normalized",
             "string", "unknown",
             "horizontalalignment", "left",
-            "position", [0.05 0.90 1 0.08]);            
+            "verticalalignment", "top",
+            "position", [x, 0, width, 0.90]);
+endfunction
+
+function dirStruct = drawDirPanel(fig, x, width, title)
+  dirStruct = createDirStruct();
+  panel = uipanel(fig, 
+            "title", title,
+            "position", [x 0 width 1]);
+  dirStruct = drawChannelPlot(1, 0.01, 0.15, 'Left', panel, dirStruct);
+  dirStruct = drawChannelPlot(2, 0.84, 0.15, 'Right', panel, dirStruct);
+  
+  
+  statusTxt = uicontrol (panel,
+            "style", "text",
+            "units", "normalized",
+            "fontweight", "demi", 
+            "string", "unknown",
+            "horizontalalignment", "left",
+            "verticalalignment", "top",
+            "position", [0.05 0.90 1 0.08]);
   dirStruct.statusTxt = statusTxt;
+  
+  dirStruct = drawDetailTxt(1, 0.16, 0.33, panel, dirStruct);
+  dirStruct = drawDetailTxt(2, 0.50, 0.33, panel, dirStruct);  
 endfunction
 
 function clbkCalibrateFreqs(src, data)
@@ -42,7 +64,7 @@ function drawMidPanel(fig, x, width)
   midPanel = uipanel(fig, "title", "Common", "position", [x, 0, width, 1]);
 
 
-  btnWidth = 250;
+  btnWidth = 180;
   global HEIGHT;
   global DIR_PANEL_REL_WIDTH;
   global WIDTH;
@@ -51,13 +73,13 @@ function drawMidPanel(fig, x, width)
   uicontrol (midPanel, "string", "Calibrate VD Freqs", "position",[10 yPos btnWidth 30], 'callback', @clbkCalibrateFreqs);
 
   yPos -= 40;
-  uicontrol (midPanel, "string", "Joint-Device Compensate VD", "position",[10 yPos btnWidth 30], 'callback', @clbkCompenVD);
+  uicontrol (midPanel, "string", "Joint-Dev. Compen. VD", "position",[10 yPos btnWidth 30], 'callback', @clbkCompenVD);
 
   yPos -= 40;
   uicontrol (midPanel, "string", "Calibrate LPF", "position",[10 yPos btnWidth 30], 'callback', @clbkCalibrateLPF);
 
   yPos -= 40;
-  uicontrol (midPanel, "string", "Joint-Device Compensate LPF", "position",[10 yPos btnWidth 30], 'callback', @clbkCompenLPF);
+  uicontrol (midPanel, "string", "Joint-Dev. Compen. LPF", "position",[10 yPos btnWidth 30], 'callback', @clbkCompenLPF);
 
   yPos -= 40;
   uicontrol (midPanel, "string", "Measure Filter", "position",[10 yPos btnWidth 30], 'callback', @clbkMeasureFilter);
@@ -66,7 +88,7 @@ function drawMidPanel(fig, x, width)
   uicontrol (midPanel, "string", "Split Calibration", "position",[10 yPos btnWidth 30], 'callback', @clbkSplitCalibrate);
 
   yPos -= 40;
-  uicontrol (midPanel, "string", "Split-Device Compensate Each Side", "position",[10 yPos btnWidth 30], 'callback', @clbkSplitCompen);
+  uicontrol (midPanel, "string", "Split-Dev. Compen. Sides", "position",[10 yPos btnWidth 30], 'callback', @clbkSplitCompen);
 
 
   global outBox = uicontrol (midPanel, "style", "edit", "position",[5, 5, (1-2*DIR_PANEL_REL_WIDTH)*WIDTH - 10, 100]);
@@ -77,14 +99,13 @@ function drawMidPanel(fig, x, width)
 
 endfunction
 
-function dirStruct = initPlot(dirStruct)
-  ax = axes ('parent', dirStruct.plotPanel);
+function [calPlot, ax] = initPlot(plotPanel)
+  ax = axes ('parent', plotPanel);
   x = zeros(1, 5);
-  dirStruct.calPlot = plot(ax, x, 20*log10([0.9 0.8 0.7 0.65 0.6 ]), '>r', 'markerfacecolor', 'r');
+  calPlot = plot(ax, x, 20*log10([0.9 0.8 0.7 0.65 0.6 ]), '>r', 'markerfacecolor', 'r');
   set(ax,'Xtick',[])
-  set (ax, "ygrid", "on");
-  set(ax, "outerposition",  [0,0, 1, 1])
-  dirStruct.ax = ax;
+  set(ax, "ygrid", "on");
+  set(ax, "outerposition",  [0, 0, 1, 1])
 endfunction
 
 % create  PAIR sockets
@@ -102,10 +123,10 @@ global cmdFilePlay = genDataPath(CMD_FILE_PLAY);
 global fs = 48000;
 global freq = 3000;
 
-global WIDTH = 800;
+global WIDTH = 1000;
 global HEIGHT = 600;
 
-global DIR_PANEL_REL_WIDTH = 0.3;
+global DIR_PANEL_REL_WIDTH = 0.4;
 
 global doQuit = false;
 
@@ -122,9 +143,6 @@ set(fig, 'DeleteFcn', @(h, e) doExit(fig));
 playStruct = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Play");
 recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "Capture");
 drawMidPanel(fig, DIR_PANEL_REL_WIDTH, (1 - 2*DIR_PANEL_REL_WIDTH));
-
-playStruct = initPlot(playStruct);
-recStruct = initPlot(recStruct);
 
 % queue for schedItems
 global schedQueue = cell();
