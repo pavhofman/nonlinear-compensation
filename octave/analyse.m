@@ -4,7 +4,7 @@
 % measuredPeaks - measured fundamental peaks
 % paramsAdvanceT - advance time of measuredParams related to the end of buffer (use t = paramsAdvanceT for starting sample of next buffer in compenReference calculation)
 % fundPeaks, distortPeaks - read from calibration file corresponding to current stream freqs
-function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = analyse(buffer, fs, calDeviceName, extraCircuit, restartAnalysis)
+function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = analyse(buffer, fs, calDeviceName, extraCircuit, genDistortPeaks, restartAnalysis)
 
   persistent analysisBuffer = [];
   persistent channelCnt = columns(buffer);
@@ -46,30 +46,34 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
     % each channel handled separately
     for channelID = 1:channelCnt
       measuredPeaksCh = measuredPeaks{channelID};
-    
-      freqs = getFreqs(measuredPeaksCh);
-      % check if new and stable
-      if isChangedAndStable(freqs, channelID, channelCnt, clearFreqHistory) || restartAnalysis
-        % changed incoming frequency, load from calfile (if exists)
-        [distortFreqsCh, complAllPeaksCh] = loadPeaks(measuredPeaksCh, freqs, fs, channelID, calDeviceName, extraCircuit);
-        % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
-        if find(isna(complAllPeaksCh))
-          complAllPeaksCh = fillMissingPeaks(complAllPeaksCh);
+      if genDistortPeaks            
+        freqs = getFreqs(measuredPeaksCh);
+        % check if new and stable
+        if isChangedAndStable(freqs, channelID, channelCnt, clearFreqHistory) || restartAnalysis
+          % changed incoming frequency, load from calfile (if exists)
+          [distortFreqsCh, complAllPeaksCh] = loadPeaks(measuredPeaksCh, freqs, fs, channelID, calDeviceName, extraCircuit);
+          % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
+          if find(isna(complAllPeaksCh))
+            complAllPeaksCh = fillMissingPeaks(complAllPeaksCh);
+          endif
+          % storing to persistent vars
+          distortFreqs{channelID} = distortFreqsCh;
+          complAllPeaks{channelID} = complAllPeaksCh;
+          
         endif
-        % storing to persistent vars
-        distortFreqs{channelID} = distortFreqsCh;
-        complAllPeaks{channelID} = complAllPeaksCh;
-        
-      endif
-      if !isempty(complAllPeaks{channelID})
-        % interpolate to current measured level
-        [fundPeaksCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs{channelID}, complAllPeaks{channelID});
-      else          
-        % no signal  
-        % zero peaks
+        if !isempty(complAllPeaks{channelID})
+          % interpolate to current measured level
+          [fundPeaksCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs{channelID}, complAllPeaks{channelID});
+        else          
+          % no signal  
+          % zero peaks
+          fundPeaksCh = [];
+          distortPeaksCh = [];
+        endif
+      else
         fundPeaksCh = [];
         distortPeaksCh = [];
-      endif
+      endif        
       fundPeaks{channelID} = fundPeaksCh;
       distortPeaks{channelID} = distortPeaksCh;
     endfor

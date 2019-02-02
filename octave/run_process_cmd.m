@@ -18,8 +18,8 @@ elseif (strcmp(cmd{1}, CALIBRATE))
 
 elseif (strcmp(cmd{1}, COMPENSATE))
   % comp calDeviceName extraCircuit
-  % start/restart analysis first, compensation will run after measuring current stream parameters
-  setStatus(ANALYSING);
+  setStatus(COMPENSATING);
+  addStatus(ANALYSING);
   % reading optional deviceName string
   if (rows(cmd) > 1)
     calDeviceName = cmd{2};
@@ -43,6 +43,11 @@ elseif (strcmp(cmd{1}, DISTORT) && (statusContains(PASSING) || statusContains(CO
 
 elseif (strcmp(cmd{1}, PASS))
   setStatus(PASSING);
+  % keep analysis running all the time (without generating distortion peaks)
+  addStatus(ANALYSING);
+  calDeviceName = "";
+  compExtraCircuit = "";
+
   showFFTFigureConfig.restartAvg = 1;
 
 elseif strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
