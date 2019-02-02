@@ -58,12 +58,10 @@ function result = calibrate(buffer, fs, deviceName, extraCircuit, restart)
       for channelID = 1:channelCnt
         % determine peaks from runs
         [fundPeaksCh, distortPeaksCh] = detAveragePeaks(runPeaks, channelID)
-        if hasAnyPeak(fundPeaksCh) && hasAnyPeak(distortPeaksCh)
+        if hasAnyPeak(fundPeaksCh)
           saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit);
-        elseif ~hasAnyPeak(fundPeaksCh) 
-          printf('No fundaments found for channel ID %d, not storing its calibration file\n', channelID);
         else
-          printf('No distortion peaks found for channel ID %d, not storing its calibration file\n', channelID);
+          printf('No fundaments found for channel ID %d, not storing its calibration file\n', channelID);
         endif
       endfor
       % reset runID for next time

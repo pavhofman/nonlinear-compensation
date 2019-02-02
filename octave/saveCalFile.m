@@ -1,8 +1,10 @@
-% both fundPeaksCh and distortPeaksCh have at least one freq (row)!!
+% fundPeaksCh have at least one freq (row), distortPeaksCh can be empty (clean signal or single-sine fundament > fs/4 (i.e. no higher harmonics)
 function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit = '')
   % remove zero freq rows from distortPeaksCh
-  rowIDs = distortPeaksCh(:, 1) == 0;
-  distortPeaksCh(rowIDs, :) = [];
+  if ~isempty(distortPeaksCh)
+    rowIDs = distortPeaksCh(:, 1) == 0;
+    distortPeaksCh(rowIDs, :) = [];
+  endif
   
   freqs =  getFreqs(fundPeaksCh);
   calFile = genCalFilename(freqs, fs, channelID, deviceName, extraCircuit);
@@ -15,13 +17,20 @@ function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timest
     complAllPeaks = calRec.peaks;
     distortFreqs = calRec.distortFreqs;
     [complAllPeaks, distortFreqs] = addRow(fundPeaksCh, distortPeaksCh, complAllPeaks, distortFreqs, timestamp);
-  else        
-    distortFreqs = transpose(distortPeaksCh(:, 1));
-    % build new/first complPeak line - convert peaks to complex numbers and transpose
-    dPeaksC = transpose(distortPeaksCh(:, 2) .* exp(i * distortPeaksCh(:, 3)));
+  else
+    if isempty(distortPeaksCh)
+      % no distortions, only fund  peaks
+      distortFreqs = [];
+      dPeaksC = [];
+    else
+      distortFreqs = transpose(distortPeaksCh(:, 1));
+      % build new/first complPeak line - convert peaks to complex numbers and transpose
+      dPeaksC = transpose(distortPeaksCh(:, 2) .* exp(i * distortPeaksCh(:, 3)));
+    endif
     complAllPeaks = buildComplPeakRow(timestamp, fundPeaksCh, dPeaksC);
     % adding edge rows for extrapolation
     complAllPeaks = addExtrapolRows(complAllPeaks);
+
   endif
 
   calRec.fundFreqs = transpose(fundPeaksCh(:, 1));
@@ -35,6 +44,9 @@ function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timest
   result = FINISHED_RESULT;
 endfunction
 
+
+% adding row to complAllPeaks
+% distortPeaksCh can be empty
 function [complAllPeaks, distortFreqs] = addRow(fundPeaksCh, distortPeaksCh, complAllPeaks, distortFreqs, timestamp)
   % complAllPeaks: time, origFundPhase1, origFundPhase2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
   persistent AMPL_IDX = 4;  % = index of fundAmpl1
@@ -49,6 +61,7 @@ function [complAllPeaks, distortFreqs] = addRow(fundPeaksCh, distortPeaksCh, com
   allDPeaksC = complAllPeaks(:, PEAKS_START_IDX:end);
   
   % peak values: complex numbers. Missing/not measured: NA
+    
   freqIDs = [];
   for rowID = 1:rows(distortPeaksCh)
     % find freq position in distortFreqs
@@ -73,27 +86,30 @@ function [complAllPeaks, distortFreqs] = addRow(fundPeaksCh, distortPeaksCh, com
     dPeaksC(freqID) = peak(2) * exp(i * peak(3));
   endfor
   
-  % sorting allDPeaksC by freqs:
-  % add peaks to end
-  allDPeaksC = [allDPeaksC; dPeaksC];
-  
-  % add freqs to first row
-  allDPeaksC = [distortFreqs; allDPeaksC];
+  if ~isempty(allDPeaksC)
+    % sorting allDPeaksC by freqs:
+    % add peaks to end
+    allDPeaksC = [allDPeaksC; dPeaksC];
+    
+    % add freqs to first row
+    allDPeaksC = [distortFreqs; allDPeaksC];
 
-  % sort all by first row
-  % only sortrows available, must use transposition
-  allDPeaksC = transpose(sortrows(transpose(allDPeaksC), 1));
+    % sort all by first row
+    % only sortrows available, must use transposition
+    allDPeaksC = transpose(sortrows(transpose(allDPeaksC), 1));
 
-  % recover sorted freqs, remove from allDPeaksC
-  distortFreqs = allDPeaksC(1,:);
-  allDPeaksC = allDPeaksC(2:end, :);
-  
-  % recover new peaks row sorted by frequency, remove from allDPeaksC (to be added later on)
-  dPeaksC = allDPeaksC(end,:);
-  allDPeaksC = allDPeaksC(1:end - 1, :);
-  
-  % put allDPeaksC back to complAllPeaks
-  complAllPeaks = [complAllPeaks(:, 1:PEAKS_START_IDX - 1), allDPeaksC];
+
+    % recover sorted freqs, remove from allDPeaksC
+    distortFreqs = allDPeaksC(1,:);
+    allDPeaksC = allDPeaksC(2:end, :);
+    
+    % recover new peaks row sorted by frequency, remove from allDPeaksC (to be added later on)
+    dPeaksC = allDPeaksC(end,:);
+    allDPeaksC = allDPeaksC(1:end - 1, :);
+    
+    % put allDPeaksC back to complAllPeaks
+    complAllPeaks = [complAllPeaks(:, 1:PEAKS_START_IDX - 1), allDPeaksC];
+  endif
   
   % build new complPeak line
   complPeak = buildComplPeakRow(timestamp, fundPeaksCh, dPeaksC);
@@ -126,6 +142,7 @@ function [complAllPeaks, distortFreqs] = addRow(fundPeaksCh, distortPeaksCh, com
   complAllPeaks = addExtrapolRows(complAllPeaks);
 endfunction
 
+% building one row for calFIle.peaks. dPeaksC can be empty
 function complPeak = buildComplPeakRow(timestamp, fundPeaksCh, dPeaksC)
   % build new complPeak line
   origFundPhases = fundPeaksCh(:, 3);

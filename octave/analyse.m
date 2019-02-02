@@ -50,7 +50,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
       freqs = getFreqs(measuredPeaksCh);
       % check if new and stable
       if isChangedAndStable(freqs, channelID, channelCnt, clearFreqHistory) || restartAnalysis
-        % changed incoming frequency
+        % changed incoming frequency, load from calfile (if exists)
         [distortFreqsCh, complAllPeaksCh] = loadPeaks(measuredPeaksCh, freqs, fs, channelID, calDeviceName, extraCircuit);
         % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
         if find(isna(complAllPeaksCh))
@@ -163,21 +163,25 @@ function [fundPeaksCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, chann
   % WARN: ALL peaks must be known (no NA values!)
   persistent AMPL_IDX = 4;  % = index of fundAmpl1
   persistent PEAKS_START_IDX = 6; 
-
-  allPeaks = complAllPeaks(:, PEAKS_START_IDX:end);
- 
-  % levels = AMPL_IDX column
-  levels = complAllPeaks(:, AMPL_IDX);
-  
-  % amplitude of first fundamental
-  currentLevel = measuredPeaksCh(1, 2);  
-  % interpolate, non-complex output!!!
-  
   distortPeaksCh = [];
-  % interp1 is slow (10ms in internal ppval()), run only once for all freqs
-  peaksAtLevel = interp1(levels, allPeaks , currentLevel, 'linear', 'extrap');
-  peaksAtLevel = transpose(peaksAtLevel);
-  distortPeaksCh = [transpose(distortFreqs), abs(peaksAtLevel), angle(peaksAtLevel)];
+  
+  allDPeaksC = complAllPeaks(:, PEAKS_START_IDX:end);
+  if ~isempty(allDPeaksC) 
+    % the actual interpolation
+    
+    % levels = AMPL_IDX column
+    levels = complAllPeaks(:, AMPL_IDX);
+    
+    % amplitude of first fundamental
+    currentLevel = measuredPeaksCh(1, 2);  
+    % interpolate, non-complex output!!!
+    
+
+    % interp1 is slow (10ms in internal ppval()), run only once for all freqs
+    peaksAtLevel = interp1(levels, allDPeaksC , currentLevel, 'linear', 'extrap');
+    peaksAtLevel = transpose(peaksAtLevel);
+    distortPeaksCh = [transpose(distortFreqs), abs(peaksAtLevel), angle(peaksAtLevel)];
+  endif
   % since currentPeaksCh are already interpolated to current level, fundPeaks = measuredPeaksCh with zero phase
   fundPeaksCh = measuredPeaksCh;
   fundPeaksCh(:, 3) = 0;
