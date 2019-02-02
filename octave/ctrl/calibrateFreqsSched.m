@@ -39,7 +39,7 @@ function calibrateFreqsSched(label = 1)
             writeCmd("cal", cmdFileRec);
             % next frequency
             curFreq += freq;
-            schedPause(1, P2, mfilename());
+            schedPause(2, P2, mfilename());
             return;
           endswitch
       endwhile
