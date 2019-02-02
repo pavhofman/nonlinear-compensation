@@ -3,7 +3,7 @@ pkg load database;
 
 more off;
 
-function dirS = createDirStruct();
+function dirStruct = createDirStruct();
   dirStruct = struct();
   dirStruct.plotPanel = NA;
   dirStruct.ax = NA;
