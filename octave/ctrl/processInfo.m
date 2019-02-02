@@ -28,8 +28,11 @@ function [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info)
   statusStr = cell();
   detailsCh1 = cell();
   detailsCh2 = cell();
-  for id = 1:length(info.status)
-    status = info.status(id);
+  
+  % sorting statuses to list in correct order - depends on values in consts.m!
+  statuses = transpose(sortrows(transpose(info.status)));
+  for id = 1:length(statuses)
+    status = statuses(id);
     statusStr{end + 1} = STATUS_NAMES{status};
     detailsCh1 = addDetails(1, status, id, info, detailsCh1);
     detailsCh2 = addDetails(2, status, id, info, detailsCh2);
