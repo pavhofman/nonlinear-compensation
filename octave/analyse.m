@@ -111,6 +111,7 @@ endfunction
 
 
 
+% newFreqs never empty, one or two items in row
 function isChanged = isChangedAndStable(newFreqs, channelID, channelCnt, clearFreqHistory)
   % const
   % how many cycles freqs must be same until declared stable - avoid artefacts caused by freqs change within the cycle
@@ -124,6 +125,10 @@ function isChanged = isChangedAndStable(newFreqs, channelID, channelCnt, clearFr
   
   freqsHistory = freqsHistories{channelID};
   % append  newFreqs at the end
+  % pad newFreqs with zero to two items
+  if columns(newFreqs) == 1
+    newFreqs = [newFreqs, 0];
+  endif
   freqsHistory = [freqsHistory; newFreqs];
   
   if rows(freqsHistory) == 1
