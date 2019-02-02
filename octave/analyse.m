@@ -99,7 +99,7 @@ function [distortFreqsCh, complAllPeaksCh] = loadPeaks(measuredPeaksCh, freqs, f
       % loading calRec, initialising persistent vars
       load(calFile);
       distortFreqsCh = calRec.distortFreqs;
-      complAllPeaksCh = calRec.distortPeaks;
+      complAllPeaksCh = calRec.peaks;
       printf('Distortion peaks for channel ID %d read from calibration file %s\n', channelID, calFile);
     else
       printf('Did not find calib file %s, channel ID %d PASSING\n', calFile, channelID);

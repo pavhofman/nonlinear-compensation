@@ -26,7 +26,7 @@ function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timest
 
   calRec.fundFreqs = transpose(fundPeaksCh(:, 1));
   calRec.distortFreqs = distortFreqs;
-  calRec.distortPeaks = complAllPeaks;
+  calRec.peaks = complAllPeaks;
   
   disp(calRec);
   save(calFile, 'calRec');
