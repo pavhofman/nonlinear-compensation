@@ -96,8 +96,10 @@ function [avgFundPeaksCh, avgDistortPeaksCh] = detAveragePeaks(runPeaks, channel
   endfor
   
   % calculate only if some fund and distort peaks are found
-  if hasAnyPeak(allFundPeaksCh) && hasAnyPeak(allDistortPeaksCh)
+  if hasAnyPeak(allFundPeaksCh)
     avgFundPeaksCh = calculateAvgPeaks(allFundPeaksCh);
+  endif
+  if hasAnyPeak(allDistortPeaksCh)
     avgDistortPeaksCh = calculateAvgPeaks(allDistortPeaksCh);  
   endif
 endfunction
