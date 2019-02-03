@@ -58,7 +58,12 @@ function details = addDetails(channelID, status, id, info, details)
     
     case COMPENSATING
       details{end + 1} = 'Compen. Distorts:';
-      details = addPeaksStr(info.distortPeaks{channelID}, 1, details);
+      % sorting distortPeaks by amplitude
+      peaks = info.distortPeaks{channelID};
+      if ~isempty(peaks)
+        peaks = sortrows(info.distortPeaks{channelID}, -2);
+        details = addPeaksStr(peaks, 1, details);
+      endif
       
     case ANALYSING
       details{end + 1} = 'Measured Funds:';
