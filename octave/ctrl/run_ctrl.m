@@ -2,7 +2,7 @@ pkg load zeromq;
 pkg load database;
 
 more off;
-
+  
 function dirStruct = createDirStruct();
   dirStruct = struct();
   dirStruct.plotPanels = cell(2);
@@ -131,7 +131,6 @@ global DIR_PANEL_REL_WIDTH = 0.4;
 global doQuit = false;
 
 function doExit(fig)
-  close(fig);
   global doQuit;
   doQuit = true;
 endfunction
@@ -171,6 +170,3 @@ while (~doQuit)
 
   drawnow();
 endwhile
-
-zmq_close(recSock);
-zmq_close(playSock);
