@@ -32,6 +32,10 @@ if (result == 1)
   printf('Storing %d transfer lines into %s\n', rows(transfers), transferFile);
   % saving updated transfers to file
   save(transferFile, 'transfers');
+  
+  % finished measuring command
+  cmdDoneID = cmdID;
+  
   cmd = {PASS};
 endif
 

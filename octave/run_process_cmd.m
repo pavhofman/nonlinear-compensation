@@ -49,6 +49,8 @@ elseif (strcmp(cmd{1}, PASS))
   compExtraCircuit = "";
 
   showFFTFigureConfig.restartAvg = 1;
+  % passing completes command immediately
+  cmdDoneID = cmdID;
 
 elseif strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
   showFFTFigureConfig.numAvg = str2num(cmd{2});
@@ -67,6 +69,9 @@ elseif strcmp(cmd{1}, GENERATE) && (rows(cmd) > 1)
   % zeroing time
   startingT = 0;
   showFFTFigureConfig.restartAvg = 1;
+  % generating completes command immediately
+  cmdDoneID = cmdID;
+  
 elseif strcmp(cmd{1}, MEASURE) && (rows(cmd) > 2)
   % meas freq channelID
   % measure transfer of channelID against the other channel at freq, store to transf.dat
@@ -75,6 +80,7 @@ elseif strcmp(cmd{1}, MEASURE) && (rows(cmd) > 2)
   % channel ID for transfer measurement. The other channel receives the original signal
   transfer.channel = str2num(cmd{3});
   restartMeasuring = true;
+    
 elseif (strcmp(cmd{1}, SPLIT))
   % split joint-device calibration to DAC/ADC sides. Requires direct cal file, filter cal file at same freq, measured filter transfer file containing freq harmonics
   setStatus(SPLITTING);

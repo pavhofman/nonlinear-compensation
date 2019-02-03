@@ -8,6 +8,7 @@ function info = buildInfo()
 
   global fs;
   global direction;
+  global cmdDoneID;
 
   info.id = NA;
   info.time = time();
@@ -23,6 +24,7 @@ function info = buildInfo()
   info.distortPeaks = distortPeaks;
 
   info.fs = fs;
+  info.cmdDoneID = cmdDoneID;
   info.direction = direction;
 endfunction
 

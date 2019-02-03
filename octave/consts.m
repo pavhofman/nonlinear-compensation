@@ -51,6 +51,9 @@ global NOT_FINISHED_RESULT = 0;
 global FINISHED_RESULT = 1;
 
 
+% format: ID25
+global CMD_ID_PREFIX = "ID";
+
 % direction cmd.info files
 global CMD_FILE_REC = 'cmd.info';
 global CMD_FILE_PLAY = 'cmd-play.info';

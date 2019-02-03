@@ -26,6 +26,11 @@ transferFile = genDataPath('transf.dat');
 % default initial command - PASS
 cmd = cellstr(PASS);
 
+% command ID
+cmdID = '';
+% ID of finished/done command
+global cmdDoneID = '';
+
 global status = PASSING;
 global measuredPeaks = NA;
 global fundPeaks = NA;
@@ -51,8 +56,16 @@ source 'run_common.m';
 
 while(true)
   % checking command file for new commands
-  if (exist(cmdFile, 'file'))
-    cmd = textread(cmdFile, '%s');
+  if (exist(cmdFile, 'file'))    
+    lines = textread(cmdFile, '%s');
+    % first line could be command ID if starts with ID
+    if length(lines) > 1 && strncmp(lines{1}, CMD_ID_PREFIX, length(CMD_ID_PREFIX))
+      cmdID = lines{1};
+      cmd = lines(2:end);
+    else
+      % no cmd ID as first item
+      cmd = lines;
+    endif
     delete(cmdFile);
   endif;
 

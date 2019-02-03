@@ -117,5 +117,7 @@ else
   saveCalFile(fundPeaksLP, distortPeaksD, fs, outputDeviceName);
 endif
 
+% finished command splitting
+cmdDoneID = cmdID;
 
 cmd = {PASS};
