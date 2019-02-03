@@ -62,10 +62,18 @@ elseif strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
 
 elseif strcmp(cmd{1}, GENERATE) && (rows(cmd) > 1)
   % gen freq
-  % start generating sine at freq, at genAmpl level (fixed in consts.m for now)
+  % start generating sine at freq, at genAmpl level
+  genFreq = findNumInCmd(cmd, CMD_FREQ_PREFIX);  
+  if isempty(genFreq)
+    printf('No generator frequency found in command, using 1000Hz');
+    genFreq = 1000;
+  endif
+  genAmpl = findNumInCmd(cmd, CMD_AMPL_PREFIX);  
+  if isempty(genAmpl)
+    printf('No generator amplitude found in command, using -3dB');
+    genFreq = db2mag(-3);
+  endif  
   setStatus(GENERATING);
-  genFreq = str2num(cmd{2});  
-  genAmpl = genAmpl;
   % zeroing time
   startingT = 0;
   showFFTFigureConfig.restartAvg = 1;

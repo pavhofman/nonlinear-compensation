@@ -10,6 +10,9 @@ function calibrateFreqsSched(label = 1)
   global fs;
   global cmdFileRec;
   global cmdFilePlay;
+  global GENERATE;
+  global CMD_FREQ_PREFIX;
+  global CMD_AMPL_PREFIX;
   
   % current frequency of calibration
   persistent curFreq = freq;
@@ -34,7 +37,7 @@ function calibrateFreqsSched(label = 1)
         switch(label)
           case P2            
             printStr(sprintf("Generating %dHz", curFreq));    
-            cmdID = writeCmd(sprintf ("gen %d", curFreq), cmdFilePlay);
+            cmdID = writeCmd([GENERATE " " CMD_FREQ_PREFIX num2str(curFreq) " " CMD_AMPL_PREFIX num2str(db2mag(-3))], cmdFilePlay);
             waitForCmdDone(cmdID, P3, TIMEOUT, ERROR, mfilename());
             return;
           case P3
