@@ -147,10 +147,13 @@ drawMidPanel(fig, DIR_PANEL_REL_WIDTH, (1 - 2*DIR_PANEL_REL_WIDTH));
 % queue for schedItems
 global schedQueue = cell();
 
+recInfo = [];
+playInfo = [];
 % loop until doQuit, waiting for client infos
 while (~doQuit)
   % process scheduled callbacks, if any applicable at this time
-  runScheduled();
+  % callbacks can use received info structures
+  runScheduled(recInfo, playInfo);
   
   recInfo = rcvInfo(recSock);
   if isempty(recInfo)
@@ -168,3 +171,6 @@ while (~doQuit)
 
   drawnow();
 endwhile
+
+zmq_close(recSock);
+zmq_close(playSock);

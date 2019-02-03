@@ -1,4 +1,4 @@
-function runScheduled()
+function runScheduled(recInfo, playInfo);
   global schedQueue;
   idsToRemove = [];
   cnt = length(schedQueue);
@@ -6,8 +6,8 @@ function runScheduled()
   % loop all scheduled items
   for id = 1:cnt    
     s = schedQueue{id};
-    % determine new label for current time
-    newLabel = s.getLabel(curTime);
+    % determine new label for current time and received infos
+    newLabel = s.getLabel(curTime, recInfo, playInfo);
     if ~isna(newLabel)
       % some label returned, executing fname
       feval(s.fname, newLabel);

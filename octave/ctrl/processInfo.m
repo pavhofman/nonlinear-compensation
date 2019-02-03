@@ -8,6 +8,7 @@ function processInfo(info, dirStruct)
   %info.genAmpl = genAmpl;
   %info.genFreq = genFreq;
   %info.fs = fs;
+  %info.cmdDoneID
   %info.direction = direction;
   
   %dirStruct.statusTxt = NA;

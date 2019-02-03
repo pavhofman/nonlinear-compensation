@@ -3,7 +3,7 @@
 function schedPause(timeout, nextLabel, fname)
   global schedQueue;
   reqTime = time() + timeout;
-  getLabel = @(curTime) nextLabelWhen(curTime,  reqTime, nextLabel);
+  getLabel = @(curTime, recInfo, playInfo) nextLabelWhen(curTime,  reqTime, nextLabel);
   schedQueue{end + 1} =  createSchedItem(getLabel, fname);
 endfunction
 

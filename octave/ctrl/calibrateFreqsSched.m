@@ -1,7 +1,9 @@
 % scheduler-enabled function for calibrating joint-device freqs
 function calibrateFreqsSched(label = 1)
   % init section
-  [P1, P2, P3, P4] = enum();
+  [P1, P2, P3, P4, ERROR] = enum();
+  
+  persistent TIMEOUT = 5;
   
   % fixed for now
   global freq;
@@ -19,10 +21,12 @@ function calibrateFreqsSched(label = 1)
       clearOutBox();
       printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", freq));;
 
-
       writeCmd("pass", cmdFilePlay);
-      writeCmd("pass", cmdFileRec);
-      schedPause(1, P2, mfilename());
+      cmdID = writeCmd("pass", cmdFileRec);
+      % we have to wait for command acceptance before issuing new commands (the cmd files could be deleted by new commands before they are consumed
+      % waiting only for one of the pass commands, both sides run at same speed
+      % after TIMEOUT secs timeout call ERROR
+      waitForCmdDone(cmdID, P2, TIMEOUT, ERROR, mfilename());
       return;
     case {P2 P3}
       % calibrating direct connection at freq harmonics
@@ -30,19 +34,21 @@ function calibrateFreqsSched(label = 1)
         switch(label)
           case P2            
             printStr(sprintf("Generating %dHz", curFreq));    
-            writeCmd(sprintf ("gen %d", curFreq), cmdFilePlay);
-            % long pause to let samples propagate through all the buffers
-            schedPause(2, P3, mfilename());
+            cmdID = writeCmd(sprintf ("gen %d", curFreq), cmdFilePlay);
+            waitForCmdDone(cmdID, P3, TIMEOUT, ERROR, mfilename());
             return;
           case P3
             printStr(sprintf("Joint-device calibrating VD at %dHz", curFreq));
-            writeCmd("cal", cmdFileRec);
+            cmdID = writeCmd("cal", cmdFileRec);
             % next frequency
             curFreq += freq;
-            schedPause(2, P2, mfilename());
-            return;
+            waitForCmdDone(cmdID, P2, TIMEOUT, ERROR, mfilename());
+            return;            
           endswitch
       endwhile
+      case ERROR
+        printStr('Timeout waiting for command done, exiting callback');
+        return;
   endswitch
   % final section
   writeCmd("pass", cmdFilePlay);
