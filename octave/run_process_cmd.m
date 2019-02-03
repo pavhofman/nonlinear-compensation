@@ -7,11 +7,8 @@ elseif (strcmp(cmd{1}, CALIBRATE))
   % add status - e.g. why compensation is running for incremental calibration
   addStatus(CALIBRATING);
   % reading optional  extra circuit specifier string (will be stored in cal file name)
-  if (rows(cmd) > 1)
-    calExtraCircuit = cmd{2};
-  else
-    calExtraCircuit = '';
-  endif
+  calExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
+
   % clearing calibration buffer
   restartCal = true;
   showFFTFigureConfig.restartAvg = 1;
@@ -21,17 +18,9 @@ elseif (strcmp(cmd{1}, COMPENSATE))
   setStatus(COMPENSATING);
   addStatus(ANALYSING);
   % reading optional deviceName string
-  if (rows(cmd) > 1)
-    calDeviceName = cmd{2};
-  else
-    calDeviceName = jointDeviceName;
-  endif
+  calDeviceName = findStringInCmd(cmd, CMD_DEVICE_NAME_PREFIX, jointDeviceName);
   % reading optional extraCircuit string
-  if (rows(cmd) > 2)
-    compExtraCircuit = cmd{3};
-  else
-    compExtraCircuit = '';
-  endif
+  compExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
   
   restartAnalysis = true;
   showFFTFigureConfig.restartAvg = 1;
@@ -63,16 +52,8 @@ elseif strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
 elseif strcmp(cmd{1}, GENERATE) && (rows(cmd) > 1)
   % gen freq
   % start generating sine at freq, at genAmpl level
-  genFreq = findNumInCmd(cmd, CMD_FREQ_PREFIX);  
-  if isempty(genFreq)
-    printf('No generator frequency found in command, using 1000Hz');
-    genFreq = 1000;
-  endif
-  genAmpl = findNumInCmd(cmd, CMD_AMPL_PREFIX);  
-  if isempty(genAmpl)
-    printf('No generator amplitude found in command, using -3dB');
-    genFreq = db2mag(-3);
-  endif  
+  genFreq = findNumInCmd(cmd, CMD_FREQ_PREFIX, 1000, 'No generator frequency found in command, using 1000Hz');
+  genAmpl = findNumInCmd(cmd, CMD_AMPL_PREFIX, db2mag(-3), 'No generator amplitude found in command, using -3dB');
   setStatus(GENERATING);
   % zeroing time
   startingT = 0;

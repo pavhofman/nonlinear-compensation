@@ -58,6 +58,10 @@ global CMD_ID_PREFIX = "ID";
 global CMD_FREQ_PREFIX = 'F';
 %A0.8945
 global CMD_AMPL_PREFIX = 'A';
+%ECfilter
+global CMD_EXTRA_CIRCUIT_PREFIX = 'EC';
+%DNrec8
+global CMD_DEVICE_NAME_PREFIX = 'DN';
 
 % direction cmd.info files
 global CMD_FILE_REC = 'cmd.info';
