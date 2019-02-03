@@ -11,6 +11,8 @@ function calibrateFreqsSched(label = 1)
   global cmdFileRec;
   global cmdFilePlay;
   global GENERATE;
+  global PASS;
+  global CALIBRATE;
   global CMD_FREQ_PREFIX;
   global CMD_AMPL_PREFIX;
   
@@ -24,8 +26,8 @@ function calibrateFreqsSched(label = 1)
       clearOutBox();
       printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", freq));;
 
-      writeCmd("pass", cmdFilePlay);
-      cmdID = writeCmd("pass", cmdFileRec);
+      writeCmd(PASS, cmdFilePlay);
+      cmdID = writeCmd(PASS, cmdFileRec);
       % we have to wait for command acceptance before issuing new commands (the cmd files could be deleted by new commands before they are consumed
       % waiting only for one of the pass commands, both sides run at same speed
       % after TIMEOUT secs timeout call ERROR
@@ -42,7 +44,7 @@ function calibrateFreqsSched(label = 1)
             return;
           case P3
             printStr(sprintf("Joint-device calibrating VD at %dHz", curFreq));
-            cmdID = writeCmd("cal", cmdFileRec);
+            cmdID = writeCmd(CALIBRATE, cmdFileRec);
             % next frequency
             curFreq += freq;
             waitForCmdDone(cmdID, P2, TIMEOUT, ERROR, mfilename());
@@ -54,7 +56,7 @@ function calibrateFreqsSched(label = 1)
         return;
   endswitch
   % final section
-  writeCmd("pass", cmdFilePlay);
-  writeCmd("pass", cmdFileRec);
+  writeCmd(PASS, cmdFilePlay);
+  writeCmd(PASS, cmdFileRec);
   printStr('Finished, both sides passing');  
 endfunction
