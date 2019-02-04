@@ -22,7 +22,7 @@ elseif (strcmp(cmd{1}, COMPENSATE))
   % reading optional extraCircuit string
   compExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
   
-  restartAnalysis = true;
+  reloadCalFiles = true;
   showFFTFigureConfig.restartAvg = 1;
 
 % distortion allowed only for status PASSING and COMPENSATING

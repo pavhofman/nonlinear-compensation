@@ -4,29 +4,19 @@
 % measuredPeaks - measured fundamental peaks
 % paramsAdvanceT - advance time of measuredParams related to the end of buffer (use t = paramsAdvanceT for starting sample of next buffer in compenReference calculation)
 % fundPeaks, distortPeaks - read from calibration file corresponding to current stream freqs
-function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = analyse(buffer, fs, calDeviceName, extraCircuit, genDistortPeaks, restartAnalysis)
-
+function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = analyse(buffer, fs, calDeviceName, extraCircuit, shouldGenCompenPeaks, reloadCalFiles)
   persistent analysisBuffer = [];
   persistent channelCnt = columns(buffer);
-  persistent fundPeaks = cell(channelCnt, 1);
-  persistent distortPeaks = cell(channelCnt, 1);
-  
-  persistent distortFreqs = cell(channelCnt, 1);
-  persistent complAllPeaks = cell(channelCnt, 1);
-  
-  persistent clearFreqHistory = true;
   
   global NOT_FINISHED_RESULT;
   global FINISHED_RESULT;
 
   measuredPeaks = cell(channelCnt, 1);
+  fundPeaks = cell(channelCnt, 1);
+  distortPeaks = cell(channelCnt, 1);
+
   paramsAdvanceT = -1;
   
-  if (restartAnalysis)
-    % new start - clearing the buffer
-    analysisBuffer = [];
-  endif
-
   analysisBuffer = [analysisBuffer; buffer];
 
   % frequency analysis requires 1 second
@@ -35,42 +25,22 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
   if (rows(analysisBuffer) < freqAnalysisSize)
     % not enough data, run again, send more data      
     result = NOT_FINISHED_RESULT;
-    clearFreqHistory = true;
     return;
   else
     % purging old samples from analysis buffer to cut analysisBuffer to freqAnalysisSize     
     analysisBuffer = analysisBuffer(rows(analysisBuffer) - freqAnalysisSize + 1: end, :);
     % enough data, measure fundPeaks, distortPeaks are ignored (not calibration signal)
     measuredPeaks = getHarmonics(analysisBuffer, fs, false);
-       
     % each channel handled separately
     for channelID = 1:channelCnt
       measuredPeaksCh = measuredPeaks{channelID};
-      if genDistortPeaks            
-        freqs = getFreqs(measuredPeaksCh);
-        % check if new and stable
-        if isChangedAndStable(freqs, channelID, channelCnt, clearFreqHistory) || restartAnalysis
-          % changed incoming frequency, load from calfile (if exists)
-          [distortFreqsCh, complAllPeaksCh] = loadPeaks(measuredPeaksCh, freqs, fs, channelID, calDeviceName, extraCircuit);
-          % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
-          if find(isna(complAllPeaksCh))
-            complAllPeaksCh = fillMissingPeaks(complAllPeaksCh);
-          endif
-          % storing to persistent vars
-          distortFreqs{channelID} = distortFreqsCh;
-          complAllPeaks{channelID} = complAllPeaksCh;
-          
-        endif
-        if !isempty(complAllPeaks{channelID})
-          % interpolate to current measured level
-          [fundPeaksCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs{channelID}, complAllPeaks{channelID});
-        else          
-          % no signal  
-          % zero peaks
-          fundPeaksCh = [];
-          distortPeaksCh = [];
-        endif
+      if shouldGenCompenPeaks && hasAnyPeak(measuredPeaksCh)
+        [fundPeaksCh, distortPeaksCh] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
       else
+        if ~hasAnyPeak(measuredPeaksCh)
+          printf('Did not find any fundaments, channel ID %d PASSING\n', channelID);
+        endif
+        % not generating compen peaks
         fundPeaksCh = [];
         distortPeaksCh = [];
       endif        
@@ -78,7 +48,6 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
       distortPeaks{channelID} = distortPeaksCh;
     endfor
     
-    clearFreqHistory = false;
     % measuredPeaks are calculated for time at start of analysisBuffer
     % but compensation will work on the current buffer
     % advance time of measuredPeaks relative to the start of buffer which is located at the end of analysisBuffer [analysisBuffer [ buffer]]
@@ -90,80 +59,74 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
 endfunction
 
 
+function [fundPeaksCh, distortPeaksCh] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
+  
+  persistent distortFreqs = cell(channelCnt, 1);
+  persistent complAllPeaks = cell(channelCnt, 1);
+  
+  persistent prevFreqs = cell(channelCnt, 1);  
+  persistent sameFreqsCounter = zeros(channelCnt, 1);
+  % how many cycles freqs must be same until declared stable - avoid artefacts caused by freqs change within the cycle
+  persistent SAME_FREQS_ROUNDS = 2;
+  
+  % default values
+  fundPeaksCh = [];
+  distortPeaksCh = [];
 
-function [distortFreqsCh, complAllPeaksCh] = loadPeaks(measuredPeaksCh, freqs, fs, channelID, calDeviceName, extraCircuit)
+  freqsCh = getFreqs(measuredPeaksCh);
+        
+  % check if new and stable
+  areSame = isequal(freqsCh, prevFreqs{channelID});
+  % remember for next round
+  prevFreqs{channelID} = freqsCh;
+  if ~areSame
+    % are different
+    % reset the counter
+    sameFreqsCounter(channelID) = 0;
+    % next run
+    return;
+  else
+    % same freqs from previous run, can continue
+    sameFreqsCounter(channelID) += 1;
+    
+    if sameFreqsCounter(channelID) >= SAME_FREQS_ROUNDS
+      if sameFreqsCounter(channelID) == SAME_FREQS_ROUNDS || reloadCalFiles
+        % changed incoming frequency, has been stable for SAME_FREQS_ROUNDS, load from calfile (if exists)
+        [distortFreqsCh, complAllPeaksCh] = loadPeaks(freqsCh, fs, channelID, calDeviceName, extraCircuit);
+        % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
+        if find(isna(complAllPeaksCh))
+          complAllPeaksCh = fillMissingPeaks(complAllPeaksCh);
+        endif
+        % storing to persistent vars
+        distortFreqs{channelID} = distortFreqsCh;
+        complAllPeaks{channelID} = complAllPeaksCh;          
+      endif
+    
+      % interpolating
+      if !isempty(complAllPeaks{channelID})
+        % interpolate to current measured level
+        [fundPeaksCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs{channelID}, complAllPeaks{channelID});
+      endif
+    endif
+  endif
+endfunction  
+
+function [distortFreqsCh, complAllPeaksCh] = loadPeaks(freqs, fs, channelID, calDeviceName, extraCircuit)
   % values for no signal/no calfile
   distortFreqsCh = [];
   complAllPeaksCh = [];
   
-  if (hasAnyPeak(measuredPeaksCh))
-    % re-reading cal file with one channel calib data
-    calFile = genCalFilename(freqs, fs, channelID, calDeviceName, extraCircuit);
-    if (exist(calFile, 'file'))
-      % loading calRec, initialising persistent vars
-      load(calFile);
-      distortFreqsCh = calRec.distortFreqs;
-      complAllPeaksCh = calRec.peaks;
-      printf('Distortion peaks for channel ID %d read from calibration file %s\n', channelID, calFile);
-    else
-      printf('Did not find calib file %s, channel ID %d PASSING\n', calFile, channelID);
-    endif
+  % re-reading cal file with one channel calib data
+  calFile = genCalFilename(freqs, fs, channelID, calDeviceName, extraCircuit);
+  if (exist(calFile, 'file'))
+    % loading calRec, initialising persistent vars
+    load(calFile);
+    distortFreqsCh = calRec.distortFreqs;
+    complAllPeaksCh = calRec.peaks;
+    printf('Distortion peaks for channel ID %d read from calibration file %s\n', channelID, calFile);
   else
-    printf('Did not find any fundaments, channel ID %d PASSING\n', channelID);
+    printf('Did not find calib file %s, channel ID %d PASSING\n', calFile, channelID);
   endif
-endfunction
-
-
-
-% newFreqs never empty, one or two items in row
-function isChanged = isChangedAndStable(newFreqs, channelID, channelCnt, clearFreqHistory)
-  % const
-  % how many cycles freqs must be same until declared stable - avoid artefacts caused by freqs change within the cycle
-  persistent EQUAL_CYCLES = 2;
-  % history of last (EQUAL_CYCLES + 1) freqs, latest last
-  persistent freqsHistories = initHistories(channelCnt);
-  
-  if clearFreqHistory
-    freqsHistories = initHistories(channelCnt);
-  endif
-  
-  freqsHistory = freqsHistories{channelID};
-  % append  newFreqs at the end
-  % pad newFreqs with zero to two items
-  if columns(newFreqs) == 1
-    newFreqs = [newFreqs, 0];
-  endif
-  freqsHistory = [freqsHistory; newFreqs];
-  
-  if rows(freqsHistory) == 1
-    % first run, certainly changed
-    isChanged = true;
-  elseif rows(freqsHistory) < (EQUAL_CYCLES + 1)
-    % not enough rows to decide -> no change
-    isChanged = false;
-  else
-    if rows(freqsHistory) > (EQUAL_CYCLES + 1)
-      % purge the oldest rows from beginning, keep (EQUAL_CYCLES + 1) rows
-      freqsHistory = freqsHistory(2:end, :);
-    endif
-    
-    % isChanged IF last EQUAL_CYCLES rows are same AND different than the first one
-    oldFreqs = freqsHistory(1, :);
-    newFreqsRows = freqsHistory(2:end, :);
-    % all newFreqsRows must be same
-    newFreqsRowsEqual = nnz(diff(newFreqsRows, 1)) == 0;
-    % last EQUAL_CYCLES same, previous different from newFreqs
-    isChanged = newFreqsRowsEqual && !isequal(oldFreqs, newFreqs);
-  endif
-  % store updated freqsHistory
-  freqsHistories{channelID} = freqsHistory;  
-endfunction
-
-function histories = initHistories(channelCnt)
-  histories = {};
-  for channelID = 1:channelCnt
-    histories{channelID} = [];
-  endfor
 endfunction
 
 

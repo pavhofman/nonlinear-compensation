@@ -45,7 +45,7 @@ transfer = struct();
 % first run -> restart, reading all files
 restartReading = true;
 restartCal = true;
-restartAnalysis = true;
+reloadCalFiles = true;
 restartWriting = true;
 restartMeasuring = true;
 
