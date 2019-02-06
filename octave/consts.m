@@ -49,6 +49,8 @@ global DIR_PLAY = 2;
 % results
 global NOT_FINISHED_RESULT = 0;
 global FINISHED_RESULT = 1;
+% e.g. failed calibration
+global FAILED_RESULT = 2;
 
 
 % CMD prefices
