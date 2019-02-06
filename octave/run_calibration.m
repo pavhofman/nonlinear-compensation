@@ -1,8 +1,11 @@
-result = calibrate(buffer, fs, jointDeviceName, calExtraCircuit, restartCal);
+result = calibrate(buffer, fs, calFreqs, jointDeviceName, calExtraCircuit, restartCal);
 restartCal = false;
-if (result == FINISHED_RESULT)
-  % new calfile, instruct analysis to reload
-  reloadCalFiles = true;
+if result == FINISHED_RESULT || result == FAILED_RESULT
+  % end of calibration
+  if result == FINISHED_RESULT 
+    % new calfile, instruct analysis to reload
+    reloadCalFiles = true;
+  endif
 
   % turn off calibration
   removeFromStatus(CALIBRATING);

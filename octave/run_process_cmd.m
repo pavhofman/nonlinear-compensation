@@ -8,6 +8,17 @@ elseif (strcmp(cmd{1}, CALIBRATE))
   addStatus(CALIBRATING);
   % reading optional  extra circuit specifier string (will be stored in cal file name)
   calExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
+  
+  % optional calibration freqs (both channels) to wait for
+  calFreqs = findNumInCmd(cmd, CMD_FREQ_PREFIX);
+  % calFreqs must be asc-sorted row
+  if size(calFreqs, 1) > 1
+    % in rows, transpose to columns
+    calFreqs = transpose(calFreqs);
+  endif
+  if length(calFreqs) > 1
+    calFreqs = sort(calFreqs);
+  endif
 
   % clearing calibration buffer
   restartCal = true;
