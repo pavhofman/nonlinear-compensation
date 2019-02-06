@@ -44,7 +44,8 @@ function calibrateFreqsSched(label = 1)
             return;
           case P3
             printStr(sprintf("Joint-device calibrating VD at %dHz", curFreq));
-            cmdID = writeCmd(CALIBRATE, cmdFileRec);
+            % safety measure - requesting calibration only at curFreq
+            cmdID = writeCmd([CALIBRATE " " CMD_FREQ_PREFIX num2str(curFreq)], cmdFileRec);
             % next frequency
             curFreq += freq;
             waitForCmdDone(cmdID, P2, TIMEOUT, ERROR, mfilename());
