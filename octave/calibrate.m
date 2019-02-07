@@ -14,6 +14,8 @@ function result = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, rest
   
   persistent runID = 0;
   global NOT_FINISHED_RESULT;
+  global FAILING_RESULT;
+  global RUNNING_OK_RESULT;
 
   
   
@@ -76,6 +78,7 @@ function result = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, rest
         disp(oldFreqs);
         printf('Different/zero fund freqs in run %d from previous run, resetting counter\n', runID);
 
+        result = FAILING_RESULT;
         % go to next channel
         break;
       else
@@ -92,7 +95,7 @@ function result = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, rest
         % some allXXXPeaks lines will stay empty, but calculateAvgPeaks() ignores them
         allFundPeaks{channelID, runID} = fundPeaksCh;
         allDistortPeaks{channelID, runID} = distortPeaksCh;      
-
+        result = RUNNING_OK_RESULT;
       endif
     endfor
     
@@ -101,7 +104,7 @@ function result = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, rest
     if any(sameFreqsCounter < CAL_RUNS) && runID < MAX_RUNS
       % some of the channels have not reached cal runs of same freqs
       % and still can run next time
-      result = NOT_FINISHED_RESULT;
+      % result is already set
       return;
     end
         

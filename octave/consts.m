@@ -35,10 +35,17 @@ global DIR_REC = 1;
 global DIR_PLAY = 2;
 
 % results
-global NOT_FINISHED_RESULT = 0;
-global FINISHED_RESULT = 1;
+% good results - positive
+% bad results - negative
+% running results - even
+% finished resulsts - odd
+global NOT_FINISHED_RESULT = 2; % running, good
+global RUNNING_OK_RESULT = 4; % running, good
+global FINISHED_RESULT = 1; % finished, good
+% e.g. calibration cannot detect stable freq
+global FAILING_RESULT = -2; % running, bad
 % e.g. failed calibration
-global FAILED_RESULT = 2;
+global FAILED_RESULT = -1; % finished, bad
 
 
 % CMD prefices

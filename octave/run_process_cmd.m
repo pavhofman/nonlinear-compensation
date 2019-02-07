@@ -51,6 +51,8 @@ elseif (strcmp(cmd{1}, PASS))
   showFFTFigureConfig.restartAvg = 1;
   % passing completes command immediately
   cmdDoneID = cmdID;
+  % passing never fails
+  setStatusResult(PASSING, RUNNING_OK_RESULT);
 
 elseif strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
   showFFTFigureConfig.numAvg = str2num(cmd{2});

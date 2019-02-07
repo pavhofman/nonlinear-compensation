@@ -1,8 +1,9 @@
 result = calibrate(buffer, fs, calFreqs, jointDeviceName, calExtraCircuit, restartCal);
+setStatusResult(CALIBRATING, result);
 restartCal = false;
-if result == FINISHED_RESULT || result == FAILED_RESULT
+if isResultFinished(result)
   % end of calibration
-  if result == FINISHED_RESULT 
+  if isResultOK(result)
     % new calfile, instruct analysis to reload
     reloadCalFiles = true;
   endif

@@ -10,6 +10,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
   
   global NOT_FINISHED_RESULT;
   global FINISHED_RESULT;
+  global FAILED_RESULT;
 
   measuredPeaks = cell(channelCnt, 1);
   fundPeaks = cell(channelCnt, 1);
@@ -31,6 +32,8 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
     analysisBuffer = analysisBuffer(rows(analysisBuffer) - freqAnalysisSize + 1: end, :);
     % enough data, measure fundPeaks, distortPeaks are ignored (not calibration signal)
     measuredPeaks = getHarmonics(analysisBuffer, fs, false);
+    % default result
+    result = FINISHED_RESULT;
     % each channel handled separately
     for channelID = 1:channelCnt
       measuredPeaksCh = measuredPeaks{channelID};
@@ -39,6 +42,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
       else
         if ~hasAnyPeak(measuredPeaksCh)
           printf('Did not find any fundaments, channel ID %d PASSING\n', channelID);
+          result = FAILED_RESULT;
         endif
         % not generating compen peaks
         fundPeaksCh = [];
@@ -52,8 +56,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
     % but compensation will work on the current buffer
     % advance time of measuredPeaks relative to the start of buffer which is located at the end of analysisBuffer [analysisBuffer [ buffer]]
     paramsAdvanceT = (rows(analysisBuffer) - rows(buffer))/fs;    
-    % finished OK
-    result = FINISHED_RESULT;
+    % finished OK    
     return;
   endif
 endfunction
