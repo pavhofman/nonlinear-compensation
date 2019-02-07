@@ -31,7 +31,8 @@ cmdID = '';
 % ID of finished/done command
 global cmdDoneID = '';
 
-global status = PASSING;
+global statusStruct = struct()
+setStatus(PASSING);
 global measuredPeaks = NA;
 global fundPeaks = NA;
 global distortPeaks = NA;
@@ -91,7 +92,7 @@ while(true)
   else
     % reading/writing to soundcards
     [buffer, fs] = readWritePlayrec(-1, buffer, restartReading);
-  end  
+  end
   restartReading = false;
 
     

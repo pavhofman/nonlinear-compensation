@@ -12,7 +12,7 @@ if result == FINISHED_RESULT || result == FAILED_RESULT
   % calibration command finished
   cmdDoneID = cmdID;
   
-  if isempty(status)
+  if numfields(statusStruct) == 0
     cmd = {PASS};
   endif
 endif

@@ -25,18 +25,18 @@ function processInfo(info, dirStruct)
 endfunction
 
 function [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info)
-  global STATUS_NAMES;
   statusStr = cell();
   detailsCh1 = cell();
   detailsCh2 = cell();
   
-  % sorting statuses to list in correct order - depends on values in consts.m!
-  statuses = transpose(sortrows(transpose(info.status)));
-  for id = 1:length(statuses)
-    status = statuses(id);
-    statusStr{end + 1} = STATUS_NAMES{status};
+  statusStruct = info.status;
+  
+  id = 1;
+  for [statusVal, status] = statusStruct
+    statusStr{end + 1} = status;
     detailsCh1 = addDetails(1, status, id, info, detailsCh1);
     detailsCh2 = addDetails(2, status, id, info, detailsCh2);
+    ++id;
   endfor  
 endfunction
 

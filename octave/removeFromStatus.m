@@ -1,6 +1,5 @@
 % remove from status
 function status = removeFromStatus(statusToRemove)
-  global status;
-  id = find(status == statusToRemove);
-  status(id) = [];
+  global statusStruct;
+  statusStruct = rmfield(statusStruct, statusToRemove);
 endfunction

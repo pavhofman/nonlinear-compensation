@@ -18,28 +18,16 @@ global SPLIT = 'split';
 global SPLIT2 = 'split2';
 NO_CMD = '';
 
-% bits for statuses
-global PAUSED = 1;
-global PASSING = 2;
-global CALIBRATING = 3;
-global ANALYSING = 4;
-global COMPENSATING = 5;
-global DISTORTING = 6;
-global GENERATING = 7;
-global MEASURING = 8;
-global SPLITTING = 9;
-
-
-global STATUS_NAMES = cell();
-STATUS_NAMES{PAUSED} = 'Paused';
-STATUS_NAMES{PASSING} = 'Passing';
-STATUS_NAMES{CALIBRATING} = 'Calibrating';
-STATUS_NAMES{ANALYSING} = 'Analysing';
-STATUS_NAMES{COMPENSATING} = 'Compensating';
-STATUS_NAMES{DISTORTING} = 'Distorting';
-STATUS_NAMES{GENERATING} = 'Generating';
-STATUS_NAMES{MEASURING} = 'Measuring';
-STATUS_NAMES{SPLITTING} = 'Splitting';
+% statuses
+global PAUSED = 'Paused';
+global PASSING = 'Passing';
+global CALIBRATING = 'Calibrating';
+global ANALYSING = 'Analysing';
+global COMPENSATING = 'Compensating';
+global DISTORTING = 'Distorting';
+global GENERATING = 'Generating';
+global MEASURING = 'Measuring';
+global SPLITTING = 'Splitting';
 
 
 %directions

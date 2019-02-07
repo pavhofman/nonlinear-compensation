@@ -1,7 +1,7 @@
 % building info struct from global variables
 function info = buildInfo()
   info = struct();
-  global status;
+  global statusStruct;
   global measuredPeaks;
   global fundPeaks;
   global distortPeaks;
@@ -13,9 +13,8 @@ function info = buildInfo()
   info.id = NA;
   info.time = time();
   
-  info.status = status;
-  for id = 1: length(status)
-    statusItem = status(id);
+  info.status = statusStruct;
+  for [val, statusItem ] = statusStruct
     info = addStatusDetails(statusItem, info);
   endfor
   

@@ -1,4 +1,4 @@
 function result = statusContains(testedStatus)
-  global status;
-  result = any(status == testedStatus);
+  global statusStruct;
+  result = isfield(statusStruct, testedStatus);
 endfunction

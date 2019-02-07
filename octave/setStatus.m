@@ -1,5 +1,6 @@
 % setting status
 function setStatus(newStatus)
-  global status;
-  status = newStatus;
+  global statusStruct;
+  statusStruct = struct();
+  statusStruct.(newStatus) = struct();
 endfunction
