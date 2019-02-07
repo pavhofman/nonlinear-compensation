@@ -33,7 +33,18 @@ function [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info)
   
   id = 1;
   for [statusVal, status] = statusStruct
-    statusStr{end + 1} = status;
+    statusToShow = status;
+    if isfield(statusVal, 'result')
+      result = statusVal.result;
+      if isResultOK(result)
+        how = 'OK';
+      else
+        how = 'BAD';
+      endif
+      statusToShow = [status ' ' how];
+    endif
+      
+    statusStr{end + 1} = statusToShow;
     detailsCh1 = addDetails(1, status, id, info, detailsCh1);
     detailsCh2 = addDetails(2, status, id, info, detailsCh2);
     ++id;
