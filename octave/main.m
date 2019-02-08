@@ -40,6 +40,8 @@ global genAmpl = NA;
 global genFreq = NA;
 global fs = NA;
 
+global compenCalFiles = NA;
+
 transfer = struct();
 
 
@@ -54,6 +56,8 @@ startingT = 0;
 buffer = [0];
 
 source 'run_common.m';
+
+firstCycle = true;
 
 while(true)
   % checking command file for new commands
@@ -94,8 +98,13 @@ while(true)
     [buffer, fs] = readWritePlayrec(-1, buffer, restartReading);
   end
   restartReading = false;
+  
+  % we already know channel count, initialize compenCalFiles
+  if firstCycle
+    compenCalFiles = cell(columns(buffer), 1);
+    firstCycle = false;
+  endif
 
-    
   if (isStatus(GENERATING))
     source 'run_generator.m';
   endif
@@ -120,6 +129,9 @@ while(true)
     %id = tic();
     source 'run_compensation.m';
     %printf('Compensation took %f\n', toc(id));
+  else
+    % for all other statuses - clear compenCalFiles
+    compenCalFiles = cell(columns(buffer), 1);
   endif
 
   % not stopped, always writing

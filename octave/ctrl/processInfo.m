@@ -1,14 +1,15 @@
 function processInfo(info, dirStruct)
   %info.id = NA;
   %info.time = time();
-  %info.status = status;
+  %info.status = statusStruct;
   %info.measuredPeaks = measuredPeaks;
   %info.fundPeaks = fundPeaks;
   %info.distortPeaks = distortPeaks;
   %info.genAmpl = genAmpl;
   %info.genFreq = genFreq;
   %info.fs = fs;
-  %info.cmdDoneID
+  %info.cmdDoneID;
+  %info.compenCalFiles = compenCalFiles;
   %info.direction = direction;
   
   %dirStruct.statusTxt = NA;
@@ -25,6 +26,7 @@ function processInfo(info, dirStruct)
 endfunction
 
 function [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info)
+  global COMPENSATING;
   statusStr = cell();
   detailsCh1 = cell();
   detailsCh2 = cell();
@@ -46,7 +48,7 @@ function [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info)
     if isfield(statusVal, 'msg')
       statusToShow = [statusToShow ' ' statusVal.msg];
     endif
-      
+    
     statusStr{end + 1} = statusToShow;
     detailsCh1 = addDetails(1, status, id, info, detailsCh1);
     detailsCh2 = addDetails(2, status, id, info, detailsCh2);
@@ -72,10 +74,13 @@ function details = addDetails(channelID, status, id, info, details)
       details{end + 1 } = [int2str(info.genFreq) 'Hz ' num2str(20*log10(info.genAmpl), 1) 'dB'];
     
     case COMPENSATING
-      details{end + 1} = 'Compen. Distorts:';
       % sorting distortPeaks by amplitude
       peaks = info.distortPeaks{channelID};
       if ~isempty(peaks)
+        details{end + 1} = 'Compen. Distorts:';
+        if ~isempty(info.compenCalFiles{channelID})
+          details{end + 1} = info.compenCalFiles{channelID};
+        endif
         peaks = sortrows(info.distortPeaks{channelID}, -2);
         details = addPeaksStr(peaks, 1, details);
       endif

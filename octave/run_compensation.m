@@ -15,6 +15,8 @@ for channelID = 1:columns(buffer)
   else
     % even one channel on non-compensation means status failure
     result = FAILING_RESULT;
+    % resetting calfile
+    compenCalFiles{channelID} = '';
   endif
 endfor
 

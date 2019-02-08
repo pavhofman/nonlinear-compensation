@@ -40,7 +40,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result, msg] =
     for channelID = 1:channelCnt
       measuredPeaksCh = measuredPeaks{channelID};
       if shouldGenCompenPeaks && hasAnyPeak(measuredPeaksCh)
-        [fundPeaksCh, distortPeaksCh] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
+        [fundPeaksCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
       else
         if ~hasAnyPeak(measuredPeaksCh)
           printf('Did not find any fundaments, channel ID %d PASSING\n', channelID);
@@ -50,9 +50,12 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result, msg] =
         % not generating compen peaks
         fundPeaksCh = [];
         distortPeaksCh = [];
+        calFile = '';
       endif        
       fundPeaks{channelID} = fundPeaksCh;
       distortPeaks{channelID} = distortPeaksCh;
+      global compenCalFiles;
+      compenCalFiles{channelID} = calFile;
     endfor
     
     % measuredPeaks are calculated for time at start of analysisBuffer
@@ -65,10 +68,11 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result, msg] =
 endfunction
 
 
-function [fundPeaksCh, distortPeaksCh] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
+function [fundPeaksCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
   
   persistent distortFreqs = cell(channelCnt, 1);
   persistent complAllPeaks = cell(channelCnt, 1);
+  persistent calFiles = cell(channelCnt, 1);
   
   persistent prevFreqs = cell(channelCnt, 1);  
   persistent sameFreqsCounter = zeros(channelCnt, 1);
@@ -78,6 +82,7 @@ function [fundPeaksCh, distortPeaksCh] = genCompensationPeaks(measuredPeaksCh, f
   % default values
   fundPeaksCh = [];
   distortPeaksCh = [];
+  calFile = '';
 
   freqsCh = getFreqs(measuredPeaksCh);
         
@@ -98,26 +103,28 @@ function [fundPeaksCh, distortPeaksCh] = genCompensationPeaks(measuredPeaksCh, f
     if sameFreqsCounter(channelID) >= SAME_FREQS_ROUNDS
       if sameFreqsCounter(channelID) == SAME_FREQS_ROUNDS || reloadCalFiles
         % changed incoming frequency, has been stable for SAME_FREQS_ROUNDS, load from calfile (if exists)
-        [distortFreqsCh, complAllPeaksCh] = loadPeaks(freqsCh, fs, channelID, calDeviceName, extraCircuit);
+        [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqsCh, fs, channelID, calDeviceName, extraCircuit);
         % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
         if find(isna(complAllPeaksCh))
           complAllPeaksCh = fillMissingPeaks(complAllPeaksCh);
         endif
         % storing to persistent vars
         distortFreqs{channelID} = distortFreqsCh;
-        complAllPeaks{channelID} = complAllPeaksCh;          
+        complAllPeaks{channelID} = complAllPeaksCh;
+        calFiles{channelID} = calFile;
       endif
     
       % interpolating
       if !isempty(complAllPeaks{channelID})
         % interpolate to current measured level
         [fundPeaksCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs{channelID}, complAllPeaks{channelID});
+        calFile = calFiles{channelID};
       endif
     endif
   endif
 endfunction  
 
-function [distortFreqsCh, complAllPeaksCh] = loadPeaks(freqs, fs, channelID, calDeviceName, extraCircuit)
+function [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqs, fs, channelID, calDeviceName, extraCircuit)
   % values for no signal/no calfile
   distortFreqsCh = [];
   complAllPeaksCh = [];
@@ -132,6 +139,7 @@ function [distortFreqsCh, complAllPeaksCh] = loadPeaks(freqs, fs, channelID, cal
     printf('Distortion peaks for channel ID %d read from calibration file %s\n', channelID, calFile);
   else
     printf('Did not find calib file %s, channel ID %d PASSING\n', calFile, channelID);
+    calFile = '';    
   endif
 endfunction
 
