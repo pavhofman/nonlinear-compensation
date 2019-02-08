@@ -1,5 +1,6 @@
-result = calibrate(buffer, fs, calFreqs, jointDeviceName, calExtraCircuit, restartCal);
+[result, msg] = calibrate(buffer, fs, calFreqs, jointDeviceName, calExtraCircuit, restartCal);
 setStatusResult(CALIBRATING, result);
+setStatusMsg(CALIBRATING, msg);
 restartCal = false;
 if isResultFinished(result)
   % end of calibration

@@ -1,3 +1,4 @@
-[measuredPeaks, startingT, fundPeaks, distortPeaks, result] = analyse(buffer, fs, calDeviceName, compExtraCircuit, statusContains(COMPENSATING), reloadCalFiles);
+[measuredPeaks, startingT, fundPeaks, distortPeaks, result, msg] = analyse(buffer, fs, calDeviceName, compExtraCircuit, statusContains(COMPENSATING), reloadCalFiles);
 setStatusResult(ANALYSING, result);
+setStatusMsg(ANALYSING, msg);
 reloadCalFiles = false;

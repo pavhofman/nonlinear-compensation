@@ -4,13 +4,15 @@
 % measuredPeaks - measured fundamental peaks
 % paramsAdvanceT - advance time of measuredParams related to the end of buffer (use t = paramsAdvanceT for starting sample of next buffer in compenReference calculation)
 % fundPeaks, distortPeaks - read from calibration file corresponding to current stream freqs
-function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = analyse(buffer, fs, calDeviceName, extraCircuit, shouldGenCompenPeaks, reloadCalFiles)
+function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result, msg] = analyse(buffer, fs, calDeviceName, extraCircuit, shouldGenCompenPeaks, reloadCalFiles)
   persistent analysisBuffer = [];
   persistent channelCnt = columns(buffer);
   
   global NOT_FINISHED_RESULT;
   global FINISHED_RESULT;
   global FAILED_RESULT;
+  
+  msg = '';
 
   measuredPeaks = cell(channelCnt, 1);
   fundPeaks = cell(channelCnt, 1);
@@ -42,6 +44,7 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result] = anal
       else
         if ~hasAnyPeak(measuredPeaksCh)
           printf('Did not find any fundaments, channel ID %d PASSING\n', channelID);
+          msg = 'No fundamentals found';
           result = FAILED_RESULT;
         endif
         % not generating compen peaks

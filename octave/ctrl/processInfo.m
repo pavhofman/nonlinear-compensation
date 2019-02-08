@@ -41,7 +41,10 @@ function [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info)
       else
         how = 'BAD';
       endif
-      statusToShow = [status ' ' how];
+      statusToShow = [statusToShow ' ' how];
+    endif
+    if isfield(statusVal, 'msg')
+      statusToShow = [statusToShow ' ' statusVal.msg];
     endif
       
     statusStr{end + 1} = statusToShow;

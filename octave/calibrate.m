@@ -1,5 +1,5 @@
 % calFreqs - optional 1/2 values. If not empty, wait for these freqs to come (in both channels), with timeout
-function result = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, restart)
+function [result, msg] = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, restart)
   persistent calBuffer = []; 
   persistent channelCnt = columns(buffer);
   % consts
@@ -17,10 +17,10 @@ function result = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, rest
   global FAILING_RESULT;
   global RUNNING_OK_RESULT;
 
-  
-  
   persistent prevFreqs = cell(channelCnt, 1);  
   persistent sameFreqsCounter = zeros(channelCnt, 1);
+  
+  msg = '';
 
     
   calibrationSize = fs; % 1 second, resolution 1Hz
@@ -77,7 +77,7 @@ function result = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, rest
         printf('Prev. round freqsCh:')
         disp(oldFreqs);
         printf('Different/zero fund freqs in run %d from previous run, resetting counter\n', runID);
-
+        msg = 'Unstable/different freqs';
         result = FAILING_RESULT;
         % go to next channel
         break;
@@ -129,6 +129,7 @@ function result = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, rest
       
     else
       printf("Reached %d max runs yet did not have at least %d same freqs runs in all channels, failing the calibration\n", MAX_RUNS, CAL_RUNS);
+      msg = 'Timed out without freqs';
       global FAILED_RESULT;
       result = FAILED_RESULT;
     endif
