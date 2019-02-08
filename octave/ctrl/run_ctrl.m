@@ -6,7 +6,7 @@ more off;
 function dirStruct = createDirStruct();
   dirStruct = struct();
   dirStruct.plotPanels = cell(2);
-  dirStruct.axs = cell(2);
+  dirStruct.axes = cell(2);
   dirStruct.calPlots = cell(2);
   dirStruct.measPlots = cell(2);
   dirStruct.statusTxt = NA;
@@ -18,7 +18,7 @@ function dirStruct = drawChannelPlot(channelID, x, width, title, panel, dirStruc
             "title", title, 
             "position", [x, 0, width, 0.90]);
   dirStruct.plotPanels{channelID} = plotPanel;
-  [dirStruct.calPlots{channelID}, dirStruct.axs{channelID}] = initPlot(plotPanel);  
+  [dirStruct.calPlots{channelID}, dirStruct.axes{channelID}] = initPlot(plotPanel);  
 endfunction
 
 function dirStruct = drawDetailTxt(channelID, x, width, panel, dirStruct)
@@ -99,13 +99,13 @@ function drawMidPanel(fig, x, width)
 
 endfunction
 
-function [calPlot, ax] = initPlot(plotPanel)
-  ax = axes ('parent', plotPanel);
+function [calPlot, axis] = initPlot(plotPanel)
+  axis = axes ('parent', plotPanel);
   x = zeros(1, 5);
-  calPlot = plot(ax, x, 20*log10([0.9 0.8 0.7 0.65 0.6 ]), '>r', 'markerfacecolor', 'r');
-  set(ax,'Xtick',[])
-  set(ax, "ygrid", "on");
-  set(ax, "outerposition",  [0, 0, 1, 1])
+  calPlot = plot(axis, x, 20*log10([0.9 0.8 0.7 0.65 0.6 ]), '>r', 'markerfacecolor', 'r');
+  set(axis,'Xtick',[])
+  set(axis, "ygrid", "on");
+  set(axis, "outerposition",  [0, 0, 1, 1])
 endfunction
 
 % create  PAIR sockets
