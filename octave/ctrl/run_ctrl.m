@@ -125,15 +125,6 @@ function [plotStruct] = initPlot(plotPanel)
   plotStruct.curLine = curLine;
 endfunction
 
-% create  PAIR sockets
-recSock = zmq_socket(ZMQ_PAIR);
-playSock = zmq_socket(ZMQ_PAIR);
-
-% bind to corresponding ports
-zmq_bind (recSock, ['tcp://*:' num2str(ZEROMQ_PORT_REC)]);
-zmq_bind (playSock, ['tcp://*:' num2str(ZEROMQ_PORT_PLAY)]);
-  
-
 global cmdFileRec = genDataPath(CMD_FILE_REC);
 global cmdFilePlay = genDataPath(CMD_FILE_PLAY);
 
@@ -162,6 +153,15 @@ drawMidPanel(fig, DIR_PANEL_REL_WIDTH, (1 - 2*DIR_PANEL_REL_WIDTH));
 
 % queue for schedItems
 global schedQueue = cell();
+
+
+% create  PAIR sockets
+recSock = zmq_socket(ZMQ_PAIR);
+playSock = zmq_socket(ZMQ_PAIR);
+
+% bind to corresponding ports
+zmq_bind (recSock, ['tcp://*:' num2str(ZEROMQ_PORT_REC)]);
+zmq_bind (playSock, ['tcp://*:' num2str(ZEROMQ_PORT_PLAY)]);
 
 recInfo = [];
 playInfo = [];
