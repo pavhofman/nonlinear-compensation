@@ -20,7 +20,7 @@ function [fundPeaksCh, errorMsg] = findFundPeaksCh(x, yc, y)
       return
   end
 
-  for idx = find(y >= ymax/10)'
+  for idx = transpose(find(y >= ymax/10))
     % local maximum?
       if ...
         % first bin
@@ -34,6 +34,6 @@ function [fundPeaksCh, errorMsg] = findFundPeaksCh(x, yc, y)
           % not local maximum, skipping
           continue
       end
-      fundPeaksCh = [fundPeaksCh; x(idx), y(idx), arg(yc(idx))];
+      fundPeaksCh = [fundPeaksCh; x(idx), y(idx), angle(yc(idx))];
   end
 endfunction
