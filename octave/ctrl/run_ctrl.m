@@ -18,7 +18,7 @@ function dirStruct = drawChannelPlot(channelID, x, width, title, panel, dirStruc
             "title", title, 
             "position", [x, 0, width, 0.90]);
   dirStruct.plotPanels{channelID} = plotPanel;
-  [dirStruct.calPlots{channelID}, dirStruct.axes{channelID}] = initPlot(plotPanel);  
+  [dirStruct.calPlots{channelID}] = initPlot(plotPanel);  
 endfunction
 
 function dirStruct = drawDetailTxt(channelID, x, width, panel, dirStruct)
@@ -99,13 +99,30 @@ function drawMidPanel(fig, x, width)
 
 endfunction
 
-function [calPlot, axis] = initPlot(plotPanel)
+function [plotStruct] = initPlot(plotPanel)
   axis = axes ('parent', plotPanel);
-  x = zeros(1, 5);
-  calPlot = plot(axis, x, 20*log10([0.9 0.8 0.7 0.65 0.6 ]), '>r', 'markerfacecolor', 'r');
+  x = [];
+  calLevels = [];
+  curLevels = [];
+  % 2 lines - calibration levels, current levels
+  lines = plot(axis, 0, 0, '>r', 'markerfacecolor', 'r', 1.1, 0, '<r', 'markerfacecolor', 'b');
+  % fixed limit
+  set(axis, 'ylim', [-20,1]);
+  calLine = lines(1);
+  curLine = lines(2);
+  set(calLine, 'visible', 'off');
+  set(curLine, 'visible', 'off');
+  
   set(axis,'Xtick',[])
   set(axis, "ygrid", "on");
   set(axis, "outerposition",  [0, 0, 1, 1])
+  
+  plotStruct = struct();
+  plotStruct.axis = axis;
+  % line with calibration level points
+  plotStruct.calLine = calLine;
+  % line with current level points
+  plotStruct.curLine = curLine;
 endfunction
 
 % create  PAIR sockets

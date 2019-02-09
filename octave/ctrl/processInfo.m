@@ -20,8 +20,7 @@ function processInfo(info, dirStruct)
   set(dirStruct.detailTxts{1}, 'string', detailsCh1);
   set(dirStruct.detailTxts{2}, 'string', detailsCh2);
   
-  
-  
+  updatePlots(dirStruct, info);
   disp(info);
 endfunction
 
