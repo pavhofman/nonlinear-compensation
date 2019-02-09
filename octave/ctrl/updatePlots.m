@@ -1,6 +1,7 @@
 % Updating corresponding calPlots based on info. Reads fundamental amplitudes from calFiles, updates only calLines in dirStruct.
 function updatePlots(dirStruct, info)
   global COMPENSATING;
+  global CH_DISTANCE_X;
   persistent calFiles = cell(2, 2);
   persistent allCalLevels = cell(2, 2);
   
@@ -30,7 +31,7 @@ function updatePlots(dirStruct, info)
       calX = zeros(rows(calLevels), 1);
       calY = calLevels;
       if columns(calLevels) == 2
-        calX = [calX; calX + 0.1];
+        calX = [calX; calX + CH_DISTANCE_X];
         calY = [calLevels(:, 1); calLevels(:, 2)];
       endif
 
@@ -51,7 +52,7 @@ function updatePlots(dirStruct, info)
       curX = ones(rows(curLevels), 1);
       curY = curLevels;
       if length(curLevels) == 2
-        curX(2) += 0.1;
+        curX(2) += CH_DISTANCE_X;
       endif
       plotLevels(plotStruct.curLine, curX, curY);
     endif

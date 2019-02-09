@@ -105,7 +105,7 @@ function [plotStruct] = initPlot(plotPanel)
   calLevels = [];
   curLevels = [];
   % 2 lines - calibration levels, current levels
-  lines = plot(axis, 0, 0, '>r', 'markerfacecolor', 'r', 1.1, 0, '<r', 'markerfacecolor', 'b');
+  lines = plot(axis, 0, 0, '>r', 'markerfacecolor', 'r', 1, 0, '<r', 'markerfacecolor', 'b');
   % fixed limit
   set(axis, 'ylim', [-20,1]);
   calLine = lines(1);
@@ -135,6 +135,8 @@ global WIDTH = 1000;
 global HEIGHT = 600;
 
 global DIR_PANEL_REL_WIDTH = 0.4;
+
+global CH_DISTANCE_X = 0.3
 
 global doQuit = false;
 
