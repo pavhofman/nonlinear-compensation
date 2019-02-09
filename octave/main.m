@@ -48,7 +48,7 @@ transfer = struct();
 % first run -> restart, reading all files
 restartReading = true;
 restartCal = true;
-reloadCalFiles = true;
+global reloadCalFiles = false;
 restartWriting = true;
 restartMeasuring = true;
 
@@ -104,6 +104,10 @@ while(true)
     compenCalFiles = cell(columns(buffer), 1);
     firstCycle = false;
   endif
+  
+  % this variable is used for communication between calibration -> analysis within one loop. 
+  % Since we need to keep the value until buildInfo is called (passed to CTRL process), it must be reset at the start of the loop
+  reloadCalFiles = false;
 
   if (isStatus(GENERATING))
     source 'run_generator.m';

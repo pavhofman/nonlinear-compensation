@@ -13,8 +13,8 @@ function updatePlots(dirStruct, info)
       presus = 1;
     endif
     calFile = info.compenCalFiles{channelID};
-    if ~strcmp(calFiles{direction, channelID}, calFile)
-      % change from last run
+    if ~strcmp(calFiles{direction, channelID}, calFile) || info.reloadCalFiles
+      % change from last run or explicit request to reload calfiles
       if ~isempty(calFile)
         % plot calfile levels
         calLevels = loadCalLevels(calFile);

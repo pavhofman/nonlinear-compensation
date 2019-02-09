@@ -10,6 +10,7 @@ function info = buildInfo()
   global direction;
   global cmdDoneID;
   global compenCalFiles;
+  global reloadCalFiles;
 
   info.id = NA;
   info.time = time();
@@ -23,6 +24,7 @@ function info = buildInfo()
   info.fundPeaks = fundPeaks;
   info.distortPeaks = distortPeaks;
   info.compenCalFiles = compenCalFiles;
+  info.reloadCalFiles = reloadCalFiles;
 
   info.fs = fs;
   info.cmdDoneID = cmdDoneID;
