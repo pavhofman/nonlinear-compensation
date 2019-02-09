@@ -78,8 +78,14 @@ endfunction
 function plotLevels(line, x, y)
   isVisible = strcmp(get(line, 'visible'), 'on');
   if ~isempty(y)
-    set(line, 'XData', x);
-    set(line, 'YData', y);
+    shownX = get(line, 'XData');    
+    if ~isequal(shownX, x)
+      set(line, 'XData', x);
+    endif
+    shownY = get(line, 'YData');
+    if ~isequal(shownY, y)
+      set(line, 'YData', y);
+    endif
     if ~isVisible
       set(line, 'visible', 'on');
     endif

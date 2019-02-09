@@ -16,12 +16,20 @@ function processInfo(info, dirStruct)
   %dirStruct.detailTxts = cell(2);
 
   [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info);
-  set(dirStruct.statusTxt, 'string', statusStr);
-  set(dirStruct.detailTxts{1}, 'string', detailsCh1);
-  set(dirStruct.detailTxts{2}, 'string', detailsCh2);
+  
+  updateTxt(dirStruct.statusTxt, statusStr);
+  updateTxt(dirStruct.detailTxts{1}, detailsCh1);
+  updateTxt(dirStruct.detailTxts{2}, detailsCh2);
   
   updatePlots(dirStruct, info);
   disp(info);
+endfunction
+
+function updateTxt(txtField, newText)
+  shownText = get(txtField, 'string');
+  if ~isequal(shownText, newText)
+    set(txtField, 'string', newText);
+  endif
 endfunction
 
 function [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info)
