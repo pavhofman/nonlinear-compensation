@@ -148,6 +148,10 @@ endfunction
 % allXXXPeaksCh - cell array(1, MAX_RUNS) of peaks matrices
 function [avgFundPeaksCh, avgDistortPeaksCh] = detAveragePeaks(allFundPeaksCh, allDistortPeaksCh)
   mergedFundPeaksCh = mergePeaks(allFundPeaksCh);
+  % allDistortPeaks are already 0-time based which means all fundamentals at phase 0
+  % zeroing mergedFundPeaksCh phases first
+  mergedFundPeaksCh(:, 3) = 0;
+  
   mergedDistortPeaksCh = mergePeaks(allDistortPeaksCh);
   
   % calculate only if some fund and distort peaks are found
