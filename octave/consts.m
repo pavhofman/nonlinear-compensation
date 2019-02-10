@@ -29,6 +29,21 @@ global GENERATING = 'Generating';
 global MEASURING = 'Measuring';
 global SPLITTING = 'Splitting';
 
+% order of statuses shown in statusTxt fields. Not listed statuses go last.
+global TXT_STATUS_ORDER = {
+PASSING
+GENERATING
+DISTORTING
+COMPENSATING 
+ANALYSING
+CALIBRATING 
+};
+
+% order of statuses shown in detailsTxt fields. Not listed statuses go last.
+global DETAILS_STATUS_ORDER = {
+ANALYSING
+COMPENSATING 
+};
 
 %directions
 global DIR_REC = 1;

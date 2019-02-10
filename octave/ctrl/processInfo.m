@@ -15,48 +15,83 @@ function processInfo(info, dirStruct)
   %dirStruct.statusTxt = NA;
   %dirStruct.detailTxts = cell(2);
 
-  [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info);
   
-  updateTxt(dirStruct.statusTxt, statusStr);
-  updateTxt(dirStruct.detailTxts{1}, detailsCh1);
-  updateTxt(dirStruct.detailTxts{2}, detailsCh2);
+  updateStatusTxts(dirStruct, info);
+
+  [detailsCh1, detailsCh2] = getStatusDetails(info)
+  updateFieldString(dirStruct.detailTxts{1}, detailsCh1);
+  updateFieldString(dirStruct.detailTxts{2}, detailsCh2);
   
   updatePlots(dirStruct, info);
   disp(info);
 endfunction
 
-function updateTxt(txtField, newText)
-  shownText = get(txtField, 'string');
+function updateFieldString(field, newText)
+  shownText = get(field, 'string');
   if ~isequal(shownText, newText)
-    set(txtField, 'string', newText);
+    set(field, 'string', newText);
   endif
 endfunction
 
-function [statusStr, detailsCh1, detailsCh2] = getStatusesStrings(info)
+function updateFieldColor(field, newColor)
+  shownColor = get(field, 'foregroundcolor');
+  if ~isequal(shownColor, newColor)
+    set(field, 'foregroundcolor', newColor);
+  endif
+endfunction
+
+function updateStatusTxts(dirStruct, info)
+  persistent GREEN = [0, 0.5, 0];
+  persistent RED = [0.5, 0, 0];
+  
   global COMPENSATING;
   statusStr = cell();
-  detailsCh1 = cell();
-  detailsCh2 = cell();
   
   statusStruct = info.status;
+  global TXT_STATUS_ORDER;
+  sortedStatuses = sortStatuses(statusStruct, TXT_STATUS_ORDER);
   
-  id = 1;
-  for [statusVal, status] = statusStruct
+  cnt = length(sortedStatuses);
+  if cnt > 4
+    printf('Too many statuses to show in statusTXT fields, showing only first 4\n');
+    cnt = 4;
+  endif
+
+  for id = 1 : cnt;
+    status = sortedStatuses{id};
     statusToShow = status;
+    
+    statusVal = statusStruct.(status);
+    if isfield(statusVal, 'msg') && ~isempty(statusVal.msg)
+      statusToShow = [statusToShow ': ' statusVal.msg];
+    endif
+    updateFieldString(dirStruct.statusTxts{id}, statusToShow);
+
     if isfield(statusVal, 'result')
       result = statusVal.result;
       if isResultOK(result)
-        how = 'OK';
+        color = GREEN;
       else
-        how = 'BAD';
+        color = RED;
       endif
-      statusToShow = [statusToShow ' ' how];
+      updateFieldColor(dirStruct.statusTxts{id}, color);
     endif
-    if isfield(statusVal, 'msg')
-      statusToShow = [statusToShow ' ' statusVal.msg];
-    endif
-    
-    statusStr{end + 1} = statusToShow;
+  endfor
+  % clear the rest
+  for id = cnt + 1:length(dirStruct.statusTxts)
+    updateFieldString(dirStruct.statusTxts{id}, '');
+  endfor
+endfunction
+  
+function [detailsCh1, detailsCh2] = getStatusDetails(info)  
+  statusStruct = info.status;
+  global DETAILS_STATUS_ORDER;
+  sortedStatuses = sortStatuses(statusStruct, DETAILS_STATUS_ORDER);
+  
+  detailsCh1 = cell();
+  detailsCh2 = cell();
+  for id = 1 : length(sortedStatuses)
+    status = sortedStatuses{id};
     detailsCh1 = addDetails(1, status, id, info, detailsCh1);
     detailsCh2 = addDetails(2, status, id, info, detailsCh2);
     ++id;
@@ -101,7 +136,7 @@ endfunction
 
 function str = addPeaksStr(peaksCh, decimals, str)
   % consts
-  persistent MAX_LINES = 10;
+  persistent MAX_LINES = 20;
   format = ['%7.' int2str(decimals) 'f'];
   cnt = rows(peaksCh);
   id = 0;
@@ -109,7 +144,7 @@ function str = addPeaksStr(peaksCh, decimals, str)
     ++id;
     if id > MAX_LINES
       % enough lines, add ...
-      str{end + 1} = ['... + ' num2str(cnt - id + 1) + ' peaks'];
+      str{end + 1} = ['... + ' num2str(cnt - id + 1) ' peaks'];
       % quit loop
       break
     endif
@@ -117,3 +152,4 @@ function str = addPeaksStr(peaksCh, decimals, str)
     str{end + 1} = ['  ' num2str(peak(1)) 'Hz ' num2str(20*log10(peak(2)), format) 'dB'];
   endwhile
 endfunction
+

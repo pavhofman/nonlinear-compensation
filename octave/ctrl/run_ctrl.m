@@ -13,45 +13,56 @@ function dirStruct = createDirStruct();
   dirStruct.detailTxts = cell(2);
 endfunction
 
-function dirStruct = drawChannelPlot(channelID, x, width, title, panel, dirStruct)
-  plotPanel = uipanel(panel, 
-            "title", title, 
-            "position", [x, 0, width, 0.90]);
-  dirStruct.plotPanels{channelID} = plotPanel;
-  [dirStruct.calPlots{channelID}] = initPlot(plotPanel);  
-endfunction
-
-function dirStruct = drawDetailTxt(channelID, x, width, panel, dirStruct)
-    dirStruct.detailTxts{channelID} = uicontrol (panel,
-            "style", "text",
-            "units", "normalized",
-            "string", "unknown",
-            "horizontalalignment", "left",
-            "verticalalignment", "top",
-            "position", [x, 0, width, 0.90]);
-endfunction
-
 function dirStruct = drawDirPanel(fig, x, width, title)
+  global CHANNEL_REL_HEIGHT;
   dirStruct = createDirStruct();
   panel = uipanel(fig, 
             "title", title,
             "position", [x 0 width 1]);
-  dirStruct = drawChannelPlot(1, 0.01, 0.15, 'Left', panel, dirStruct);
-  dirStruct = drawChannelPlot(2, 0.84, 0.15, 'Right', panel, dirStruct);
+  dirStruct = drawChannelPlot(1, 0.01, 0.15, CHANNEL_REL_HEIGHT, 'Left', panel, dirStruct);
+  dirStruct = drawChannelPlot(2, 0.84, 0.15, CHANNEL_REL_HEIGHT, 'Right', panel, dirStruct);
+  
+  % initializing status txt fields - 4
+  statusTxts = cell(4, 1);
+  for i = 1:4
+    statusTxts{i} = drawStatusTxt(i, panel); 
+  endfor
+  dirStruct.statusTxts = statusTxts;
   
   
+  dirStruct.detailTxts{1} = drawDetailTxt(1, 0.16, 0.33, CHANNEL_REL_HEIGHT, panel);
+  dirStruct.detailTxts{2} = drawDetailTxt(2, 0.50, 0.33, CHANNEL_REL_HEIGHT, panel);  
+endfunction
+
+
+function dirStruct = drawChannelPlot(channelID, x, width, height, title, panel, dirStruct)
+  plotPanel = uipanel(panel, 
+            "title", title, 
+            "position", [x, 0, width, height]);
+  dirStruct.plotPanels{channelID} = plotPanel;
+  dirStruct.calPlots{channelID} = initPlot(plotPanel);  
+endfunction
+
+function detailTxt = drawDetailTxt(channelID, x, width, height, panel, dirStruct)
+    detailTxt = uicontrol (panel,
+            "style", "text",
+            "units", "normalized",
+            "horizontalalignment", "left",
+            "verticalalignment", "top",
+            "position", [x, 0, width, height]);
+endfunction
+
+
+function statusTxt = drawStatusTxt(id, panel)
+  persistent HEIGHT = 0.025;
   statusTxt = uicontrol (panel,
             "style", "text",
             "units", "normalized",
             "fontweight", "demi", 
-            "string", "unknown",
             "horizontalalignment", "left",
             "verticalalignment", "top",
-            "position", [0.05 0.90 1 0.08]);
-  dirStruct.statusTxt = statusTxt;
-  
-  dirStruct = drawDetailTxt(1, 0.16, 0.33, panel, dirStruct);
-  dirStruct = drawDetailTxt(2, 0.50, 0.33, panel, dirStruct);  
+            "position", [0.05, 0.96 - (HEIGHT * (id - 1)), 1, HEIGHT]
+            );
 endfunction
 
 function clbkCalibrateFreqs(src, data)
@@ -133,6 +144,9 @@ global freq = 3000;
 
 global WIDTH = 1000;
 global HEIGHT = 600;
+
+% relative height of the channel block (plot, detailTxt)
+global CHANNEL_REL_HEIGHT = 0.85;
 
 global DIR_PANEL_REL_WIDTH = 0.4;
 
