@@ -12,7 +12,7 @@
 %
 function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidth=1)
   % consts
-  persistent MIN_LEVEL = db2mag(-150);
+  global MIN_DISTORT_LEVEL;
   distortPeaksCh = [];
   fundPeakBins = [];
   nffto2 = rows(y);
@@ -27,7 +27,7 @@ function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidt
               % ignore aliased frequencies
               break
           end
-          if (y(i) >= (ymax / 10)) || (y(i) < MIN_LEVEL)
+          if (y(i) >= (ymax / 10)) || (y(i) < MIN_DISTORT_LEVEL)
               % ignore frequencies stronger than 1/10 (-20dB) of the strongest one
               % ignore frequencies weaker than MIN_LEVEL
               continue
@@ -52,7 +52,7 @@ function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidt
                   % ignore frequencies stronger than 1/10 (-20dB) of the strongest one
                   || (y(i) >= (ymax / 10)) ...
                   % ignore frequencies waker than MIN_LEVEL
-                  || (y(i) < MIN_LEVEL)
+                  || (y(i) < MIN_DISTORT_LEVEL)
                   continue
                 end
                 distortPeaksCh = [distortPeaksCh; x(i), y(i), arg(yc(i))];

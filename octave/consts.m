@@ -70,3 +70,7 @@ DEVICE_PLAY_PREFIX = 'play';
 
 ZEROMQ_PORT_REC = 5555;
 ZEROMQ_PORT_PLAY = 5556;
+
+% minimum level of distortion peaks to be included into calibration profile
+% depends largely on soundcard performance
+global MIN_DISTORT_LEVEL = db2mag(-135);
