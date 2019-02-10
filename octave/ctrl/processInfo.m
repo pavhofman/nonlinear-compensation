@@ -100,9 +100,20 @@ function details = addDetails(channelID, status, id, info, details)
 endfunction
 
 function str = addPeaksStr(peaksCh, decimals, str)
+  % consts
+  persistent MAX_LINES = 10;
   format = ['%7.' int2str(decimals) 'f'];
-  for id = 1:rows(peaksCh)
+  cnt = rows(peaksCh);
+  id = 0;
+  while id < cnt
+    ++id;
+    if id > MAX_LINES
+      % enough lines, add ...
+      str{end + 1} = ['... + ' num2str(cnt - id + 1) + ' peaks'];
+      % quit loop
+      break
+    endif
     peak = peaksCh(id, :);
     str{end + 1} = ['  ' num2str(peak(1)) 'Hz ' num2str(20*log10(peak(2)), format) 'dB'];
-  endfor
+  endwhile
 endfunction
