@@ -138,18 +138,26 @@ endfunction
 
 function initMenu(fig)
   global cmdFileRec;
+  global cmdFilePlay;
   global CALIBRATE = 'cal';
   global COMPENSATE = 'comp';
   global PASS = 'pass';
 
-  fPass = @(src, data) writeCmd(PASS, cmdFileRec);
-  fCal = @(src, data) writeCmd(CALIBRATE, cmdFileRec);
-  fComp = @(src, data) writeCmd(COMPENSATE, cmdFileRec);
+  fPlayPass = @(src, data) writeCmd(PASS, cmdFilePlay);
+  fPlayComp = @(src, data) writeCmd(COMPENSATE, cmdFilePlay);
 
+  playMenu = uimenu (fig, "label", "&Playback", "accelerator", "c");
+  uimenu (playMenu, "label", "Pass", "callback", fPlayPass);
+  uimenu (playMenu, "label", "Compensate", "callback", fPlayComp);
+
+  fRecPass = @(src, data) writeCmd(PASS, cmdFileRec);
+  fRecCal = @(src, data) writeCmd(CALIBRATE, cmdFileRec);
+  fRecComp = @(src, data) writeCmd(COMPENSATE, cmdFileRec);
+  
   recMenu = uimenu (fig, "label", "&Capture", "accelerator", "c");
-  uimenu (recMenu, "label", "Pass", "callback", fPass);
-  uimenu (recMenu, "label", "Compensate", "callback", fComp);
-  uimenu (recMenu, "label", "Calibrate", "callback", fCal);
+  uimenu (recMenu, "label", "Pass", "callback", fRecPass);
+  uimenu (recMenu, "label", "Compensate", "callback", fRecComp);
+  uimenu (recMenu, "label", "Calibrate", "callback", fRecCal);
 endfunction
 
 
