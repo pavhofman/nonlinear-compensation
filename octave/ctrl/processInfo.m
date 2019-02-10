@@ -24,7 +24,7 @@ function processInfo(info, dirStruct)
   updateFieldString(dirStruct.detailTxts{2}, detailsCh2);
   
   updatePlots(dirStruct, info);
-  disp(info);
+  %disp(info);
 endfunction
 
 function updateFieldString(field, newText)
