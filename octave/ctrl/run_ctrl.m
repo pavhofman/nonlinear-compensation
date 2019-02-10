@@ -200,6 +200,11 @@ zmq_bind (playSock, ['tcp://*:' num2str(ZEROMQ_PORT_PLAY)]);
 
 recInfo = [];
 playInfo = [];
+
+% maximum age of received info for processing
+% older infos are skipped - flushing the incoming queue
+MAX_INFO_AGE = 0.5;
+
 % loop until doQuit, waiting for client infos
 while (~doQuit)
   % process scheduled callbacks, if any applicable at this time
@@ -209,14 +214,20 @@ while (~doQuit)
   recInfo = rcvInfo(recSock);
   if isempty(recInfo)
     printf('Empty rec info\n');
+  elseif recInfo.time < time() - MAX_INFO_AGE
+    printf('Outdated rec info, flushing\n');
   else
+    printf('Processing rec info\n');
     processInfo(recInfo, recStruct);
   endif
 
   playInfo = rcvInfo(playSock);
   if isempty(playInfo)
     printf('Empty play info\n');
+  elseif playInfo.time < time() - MAX_INFO_AGE
+    printf('Outdated play info, flushing\n');
   else
+    printf('Processing play info\n');
     processInfo(playInfo, playStruct);
   endif
 
