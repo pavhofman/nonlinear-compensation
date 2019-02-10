@@ -190,7 +190,7 @@ set(fig, 'DeleteFcn', @(h, e) doExit(fig));
 
 initMenu(fig);
 
-playStruct = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Play");
+playStruct = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Playback");
 recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "Capture");
 drawMidPanel(fig, DIR_PANEL_REL_WIDTH, (1 - 2*DIR_PANEL_REL_WIDTH));
 
