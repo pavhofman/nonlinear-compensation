@@ -1,5 +1,5 @@
 % calFreqs - optional 1/2 values. If not empty, wait for these freqs to come (in both channels), with timeout
-function [result, msg] = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, restart)
+function [result, runID, sameFreqsCounter, msg] = calibrate(buffer, fs, calFreqs, deviceName, extraCircuit, restart)
   persistent calBuffer = []; 
   persistent channelCnt = columns(buffer);
   % consts
@@ -100,7 +100,6 @@ function [result, msg] = calibrate(buffer, fs, calFreqs, deviceName, extraCircui
     endfor
     
     % runPeaks are updated, now checking RUN conditions
-    
     if any(sameFreqsCounter < CAL_RUNS) && runID < MAX_RUNS
       % some of the channels have not reached cal runs of same freqs
       % and still can run next time

@@ -1,6 +1,10 @@
-[result, msg] = calibrate(buffer, fs, calFreqs, jointDeviceName, calExtraCircuit, restartCal);
+[result, runID, sameFreqsCounter, msg] = calibrate(buffer, fs, calFreqs, jointDeviceName, calExtraCircuit, restartCal);
 setStatusResult(CALIBRATING, result);
-setStatusMsg(CALIBRATING, msg);
+
+% building complete status infomessage
+completeMsg = [num2str(sameFreqsCounter(1)) '-' num2str(sameFreqsCounter(2)) '/' num2str(runID) ' ' msg];
+setStatusMsg(CALIBRATING, completeMsg);
+
 restartCal = false;
 if isResultFinished(result)
   % end of calibration
