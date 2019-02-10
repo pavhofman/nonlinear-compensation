@@ -9,7 +9,7 @@ function info = rcvInfo(sock)
   if (hasData)
     % info struct is long
     % 0 = blocking mode
-    data = zmq_recv (sock, 10000, 0);
+    data = zmq_recv (sock, 50000, 0);
     info = bytea2var(data);
   endif
 endfunction
