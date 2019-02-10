@@ -12,6 +12,9 @@ if isResultFinished(result)
     % new calfile, instruct analysis to reload
     reloadCalFiles = true;
   endif
+  
+  % clearing calibration freqs
+  calFreqs = [];
 
   % turn off calibration
   removeFromStatus(CALIBRATING);

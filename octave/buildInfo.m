@@ -35,11 +35,18 @@ endfunction
 % adding details for each status item, if any
 function info = addStatusDetails(status, info)
   global GENERATING;
+  global CALIBRATING;
+  
   switch status
     case GENERATING
       global genAmpl;
       info.genAmpl = genAmpl;
       global genFreq;
       info.genFreq = genFreq;
+      
+    case CALIBRATING
+      global calFreqs;
+      info.calFreqs = calFreqs;
+      
   endswitch
 endfunction

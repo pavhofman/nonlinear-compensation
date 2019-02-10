@@ -41,6 +41,7 @@ CALIBRATING
 
 % order of statuses shown in detailsTxt fields. Not listed statuses go last.
 global DETAILS_STATUS_ORDER = {
+CALIBRATING
 ANALYSING
 COMPENSATING 
 };

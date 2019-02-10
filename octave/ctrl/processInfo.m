@@ -10,6 +10,7 @@ function processInfo(info, dirStruct)
   %info.fs = fs;
   %info.cmdDoneID;
   %info.compenCalFiles = compenCalFiles;
+  %info.calFreqs;
   %info.direction = direction;
   
   %dirStruct.statusTxt = NA;
@@ -103,6 +104,7 @@ function details = addDetails(channelID, status, id, info, details)
   global GENERATING;
   global COMPENSATING;
   global ANALYSING;
+  global CALIBRATING;
   
   % empty line before second+ statuses
   if id > 1
@@ -129,7 +131,20 @@ function details = addDetails(channelID, status, id, info, details)
       
     case ANALYSING
       details{end + 1} = 'Measured Funds:';
-      details = addPeaksStr(info.measuredPeaks{channelID}, 3, details);      
+      details = addPeaksStr(info.measuredPeaks{channelID}, 3, details);
+      
+    case CALIBRATING
+      calFreqs = info.calFreqs;
+      if ~isempty(calFreqs)
+        details{end + 1} = 'Calib. Freqs:';
+        freqsStr = '';
+        for id = 1:length(calFreqs)
+          calFreq = calFreqs(id);
+          freqsStr = [freqsStr ' ' num2str(calFreq) 'Hz'];
+        endfor
+        details{end + 1} = freqsStr;
+      endif
+
   endswitch
   
 endfunction

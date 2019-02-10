@@ -41,6 +41,7 @@ global genFreq = NA;
 global fs = NA;
 
 global compenCalFiles = NA;
+global calFreqs = NA;
 
 transfer = struct();
 
