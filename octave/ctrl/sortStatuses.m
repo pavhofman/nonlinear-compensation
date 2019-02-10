@@ -4,7 +4,7 @@ function sortedStatuses = sortStatuses(statusStruct, orderTemplate)
   orderInTemplate = [];
   
   for [statusVal, status] = statusStruct
-    idx = find(ismember(orderTemplate, status))
+    idx = find(ismember(orderTemplate, status));
     if isempty(idx)
       idx = 100;
     endif

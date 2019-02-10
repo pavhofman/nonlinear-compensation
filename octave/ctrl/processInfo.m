@@ -19,7 +19,7 @@ function processInfo(info, dirStruct)
   
   updateStatusTxts(dirStruct, info);
 
-  [detailsCh1, detailsCh2] = getStatusDetails(info)
+  [detailsCh1, detailsCh2] = getStatusDetails(info);
   updateFieldString(dirStruct.detailTxts{1}, detailsCh1);
   updateFieldString(dirStruct.detailTxts{2}, detailsCh2);
   
