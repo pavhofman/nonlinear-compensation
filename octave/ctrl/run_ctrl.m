@@ -219,21 +219,22 @@ while (~doQuit)
   % callbacks can use received info structures
   runScheduled(recInfo, playInfo);
   
-  recInfo = rcvInfo(recSock);
+  do
+    recInfo = rcvInfo(recSock);
+  until isempty(recInfo) || recInfo.time > time() - MAX_INFO_AGE
   if isempty(recInfo)
     printf('Empty rec info\n');
-  elseif recInfo.time < time() - MAX_INFO_AGE
-    printf('Outdated rec info, flushing\n');
   else
     printf('Processing rec info\n');
     processInfo(recInfo, recStruct);
   endif
 
-  playInfo = rcvInfo(playSock);
+
+  do
+    playInfo = rcvInfo(playSock);
+  until isempty(playInfo) || playInfo.time > time() - MAX_INFO_AGE
   if isempty(playInfo)
     printf('Empty play info\n');
-  elseif playInfo.time < time() - MAX_INFO_AGE
-    printf('Outdated play info, flushing\n');
   else
     printf('Processing play info\n');
     processInfo(playInfo, playStruct);
