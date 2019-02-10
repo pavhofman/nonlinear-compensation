@@ -136,6 +136,23 @@ function [plotStruct] = initPlot(plotPanel)
   plotStruct.curLine = curLine;
 endfunction
 
+function initMenu(fig)
+  global cmdFileRec;
+  global CALIBRATE = 'cal';
+  global COMPENSATE = 'comp';
+  global PASS = 'pass';
+
+  fPass = @(src, data) writeCmd(PASS, cmdFileRec);
+  fCal = @(src, data) writeCmd(CALIBRATE, cmdFileRec);
+  fComp = @(src, data) writeCmd(COMPENSATE, cmdFileRec);
+
+  recMenu = uimenu (fig, "label", "&Capture", "accelerator", "c");
+  uimenu (recMenu, "label", "Pass", "callback", fPass);
+  uimenu (recMenu, "label", "Compensate", "callback", fComp);
+  uimenu (recMenu, "label", "Calibrate", "callback", fCal);
+endfunction
+
+
 global cmdFileRec = genDataPath(CMD_FILE_REC);
 global cmdFilePlay = genDataPath(CMD_FILE_PLAY);
 
@@ -160,8 +177,10 @@ function doExit(fig)
 endfunction
 
 % create figure and panel on it
-fig = figure("toolbar", "none", "menubar", "none",  'position', [100, 100, WIDTH, HEIGHT]);
+fig = figure("toolbar", "none", "menubar", "figure",  'position', [100, 100, WIDTH, HEIGHT]);
 set(fig, 'DeleteFcn', @(h, e) doExit(fig));
+
+initMenu(fig);
 
 playStruct = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Play");
 recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "Capture");
