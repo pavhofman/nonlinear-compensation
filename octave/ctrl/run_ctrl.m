@@ -18,9 +18,9 @@ function dirStruct = drawDirPanel(fig, x, width, title)
   dirStruct = createDirStruct();
   panel = uipanel(fig, 
             "title", title,
-            "position", [x 0 width 1]);
-  dirStruct = drawChannelPlot(1, 0.01, 0.15, CHANNEL_REL_HEIGHT, 'Left', panel, dirStruct);
-  dirStruct = drawChannelPlot(2, 0.84, 0.15, CHANNEL_REL_HEIGHT, 'Right', panel, dirStruct);
+            "position", [x, 0.1, width, 0.9]);
+  dirStruct = drawChannelPlot(1, 0.01, 0.12, CHANNEL_REL_HEIGHT, 'Left', panel, dirStruct);
+  dirStruct = drawChannelPlot(2, 0.87, 0.12, CHANNEL_REL_HEIGHT, 'Right', panel, dirStruct);
   
   % initializing status txt fields - 4
   statusTxts = cell(4, 1);
@@ -30,8 +30,8 @@ function dirStruct = drawDirPanel(fig, x, width, title)
   dirStruct.statusTxts = statusTxts;
   
   
-  dirStruct.detailTxts{1} = drawDetailTxt(1, 0.16, 0.33, CHANNEL_REL_HEIGHT, panel);
-  dirStruct.detailTxts{2} = drawDetailTxt(2, 0.50, 0.33, CHANNEL_REL_HEIGHT, panel);  
+  dirStruct.detailTxts{1} = drawDetailTxt(1, 0.14, 0.35, CHANNEL_REL_HEIGHT, panel);
+  dirStruct.detailTxts{2} = drawDetailTxt(2, 0.52, 0.35, CHANNEL_REL_HEIGHT, panel);  
 endfunction
 
 
@@ -54,60 +54,20 @@ endfunction
 
 
 function statusTxt = drawStatusTxt(id, panel)
-  persistent HEIGHT = 0.025;
+  persistent TXT_HEIGHT = 0.026;
   statusTxt = uicontrol (panel,
             "style", "text",
             "units", "normalized",
             "fontweight", "demi", 
             "horizontalalignment", "left",
             "verticalalignment", "top",
-            "position", [0.05, 0.96 - (HEIGHT * (id - 1)), 1, HEIGHT]
+            "position", [0.05, 0.96 - (TXT_HEIGHT * (id - 1)), 1, TXT_HEIGHT]
             );
 endfunction
 
 function clbkCalibrateFreqs(src, data)
   % calling scheduler-enabled calibration
   calibrateFreqsSched();
-endfunction
-
-function drawMidPanel(fig, x, width)
-  
-  midPanel = uipanel(fig, "title", "Common", "position", [x, 0, width, 1]);
-
-
-  btnWidth = 180;
-  global HEIGHT;
-  global DIR_PANEL_REL_WIDTH;
-  global WIDTH;
-  
-  yPos = HEIGHT - 50;
-  uicontrol (midPanel, "string", "Calibrate VD Freqs", "position",[10 yPos btnWidth 30], 'callback', @clbkCalibrateFreqs);
-
-  yPos -= 40;
-  uicontrol (midPanel, "string", "Joint-Dev. Compen. VD", "position",[10 yPos btnWidth 30], 'callback', @clbkCompenVD);
-
-  yPos -= 40;
-  uicontrol (midPanel, "string", "Calibrate LPF", "position",[10 yPos btnWidth 30], 'callback', @clbkCalibrateLPF);
-
-  yPos -= 40;
-  uicontrol (midPanel, "string", "Joint-Dev. Compen. LPF", "position",[10 yPos btnWidth 30], 'callback', @clbkCompenLPF);
-
-  yPos -= 40;
-  uicontrol (midPanel, "string", "Measure Filter", "position",[10 yPos btnWidth 30], 'callback', @clbkMeasureFilter);
-
-  yPos -= 40;
-  uicontrol (midPanel, "string", "Split Calibration", "position",[10 yPos btnWidth 30], 'callback', @clbkSplitCalibrate);
-
-  yPos -= 40;
-  uicontrol (midPanel, "string", "Split-Dev. Compen. Sides", "position",[10 yPos btnWidth 30], 'callback', @clbkSplitCompen);
-
-
-  global outBox = uicontrol (midPanel, "style", "edit", "position",[5, 5, (1-2*DIR_PANEL_REL_WIDTH)*WIDTH - 10, 100]);
-  % outbox requires configuration
-  set(outBox, 'horizontalalignment', 'left');
-  set(outBox, 'verticalalignment', 'top');
-  set(outBox, 'max', 1000);
-
 endfunction
 
 function [plotStruct] = initPlot(plotPanel)
@@ -146,18 +106,28 @@ function initMenu(fig)
   fPlayPass = @(src, data) writeCmd(PASS, cmdFilePlay);
   fPlayComp = @(src, data) writeCmd(COMPENSATE, cmdFilePlay);
 
-  playMenu = uimenu (fig, "label", "&Playback", "accelerator", "c");
-  uimenu (playMenu, "label", "Pass", "callback", fPlayPass);
-  uimenu (playMenu, "label", "Compensate", "callback", fPlayComp);
+  playMenu = uimenu (fig, "label", "&Playback");
+  uimenu(playMenu, "label", "Pass", "callback", fPlayPass);
+  uimenu(playMenu, "label", "Compensate", "callback", fPlayComp);
 
   fRecPass = @(src, data) writeCmd(PASS, cmdFileRec);
   fRecCal = @(src, data) writeCmd(CALIBRATE, cmdFileRec);
   fRecComp = @(src, data) writeCmd(COMPENSATE, cmdFileRec);
   
-  recMenu = uimenu (fig, "label", "&Capture", "accelerator", "c");
-  uimenu (recMenu, "label", "Pass", "callback", fRecPass);
-  uimenu (recMenu, "label", "Compensate", "callback", fRecComp);
-  uimenu (recMenu, "label", "Calibrate", "callback", fRecCal);
+  recMenu = uimenu (fig, "label", "&Capture");
+  uimenu(recMenu, "label", "Pass", "callback", fRecPass);
+  uimenu(recMenu, "label", "Compensate", "callback", fRecComp);
+  uimenu(recMenu, "label", "Calibrate", "callback", fRecCal);
+  
+  tasksMenu = uimenu (fig, "label", "&Tasks");
+  
+  uimenu(tasksMenu, "label", "Calibrate VD Freqs", 'callback', @clbkCalibrateFreqs);
+  uimenu(tasksMenu, "label", "Joint-Dev. Compen. VD", 'callback', @clbkCompenVD);
+  uimenu(tasksMenu, "label", "Calibrate LPF", 'callback', @clbkCalibrateLPF);
+  uimenu(tasksMenu, "label", "Joint-Dev. Compen. LPF", 'callback', @clbkCompenLPF);
+  uimenu(tasksMenu, "label", "Measure Filter", 'callback', @clbkMeasureFilter);
+  uimenu(tasksMenu, "label", "Split Calibration", 'callback', @clbkSplitCalibrate);
+  uimenu(tasksMenu, "label", "Split-Dev. Compen. Sides", 'callback', @clbkSplitCompen);
 endfunction
 
 
@@ -173,7 +143,7 @@ global HEIGHT = 600;
 % relative height of the channel block (plot, detailTxt)
 global CHANNEL_REL_HEIGHT = 0.85;
 
-global DIR_PANEL_REL_WIDTH = 0.4;
+global DIR_PANEL_REL_WIDTH = 0.5;
 
 global CH_DISTANCE_X = 0.3
 
@@ -196,8 +166,17 @@ initMenu(fig);
 
 playStruct = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Playback");
 recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "Capture");
-drawMidPanel(fig, DIR_PANEL_REL_WIDTH, (1 - 2*DIR_PANEL_REL_WIDTH));
 
+% buttom panel with outBox
+global outBox = uicontrol(fig, "style", "edit", "units", "normalized", 'position', [0, 0, 1, 0.1]);
+% outbox requires configuration
+set(outBox, 'horizontalalignment', 'left');
+set(outBox, 'verticalalignment', 'top');
+set(outBox, 'max', 1000);
+
+% resizing figure to fix painting problems
+set(fig, 'position', [100, 100, WIDTH, HEIGHT + 1]);
+set(fig, 'position', [100, 100, WIDTH, HEIGHT]);
 % queue for schedItems
 global schedQueue = cell();
 
