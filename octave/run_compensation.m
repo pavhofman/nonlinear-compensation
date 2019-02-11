@@ -20,7 +20,7 @@ for channelID = 1:columns(buffer)
     compenCalFiles{channelID} = '';
     if hasAnyPeak(measuredPeaksCh) && ~hasAnyPeak(fundPeaksCh)
       % incoming signal, yet not fundPeaks from calfile - no calfile found
-      msg = [msg ' ' 'No calib. for CH' num2str(channelID) '.'];
+      msg = [msg ' ' 'No calib. file for CH' num2str(channelID) '.'];
     endif
   endif
 endfor
