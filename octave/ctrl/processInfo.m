@@ -93,21 +93,21 @@ function [detailsCh1, detailsCh2] = getStatusDetails(info)
   detailsCh2 = cell();
   for id = 1 : length(sortedStatuses)
     status = sortedStatuses{id};
-    detailsCh1 = addDetails(1, status, id, info, detailsCh1);
-    detailsCh2 = addDetails(2, status, id, info, detailsCh2);
+    detailsCh1 = addDetails(1, status, info, detailsCh1);
+    detailsCh2 = addDetails(2, status, info, detailsCh2);
     ++id;
   endfor  
 endfunction
 
 % formatting strings for details of channelID
-function details = addDetails(channelID, status, id, info, details)
+function details = addDetails(channelID, status, info, details)
   global GENERATING;
   global COMPENSATING;
   global ANALYSING;
   global CALIBRATING;
   
   % empty line before second+ statuses
-  if id > 1
+  if ~isempty(details)
     details{end + 1} = '';
   endif
   
@@ -115,7 +115,7 @@ function details = addDetails(channelID, status, id, info, details)
     case GENERATING
       % showing generator freq and amplitude
       details{end + 1} = 'Frequencies:';
-      details{end + 1 } = [int2str(info.genFreq) 'Hz ' num2str(20*log10(info.genAmpl), 1) 'dB'];
+      details{end + 1 } = [int2str(info.genFreq) 'Hz '   num2str(20*log10(info.genAmpl), 1) 'dB'];
     
     case COMPENSATING
       % sorting distortPeaks by amplitude
@@ -140,7 +140,7 @@ function details = addDetails(channelID, status, id, info, details)
         freqsStr = '';
         for id = 1:length(calFreqs)
           calFreq = calFreqs(id);
-          freqsStr = [freqsStr ' ' num2str(calFreq) 'Hz'];
+          freqsStr = [freqsStr '  ' num2str(calFreq) 'Hz'];
         endfor
         details{end + 1} = freqsStr;
       endif
@@ -164,7 +164,7 @@ function str = addPeaksStr(peaksCh, decimals, str)
       break
     endif
     peak = peaksCh(id, :);
-    str{end + 1} = ['  ' num2str(peak(1)) 'Hz ' num2str(20*log10(peak(2)), format) 'dB'];
+    str{end + 1} = ['  ' num2str(peak(1)) 'Hz   ' num2str(20*log10(peak(2)), format) 'dB'];
   endwhile
 endfunction
 

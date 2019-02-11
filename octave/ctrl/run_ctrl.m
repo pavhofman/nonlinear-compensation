@@ -31,7 +31,7 @@ function dirStruct = drawDirPanel(fig, x, width, title)
   
   
   dirStruct.detailTxts{1} = drawDetailTxt(1, 0.14, 0.35, CHANNEL_REL_HEIGHT, panel);
-  dirStruct.detailTxts{2} = drawDetailTxt(2, 0.52, 0.35, CHANNEL_REL_HEIGHT, panel);  
+  dirStruct.detailTxts{2} = drawDetailTxt(2, 0.50, 0.35, CHANNEL_REL_HEIGHT, panel);  
 endfunction
 
 
@@ -61,7 +61,7 @@ function statusTxt = drawStatusTxt(id, panel)
             "fontweight", "demi", 
             "horizontalalignment", "left",
             "verticalalignment", "top",
-            "position", [0.05, 0.96 - (TXT_HEIGHT * (id - 1)), 1, TXT_HEIGHT]
+            "position", [0.02, 0.96 - (TXT_HEIGHT * (id - 1)), 1, TXT_HEIGHT]
             );
 endfunction
 
