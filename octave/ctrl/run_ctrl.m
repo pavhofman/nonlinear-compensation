@@ -185,7 +185,11 @@ function doExit(fig)
 endfunction
 
 % create figure and panel on it
-fig = figure("toolbar", "none", "menubar", "figure",  'position', [100, 100, WIDTH, HEIGHT]);
+fig = figure('position', [100, 100, WIDTH, HEIGHT]);
+% menubar must be removed with set, otherwise no menu bar is displayed
+set(fig, 'menubar', 'none');
+set(fig, "toolbar", "none");
+
 set(fig, 'DeleteFcn', @(h, e) doExit(fig));
 
 initMenu(fig);
