@@ -34,18 +34,18 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result, msg] =
     analysisBuffer = analysisBuffer(rows(analysisBuffer) - freqAnalysisSize + 1: end, :);
     % enough data, measure fundPeaks, distortPeaks are ignored (not calibration signal)
     measuredPeaks = getHarmonics(analysisBuffer, fs, false);
-    % default result
-    result = FINISHED_RESULT;
+    
+    hasAnyChannelPeaks = false;
     % each channel handled separately
     for channelID = 1:channelCnt
       measuredPeaksCh = measuredPeaks{channelID};
       if shouldGenCompenPeaks && hasAnyPeak(measuredPeaksCh)
         [fundPeaksCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
       else
-        if ~hasAnyPeak(measuredPeaksCh)
+        if hasAnyPeak(measuredPeaksCh)
+          hasAnyChannelPeaks = true;
+        else
           printf('Did not find any fundaments, channel ID %d PASSING\n', channelID);
-          msg = 'No fundamentals found';
-          result = FAILED_RESULT;
         endif
         % not generating compen peaks
         fundPeaksCh = [];
@@ -58,6 +58,14 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result, msg] =
       compenCalFiles{channelID} = calFile;
     endfor
     
+    if hasAnyChannelPeaks
+      % one channel is enough for OK
+      result = FINISHED_RESULT;
+    else
+      msg = 'No fundamentals in any channel found';
+      result = FAILED_RESULT;
+    endif
+
     % measuredPeaks are calculated for time at start of analysisBuffer
     % but compensation will work on the current buffer
     % advance time of measuredPeaks relative to the start of buffer which is located at the end of analysisBuffer [analysisBuffer [ buffer]]
