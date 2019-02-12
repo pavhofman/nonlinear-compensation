@@ -3,18 +3,23 @@ function signal = genSine(genFunds, fs, startingT, samplesCnt)
   step = 1/fs;
   signal = [];
   t = linspace(startingT, startingT + (samplesCnt - 1) * step, samplesCnt);
-  for channelID = 1 : length(genFunds)
+  for channelID = 1 : length(genFunds)    
     freqs = genFunds{channelID}(:, 1);
     ampls = genFunds{channelID}(:, 2);
-    signals = cos(2 * pi * freqs .* t ) .* ampls;
-    % sum all rows, transpose to column
-    signalCh = sum(signals, 1);
-    
-    % clipping to <-1, 1>
-    signalCh(signalCh > 1) = 1;
-    signalCh(signalCh < -1) = -1;
-    
-    signalCh = transpose(signalCh);
+    if all(ampls == 0)
+      % all zero ampls, zero signal
+      signalCh = zeros(samplesCnt, 1);
+    else
+      signals = cos(2 * pi * freqs .* t ) .* ampls;
+      % sum all rows, transpose to column
+      signalCh = sum(signals, 1);
+      
+      % clipping to <-1, 1>
+      signalCh(signalCh > 1) = 1;
+      signalCh(signalCh < -1) = -1;
+      
+      signalCh = transpose(signalCh);
+    endif
     signal = [signal, signalCh];
   endfor
 endfunction
