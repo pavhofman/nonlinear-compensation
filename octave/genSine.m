@@ -1,7 +1,20 @@
 % Generates samplesCnt of cosine signal starting at startingT
-function signal = genSine(freq, fs, genAmpl, startingT, samplesCnt)
+function signal = genSine(genFunds, fs, startingT, samplesCnt)
   step = 1/fs;
-  t = linspace(startingT, startingT + (samplesCnt - 1) * step, samplesCnt)';
-  
-  signal = cos(2 * pi * freq * t ) * genAmpl;
+  signal = [];
+  t = linspace(startingT, startingT + (samplesCnt - 1) * step, samplesCnt);
+  for channelID = 1 : length(genFunds)
+    freqs = genFunds{channelID}(:, 1);
+    ampls = genFunds{channelID}(:, 2);
+    signals = cos(2 * pi * freqs .* t ) .* ampls;
+    % sum all rows, transpose to column
+    signalCh = sum(signals, 1);
+    
+    % clipping to <-1, 1>
+    signalCh(signalCh > 1) = 1;
+    signalCh(signalCh < -1) = -1;
+    
+    signalCh = transpose(signalCh);
+    signal = [signal, signalCh];
+  endfor
 endfunction

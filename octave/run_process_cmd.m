@@ -62,14 +62,17 @@ elseif strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
   showFFTFigureConfig.fftSize = str2num(cmd{2});
   showFFTFigureConfig.restartAvg = 1;
 
-elseif strcmp(cmd{1}, GENERATE) && (rows(cmd) > 1)
+elseif strcmp(cmd{1}, GENERATE)
   % gen freq
   % start generating sine at freq, at genAmpl level
-  genFreq = findNumInCmd(cmd, CMD_FREQ_PREFIX, 1000, 'No generator frequency found in command, using 1000Hz');
-  genAmpl = findNumInCmd(cmd, CMD_AMPL_PREFIX, db2mag(-3), 'No generator amplitude found in command, using -3dB');
+  genFunds = findFundInCmd(cmd, CMD_CHANNEL_FUND_PREFIX, defaultValue = {[1000, db2mag(-3)]}, defaultMsg = 'No generator fundamentals found in command, using 1000Hz@-3dB');
+  
   setStatus(GENERATING);
+  % keep analysis running all the time (without generating distortion peaks)
+  addStatus(ANALYSING);
+
   % zeroing time
-  startingT = 0;
+  genStartingT = 0;
   showFFTFigureConfig.restartAvg = 1;
   % generating completes command immediately
   cmdDoneID = cmdID;

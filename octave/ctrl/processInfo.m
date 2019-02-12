@@ -114,8 +114,8 @@ function details = addDetails(channelID, status, info, details)
   switch(status)
     case GENERATING
       % showing generator freq and amplitude
-      details{end + 1} = 'Frequencies:';
-      details{end + 1 } = [int2str(info.genFreq) 'Hz '   num2str(20*log10(info.genAmpl), 1) 'dB'];
+      details{end + 1} = 'Gen. Frequencies:';
+      details = addPeaksStr(abs(info.genFunds{channelID}), 3, details);
     
     case COMPENSATING
       % sorting distortPeaks by amplitude
@@ -164,7 +164,7 @@ function str = addPeaksStr(peaksCh, decimals, str)
       break
     endif
     peak = peaksCh(id, :);
-    str{end + 1} = ['  ' num2str(peak(1)) 'Hz   ' num2str(20*log10(peak(2)), format) 'dB'];
+    str{end + 1} = ['  ' num2str(peak(1)) 'Hz   ' num2str(20*log10(abs(peak(2))), format) 'dB'];
   endwhile
 endfunction
 

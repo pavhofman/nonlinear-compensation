@@ -39,10 +39,8 @@ function info = addStatusDetails(status, info)
   
   switch status
     case GENERATING
-      global genAmpl;
-      info.genAmpl = genAmpl;
-      global genFreq;
-      info.genFreq = genFreq;
+      global genFunds;
+      info.genFunds = genFunds;
       
     case CALIBRATING
       global calFreqs;

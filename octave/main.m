@@ -36,8 +36,7 @@ setStatus(PASSING);
 global measuredPeaks = NA;
 global fundPeaks = NA;
 global distortPeaks = NA;
-global genAmpl = NA;
-global genFreq = NA;
+global genFunds = NA;
 global fs = NA;
 
 global compenCalFiles = NA;
@@ -110,7 +109,7 @@ while(true)
   % Since we need to keep the value until buildInfo is called (passed to CTRL process), it must be reset at the start of the loop
   reloadCalFiles = false;
 
-  if (isStatus(GENERATING))
+  if (statusContains(GENERATING))
     source 'run_generator.m';
   endif
  

@@ -42,6 +42,7 @@ CALIBRATING
 % order of statuses shown in detailsTxt fields. Not listed statuses go last.
 global DETAILS_STATUS_ORDER = {
 CALIBRATING
+GENERATING
 ANALYSING
 COMPENSATING 
 };
@@ -75,6 +76,10 @@ global CMD_AMPL_PREFIX = 'A';
 global CMD_EXTRA_CIRCUIT_PREFIX = 'EC';
 %DNrec8
 global CMD_DEVICE_NAME_PREFIX = 'DN';
+% format for generator
+%CH[1000,0.85;2000,0.85]
+global CMD_CHANNEL_FUND_PREFIX = 'CH';
+
 
 % direction cmd.info files
 global CMD_FILE_REC = 'cmd.info';
