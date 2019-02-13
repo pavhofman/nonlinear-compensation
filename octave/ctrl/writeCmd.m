@@ -1,5 +1,6 @@
 % atomic writing commands to cmd file
-function cmdID = writeCmd(cmd, cmdFilename)  
+% clear - clear outbox before printStr, default false
+function cmdID = writeCmd(cmd, cmdFilename, clear = false)  
   persistent intCmdID = 1;
   global CMD_ID_PREFIX;
   
@@ -11,7 +12,10 @@ function cmdID = writeCmd(cmd, cmdFilename)
   fclose(tmpfid);
   movefile(tmpFilename, cmdFilename);
   unlink(tmpFilename);
-  
+  if clear
+    clearOutBox();
+  endif
+  printStr(['Sent CMD: "' cmd '" to ' cmdFilename]);
   % incrementing integer part of command ID for next call
   ++intCmdID;
 endfunction
