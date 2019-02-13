@@ -103,21 +103,21 @@ function initMenu(fig)
   global COMPENSATE = 'comp';
   global PASS = 'pass';
 
-  fPlayPass = @(src, data) writeCmd(PASS, cmdFilePlay);
-  fPlayComp = @(src, data) writeCmd(COMPENSATE, cmdFilePlay);
+  fPass = @(src, data, cmdFile) writeCmd(PASS, cmdFile);
+  fComp = @(src, data, cmdFile) writeCmd(COMPENSATE, cmdFile);
 
   playMenu = uimenu (fig, "label", "&Playback");
-  uimenu(playMenu, "label", "Pass", "callback", fPlayPass);
-  uimenu(playMenu, "label", "Compensate", "callback", fPlayComp);
+  uimenu(playMenu, "label", "Pass", "callback", {fPass, cmdFilePlay});
+  uimenu(playMenu, "label", "Compensate", "callback", {fComp, cmdFilePlay});
+  uimenu(playMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Playback Side', cmdFilePlay})
 
-  fRecPass = @(src, data) writeCmd(PASS, cmdFileRec);
   fRecCal = @(src, data) writeCmd(CALIBRATE, cmdFileRec);
-  fRecComp = @(src, data) writeCmd(COMPENSATE, cmdFileRec);
   
   recMenu = uimenu (fig, "label", "&Capture");
-  uimenu(recMenu, "label", "Pass", "callback", fRecPass);
-  uimenu(recMenu, "label", "Compensate", "callback", fRecComp);
+  uimenu(recMenu, "label", "Pass", "callback", {fPass, cmdFileRec});
+  uimenu(recMenu, "label", "Compensate", "callback", {fComp, cmdFileRec});
   uimenu(recMenu, "label", "Calibrate", "callback", fRecCal);
+  uimenu(recMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Capture Side', cmdFileRec})
   
   tasksMenu = uimenu (fig, "label", "&Tasks");
   
