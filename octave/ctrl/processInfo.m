@@ -18,6 +18,7 @@ function processInfo(info, dirStruct)
 
   
   updateStatusTxts(dirStruct, info);
+  updateMenu(dirStruct, info);
 
   [detailsCh1, detailsCh2] = getStatusDetails(info);
   updateFieldString(dirStruct.detailTxts{1}, detailsCh1);
@@ -44,6 +45,7 @@ endfunction
 function updateStatusTxts(dirStruct, info)
   persistent GREEN = [0, 0.5, 0];
   persistent RED = [0.5, 0, 0];
+  persistent BLACK = [0, 0, 0];
   
   global COMPENSATING;
   statusStr = cell();
@@ -75,8 +77,11 @@ function updateStatusTxts(dirStruct, info)
       else
         color = RED;
       endif
-      updateFieldColor(dirStruct.statusTxts{id}, color);
+    else
+      % indiferent color
+      color = BLACK;
     endif
+    updateFieldColor(dirStruct.statusTxts{id}, color);
   endfor
   % clear the rest
   for id = cnt + 1:length(dirStruct.statusTxts)
@@ -105,6 +110,7 @@ function details = addDetails(channelID, status, info, details)
   global COMPENSATING;
   global ANALYSING;
   global CALIBRATING;
+  global DISTORTING;
   
   % empty line before second+ statuses
   if ~isempty(details)
@@ -145,6 +151,18 @@ function details = addDetails(channelID, status, info, details)
         details{end + 1} = freqsStr;
       endif
 
+    case DISTORTING
+      distortHarmLevels = info.distortHarmLevels;
+      if ~isempty(distortHarmLevels)
+        details{end + 1} = 'Added Distortion Levels:';
+        for id = 1:length(distortHarmLevels)
+          level = distortHarmLevels(id);
+          if ~isna(level)
+            details{end + 1} = ['Harmonics ' num2str(id + 1) ': ' num2str(level) 'dB'];
+          endif
+        endfor
+      endif
+
   endswitch
   
 endfunction
@@ -166,5 +184,16 @@ function str = addPeaksStr(peaksCh, decimals, str)
     peak = peaksCh(id, :);
     str{end + 1} = ['  ' num2str(peak(1)) 'Hz   ' num2str(20*log10(abs(peak(2))), format) 'dB'];
   endwhile
+endfunction
+
+function updateMenu(dirStruct, info)
+  % setting distortion menu items visibility
+  if isfield(info, 'distortHarmLevels') && ~isempty(info.distortHarmLevels)
+    setVisible(dirStruct.distortOnMenu, false);
+    setVisible(dirStruct.distortOffMenu, true);
+  else
+    setVisible(dirStruct.distortOnMenu, true);
+    setVisible(dirStruct.distortOffMenu, false);
+  endif
 endfunction
 

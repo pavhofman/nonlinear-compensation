@@ -9,13 +9,14 @@ function dirStruct = createDirStruct();
   dirStruct.axes = cell(2);
   dirStruct.calPlots = cell(2);
   dirStruct.measPlots = cell(2);
-  dirStruct.statusTxt = NA;
+  dirStruct.statusTxts = NA;
   dirStruct.detailTxts = cell(2);
+  dirStruct.distortOnMenu = NA;
+  dirStruct.distortOffMenu = NA;
 endfunction
 
-function dirStruct = drawDirPanel(fig, x, width, title)
+function dirStruct = drawDirPanel(fig, x, width, title, dirStruct)
   global CHANNEL_REL_HEIGHT;
-  dirStruct = createDirStruct();
   panel = uipanel(fig, 
             "title", title,
             "position", [x, 0.1, width, 0.9]);
@@ -96,12 +97,12 @@ function [plotStruct] = initPlot(plotPanel)
   plotStruct.curLine = curLine;
 endfunction
 
-function initMenu(fig)
+function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   global cmdFileRec;
   global cmdFilePlay;
-  global CALIBRATE = 'cal';
-  global COMPENSATE = 'comp';
-  global PASS = 'pass';
+  global CALIBRATE;
+  global COMPENSATE;
+  global PASS;
 
   fPass = @(src, data, cmdFile) writeCmd(PASS, cmdFile);
   fComp = @(src, data, cmdFile) writeCmd(COMPENSATE, cmdFile);
@@ -109,7 +110,9 @@ function initMenu(fig)
   playMenu = uimenu (fig, "label", "&Playback");
   uimenu(playMenu, "label", "Pass", "callback", {fPass, cmdFilePlay});
   uimenu(playMenu, "label", "Compensate", "callback", {fComp, cmdFilePlay});
-  uimenu(playMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Playback Side', cmdFilePlay})
+  uimenu(playMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Playback Side', cmdFilePlay});
+  playStruct.distortOnMenu = uimenu(playMenu, "label", "Distort", "callback", {@clbkDistort, 'Distort on Playback Side', cmdFilePlay});
+  playStruct.distortOffMenu = uimenu(playMenu, "label", "Stop Distorting", 'visible', 'off', "callback", {@clbkDistortOff, cmdFilePlay});
 
   fRecCal = @(src, data) writeCmd(CALIBRATE, cmdFileRec);
   
@@ -117,7 +120,9 @@ function initMenu(fig)
   uimenu(recMenu, "label", "Pass", "callback", {fPass, cmdFileRec});
   uimenu(recMenu, "label", "Compensate", "callback", {fComp, cmdFileRec});
   uimenu(recMenu, "label", "Calibrate", "callback", fRecCal);
-  uimenu(recMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Capture Side', cmdFileRec})
+  uimenu(recMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Capture Side', cmdFileRec});
+  recStruct.distortOnMenu = uimenu(recMenu, "label", "Distort", "callback", {@clbkDistort, 'Distort on Capture Side', cmdFileRec});
+  recStruct.distortOffMenu = uimenu(recMenu, "label", "Stop Distorting", 'visible', 'off', "callback", {@clbkDistortOff, cmdFileRec});
   
   tasksMenu = uimenu (fig, "label", "&Tasks");
   
@@ -162,10 +167,15 @@ set(fig, "toolbar", "none");
 
 set(fig, 'DeleteFcn', @(h, e) doExit(fig));
 
-initMenu(fig);
+playStruct = createDirStruct();
+recStruct = createDirStruct();
 
-playStruct = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Playback");
-recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "Capture");
+[playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
+
+playStruct = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Playback", playStruct);
+recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "Capture", recStruct);
+
+
 
 % buttom panel with outBox
 global outBox = uicontrol(fig, "style", "edit", "units", "normalized", 'position', [0, 0, 1, 0.1]);
