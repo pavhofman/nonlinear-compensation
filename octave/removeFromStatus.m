@@ -1,5 +1,7 @@
 % remove from status
 function status = removeFromStatus(statusToRemove)
   global statusStruct;
-  statusStruct = rmfield(statusStruct, statusToRemove);
+  if isfield(statusStruct, statusToRemove)
+    statusStruct = rmfield(statusStruct, statusToRemove);
+  endif
 endfunction
