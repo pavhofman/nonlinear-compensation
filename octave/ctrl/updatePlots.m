@@ -81,7 +81,6 @@ function levels = loadCalLevels(calFile)
 endfunction
 
 function plotLevels(line, x, y)
-  isVisible = strcmp(get(line, 'visible'), 'on');
   if ~isempty(y)
     shownX = get(line, 'XData');    
     if ~isequal(shownX, x)
@@ -91,13 +90,9 @@ function plotLevels(line, x, y)
     if ~isequal(shownY, y)
       set(line, 'YData', y);
     endif
-    if ~isVisible
-      set(line, 'visible', 'on');
-    endif
+    setVisible(line, true);
   else
-    % hide 
-    if isVisible
-      set(line, 'visible', 'off');
-    endif
+    % hide
+    setVisible(line, false);
   endif
 endfunction
