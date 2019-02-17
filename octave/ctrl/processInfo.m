@@ -54,13 +54,14 @@ function updateStatusTxts(dirStruct, info)
   global TXT_STATUS_ORDER;
   sortedStatuses = sortStatuses(statusStruct, TXT_STATUS_ORDER);
   
-  cnt = length(sortedStatuses);
-  if cnt > 4
-    printf('Too many statuses to show in statusTXT fields, showing only first 4\n');
-    cnt = 4;
+  statusCnt = length(sortedStatuses);
+  txtCnt = length(dirStruct.statusTxts);
+  if statusCnt > txtCnt
+    printf('Too many statuses to show in statusTXT fields, showing only first %d\n', txtCnt);
+    statusCnt = txtCnt;
   endif
 
-  for id = 1 : cnt;
+  for id = 1 : statusCnt;
     status = sortedStatuses{id};
     statusToShow = status;
     
@@ -84,7 +85,7 @@ function updateStatusTxts(dirStruct, info)
     updateFieldColor(dirStruct.statusTxts{id}, color);
   endfor
   % clear the rest
-  for id = cnt + 1:length(dirStruct.statusTxts)
+  for id = statusCnt + 1:txtCnt
     updateFieldString(dirStruct.statusTxts{id}, '');
   endfor
 endfunction

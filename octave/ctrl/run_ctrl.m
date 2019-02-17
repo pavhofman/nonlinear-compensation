@@ -20,15 +20,16 @@ endfunction
 
 function dirStruct = drawDirPanel(fig, x, width, title, dirStruct)
   global CHANNEL_REL_HEIGHT;
+  persistent STATUS_TXT_CNT = 5;
   panel = uipanel(fig, 
             "title", title,
             "position", [x, 0.1, width, 0.9]);
   dirStruct = drawChannelPlot(1, 0.01, 0.12, CHANNEL_REL_HEIGHT, 'Left', panel, dirStruct);
   dirStruct = drawChannelPlot(2, 0.87, 0.12, CHANNEL_REL_HEIGHT, 'Right', panel, dirStruct);
   
-  % initializing status txt fields - 4
-  statusTxts = cell(4, 1);
-  for i = 1:4
+  % initializing status txt fields
+  statusTxts = cell(STATUS_TXT_CNT, 1);
+  for i = 1:STATUS_TXT_CNT
     statusTxts{i} = drawStatusTxt(i, panel); 
   endfor
   dirStruct.statusTxts = statusTxts;
