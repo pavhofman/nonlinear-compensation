@@ -39,14 +39,18 @@ function [measuredPeaks, paramsAdvanceT, fundPeaks, distortPeaks, result, msg] =
     % each channel handled separately
     for channelID = 1:channelCnt
       measuredPeaksCh = measuredPeaks{channelID};
-      if shouldGenCompenPeaks && hasAnyPeak(measuredPeaksCh)
-        [fundPeaksCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
-      else
-        if hasAnyPeak(measuredPeaksCh)
-          hasAnyChannelPeaks = true;
+      if hasAnyPeak(measuredPeaksCh)
+        hasAnyChannelPeaks = true;
+        if shouldGenCompenPeaks
+          [fundPeaksCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
         else
-          printf('Did not find any fundaments, channel ID %d PASSING\n', channelID);
+          % not generating compen peaks
+          fundPeaksCh = [];
+          distortPeaksCh = [];
+          calFile = '';
         endif
+      else
+        printf('Did not find any fundaments, channel ID %d PASSING\n', channelID);
         % not generating compen peaks
         fundPeaksCh = [];
         distortPeaksCh = [];
