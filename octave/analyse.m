@@ -111,7 +111,7 @@ function [fundPeaksCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredP
   else
     % same freqs from previous run, can continue
     sameFreqsCounter(channelID) += 1;
-    
+    %printf('sameFreqsCounter(%d): %d\n', channelID, sameFreqsCounter(channelID));
     if sameFreqsCounter(channelID) >= SAME_FREQS_ROUNDS
       if sameFreqsCounter(channelID) == SAME_FREQS_ROUNDS || reloadCalFiles
         % changed incoming frequency, has been stable for SAME_FREQS_ROUNDS, load from calfile (if exists)
