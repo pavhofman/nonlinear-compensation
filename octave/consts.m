@@ -43,8 +43,9 @@ CALIBRATING
 global DETAILS_STATUS_ORDER = {
 CALIBRATING
 GENERATING
+DISTORTING
 ANALYSING
-COMPENSATING 
+COMPENSATING
 };
 
 %directions
@@ -79,6 +80,9 @@ global CMD_DEVICE_NAME_PREFIX = 'DN';
 % format for generator
 %CH[1000,0.85;2000,0.85]
 global CMD_CHANNEL_FUND_PREFIX = 'CH';
+% format for distortion - HL = Harmonic Level
+%HL[-120,NA,-130]
+global CMD_HARM_LEVELS_PREFIX = 'HL';
 
 
 % direction cmd.info files

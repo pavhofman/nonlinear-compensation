@@ -36,6 +36,7 @@ endfunction
 function info = addStatusDetails(status, info)
   global GENERATING;
   global CALIBRATING;
+  global DISTORTING;
   
   switch status
     case GENERATING
@@ -45,6 +46,10 @@ function info = addStatusDetails(status, info)
     case CALIBRATING
       global calFreqs;
       info.calFreqs = calFreqs;
+
+    case DISTORTING
+      global distortHarmLevels;
+      info.distortHarmLevels = distortHarmLevels;
       
   endswitch
 endfunction

@@ -1,2 +1,4 @@
 % introduce distortion to buffer
-buffer = polyval(distortPol, buffer);
+if ~isempty(distortPoly)
+  buffer = polyval(distortPoly, buffer);
+endif

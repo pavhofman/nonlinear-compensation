@@ -25,7 +25,7 @@ elseif (strcmp(cmd{1}, CALIBRATE))
   showFFTFigureConfig.restartAvg = 1;
 
 elseif (strcmp(cmd{1}, COMPENSATE))
-  % comp calDeviceName extraCircuit
+  % comp calDeviceName extraCircuit  
   setStatus(COMPENSATING);
   addStatus(ANALYSING);
   % reading optional deviceName string
@@ -36,10 +36,18 @@ elseif (strcmp(cmd{1}, COMPENSATE))
   reloadCalFiles = true;
   showFFTFigureConfig.restartAvg = 1;
 
-% distortion allowed only for status PASSING and COMPENSATING
-elseif (strcmp(cmd{1}, DISTORT) && (statusContains(PASSING) || statusContains(COMPENSATING)))
-  % enable distortion
-  addStatus(DISTORTING);
+elseif strcmp(cmd{1}, DISTORT)
+  if length(cmd) > 1 && strcmp(cmd{2}, 'off')
+    % distortion off
+    distortHarmLevels = [];
+    distortPoly = [];
+    removeFromStatus(DISTORTING);
+  else
+    distortHarmLevels = findLevelsInCmd(cmd, CMD_HARM_LEVELS_PREFIX, defaultValue = [-120, -120], defaultMsg = 'No distortion harmonic levels found in command, using 2nd@-120dB, 3rd@-120dB');
+    distortPoly = genDistortPoly(distortHarmLevels);
+    % enable distortion
+    addStatus(DISTORTING);
+  endif
 
 elseif (strcmp(cmd{1}, PASS))
   setStatus(PASSING);

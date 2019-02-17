@@ -36,7 +36,10 @@ setStatus(PASSING);
 global measuredPeaks = NA;
 global fundPeaks = NA;
 global distortPeaks = NA;
+
 global genFunds = NA;
+global distortHarmLevels = [];
+
 global fs = NA;
 
 global compenCalFiles = NA;
@@ -114,7 +117,7 @@ while(true)
   endif
  
 
-  if (statusContains(DISTORTING) && (statusContains(PASSING) || statusContains(COMPENSATING)))
+  if statusContains(DISTORTING)
     source 'run_distortion.m';
   endif
   
