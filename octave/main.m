@@ -10,7 +10,10 @@ pkg load optim;
 pkg load zeromq;
 pkg load database;
 
-addpath(fileparts(mfilename('fullpath')));
+currDir = fileparts(mfilename('fullpath'));
+addpath(currDir);
+statusDir = [currDir filesep() 'status'];
+addpath(statusDir);
 
 source 'config.m';
 

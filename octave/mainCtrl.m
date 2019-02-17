@@ -3,7 +3,8 @@ currDir = fileparts(mfilename('fullpath'));
 addpath(currDir);
 ctrlDir = [currDir filesep() 'ctrl'];
 addpath(ctrlDir);
-
+statusDir = [currDir filesep() 'status'];
+addpath(statusDir);
 
 source 'consts.m';
 
