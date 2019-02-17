@@ -41,11 +41,9 @@ elseif strcmp(cmd{1}, DISTORT)
   if length(cmd) > 1 && strcmp(cmd{2}, 'off')
     % distortion off
     distortHarmLevels = [];
-    distortPoly = [];
     removeFromStatus(DISTORTING);
   else
     distortHarmLevels = findLevelsInCmd(cmd, CMD_HARM_LEVELS_PREFIX, defaultValue = [-120, -120], defaultMsg = 'No distortion harmonic levels found in command, using 2nd@-120dB, 3rd@-120dB');
-    distortPoly = genDistortPoly(distortHarmLevels);
     % enable distortion
     addStatus(DISTORTING);
   endif

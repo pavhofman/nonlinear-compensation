@@ -120,6 +120,12 @@ while(true)
   endif
  
 
+  if (statusContains(ANALYSING))
+    %id = tic();
+    source 'run_analysis.m';
+    %printf('Analysis took %f\n', toc(id));
+  endif
+
   if statusContains(DISTORTING)
     source 'run_distortion.m';
   endif
@@ -128,12 +134,6 @@ while(true)
     source 'run_calibration.m';
   endif
 
-
-  if (statusContains(ANALYSING))
-    %id = tic();
-    source 'run_analysis.m';
-    %printf('Analysis took %f\n', toc(id));
-  endif
   
   if (statusContains(COMPENSATING))
     %id = tic();

@@ -1,3 +1,4 @@
+% generating distortion polynomial. distortHarmLevels are already in absolute values, not in dB!
 function distortPoly = genDistortPoly(distortHarmLevels)
   harmCnt = length(distortHarmLevels);
   distortPoly = zeros(1, harmCnt + 2);
@@ -6,8 +7,8 @@ function distortPoly = genDistortPoly(distortHarmLevels)
   
   for id = 1: harmCnt
     harmLevel = distortHarmLevels(id);
-    if ~isna(harmLevel)
-      poly = db2mag(harmLevel) * chebyshevpoly(1, id + 1);
+    if harmLevel > 0
+      poly = harmLevel * chebyshevpoly(1, id + 1);
       distortPoly = addPoly(poly, distortPoly);
     endif
   endfor

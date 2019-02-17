@@ -1,7 +1,43 @@
 % introduce distortion to buffer
-if ~isempty(distortPoly)
-  buffer = polyval(distortPoly, buffer);
+if ~isempty(distortHarmLevels)
+  % default value
+  result = FAILING_RESULT;
+  msg = '';
+  for channelID = 1:columns(buffer)
+    measuredPeaksCh = measuredPeaks{channelID};
+    if hasAnyPeak(measuredPeaksCh)
+      % distort
+      % scaling to 1 for the chebyshev filters to work correctly!
+      % this works correctly only for single tones
+      avgAmpl = mean(measuredPeaksCh(:, 2));
+      bufferCh = buffer(:, channelID) / avgAmpl;
+      
+      % adjusting distortion levels to account for signal level, converting from dB to abs values
+      % note - db2mag(NA) fails, we have to skip this
+      scaledLevels = zeros(1, length(distortHarmLevels));
+      existIDs = find(~isna(distortHarmLevels));
+      % only levels at existIDs
+      scaledLevels(existIDs) = db2mag(distortHarmLevels(existIDs)) / avgAmpl;
+      
+      distortPoly = genDistortPoly(scaledLevels);
+
+      % distorting with distortPoly
+      bufferCh = polyval(distortPoly, bufferCh);
+      % scaling back to original amplitude
+      bufferCh *= avgAmpl;
+      % copying distorting channel back to buffer
+      buffer(:, channelID) = bufferCh;
+      % one channel already means OK
+      result = RUNNING_OK_RESULT;
+    endif
+  endfor
   % clipping to <-1, 1>
   buffer(buffer > 1) = 1;
   buffer(buffer < -1) = -1;
+  
+  if result == FAILING_RESULT
+    msg = 'No channels distorted due to no fundamentals';
+  endif
+  setStatusResult(DISTORTING, result);
+  setStatusMsg(DISTORTING, msg);
 endif
