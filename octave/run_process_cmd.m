@@ -26,7 +26,8 @@ elseif (strcmp(cmd{1}, CALIBRATE))
 
 elseif (strcmp(cmd{1}, COMPENSATE))
   % comp calDeviceName extraCircuit  
-  setStatus(COMPENSATING);
+  addStatus(COMPENSATING);
+  removeFromStatus(PASSING);
   addStatus(ANALYSING);
   % reading optional deviceName string
   calDeviceName = findStringInCmd(cmd, CMD_DEVICE_NAME_PREFIX, jointDeviceName);
@@ -48,9 +49,12 @@ elseif strcmp(cmd{1}, DISTORT)
     % enable distortion
     addStatus(DISTORTING);
   endif
+  % distorting completes command immediately
+  cmdDoneID = cmdID;
 
 elseif (strcmp(cmd{1}, PASS))
-  setStatus(PASSING);
+  addStatus(PASSING);
+  removeFromStatus(COMPENSATING);
   % keep analysis running all the time (without generating distortion peaks)
   addStatus(ANALYSING);
   calDeviceName = "";
@@ -71,17 +75,22 @@ elseif strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
   showFFTFigureConfig.restartAvg = 1;
 
 elseif strcmp(cmd{1}, GENERATE)
-  % gen freq
-  % start generating sine at freq, at genAmpl level
-  genFunds = findFundInCmd(cmd, CMD_CHANNEL_FUND_PREFIX, defaultValue = {[1000, db2mag(-3)]}, defaultMsg = 'No generator fundamentals found in command, using 1000Hz@-3dB');
-  
-  setStatus(GENERATING);
-  % keep analysis running all the time (without generating distortion peaks)
-  addStatus(ANALYSING);
-
-  % zeroing time
-  genStartingT = 0;
-  showFFTFigureConfig.restartAvg = 1;
+  if length(cmd) > 1 && strcmp(cmd{2}, 'off')
+    % distortion off
+    genFunds = [];
+    removeFromStatus(GENERATING);
+  else
+    % gen freq
+    % start generating sine at freq, at genAmpl level
+    genFunds = findFundInCmd(cmd, CMD_CHANNEL_FUND_PREFIX, defaultValue = {[1000, db2mag(-3)]}, defaultMsg = 'No generator fundamentals found in command, using 1000Hz@-3dB');
+    % zeroing time
+    genStartingT = 0;
+    
+    addStatus(GENERATING);
+    % keep analysis running all the time (without generating distortion peaks)
+    addStatus(ANALYSING);
+    showFFTFigureConfig.restartAvg = 1;
+  endif
   % generating completes command immediately
   cmdDoneID = cmdID;
   
