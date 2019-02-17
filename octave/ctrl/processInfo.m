@@ -182,7 +182,10 @@ function str = addPeaksStr(peaksCh, decimals, str)
       break
     endif
     peak = peaksCh(id, :);
-    str{end + 1} = ['  ' num2str(peak(1)) 'Hz   ' num2str(20*log10(abs(peak(2))), format) 'dB'];
+    % adding only peaks with freq > 0 (i.e. real values)
+    if peak(1) > 0
+      str{end + 1} = ['  ' num2str(peak(1)) 'Hz   ' num2str(20*log10(abs(peak(2))), format) 'dB'];
+    endif
   endwhile
 endfunction
 
