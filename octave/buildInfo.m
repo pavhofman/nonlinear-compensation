@@ -3,7 +3,6 @@ function info = buildInfo()
   info = struct();
   global statusStruct;
   global measuredPeaks;
-  global fundPeaks;
   global distortPeaks;
 
   global fs;
@@ -21,7 +20,6 @@ function info = buildInfo()
   endfor
   
   info.measuredPeaks = measuredPeaks;
-  info.fundPeaks = fundPeaks;
   info.distortPeaks = distortPeaks;
   info.compenCalFiles = compenCalFiles;
   info.reloadCalFiles = reloadCalFiles;

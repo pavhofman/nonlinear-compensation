@@ -37,7 +37,7 @@ global cmdDoneID = '';
 global statusStruct = struct()
 setStatus(PASSING);
 global measuredPeaks = NA;
-global fundPeaks = NA;
+global fundLevels = NA;
 global distortPeaks = NA;
 
 global genFunds = NA;

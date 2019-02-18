@@ -1,13 +1,15 @@
 % Generates compensation reference (distortion peaks with inverted phase). Supports single and dual frequencies
-function compenSignal = genCompenReference(fundPeaksCh, distortPeaksCh, measuredPeaksCh, fs, startingT, samplesCnt)
+function compenSignal = genCompenReference(fundLevelsCh, distortPeaksCh, measuredPeaksCh, fs, startingT, samplesCnt)
   % first harmonics = zero
   compenSignal = zeros(samplesCnt, 1);
   % for now only single fundamental frequency
   measFreq = measuredPeaksCh(1, 1);
-  origFundAmpl = fundPeaksCh(1, 2);
+  origFundAmpl = fundLevelsCh(1, 2);
   currFundAmpl = measuredPeaksCh(1, 2);
   
   % time offset between current time and calibration time within single period of the signal
+  % we need peaks format (phase always = 0)
+  fundPeaksCh = [fundLevelsCh, zeros(rows(fundLevelsCh), 1)];
   timeOffset = determineTimeOffset(fundPeaksCh, measuredPeaksCh);
   
   scale = currFundAmpl / origFundAmpl;

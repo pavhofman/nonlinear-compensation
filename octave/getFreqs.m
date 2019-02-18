@@ -1,8 +1,8 @@
 % find key freqs in measured peaks of one channel. Skip all zeros
-function freqs = getFreqs(fundPeaksCh)
+function freqs = getFreqs(peaksCh)
   % transpose rows to columns
-  if (rows(fundPeaksCh) > 0)
-    freqs = transpose(fundPeaksCh(:, 1));
+  if (rows(peaksCh) > 0)
+    freqs = transpose(peaksCh(:, 1));
     % remove zeros from freqs
     freqs(freqs == 0) = [];
   else

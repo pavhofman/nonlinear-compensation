@@ -5,9 +5,9 @@ msg = '';
 for channelID = 1:columns(buffer)
   measuredPeaksCh = measuredPeaks{channelID};
   distortPeaksCh = distortPeaks{channelID};
-  fundPeaksCh = fundPeaks{channelID};
-  if hasAnyPeak(measuredPeaksCh) && hasAnyPeak(fundPeaksCh) && hasAnyPeak(distortPeaksCh)
-    ref = genCompenReference(fundPeaksCh, distortPeaksCh, measuredPeaksCh, fs, startingT, rows(buffer));
+  fundLevelsCh = fundLevels{channelID};
+  if hasAnyPeak(measuredPeaksCh) && hasAnyPeak(fundLevelsCh) && hasAnyPeak(distortPeaksCh)
+    ref = genCompenReference(fundLevelsCh, distortPeaksCh, measuredPeaksCh, fs, startingT, rows(buffer));
     if find(isna(ref))
       printf('ERROR - compensation signal contains NA values, investigate!');
     else
@@ -18,8 +18,8 @@ for channelID = 1:columns(buffer)
     result = FAILING_RESULT;
     % resetting calfile
     compenCalFiles{channelID} = '';
-    if hasAnyPeak(measuredPeaksCh) && ~hasAnyPeak(fundPeaksCh)
-      % incoming signal, yet not fundPeaks from calfile - no calfile found
+    if hasAnyPeak(measuredPeaksCh) && ~hasAnyPeak(fundLevelsCh)
+      % incoming signal, yet not fundLevels from calfile - no calfile found
       msg = [msg ' ' 'No calib. file for CH' num2str(channelID) '.'];
     endif
   endif

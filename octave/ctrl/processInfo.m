@@ -3,7 +3,6 @@ function processInfo(info, dirStruct)
   %info.time = time();
   %info.status = statusStruct;
   %info.measuredPeaks = measuredPeaks;
-  %info.fundPeaks = fundPeaks;
   %info.distortPeaks = distortPeaks;
   %info.genAmpl = genAmpl;
   %info.genFreq = genFreq;
