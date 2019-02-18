@@ -21,6 +21,7 @@ endfunction
 
 
 %!test
+%! source 'consts.m';
 %! genFunds = {[1000,0.85;2000,0.85], [3000,-0.85]};
 %! str = getGeneratorCmdStr(genFunds);
 %! expected = 'gen CH[1000,0.85;2000,0.85;] CH[3000,-0.85;]';
