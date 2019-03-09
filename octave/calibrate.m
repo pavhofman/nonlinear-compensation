@@ -7,8 +7,11 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(buffer, fs, calFreqs
   persistent CAL_RUNS = 10;
   % max number of calibration runs. When reached, calibration quits with FAILED_RESULT
   persistent MAX_RUNS = 50;
-  % memory of previous peaks, subjected to averaging
   
+  % maximum fund ampl. difference between runs to consider stable fundPeaks
+  persistent MAX_AMPL_DIFF = db2mag(-40);
+  
+  % memory of previous peaks, subjected to averaging  
   persistent allFundPeaks = cell(channelCnt, MAX_RUNS);
   persistent allDistortPeaks = cell(channelCnt, MAX_RUNS);
   
@@ -17,7 +20,8 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(buffer, fs, calFreqs
   global FAILING_RESULT;
   global RUNNING_OK_RESULT;
 
-  persistent prevFreqs = cell(channelCnt, 1);  
+  % previous fundPeaks - used for checking if fundPeaks are stable enough to start filling the averaging allFundPeaks/allDistortPeaks
+  persistent prevFundPeaks = cell(channelCnt, 1);  
   persistent sameFreqsCounter = zeros(channelCnt, 1);
   
   msg = '';
@@ -48,20 +52,18 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(buffer, fs, calFreqs
     for channelID = 1:channelCnt
       % shift distortPeaks to zero time of fundPeaks and store to runPeaks
       fundPeaksCh = fundPeaks{channelID};
-      distortPeaksCh = distortPeaks{channelID};
-      
-      freqsCh = getFreqs(fundPeaksCh);
+      distortPeaksCh = distortPeaks{channelID};    
       if runID == 1
         % first run, no history, let the isequal() check pass
-        prevFreqs{channelID} = freqsCh;
+        prevFundPeaks{channelID} = fundPeaksCh;
       endif
+      prevFundPeaksCh = prevFundPeaks{channelID}
       % check if exist, stable, resp. equal to calFreqs (calfreqs are already a sorted column - see run_process_cmd.m)
-      % TODO - add check for stable levels
-      areSameAndCorrect = ~isempty(freqsCh) && isequal(freqsCh, prevFreqs{channelID}) && (isempty(calFreqs) || isequal(calFreqs, freqsCh));
+      areSame = areSameExistingPeaks(fundPeaksCh, prevFundPeaksCh, MAX_AMPL_DIFF);
+      areCorrect = isempty(calFreqs) || isequal(calFreqs, freqsCh);
+      areSameAndCorrect = areSame && areCorrect;
       % remember for next round
-      % storing prevFreqs for debug
-      oldFreqs = prevFreqs{channelID};
-      prevFreqs{channelID} = freqsCh;
+      prevFundPeaks{channelID} = fundPeaksCh;
       
       if ~areSameAndCorrect
         % are different or none
@@ -72,17 +74,17 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(buffer, fs, calFreqs
         allDistortPeaks = cell(channelCnt, MAX_RUNS);
 
         % DEBUG printing values
-        printf('This round freqsCh:')
-        disp(freqsCh);
-        printf('Prev. round freqsCh:')
-        disp(oldFreqs);
-        printf('Different/zero fund freqs in run %d from previous run, resetting counter\n', runID);
+        printf('This round fundPeaksCh:')
+        disp(fundPeaksCh);
+        printf('Prev. round fundPeaksCh:')
+        disp(prevFundPeaksCh);
+        printf('Different/zero fund freqs or different ampls in run %d from previous run, resetting counter\n', runID);
         msg = 'Unstable/different freqs';
         result = FAILING_RESULT;
         % go to next channel
         break;
       else
-        printf('Same fund freqs as in previous run in in run %d, using for averaging\n', runID);
+        printf('Same fund peaks as in previous run in in run %d, using for averaging\n', runID);
         % same non-empty freqs from previous run, can continue
         sameFreqsCounter(channelID) += 1;
         % save peaks for averaging
@@ -127,7 +129,7 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(buffer, fs, calFreqs
       result = FINISHED_RESULT;
       
     else
-      printf("Reached %d max runs yet did not have at least %d same freqs runs in all channels, failing the calibration\n", MAX_RUNS, CAL_RUNS);
+      printf("Reached %d max runs yet did not have at least %d same fund peaks runs in all channels, failing the calibration\n", MAX_RUNS, CAL_RUNS);
       msg = 'Timed out without freqs';
       global FAILED_RESULT;
       result = FAILED_RESULT;
@@ -135,7 +137,7 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(buffer, fs, calFreqs
     
     % reset values for next calibration
     runID = 0;
-    prevFreqs = cell(channelCnt, 1);  
+    prevFundPeaks = cell(channelCnt, 1);  
     sameFreqsCounter = zeros(channelCnt, 1);
     allFundPeaks = cell(channelCnt, MAX_RUNS);
     allDistortPeaks = cell(channelCnt, MAX_RUNS);
