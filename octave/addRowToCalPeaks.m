@@ -4,6 +4,8 @@ function [calPeaks, distortFreqs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh
   % calPeaks: time, origFundPhase1, origFundPhase2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
   persistent AMPL_IDX = 4;  % = index of fundAmpl1
   persistent PEAKS_START_IDX = 6;
+  % fund amplitude within +/- SAME_AMPL_TOL considered same
+  persistent SAME_AMPL_TOL = db2mag(0.05);
   
   % edge rows can be changed if new row min or max. The easiest way is removing them first and adding newly calculated at the end
   % remove edge extrapolation rows
@@ -67,10 +69,15 @@ function [calPeaks, distortFreqs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh
   % build new complPeak line
   complPeak = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC);
 
-  % remove any existing row (if exists) with amplitude equal to fundAmpl1 from calPeaks since we have newer values
+  % remove existing rows (if any) with amplitude within tolerance SAME_AMPL_TOL apart from fundAmpl1 - we have newer values
   newFundAmpl = fundPeaksCh(1, 2);
-  rowIDs = find(calPeaks(:, AMPL_IDX) == newFundAmpl);
-  calPeaks(rowIDs, :) = [];
+  upperLimit = newFundAmpl * SAME_AMPL_TOL;
+  lowerLimit = newFundAmpl * (1/SAME_AMPL_TOL);
+  sameRowIDs = find(calPeaks(:, AMPL_IDX) < upperLimit & calPeaks(:, AMPL_IDX) > lowerLimit);
+  if ~isempty(sameRowIDs)
+    printf("Removing old close-amplitude rows IDs: %s\n", num2str(sameRowIDs));
+    calPeaks(sameRowIDs, :) = [];
+  endif
   
   
   % add the newly created row to the end
