@@ -30,7 +30,13 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(buffer, fs, calFreqs
   calibrationSize = fs; % 1 second, resolution 1Hz
 
   if (restart)
+    % resetting all relevant persistent vars
     calBuffer = [];
+    runID = 0;
+    prevFundPeaks = cell(channelCnt, 1);  
+    sameFreqsCounter = zeros(channelCnt, 1);
+    allFundPeaks = cell(channelCnt, MAX_RUNS);
+    allDistortPeaks = cell(channelCnt, MAX_RUNS);    
   endif
 
   calBuffer = [calBuffer; buffer];
