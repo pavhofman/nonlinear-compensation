@@ -130,7 +130,7 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
         [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqsCh, fs, channelID, calDeviceName, extraCircuit);
         % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
         if find(isna(complAllPeaksCh))
-          complAllPeaksCh = fillMissingPeaks(complAllPeaksCh);
+          complAllPeaksCh = fillMissingCalPeaks(complAllPeaksCh);
         endif
         % storing to persistent vars
         distortFreqs{channelID} = distortFreqsCh;
@@ -194,30 +194,4 @@ function [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, chan
   endif
   % since currentPeaksCh are already interpolated to current level, fundLevels = measuredPeaksCh (without phase info)
   fundLevelsCh = measuredPeaksCh(:, 1:2);
-endfunction
-
-% interpolate all missing (NA) distortion peaks
-% replacement for matlab's fillmissing
-function complAllPeaks = fillMissingPeaks(complAllPeaks)
-  % complAllPeaks: time, origFundPhase1, origFundPhase2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
-  persistent AMPL_IDX = 4;  % = index of fundAmpl1
- 
-  % levels = AMPL_IDX column
-  levels = complAllPeaks(:, AMPL_IDX);
-  
-  % only distort peaks can be missing, it is safe to search whole complAllPeaks
-  missingPeaksIDs = isnan(complAllPeaks);
-  
-  % interpolate for each frequency with missing values
-  % indices of columns with MISSING value
-  colIDs = find(any(missingPeaksIDs));
-  for colID = colIDs
-    missingPeaksIDsInCol = missingPeaksIDs(:, colID);
-    knownLevels = levels(~missingPeaksIDsInCol);
-    missingLevels = levels(missingPeaksIDsInCol);
-    knownPeaks = complAllPeaks(~missingPeaksIDsInCol, colID);
-    peaksAtLevels = interp1(knownLevels, knownPeaks, missingLevels, 'linear', 'extrap');
-    % insert interpolated values into complAllPeaks
-    complAllPeaks(find(missingPeaksIDsInCol), colID) = peaksAtLevels;
-  endfor
 endfunction
