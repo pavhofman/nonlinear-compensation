@@ -10,8 +10,8 @@ function calPeaks = addEdgeCalPeaks(calPeaks)
   % add first row - zero ampl peaks for <0, minLevel> extrapolation
   % each peak has aplitude -> zero and phase same as minLevel (i.e. first row)
   
-  % finding existing peaks from minimum
-  dPeaksC = getEdgePeaks(allDPeaksC, 1:rows(calPeaks));
+  % finding existing peaks from minimum. If value at first row missing, use 0
+  dPeaksC = getEdgePeaks(allDPeaksC, 1, 0);
   % phase must be preserved, therefore ampl cannot not be 0 => 1e-15 is almost zero
   zeroPeaks = 1e-15 * exp(i * angle(dPeaksC));
 
@@ -19,7 +19,8 @@ function calPeaks = addEdgeCalPeaks(calPeaks)
   complZeroPeaks = [calPeaks(1, 1 : AMPL_IDX - 1), zeroAmpls, zeroPeaks];
 
   % max level - same phase as maxLevel (last row), amplitude = scaled to fundAmpl = 1
-  dPeaksC = getEdgePeaks(allDPeaksC, flip(1:rows(calPeaks)));
+  % If value at last row missing, use NA
+  dPeaksC = getEdgePeaks(allDPeaksC, rows(calPeaks), NA);
   ampls = abs(dPeaksC);
   phases = angle(dPeaksC);
   fundAmpl1 = calPeaks(end, AMPL_IDX);
@@ -32,24 +33,18 @@ function calPeaks = addEdgeCalPeaks(calPeaks)
   calPeaks = [complZeroPeaks; calPeaks; complOnePeaks];  
 endfunction
 
-% create row of edge dPeaksC, first non-NA peak for each distortFreq, in the order of rowIDs (used for finding minimum as well as maximum)
-function dPeaksC = getEdgePeaks(allDPeaksC, rowIDs)
+% create row of edge dPeaksC, for each distortFreq, check value at rowID (used for finding minimum as well as maximum)
+function dPeaksC = getEdgePeaks(allDPeaksC, rowID, valueForNA)
   dPeaksC = [];
   % for each distortfreq
   for colID = 1:columns(allDPeaksC)
-    peak = NA;
-    for rowID = rowIDs
-      thisPeak = allDPeaksC(rowID, colID);
-      if ~isna(thisPeak)
-        % found
-        peak = thisPeak;
-        break;
-      endif      
-    endfor
-    % did not find any peak, weird!
-    if isna(peak)
-      printf('Did not find any existing edge peak, using NA\n');
-      peak = NA;
+    thisPeak = allDPeaksC(rowID, colID);
+    if ~isna(thisPeak)
+      % found
+      peak = thisPeak;
+    else
+      % did not find, using valueForNA
+      peak = valueForNA;
     endif
     % adding
     dPeaksC = [dPeaksC, peak];
