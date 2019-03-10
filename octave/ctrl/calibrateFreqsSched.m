@@ -60,7 +60,8 @@ function calibrateFreqsSched(label = 1)
         return;
   endswitch
   % final section
-  writeCmd(PASS, cmdFilePlay);
+  % generator OFF
+  writeCmd([GENERATE ' off'], cmdFilePlay);
   writeCmd(PASS, cmdFileRec);
   printStr('Finished, both sides passing');  
 endfunction
