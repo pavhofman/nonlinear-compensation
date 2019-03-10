@@ -110,10 +110,6 @@ while(true)
     compenCalFiles = cell(columns(buffer), 1);
     firstCycle = false;
   endif
-  
-  % this variable is used for communication between calibration -> analysis within one loop. 
-  % Since we need to keep the value until buildInfo is called (passed to CTRL process), it must be reset at the start of the loop
-  reloadCalFiles = false;
 
   if (statusContains(GENERATING))
     source 'run_generator.m';

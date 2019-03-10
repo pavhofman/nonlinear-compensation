@@ -93,6 +93,16 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
   % how many cycles freqs must be same until declared stable - avoid artefacts caused by freqs change within the cycle
   persistent SAME_FREQS_ROUNDS = 2;
   
+  % clearing persistent vars
+  if reloadCalFiles
+    distortFreqs = cell(channelCnt, 1);
+    complAllPeaks = cell(channelCnt, 1);
+    calFiles = cell(channelCnt, 1);
+    
+    prevFreqs = cell(channelCnt, 1);  
+    sameFreqsCounter = zeros(channelCnt, 1);
+  endif
+  
   % default values
   fundLevelsCh = [];
   distortPeaksCh = [];
