@@ -45,8 +45,13 @@ global distortHarmLevels = [];
 
 global fs = NA;
 
+channelCnt = NA;
 global compenCalFiles = NA;
+
 global calFreqs = NA;
+prevFundPeaks = NA;
+calBuffer = [];
+calibrationSize = NA;
 
 transfer = struct();
 
@@ -107,8 +112,11 @@ while(true)
   
   % we already know channel count, initialize compenCalFiles
   if firstCycle
-    compenCalFiles = cell(columns(buffer), 1);
+    channelCnt = columns(buffer);
+    compenCalFiles = cell(channelCnt, 1);
+    prevFundPeaks = cell(channelCnt, 1);
     firstCycle = false;
+    calibrationSize = fs; % 1 second, resolution 1Hz
   endif
 
   if (statusContains(GENERATING))
@@ -126,9 +134,9 @@ while(true)
     source 'run_distortion.m';
   endif
   
-  if (statusContains(CALIBRATING))
-    source 'run_calibration.m';
-  endif
+
+  % calibration - updating calBuffer in every cycle
+  source 'run_calibration.m';
 
   
   if (statusContains(COMPENSATING))
