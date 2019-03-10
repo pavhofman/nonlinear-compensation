@@ -127,8 +127,8 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   uimenu(recMenu, "label", "Pass", "callback", {fPass, cmdFileRec});
   uimenu(recMenu, "label", "Compensate", "callback", {fComp, cmdFileRec});
   uimenu(recMenu, "label", "Calibrate", "callback", fRecCal);
-  recStruct.genOnMenu = uimenu(recMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Capture Side', cmdFileRec});
-  recStruct.genOffMenu = uimenu(recMenu, "label", "Stop Generating", 'separator', 'on', 'visible', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFileRec});  
+  uimenu(recMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Capture Side', cmdFileRec});
+  recStruct.genOffMenu = uimenu(recMenu, "label", "Stop Generating", 'visible', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFileRec});  
   recStruct.distortOnMenu = uimenu(recMenu, "label", "Distort", "callback", {@clbkDistort, 'Distort on Capture Side', cmdFileRec});
   recStruct.distortOffMenu = uimenu(recMenu, "label", "Stop Distorting", 'visible', 'off', "callback", {@clbkCmdOff, DISTORT, cmdFileRec});
   

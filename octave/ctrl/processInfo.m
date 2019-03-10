@@ -200,10 +200,8 @@ function updateMenu(dirStruct, info)
   endif
   
   if isfield(info, 'genFunds') && ~isempty(info.genFunds)
-    setVisible(dirStruct.genOnMenu, false);
     setVisible(dirStruct.genOffMenu, true);
   else
-    setVisible(dirStruct.genOnMenu, true);
     setVisible(dirStruct.genOffMenu, false);
   endif
 

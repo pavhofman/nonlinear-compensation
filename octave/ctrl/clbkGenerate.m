@@ -56,9 +56,15 @@ function defaults = getDefaults(channelCnt, freqCnt)
       else
         defaultValue = '';
       endif
+      % freq
       defaults{end + 1} = defaultValue;
+      % ampl
       defaults{end + 1} = defaultValue;
     endfor
   endfor
   defaults{end + 1} = '';
+
+  % default - 1000Hz 0.9
+  defaults{1} = '1000';
+  defaults{2} = '0.9';
 endfunction
