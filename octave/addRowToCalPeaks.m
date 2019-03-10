@@ -92,7 +92,7 @@ function [calPeaks, distortFreqs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh
   if !isempty(zeroColIDs)
     % found index on all-NA collumn, remove from peaks and freqs
     calPeaks(:, zeroColIDs) = [];
-    distortFreqs(:, zeroColIDs - PEAKS_START_IDX) = [];
+    distortFreqs(:, zeroColIDs - PEAKS_START_IDX + 1) = [];
   endif
   
   % sort rows by fundAmpl1 (at position AMPL_IDX)
