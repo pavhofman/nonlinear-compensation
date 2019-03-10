@@ -84,6 +84,8 @@ global CMD_CHANNEL_FUND_PREFIX = 'CH';
 %HL[-120,NA,-130]
 global CMD_HARM_LEVELS_PREFIX = 'HL';
 
+% continuous calibration ( cal #CONT1): 1 = yes, 0 = no (default)
+global CMD_CONT_PREFIX = '#CONT';
 
 % direction cmd.info files
 global CMD_FILE_REC = 'cmd.info';

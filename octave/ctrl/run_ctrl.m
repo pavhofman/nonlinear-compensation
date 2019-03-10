@@ -111,6 +111,7 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   global PASS;
   global DISTORT;
   global GENERATE;
+  global CMD_CONT_PREFIX;
 
   fPass = @(src, data, cmdFile) writeCmd(PASS, cmdFile);
   fComp = @(src, data, cmdFile) writeCmd(COMPENSATE, cmdFile);
@@ -123,13 +124,14 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   playStruct.distortOnMenu = uimenu(playMenu, "label", "Distort", "callback", {@clbkDistort, 'Distort on Playback Side', cmdFilePlay});
   playStruct.distortOffMenu = uimenu(playMenu, "label", "Stop Distorting", 'visible', 'off', "callback", {@clbkCmdOff, DISTORT, cmdFilePlay});
 
-  fRecCal = @(src, data) writeCmd(CALIBRATE, cmdFileRec);
+  fRecSingleCal = @(src, data) writeCmd(CALIBRATE, cmdFileRec);
+  fRecContCal = @(src, data) writeCmd([CALIBRATE ' ' CMD_CONT_PREFIX '1'], cmdFileRec);
   
   recMenu = uimenu (fig, "label", "&Capture");
   uimenu(recMenu, "label", "Pass", "callback", {fPass, cmdFileRec});
   uimenu(recMenu, "label", "Compensate", "callback", {fComp, cmdFileRec});
-  recStruct.calSingleMenu = uimenu(recMenu, "label", "Calibrate Single Run", "callback", fRecCal);
-  recStruct.calContMenu = uimenu(recMenu, "label", "Calibrate Continuously", "callback", fRecCal);
+  recStruct.calSingleMenu = uimenu(recMenu, "label", "Calibrate Single Run", "callback", fRecSingleCal);
+  recStruct.calContMenu = uimenu(recMenu, "label", "Calibrate Continuously", "callback", fRecContCal);
   recStruct.calOffMenu = uimenu(recMenu, "label", "Stop Calibrating", 'visible', 'off', "callback", {@clbkCmdOff, CALIBRATE, cmdFileRec});
   uimenu(recMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Capture Side', cmdFileRec});
   recStruct.genOffMenu = uimenu(recMenu, "label", "Stop Generating", 'visible', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFileRec});  

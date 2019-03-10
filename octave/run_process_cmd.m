@@ -2,27 +2,35 @@ if (strcmp(cmd{1}, PAUSE))
   setStatus(PAUSED);
   
 elseif (strcmp(cmd{1}, CALIBRATE))
-  % cal extraCircuit
-  % start/restart joint-device calibration
-  % add status - e.g. why compensation is running for incremental calibration
-  addStatus(CALIBRATING);
-  % reading optional  extra circuit specifier string (will be stored in cal file name)
-  calExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
-  
-  % optional calibration freqs (both channels) to wait for
-  calFreqs = findNumInCmd(cmd, CMD_FREQ_PREFIX);
-  % calFreqs must be asc-sorted row
-  if size(calFreqs, 1) > 1
-    % in rows, transpose to columns
-    calFreqs = transpose(calFreqs);
-  endif
-  if length(calFreqs) > 1
-    calFreqs = sort(calFreqs);
-  endif
+    if length(cmd) > 1 && strcmp(cmd{2}, 'off')
+    % calibration off
+    source 'stopCalibration.m';
+  else
+    % cal extraCircuit
+    % start/restart joint-device calibration
+    % add status - e.g. why compensation is running for incremental calibration
+    addStatus(CALIBRATING);
+    % optional continuous calibration, false = default
+    contCal = findNumInCmd(cmd, CMD_CONT_PREFIX, false);
+    
+    % reading optional  extra circuit specifier string (will be stored in cal file name)
+    calExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
+    
+    % optional calibration freqs (both channels) to wait for
+    calFreqs = findNumInCmd(cmd, CMD_FREQ_PREFIX);
+    % calFreqs must be asc-sorted row
+    if size(calFreqs, 1) > 1
+      % in rows, transpose to columns
+      calFreqs = transpose(calFreqs);
+    endif
+    if length(calFreqs) > 1
+      calFreqs = sort(calFreqs);
+    endif
 
-  % clearing calibration buffer
-  restartCal = true;
-  showFFTFigureConfig.restartAvg = 1;
+    % clearing calibration buffer
+    restartCal = true;
+    showFFTFigureConfig.restartAvg = 1;
+  endif
 
 elseif (strcmp(cmd{1}, COMPENSATE))
   % comp calDeviceName extraCircuit  

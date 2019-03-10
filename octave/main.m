@@ -52,6 +52,8 @@ global calFreqs = NA;
 prevFundPeaks = NA;
 calBuffer = [];
 calibrationSize = NA;
+% continuous calibration. Default - false
+contCal = false;
 
 transfer = struct();
 
