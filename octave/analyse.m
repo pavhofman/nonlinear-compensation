@@ -39,12 +39,17 @@ function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] 
     
     hasAnyChannelPeaks = false;
     % each channel handled separately
+    global MIN_DISTORT_LEVEL;
     for channelID = 1:channelCnt
       measuredPeaksCh = measuredPeaks{channelID};
       if hasAnyPeak(measuredPeaksCh)
         hasAnyChannelPeaks = true;
         if shouldGenCompenPeaks
           [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
+          % removing rows with ampl < MIN_DISTORT_LEVEL
+          if ~isempty(distortPeaksCh)
+            distortPeaksCh(distortPeaksCh(:, 2) < MIN_DISTORT_LEVEL, :) = [];
+          endif
         else
           % not generating compen peaks
           fundLevelsCh = [];
