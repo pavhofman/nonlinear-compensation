@@ -80,16 +80,16 @@ endfunction
 function [plotStruct] = initPlot(plotPanel)
   axis = axes ('parent', plotPanel);
   x = [];
-  calLevels = [];
-  curLevels = [];
   % 2 lines - calibration levels, current levels
-  lines = plot(axis, 0, 0, '>r', 'markerfacecolor', 'r', 1, 0, '<r', 'markerfacecolor', 'b');
+  lines = plot(axis, 0, 0, '>r', 'markerfacecolor', 'r', 1, 0, '<r', 'markerfacecolor', 'b', 0.5, 0, '<r', 'markerfacecolor', 'g');
   % fixed limit
   set(axis, 'ylim', [-20,1]);
   calLine = lines(1);
   curLine = lines(2);
+  lastLine = lines(3);
   set(calLine, 'visible', 'off');
   set(curLine, 'visible', 'off');
+  set(lastLine, 'visible', 'off');
   
   set(axis,'Xtick',[])
   set(axis, "ygrid", "on");
@@ -101,17 +101,17 @@ function [plotStruct] = initPlot(plotPanel)
   plotStruct.calLine = calLine;
   % line with current level points
   plotStruct.curLine = curLine;
+  % line with last level points before calibration
+  plotStruct.lastLine = lastLine;
 endfunction
 
 function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   global cmdFileRec;
   global cmdFilePlay;
-  global CALIBRATE;
   global COMPENSATE;
   global PASS;
   global DISTORT;
   global GENERATE;
-  global CMD_CONT_PREFIX;
 
   fPass = @(src, data, cmdFile) writeCmd(PASS, cmdFile);
   fComp = @(src, data, cmdFile) writeCmd(COMPENSATE, cmdFile);
@@ -123,16 +123,13 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   playStruct.genOffMenu = uimenu(playMenu, "label", "Stop Generating", 'visible', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFilePlay});  
   playStruct.distortOnMenu = uimenu(playMenu, "label", "Distort", "callback", {@clbkDistort, 'Distort on Playback Side', cmdFilePlay});
   playStruct.distortOffMenu = uimenu(playMenu, "label", "Stop Distorting", 'visible', 'off', "callback", {@clbkCmdOff, DISTORT, cmdFilePlay});
-
-  fRecSingleCal = @(src, data) writeCmd(CALIBRATE, cmdFileRec);
-  fRecContCal = @(src, data) writeCmd([CALIBRATE ' ' CMD_CONT_PREFIX '1'], cmdFileRec);
-  
+ 
   recMenu = uimenu (fig, "label", "&Capture");
   uimenu(recMenu, "label", "Pass", "callback", {fPass, cmdFileRec});
   uimenu(recMenu, "label", "Compensate", "callback", {fComp, cmdFileRec});
-  recStruct.calSingleMenu = uimenu(recMenu, "label", "Calibrate Single Run", "callback", fRecSingleCal);
-  recStruct.calContMenu = uimenu(recMenu, "label", "Calibrate Continuously", "callback", fRecContCal);
-  recStruct.calOffMenu = uimenu(recMenu, "label", "Stop Calibrating", 'visible', 'off', "callback", {@clbkCmdOff, CALIBRATE, cmdFileRec});
+  recStruct.calSingleMenu = uimenu(recMenu, "label", "Calibrate Single Run", "callback", {@clbkCalib, false});
+  recStruct.calContMenu = uimenu(recMenu, "label", "Calibrate Continuously", "callback", {@clbkCalib, true});
+  recStruct.calOffMenu = uimenu(recMenu, "label", "Stop Calibrating", 'visible', 'off', "callback", @clbkCalibOff);
   uimenu(recMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Capture Side', cmdFileRec});
   recStruct.genOffMenu = uimenu(recMenu, "label", "Stop Generating", 'visible', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFileRec});  
   recStruct.distortOnMenu = uimenu(recMenu, "label", "Distort", "callback", {@clbkDistort, 'Distort on Capture Side', cmdFileRec});
@@ -181,8 +178,8 @@ set(fig, "toolbar", "none");
 
 set(fig, 'DeleteFcn', @(h, e) doExit(fig));
 
-playStruct = createDirStruct();
-recStruct = createDirStruct();
+global playStruct = createDirStruct();
+global recStruct = createDirStruct();
 
 [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
@@ -213,7 +210,7 @@ playSock = zmq_socket(ZMQ_PAIR);
 zmq_bind (recSock, ['tcp://*:' num2str(ZEROMQ_PORT_REC)]);
 zmq_bind (playSock, ['tcp://*:' num2str(ZEROMQ_PORT_PLAY)]);
 
-recInfo = [];
+global recInfo = [];
 playInfo = [];
 
 % maximum age of received info for processing

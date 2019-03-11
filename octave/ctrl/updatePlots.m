@@ -49,12 +49,7 @@ function updatePlots(dirStruct, info)
     
     % plotting current levels
     if ~isempty(curLevels)
-      curX = ones(rows(curLevels), 1);
-      curY = curLevels;
-      if length(curLevels) == 2
-        curX(2) += CH_DISTANCE_X;
-      endif
-      plotLevels(plotStruct.curLine, curX, curY);
+      updateLevelsLine(curLevels, plotStruct.curLine, 1);
     endif
     set(plotStruct.axis, 'ylim', [-20,1]);
   endfor
@@ -78,21 +73,4 @@ function levels = loadCalLevels(calFile)
   endif
   % in dB
   levels = 20*log10(levels);
-endfunction
-
-function plotLevels(line, x, y)
-  if ~isempty(y)
-    shownX = get(line, 'XData');    
-    if ~isequal(shownX, x)
-      set(line, 'XData', x);
-    endif
-    shownY = get(line, 'YData');
-    if ~isequal(shownY, y)
-      set(line, 'YData', y);
-    endif
-    setVisible(line, true);
-  else
-    % hide
-    setVisible(line, false);
-  endif
 endfunction
