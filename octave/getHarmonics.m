@@ -35,7 +35,8 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
       printf("That is more than 2 supported, will send no fund peaks\n");
       fundPeaksCh = [];
     endif
-    fundPeaks{channelID} = fundPeaksCh;
+    % Must use double! Result of time() converted to single returns incorrect time.
+    fundPeaks{channelID} = double(fundPeaksCh);
     errorMsg(:, channelID) = cellstr(errorMsgCh);
     
     if (genDistortPeaks && hasAnyPeak(fundPeaksCh))
@@ -45,7 +46,7 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
           % take distortPeaks strongest harmonics, keep unsorted
           distortPeaksCh = resize(sortrows(distortPeaksCh,-2), maxDistortPeaksCnt,3);
       end
-      distortPeaks{channelID} = distortPeaksCh;
+      distortPeaks{channelID} = double(distortPeaksCh);
     endif    
   endfor  
  
