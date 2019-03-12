@@ -154,7 +154,7 @@ function details = addDetails(channelID, status, info, details)
     case DISTORTING
       distortHarmLevels = info.distortHarmLevels;
       if ~isempty(distortHarmLevels)
-        details{end + 1} = 'Distortion Levels to Add:';
+        details{end + 1} = 'Distortion Levels Added:';
         for id = 1:length(distortHarmLevels)
           level = distortHarmLevels(id);
           if ~isna(level)

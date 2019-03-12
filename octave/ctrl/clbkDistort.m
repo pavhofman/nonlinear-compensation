@@ -26,7 +26,7 @@ endfunction
 function prompt = getPrompt(harmCnt)
   prompt = cell();
   for harmID = 1:harmCnt
-    prompt{end + 1} = ['Harmonics Nb. ' num2str(harmID + 1) 'Level (dB, none = empty)'];
+    prompt{end + 1} = ['Harmonics ' num2str(harmID + 1) ' Level (dB, none = empty)'];
   endfor
   prompt{end + 1} = 'Command String: e.g. HL[-120,NA,-140]';
 endfunction
