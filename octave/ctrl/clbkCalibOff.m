@@ -10,5 +10,7 @@ function clbkCalibOff(src, data)
   for channelID = 1:2
     plotStruct = recStruct.calPlots{channelID};
     setVisible(plotStruct.lastLine, false);
+    % resetting plot scale
+    set(plotStruct.axis, 'ylim', [-20,0]);
   endfor
 endfunction

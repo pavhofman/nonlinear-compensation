@@ -9,6 +9,9 @@ function showLastLine()
     if ~isempty(curLevels)
       updateLevelsLine(curLevels, plotStruct.lastLine, 0.5);
     endif
-    set(plotStruct.axis, 'ylim', [-20,1]);
+    % zooming
+    lowerYLim = min(curLevels)  - 0.5;
+    upperYLim = min(curLevels)  + 0.5;
+    set(plotStruct.axis, 'ylim', [lowerYLim, upperYLim]);
   endfor
 endfunction

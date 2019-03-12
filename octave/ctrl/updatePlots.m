@@ -51,7 +51,6 @@ function updatePlots(dirStruct, info)
     if ~isempty(curLevels)
       updateLevelsLine(curLevels, plotStruct.curLine, 1);
     endif
-    set(plotStruct.axis, 'ylim', [-20,1]);
   endfor
 endfunction
 

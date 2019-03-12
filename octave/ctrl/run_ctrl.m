@@ -83,7 +83,7 @@ function [plotStruct] = initPlot(plotPanel)
   % 2 lines - calibration levels, current levels
   lines = plot(axis, 0, 0, '>r', 'markerfacecolor', 'r', 1, 0, '<r', 'markerfacecolor', 'b', 0.5, 0, '<r', 'markerfacecolor', 'g');
   % fixed limit
-  set(axis, 'ylim', [-20,1]);
+  set(axis, 'ylim', [-20,0]);
   calLine = lines(1);
   curLine = lines(2);
   lastLine = lines(3);
