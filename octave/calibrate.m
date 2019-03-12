@@ -7,8 +7,8 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   % max number of calibration runs. When reached, calibration quits with FAILED_RESULT
   persistent MAX_RUNS = 50;
   
-  % maximum fund ampl. difference between runs to consider stable fundPeaks
-  persistent MAX_AMPL_DIFF = db2mag(-40);
+  % maximum fund ampl. difference between subsequent runs to consider stable fundPeaks
+  persistent MAX_AMPL_DIFF = db2mag(-60);
   
   % memory of previous peaks, subjected to averaging  
   persistent allFundPeaks = cell(channelCnt, MAX_RUNS);
