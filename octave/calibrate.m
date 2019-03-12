@@ -132,17 +132,17 @@ function [avgFundPeaksCh, avgDistortPeaksCh] = detAveragePeaks(allFundPeaksCh, a
   % zeroing mergedFundPeaksCh phases first
   mergedFundPeaksCh(:, 3) = 0;
   
-  mergedDistortPeaksCh = mergePeaks(allDistortPeaksCh);
+  [mergedDistortPeaksCh, runsCnt] = mergePeaks(allDistortPeaksCh);
   
   % calculate only if some fund and distort peaks are found
   if hasAnyPeak(mergedFundPeaksCh)
-    avgFundPeaksCh = calculateAvgPeaks(mergedFundPeaksCh);
+    avgFundPeaksCh = calculateAvgPeaks(mergedFundPeaksCh, runsCnt);
   else
     avgFundPeaksCh = [];  
   endif
   
   if hasAnyPeak(mergedDistortPeaksCh)
-    avgDistortPeaksCh = calculateAvgPeaks(mergedDistortPeaksCh);  
+    avgDistortPeaksCh = calculateAvgPeaks(mergedDistortPeaksCh, runsCnt);
   else
     avgDistortPeaksCh = [];  
   endif
@@ -152,7 +152,7 @@ endfunction
 % First and last non-empty peaks matrices are skipped - could contain dirty transitional values
 % allPeaksCh - cell array(1, MAX_RUNS) of peaks matrices
 % mergedPeaksCh - regular peaks matrix(N, 3)
-function mergedPeaksCh = mergePeaks(allPeaksCh)
+function [mergedPeaksCh, runsCnt] = mergePeaks(allPeaksCh)
   mergedPeaksCh = [];
   emptyIDs = find(cellfun('isempty', allPeaksCh));
   % remove empty cells
@@ -163,33 +163,49 @@ function mergedPeaksCh = mergePeaks(allPeaksCh)
     allPeaksCh(:, end) = [];
   endif
   
-  for runID = 1 : size(allPeaksCh, 2)
-    peaksCh = allPeaksCh{runID};
-    if ~isempty(peaksCh)
-      mergedPeaksCh = [mergedPeaksCh; peaksCh];
+  runsCnt = size(allPeaksCh, 2);
+  for runID = 1 : runsCnt
+    runPeaksCh = allPeaksCh{runID};
+    if ~isempty(runPeaksCh)
+      mergedPeaksCh = [mergedPeaksCh; runPeaksCh];
     endif
   endfor
 endfunction
 
 
 % return average peaks for each frequency found in mergedPeaksCh
+% runsCnt - number of runs within mergedPeaksCh. Is used for dropping frequencies with little count
 % allPeaksCh can contain zero rows - ignored
-function avgPeaksCh = calculateAvgPeaks(mergedPeaksCh);
+function avgPeaksCh = calculateAvgPeaks(mergedPeaksCh, runsCnt);
+  % const
+  % minimum occurence of given frequency distortion in all runsCnt to be included in the averaged peaks
+  % 30%
+  persistent MIN_OCCURENCE_LIMIT = 0.3;
   avgPeaksCh = [];
   
   uniqFreqs = unique(mergedPeaksCh(:, 1));
   uniqFreqs = sort(uniqFreqs);
+  
+  % include only frequencies which occur minRequiredCnt out of runsCnt
+  % less frequent frequencies must be ignored because their interpolation during compensation creates false compensation signals
+  minRequiredCnt = runsCnt * MIN_OCCURENCE_LIMIT;
   % average for each freq
   for freq = transpose(uniqFreqs)
     % only for nonzero freqs
     if (freq > 0)
       freqIDs = find(mergedPeaksCh(:, 1) == freq);
       % averaging requires complex values    
-      values = mergedPeaksCh(freqIDs, 2:3);
-      cValues = values(:, 1) .* exp(i * values(:, 2));
-      avgCValue = mean(cValues);
-      avgPeak = [freq, abs(avgCValue), angle(avgCValue)];
-      avgPeaksCh = [avgPeaksCh; avgPeak];
+      valuesOfFreq = mergedPeaksCh(freqIDs, 2:3);
+      valuesCnt = rows(valuesOfFreq);
+      if valuesCnt >= minRequiredCnt
+        % only frequencies measured in almost every run can be considered for compensation
+        cValues = valuesOfFreq(:, 1) .* exp(i * valuesOfFreq(:, 2));
+        avgCValue = mean(cValues);
+        avgPeak = [freq, abs(avgCValue), angle(avgCValue)];
+        avgPeaksCh = [avgPeaksCh; avgPeak];
+      else
+        printf('Distort freq %d occured only %d out of %d runs, below the required min count %d, not being included in avgPeaksCh\n', freq, valuesCnt, minRequiredCnt, runsCnt);
+      endif
     endif
   endfor
 endfunction
