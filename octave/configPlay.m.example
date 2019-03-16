@@ -1,3 +1,4 @@
+% config overrides for config.m on PLAY side
 playRecConfig.recDeviceID = 19; % octave_loop
 playRecConfig.playDeviceID = 8; % quartet analog
 playRecConfig.otherDirectionDeviceID = 8;

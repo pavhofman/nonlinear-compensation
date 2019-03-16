@@ -29,7 +29,7 @@ elseif (strcmp(cmd{1}, CALIBRATE))
 
     % clearing calibration buffer
     restartCal = true;
-    showFFTFigureConfig.restartAvg = 1;
+    showFFTCfg.restartAvg = 1;
   endif
 
 elseif (strcmp(cmd{1}, COMPENSATE))
@@ -43,7 +43,7 @@ elseif (strcmp(cmd{1}, COMPENSATE))
   compExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
   
   reloadCalFiles = true;
-  showFFTFigureConfig.restartAvg = 1;
+  showFFTCfg.restartAvg = 1;
 
 elseif strcmp(cmd{1}, DISTORT)
   if length(cmd) > 1 && strcmp(cmd{2}, 'off')
@@ -66,19 +66,19 @@ elseif (strcmp(cmd{1}, PASS))
   calDeviceName = "";
   compExtraCircuit = "";
 
-  showFFTFigureConfig.restartAvg = 1;
+  showFFTCfg.restartAvg = 1;
   % passing completes command immediately
   cmdDoneID = cmdID;
   % passing never fails
   setStatusResult(PASSING, RUNNING_OK_RESULT);
 
 elseif strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
-  showFFTFigureConfig.numAvg = str2num(cmd{2});
-  showFFTFigureConfig.restartAvg = 1;
+  showFFTCfg.numAvg = str2num(cmd{2});
+  showFFTCfg.restartAvg = 1;
 
 elseif strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
-  showFFTFigureConfig.fftSize = str2num(cmd{2});
-  showFFTFigureConfig.restartAvg = 1;
+  showFFTCfg.fftSize = str2num(cmd{2});
+  showFFTCfg.restartAvg = 1;
 
 elseif strcmp(cmd{1}, GENERATE)
   if length(cmd) > 1 && strcmp(cmd{2}, 'off')
@@ -95,7 +95,7 @@ elseif strcmp(cmd{1}, GENERATE)
     addStatus(GENERATING);
     % keep analysis running all the time (without generating distortion peaks)
     addStatus(ANALYSING);
-    showFFTFigureConfig.restartAvg = 1;
+    showFFTCfg.restartAvg = 1;
   endif
   % generating completes command immediately
   cmdDoneID = cmdID;

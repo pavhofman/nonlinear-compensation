@@ -1,4 +1,4 @@
-function showFFTFigure(samples, fs)
+function showFFTFigure(samples, fs, direction)
   persistent fftFigure = 0;
   persistent fftLine = [];
   persistent fftSize = 0;
@@ -8,7 +8,7 @@ function showFFTFigure(samples, fs)
   persistent yavg;
   persistent yavgn;
   persistent sampleBuffer = [];
-  global showFFTFigureConfig;
+  global showFFTCfg;
 
   if fftFigure == 0
     fftFigure = figure;
@@ -20,10 +20,10 @@ function showFFTFigure(samples, fs)
     set(gca,'XTickLabel', sprintf('%.0f|',xt))
     addlistener(gca, 'xlim', @logXTickZoomHandler)
   end
-  if (showFFTFigureConfig.fftSize != fftSize) ...
+  if (showFFTCfg.fftSize != fftSize) ...
       || (fs != fftFs)
     fftFs = fs;
-    fftSize = showFFTFigureConfig.fftSize;
+    fftSize = showFFTCfg.fftSize;
     fftXAxisData = (0 : (fftSize / 2)) * fs / fftSize;
     colors = {'red';'blue'};
     for i=1:length(colors)
@@ -46,12 +46,12 @@ function showFFTFigure(samples, fs)
   else
     sampleBuffer = [sampleBuffer; samples];
     nsamples = rows(sampleBuffer);
-    if nsamples < showFFTFigureConfig.fftSize
+    if nsamples < showFFTCfg.fftSize
         return
     end
-    samples = sampleBuffer(1:showFFTFigureConfig.fftSize, :);
-    if nsamples > showFFTFigureConfig.fftSize
-        sampleBuffer = sampleBuffer(showFFTFigureConfig.fftSize+1:end, :);
+    samples = sampleBuffer(1:showFFTCfg.fftSize, :);
+    if nsamples > showFFTCfg.fftSize
+        sampleBuffer = sampleBuffer(showFFTCfg.fftSize+1:end, :);
     else
         sampleBuffer = [];
     end
@@ -63,15 +63,15 @@ function showFFTFigure(samples, fs)
     yc = recFFT(:, 1:fftSize/2 + 1) / (fftSize/2 * winmean);
     y = abs(yc);
 
-    if (showFFTFigureConfig.numAvg > 0) ...
-        && (yavgn >= showFFTFigureConfig.numAvg) ...
-        && (showFFTFigureConfig.restartAvg == 0)
+    if (showFFTCfg.numAvg > 0) ...
+        && (yavgn >= showFFTCfg.numAvg) ...
+        && (showFFTCfg.restartAvg == 0)
         return
     end
-    if (showFFTFigureConfig.restartAvg == 1) ...
-        || (showFFTFigureConfig.numAvg < 2) ...
+    if (showFFTCfg.restartAvg == 1) ...
+        || (showFFTCfg.numAvg < 2) ...
         || (size(yavg) != size(y))
-        showFFTFigureConfig.restartAvg = 0;
+        showFFTCfg.restartAvg = 0;
         yavg = y;
         yavgn = 1;
     else

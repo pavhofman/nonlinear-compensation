@@ -1,6 +1,7 @@
 pkg load control;
 
-% CONSTANTS
+% CONSTANTS and DEFAULTS
+
 % commands
 global PAUSE = 'pause';
 global CALIBRATE = 'cal';
@@ -100,4 +101,15 @@ ZEROMQ_PORT_PLAY = 5556;
 
 % minimum level of distortion peaks to be included into calibration profile
 % depends largely on soundcard performance
-global MIN_DISTORT_LEVEL = db2mag(-135);
+global MIN_DISTORT_LEVEL = db2mag(-138);
+
+global showFFTCfg = struct();
+showFFTCfg.numAvg = 0;
+showFFTCfg.restartAvg = 0;
+showFFTCfg.fftSize = 2^16;
+
+% array of specific channel numbers from/to audio file or empty = all channels in input
+global FILE_CHAN_LIST = [];
+
+# show FFT charts in direction - array of DIR_REC, DIR_PLAY or empty
+global showFFT = [];

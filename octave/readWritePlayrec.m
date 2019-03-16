@@ -84,10 +84,6 @@ function [buffer, fs] = readWritePlayrec(cnt, playBuffer, restart)
     % blocking read on recording side
     playrec('block', pageNumList(1));
     buffer = playrec('getRec', pageNumList(1));
-    global channel;
-    if (channel > 0)
-      buffer = buffer(:, channel);
-    endif
     playrec('delPage', pageNumList(1));
     tic();
 

@@ -21,8 +21,10 @@ if direction == DIR_PLAY
   % overriden playback config values
   source 'configPlay.m';
   cmdFile = genDataPath(CMD_FILE_PLAY);
+  zeromqPort = ZEROMQ_PORT_PLAY;
 else
   cmdFile = genDataPath(CMD_FILE_REC);
+  zeromqPort = ZEROMQ_PORT_REC;
 endif
 
 transferFile = genDataPath('transf.dat');
@@ -105,7 +107,7 @@ while(true)
 
   % not stopped, will need data
   if exist('wavPath', 'var') && !isempty(wavPath)
-    [buffer, fs] = readData(-1, fs, restartReading);
+    [buffer, fs] = readData(-1, fs, FILE_CHAN_LIST, restartReading);
   else
     % reading/writing to soundcards
     [buffer, fs] = readWritePlayrec(-1, buffer, restartReading);
@@ -152,7 +154,11 @@ while(true)
 
   % not stopped, always writing
   writeData(buffer, fs, restartWriting);
-  restartWriting = false;
+    
+  if any(showFFT == direction)
+    % should show FFT figure for this direction
+    showFFTFigure(buffer, fs, direction)
+  endif
   
   if (isStatus(MEASURING))
     source 'run_measuring.m';
