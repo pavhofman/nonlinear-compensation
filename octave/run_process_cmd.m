@@ -79,10 +79,8 @@ elseif (strcmp(cmd{1}, READFILE))
   else
     % READFILE filename
     % start/restart reading samples from filename    
-    sourceFile = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No source audio file found in command');
-    if isempty(sourceFile)
-      source 'stop_reading_file.m';
-    else
+    sourceFile = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No source audio file found in READFILE command, ignoring');
+    if ~isempty(sourceFile)
       % start reading file inputFile
       if fromSource == PLAYREC_SRC && ~any(sinks == PLAYREC_SINK)
         % no playrec required, stop playrec
@@ -93,6 +91,24 @@ elseif (strcmp(cmd{1}, READFILE))
     endif
   endif
   % processing READFILE completes the command immediately
+  cmdDoneID = cmdID;
+
+  elseif (strcmp(cmd{1}, WRITEFILE))
+  if length(cmd) > 1 && strcmp(cmd{2}, 'off')
+    % writing file off
+    source 'stop_writing_file.m';
+  else
+    % WRITEFILE filename
+    % start/restart writing samples to filename    
+    sinkFile = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No sink audio file found in command WRITEFILE');
+    if ~isempty(sinkFile)
+      % start writing sinkFile
+      sinks = addItemToRow(sinks, FILE_SINK);
+      % close possible existing sinkFile being already recorded
+      closeSinkFile = true;
+    endif
+  endif
+  % processing WRITEFILE completes the command immediately
   cmdDoneID = cmdID;
   
 elseif strcmp(cmd{1}, AVG) && (rows(cmd) > 1)

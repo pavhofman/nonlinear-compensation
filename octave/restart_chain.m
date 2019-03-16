@@ -1,4 +1,5 @@
 restartReading = true;
 restartCal = true;
-restartWriting = true;
+% close possible file being written
+closeSinkFile = true;
 restartMeasuring = true;

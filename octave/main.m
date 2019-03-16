@@ -14,6 +14,10 @@ currDir = fileparts(mfilename('fullpath'));
 addpath(currDir);
 statusDir = [currDir filesep() 'status'];
 addpath(statusDir);
+statusDir = [currDir filesep() 'status'];
+addpath(statusDir);
+internalDir = [currDir filesep() 'internal'];
+addpath(internalDir);
 
 source 'config.m';
 
@@ -56,6 +60,9 @@ calBuffer = [];
 calibrationSize = NA;
 % continuous calibration. Default - false
 contCal = false;
+
+sinkFile = '';
+closeSinkFile = false;
 
 % init sourcenames and status
 source 'init_sourcename_status.m';
@@ -148,10 +155,13 @@ while(true)
     compenCalFiles = cell(columns(buffer), 1);
   endif
 
-  % not stopped, always writing
-  writeData(buffer, fs, restartWriting);
+  if containsItem(sinks, FILE_SINK) || closeSinkFile
+    keepWriting = containsItem(sinks, FILE_SINK);
+    writeData(buffer, fs, sinkFile, closeSinkFile, keepWriting);
+    closeSinkFile = false;
+  endif
     
-  if any(showFFT == direction)
+  if containsItem(showFFT, direction)
     % should show FFT figure for this direction
     showFFTFigure(buffer, fs, direction)
   endif
