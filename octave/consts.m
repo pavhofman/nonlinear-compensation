@@ -17,6 +17,11 @@ global MEASURE = 'meas';
 % splitting joint calibration to DAC and ADC components
 global SPLIT = 'split';
 global SPLIT2 = 'split2';
+
+% reading/writing audio file
+global READFILE = 'readfile';
+global WRITEFILE = 'writefile';
+
 NO_CMD = '';
 
 % statuses
@@ -88,6 +93,8 @@ global CMD_HARM_LEVELS_PREFIX = 'HL';
 % continuous calibration ( cal #CONT1): 1 = yes, 0 = no (default)
 global CMD_CONT_PREFIX = '#CONT';
 
+global CMD_FILEPATH_PREFIX = '#FILE#';
+
 % direction cmd.info files
 global CMD_FILE_REC = 'cmd.info';
 global CMD_FILE_PLAY = 'cmd-play.info';
@@ -95,6 +102,17 @@ global CMD_FILE_PLAY = 'cmd-play.info';
 % prefices for device names (used in calibration file names)
 DEVICE_REC_PREFIX = 'rec';
 DEVICE_PLAY_PREFIX = 'play';
+
+
+FILE_SRC = 1;
+PLAYREC_SRC = 2;
+% default - no source
+fromSource = NA;
+
+FILE_SINK = 1;
+PLAYREC_SINK = 2;
+% default - no sinks
+sinks = [];
 
 ZEROMQ_PORT_REC = 5555;
 ZEROMQ_PORT_PLAY = 5556;

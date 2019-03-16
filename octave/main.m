@@ -37,7 +37,7 @@ cmdID = '';
 global cmdDoneID = '';
 
 global statusStruct = struct()
-setStatus(PASSING);
+
 global measuredPeaks = NA;
 global fundLevels = NA;
 global distortPeaks = NA;
@@ -57,15 +57,17 @@ calibrationSize = NA;
 % continuous calibration. Default - false
 contCal = false;
 
+% init sourcenames and status
+source 'init_sourcename_status.m';
+
+% init sinkNames
+source 'init_sinknames.m';
+
 transfer = struct();
 
-
-% first run -> restart, reading all files
-restartReading = true;
-restartCal = true;
 global reloadCalFiles = false;
-restartWriting = true;
-restartMeasuring = true;
+% first run -> restart, reading all files
+source 'restart_chain.m';
 
 startingT = 0;
 buffer = [0];
@@ -106,14 +108,8 @@ while(true)
   endif
 
   % not stopped, will need data
-  if exist('wavPath', 'var') && !isempty(wavPath)
-    [buffer, fs] = readData(-1, fs, FILE_CHAN_LIST, restartReading);
-  else
-    % reading/writing to soundcards
-    [buffer, fs] = readWritePlayrec(-1, buffer, restartReading);
-  end
-  restartReading = false;
-  
+  source 'read_data.m';
+
   % we already know channel count, initialize compenCalFiles
   if firstCycle
     channelCnt = columns(buffer);

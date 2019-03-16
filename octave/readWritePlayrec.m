@@ -1,7 +1,12 @@
 function [buffer, fs] = readWritePlayrec(cnt, playBuffer, restart)
     global playRecConfig;
     persistent pageNumList;
-
+    
+    % clearing playBuffer at restart
+    if restart
+      playBuffer = [];
+    endif
+    
     if isstruct(playRecConfig) && isfield(playRecConfig, 'recDeviceID')
         recDeviceID = playRecConfig.recDeviceID;
     else

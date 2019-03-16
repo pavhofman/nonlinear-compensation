@@ -72,6 +72,29 @@ elseif (strcmp(cmd{1}, PASS))
   % passing never fails
   setStatusResult(PASSING, RUNNING_OK_RESULT);
 
+elseif (strcmp(cmd{1}, READFILE))
+  if length(cmd) > 1 && strcmp(cmd{2}, 'off')
+    % reading file off
+    source 'stop_reading_file.m';
+  else
+    % READFILE filename
+    % start/restart reading samples from filename    
+    sourceFile = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No source audio file found in command');
+    if isempty(sourceFile)
+      source 'stop_reading_file.m';
+    else
+      % start reading file inputFile
+      if fromSource == PLAYREC_SRC && ~any(sinks == PLAYREC_SINK)
+        % no playrec required, stop playrec
+        clear playrec;
+      endif
+      fromSource = FILE_SRC;
+      restartReading = true;      
+    endif
+  endif
+  % processing READFILE completes the command immediately
+  cmdDoneID = cmdID;
+  
 elseif strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
   showFFTCfg.numAvg = str2num(cmd{2});
   showFFTCfg.restartAvg = 1;

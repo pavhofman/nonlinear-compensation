@@ -8,9 +8,9 @@ endif
 
 
 global deviceName;
-if exist('wavPath', 'var') && !isempty(wavPath)
-    [wavDir, wavName, wavExt] = fileparts(wavPath);
-    deviceName = [wavName wavExt];
+
+if exist('sourceFile', 'var') && !isempty(sourceFile)
+    deviceName = getBasename(sourceFile);
 else
     global playRecConfig;
     if (direction == DIR_PLAY)

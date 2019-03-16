@@ -1,10 +1,6 @@
-function [buffer, fs] = readData(cnt, fs, chanList, restart)
+function [buffer, fs] = readFileData(cnt, fs, sourceFile, chanList, restart)
   persistent allSamples = [];
   persistent readPtr = 1;
-  
-  
-  global wavPath;
-  global audiofileChanList;
   
   if (restart)
     allSamples = [];
@@ -12,7 +8,7 @@ function [buffer, fs] = readData(cnt, fs, chanList, restart)
   endif
 
   if (isempty(allSamples))
-    [allSamples, fs] = loadSamples(wavPath, chanList);
+    [allSamples, fs] = loadSamples(sourceFile, chanList);
   endif
   
   if (cnt == -1)
@@ -48,8 +44,8 @@ function [buffer, fs] = readData(cnt, fs, chanList, restart)
   tic();
 endfunction
 
-function [samples, fs] = loadSamples(wavPath, chanList)
-    [recorded, fs] = audioreadAndCut(wavPath, chanList);
+function [samples, fs] = loadSamples(sourceFile, chanList)
+    [recorded, fs] = audioreadAndCut(sourceFile, chanList);
     limit = floor(length(recorded)/fs) * fs;
     samples = recorded(1:limit, :);
     tic();
