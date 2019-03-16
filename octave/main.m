@@ -61,8 +61,8 @@ calibrationSize = NA;
 % continuous calibration. Default - false
 contCal = false;
 
-sinkFile = '';
 closeSinkFile = false;
+
 
 % init sourcenames and status
 source 'init_sourcename_status.m';
@@ -155,9 +155,9 @@ while(true)
     compenCalFiles = cell(columns(buffer), 1);
   endif
 
-  if containsItem(sinks, FILE_SINK) || closeSinkFile
-    keepWriting = containsItem(sinks, FILE_SINK);
-    writeData(buffer, fs, sinkFile, closeSinkFile, keepWriting);
+  if containsItem(sinkStruct.sinks, FILE_SINK) || closeSinkFile
+    keepWriting = containsItem(sinkStruct.sinks, FILE_SINK);
+    writeData(buffer, fs, sinkStruct.file, closeSinkFile, keepWriting);
     closeSinkFile = false;
   endif
     

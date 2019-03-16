@@ -1,8 +1,8 @@
-sourceFile = NA;
+sourceStruct.file = NA;
 if exist('playRecConfig', 'var')
-  fromSource = PLAYREC_SRC;  
+  sourceStruct.src = PLAYREC_SRC;  
 else
-  fromSource = NA;
+  sourceStruct.src = NA;
 endif
 
 source 'restart_chain.m';

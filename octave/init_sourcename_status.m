@@ -1,11 +1,11 @@
-% init sourceName
-if fromSource == PLAYREC_SRC
-  sourceName = getPlayrecDevName(playRecConfig.recDeviceID);
+% init sourceStruct
+if sourceStruct.src == PLAYREC_SRC
+  sourceStruct.name = getPlayrecDevName(playRecConfig.recDeviceID);
   setStatus(PASSING);
-elseif fromSource == FILE_SRC
-  sourceName = getBasename(sourceFile);
+elseif sourceStruct.src == FILE_SRC
+  sourceStruct.name = getBasename(sourceStruct.file);
   setStatus(PASSING);
 else
-  sourceName = 'None';
+  sourceStruct.name = 'None';
   setStatus(PAUSED);
 endif

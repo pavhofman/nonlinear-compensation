@@ -106,13 +106,10 @@ DEVICE_PLAY_PREFIX = 'play';
 
 FILE_SRC = 1;
 PLAYREC_SRC = 2;
-% default - no source
-fromSource = NA;
 
 FILE_SINK = 1;
 PLAYREC_SINK = 2;
-% default - no sinks
-sinks = [];
+
 
 ZEROMQ_PORT_REC = 5555;
 ZEROMQ_PORT_PLAY = 5556;
@@ -131,3 +128,15 @@ global FILE_CHAN_LIST = [];
 
 # show FFT charts in direction - array of DIR_REC, DIR_PLAY or empty
 global showFFT = [];
+
+global sourceStruct = struct();
+sourceStruct.file = '';
+% default - no source
+sourceStruct.src = NA;
+sourceStruct.name = '';
+
+global sinkStruct = struct();
+sinkStruct.file = '';
+% default - no sinks
+sinkStruct.sinks = [];
+sinkStruct.names = cell();

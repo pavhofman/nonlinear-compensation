@@ -1,6 +1,6 @@
-sinkFile = '';
+sinkStruct.file = '';
 % removing from sinks
-sinks(sinks == FILE_SINK) = [];
+sinkStruct.sinks(sinkStruct.sinks == FILE_SINK) = [];
 
 closeSinkFile = true;
 

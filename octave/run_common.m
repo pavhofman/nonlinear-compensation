@@ -8,8 +8,8 @@ endif
 
 
 global deviceName;
-
-if exist('sourceFile', 'var') && !isempty(sourceFile)
+sourceFile = sourceStruct.file;
+if !isempty(sourceFile)
     deviceName = getBasename(sourceFile);
 else
     global playRecConfig;
