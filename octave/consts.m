@@ -114,6 +114,10 @@ PLAYREC_SINK = 2;
 ZEROMQ_PORT_REC = 5555;
 ZEROMQ_PORT_PLAY = 5556;
 
+% length of one loop cycle in secs. 
+% Intentionally chosen time which is not integer multiple of standard measuring frequencies/harmonics. Integer multiple (e.g. 200ms) hides errors in calculations.
+CYCLE_LENGTH = 0.211;
+
 % minimum level of distortion peaks to be included into calibration profile
 % depends largely on soundcard performance
 global MIN_DISTORT_LEVEL = db2mag(-138);

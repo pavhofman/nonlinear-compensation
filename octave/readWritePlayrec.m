@@ -1,4 +1,4 @@
-function [buffer, fs] = readWritePlayrec(cnt, playBuffer, restart)
+function [buffer, fs] = readWritePlayrec(playBuffer, cycleLength, restart)
     global playRecConfig;
     persistent pageNumList;
     
@@ -40,10 +40,7 @@ function [buffer, fs] = readWritePlayrec(cnt, playBuffer, restart)
         pageBufCount = 5;
     end
 
-    if (cnt == -1)
-      % Intentionally chosen time which is not integer multiple of standard measuring frequencies/harmonics. Integer multiple (e.g. 200ms) hides errors in calculations.
-      cnt = floor(fs * 0.211);
-    endif
+    cnt = floor(fs * cycleLength);
 
     if((ndims(recChanList)~=2) || (size(recChanList, 1)~=1))
         error ('chanList must be a row vector');

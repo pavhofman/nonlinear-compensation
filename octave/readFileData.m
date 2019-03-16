@@ -1,4 +1,4 @@
-function [buffer, fs] = readFileData(cnt, fs, sourceFile, chanList, restart)
+function [buffer, fs] = readFileData(fs, sourceFile, chanList, cycleLength, doWait, restart)
   persistent allSamples = [];
   persistent readPtr = 1;
   
@@ -11,12 +11,7 @@ function [buffer, fs] = readFileData(cnt, fs, sourceFile, chanList, restart)
     [allSamples, fs] = loadSamples(sourceFile, chanList);
   endif
   
-  if (cnt == -1)
-    % requested to determine count internally
-    % 200ms
-    cnt = fs * 0.4;
-  endif
-  
+  cnt = fs * cycleLength;
 
   newPtr = readPtr + cnt - 1;
   if (newPtr <= length(allSamples))
@@ -30,18 +25,10 @@ function [buffer, fs] = readFileData(cnt, fs, sourceFile, chanList, restart)
   endif
   readPtr = newPtr + 1;
   
-  % emulating samplerate timing
-  bufferTime = length(buffer)/fs;
-  delay = toc();
-  if (delay > bufferTime)
-    printf("XRUN: delay: %f, bufferTime %f\n", delay, bufferTime);
-  else
-    % sleep for the remaining time
-    sleepTime = bufferTime - delay;
-    printf("Sleeping for %f\n", sleepTime);
-    pause(sleepTime);
-  endif  
-  tic();
+  if doWait
+    % emulating samplerate timing
+    waitRemainingTime(length(buffer)/fs);
+  endif
 endfunction
 
 function [samples, fs] = loadSamples(sourceFile, chanList)
@@ -49,4 +36,17 @@ function [samples, fs] = loadSamples(sourceFile, chanList)
     limit = floor(length(recorded)/fs) * fs;
     samples = recorded(1:limit, :);
     tic();
+endfunction
+
+function waitRemainingTime(bufferTime)
+  delay = toc();
+  if (delay > bufferTime)
+    printf("XRUN: delay: %f, bufferTime %f\n", delay, bufferTime);
+  else
+    % sleep for the remaining time
+    sleepTime = bufferTime - delay;
+    printf("Sleeping in readFileData for %f\n", sleepTime);
+    pause(sleepTime);
+  endif  
+  tic();
 endfunction
