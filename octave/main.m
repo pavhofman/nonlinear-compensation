@@ -63,12 +63,8 @@ contCal = false;
 
 closeSinkFile = false;
 
-
-% init sourcenames and status
-source 'init_sourcename_status.m';
-
-% init sinkNames
-source 'init_sinknames.m';
+source 'init_sourcestruct.m';
+source 'init_sinkstruct.m';
 
 transfer = struct();
 

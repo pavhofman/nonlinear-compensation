@@ -132,15 +132,3 @@ global FILE_CHAN_LIST = [];
 
 # show FFT charts in direction - array of DIR_REC, DIR_PLAY or empty
 global showFFT = [];
-
-global sourceStruct = struct();
-sourceStruct.file = '';
-% default - no source
-sourceStruct.src = NA;
-sourceStruct.name = '';
-
-global sinkStruct = struct();
-sinkStruct.file = '';
-% default - no sinks
-sinkStruct.sinks = [];
-sinkStruct.names = cell();
