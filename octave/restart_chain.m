@@ -1,5 +1,6 @@
 restartReading = true;
 restartCal = true;
-% close possible file being written
-closeSinkFile = true;
+% clear recorded data
+recordedData = [];
+
 restartMeasuring = true;

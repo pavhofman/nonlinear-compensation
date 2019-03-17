@@ -18,9 +18,12 @@ global MEASURE = 'meas';
 global SPLIT = 'split';
 global SPLIT2 = 'split2';
 
-% reading/writing audio file
+% reading from audio file
 global READFILE = 'readfile';
-global WRITEFILE = 'writefile';
+% record output data
+global RECORD = 'rec';
+% store recorded output data into audio file
+global STORE_RECORDED = 'storerec';
 
 NO_CMD = '';
 
@@ -93,6 +96,7 @@ global CMD_HARM_LEVELS_PREFIX = 'HL';
 % continuous calibration ( cal #CONT1): 1 = yes, 0 = no (default)
 global CMD_CONT_PREFIX = '#CONT';
 
+% for READFILE and STORE_RECORDED
 global CMD_FILEPATH_PREFIX = '#FILE#';
 
 % direction cmd.info files
@@ -107,7 +111,7 @@ DEVICE_PLAY_PREFIX = 'play';
 FILE_SRC = 1;
 PLAYREC_SRC = 2;
 
-FILE_SINK = 1;
+MEMORY_SINK = 1;
 PLAYREC_SINK = 2;
 
 

@@ -1,10 +1,10 @@
 % init sourceStruct
 if sourceStruct.src == PLAYREC_SRC
   sourceStruct.name = getPlayrecDevName(playRecConfig.recDeviceID);
-  setStatus(PASSING);
+  addStatus(PASSING);
 elseif sourceStruct.src == FILE_SRC
   sourceStruct.name = getBasename(sourceStruct.file);
-  setStatus(PASSING);
+  addStatus(PASSING);
 else
   sourceStruct.name = 'None';
   setStatus(PAUSED);

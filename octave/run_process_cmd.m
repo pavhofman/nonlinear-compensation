@@ -82,32 +82,29 @@ elseif (strcmp(cmd{1}, READFILE))
     sourceStruct.file = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No source audio file found in READFILE command, ignoring');
     if ~isempty(sourceStruct.file)
       % start reading file inputFile
-      if sourceStruct.src == PLAYREC_SRC && ~any(sinkStruct.sinks == PLAYREC_SINK)
-        % no playrec required, stop playrec
-        printf('Clearing not used playrec\n');
-        clear playrec;
-      endif
-      sourceStruct.src = FILE_SRC;
-      restartReading = true;      
+      source 'start_reading_file.m';
     endif
   endif
   % processing READFILE completes the command immediately
   cmdDoneID = cmdID;
 
-elseif (strcmp(cmd{1}, WRITEFILE))
+elseif (strcmp(cmd{1}, RECORD))
   if length(cmd) > 1 && strcmp(cmd{2}, 'off')
     % writing file off
-    source 'stop_writing_file.m';
+    source 'stop_recording.m';
   else
-    % WRITEFILE filename
-    % start/restart writing samples to filename    
-    sinkStruct.file = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No sink audio file found in command WRITEFILE');
-    if ~isempty(sinkStruct.file)
-      % start writing sinkFile
-      sinkStruct.sinks = addItemToRow(sinkStruct.sinks, FILE_SINK);
-      % close possible existing sinkFile being already recorded
-      closeSinkFile = true;
-    endif
+    % start/restart recodring samples to memory
+    source 'start_recording.m';
+  endif
+  % processing WRITEFILE completes the command immediately
+  cmdDoneID = cmdID;
+
+elseif (strcmp(cmd{1}, STORE_RECORDED))
+  % STORE_RECORDED filename
+  % write recorded samples to filename    
+  sinkStruct.file = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No sink audio file found in command STORE_RECORDED');
+  if ~isempty(sinkStruct.file)
+    source 'store_recorded_data.m';
   endif
   % processing WRITEFILE completes the command immediately
   cmdDoneID = cmdID;

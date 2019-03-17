@@ -3,8 +3,8 @@ sinkStruct.file = '';
 % default - no sinks
 sinkStruct.sinks = sinks;
 sinkStruct.names = cell();
-% current write position (in secs) in sinkFile (not stored, only in memory)
-sinkStruct.filePos = NA;
+% current length or recorded data (in secs)
+sinkStruct.recLength = NA;
 
 
 % init sinkNames

@@ -61,7 +61,7 @@ calibrationSize = NA;
 % continuous calibration. Default - false
 contCal = false;
 
-closeSinkFile = false;
+recordedData = [];
 
 source 'init_sourcestruct.m';
 source 'init_sinkstruct.m';
@@ -151,10 +151,9 @@ while(true)
     compenCalFiles = cell(columns(buffer), 1);
   endif
   
-  shouldWriteFile = containsItem(sinkStruct.sinks, FILE_SINK);
-  if shouldWriteFile || closeSinkFile
-    writeData(buffer, fs, sinkStruct, closeSinkFile, shouldWriteFile);
-    closeSinkFile = false;
+  % recording to memory if enabled
+  if containsItem(sinkStruct.sinks, MEMORY_SINK)
+    source 'record_data.m';
   endif
     
   if containsItem(showFFT, direction)
