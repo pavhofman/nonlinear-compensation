@@ -17,24 +17,60 @@ function dirStruct = createDirStruct();
   dirStruct.calSingleMenu = NA;
   dirStruct.calContMenu = NA;
   dirStruct.calOffMenu = NA;
+  dirStruct.inTxt = NA;
+  dirStruct.outTxt = NA;
   
 endfunction
 
 function dirStruct = drawDirPanel(fig, x, width, title, dirStruct)
   global CHANNEL_REL_HEIGHT;
   persistent STATUS_TXT_CNT = 5;
+  global TXT_FIELD_HEIGHT;
+  
   panel = uipanel(fig, 
             "title", title,
             "position", [x, 0.1, width, 0.9]);
-  dirStruct = drawChannelPlot(1, 0.01, 0.12, CHANNEL_REL_HEIGHT, 'Left', panel, dirStruct);
-  dirStruct = drawChannelPlot(2, 0.87, 0.12, CHANNEL_REL_HEIGHT, 'Right', panel, dirStruct);
+  % from the top
+  devPanelHeight = 2 * TXT_FIELD_HEIGHT + 0.05;
+  maxFigY = 0.99;
+  
+  devPanelY = maxFigY - devPanelHeight;
+  inDevPanel = uipanel(panel, 
+            "title", 'IN',
+            "position", [0, devPanelY, 0.5, devPanelHeight]);
+  maxDevPanelY = 0.88;
+  inTxt = uicontrol (inDevPanel,
+            "style", "text",
+            "units", "normalized",
+            "horizontalalignment", "left",
+            "verticalalignment", "top",
+            "position", [0.01, 0.01, 1, maxDevPanelY]
+            );
+
+  dirStruct.inTxt = inTxt;
+
+  outDevPanel = uipanel(panel, 
+            "title", 'OUT',
+            "position", [0.5, devPanelY, 0.5, devPanelHeight]);
+            
+  outTxt = uicontrol (outDevPanel,
+            "style", "text",
+            "units", "normalized",
+            "horizontalalignment", "left",
+            "verticalalignment", "top",
+            "position", [0.01, 0.01, 1, maxDevPanelY]
+            );
+  dirStruct.outTxt = outTxt;          
   
   % initializing status txt fields
   statusTxts = cell(STATUS_TXT_CNT, 1);
   for i = 1:STATUS_TXT_CNT
-    statusTxts{i} = drawStatusTxt(i, panel); 
+    statusTxts{i} = drawStatusTxt(i, panel, devPanelY - 0.03); 
   endfor
   dirStruct.statusTxts = statusTxts;
+  
+  dirStruct = drawChannelPlot(1, 0.01, 0.12, CHANNEL_REL_HEIGHT, 'Left', panel, dirStruct);
+  dirStruct = drawChannelPlot(2, 0.87, 0.12, CHANNEL_REL_HEIGHT, 'Right', panel, dirStruct);
   
   
   dirStruct.detailTxts{1} = drawDetailTxt(1, 0.14, 0.35, CHANNEL_REL_HEIGHT, panel);
@@ -60,15 +96,15 @@ function detailTxt = drawDetailTxt(channelID, x, width, height, panel, dirStruct
 endfunction
 
 
-function statusTxt = drawStatusTxt(id, panel)
-  persistent TXT_HEIGHT = 0.026;
+function statusTxt = drawStatusTxt(id, panel, topY)
+  global TXT_FIELD_HEIGHT;
   statusTxt = uicontrol (panel,
             "style", "text",
             "units", "normalized",
             "fontweight", "demi", 
             "horizontalalignment", "left",
             "verticalalignment", "top",
-            "position", [0.02, 0.96 - (TXT_HEIGHT * (id - 1)), 1, TXT_HEIGHT]
+            "position", [0.01, topY - (TXT_FIELD_HEIGHT * (id - 1)), 1, TXT_FIELD_HEIGHT]
             );
 endfunction
 
@@ -93,6 +129,7 @@ function [plotStruct] = initPlot(plotPanel)
   
   set(axis,'Xtick',[])
   set(axis, "ygrid", "on");
+  set(axis, "outerposition",  [0, 0, 1, 1])
   set(axis, "outerposition",  [0, 0, 1, 1])
   
   plotStruct = struct();
@@ -157,11 +194,12 @@ global WIDTH = 1000;
 global HEIGHT = 600;
 
 % relative height of the channel block (plot, detailTxt)
-global CHANNEL_REL_HEIGHT = 0.85;
+global CHANNEL_REL_HEIGHT = 0.75;
 
 global DIR_PANEL_REL_WIDTH = 0.5;
 
 global CH_DISTANCE_X = 0.3
+global TXT_FIELD_HEIGHT = 0.026
 
 global doQuit = false;
 

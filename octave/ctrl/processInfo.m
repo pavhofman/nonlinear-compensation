@@ -20,25 +20,14 @@ function processInfo(info, dirStruct)
   updateMenu(dirStruct, info);
 
   [detailsCh1, detailsCh2] = getStatusDetails(info);
-  updateFieldString(dirStruct.detailTxts{1}, detailsCh1);
-  updateFieldString(dirStruct.detailTxts{2}, detailsCh2);
+  setFieldString(dirStruct.detailTxts{1}, detailsCh1);
+  setFieldString(dirStruct.detailTxts{2}, detailsCh2);
   
   updatePlots(dirStruct, info);
   %disp(info);
-endfunction
-
-function updateFieldString(field, newText)
-  shownText = get(field, 'string');
-  if ~isequal(shownText, newText)
-    set(field, 'string', newText);
-  endif
-endfunction
-
-function updateFieldColor(field, newColor)
-  shownColor = get(field, 'foregroundcolor');
-  if ~isequal(shownColor, newColor)
-    set(field, 'foregroundcolor', newColor);
-  endif
+  
+  setFieldString(dirStruct.inTxt, info.sourceStruct.name);
+  setFieldString(dirStruct.outTxt, info.sinkStruct.names);
 endfunction
 
 function updateStatusTxts(dirStruct, info)
@@ -68,7 +57,7 @@ function updateStatusTxts(dirStruct, info)
     if isfield(statusVal, 'msg') && ~isempty(statusVal.msg)
       statusToShow = [statusToShow ': ' statusVal.msg];
     endif
-    updateFieldString(dirStruct.statusTxts{id}, statusToShow);
+    setFieldString(dirStruct.statusTxts{id}, statusToShow);
 
     if isfield(statusVal, 'result')
       result = statusVal.result;
@@ -81,11 +70,11 @@ function updateStatusTxts(dirStruct, info)
       % indiferent color
       color = BLACK;
     endif
-    updateFieldColor(dirStruct.statusTxts{id}, color);
+    setFieldColor(dirStruct.statusTxts{id}, color);
   endfor
   % clear the rest
   for id = statusCnt + 1:txtCnt
-    updateFieldString(dirStruct.statusTxts{id}, '');
+    setFieldString(dirStruct.statusTxts{id}, '');
   endfor
 endfunction
   
