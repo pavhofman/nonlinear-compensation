@@ -5,6 +5,8 @@ ctrlDir = [currDir filesep() 'ctrl'];
 addpath(ctrlDir);
 statusDir = [currDir filesep() 'status'];
 addpath(statusDir);
+internalDir = [currDir filesep() 'internal'];
+addpath(internalDir);
 
 source 'consts.m';
 

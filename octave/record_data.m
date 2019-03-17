@@ -1,2 +1,2 @@
 recordedData = [recordedData; buffer];
-sinkStruct.recLength = rows(recordedData)/fs;
+sinkStruct.(MEMORY_SINK).recLength = rows(recordedData)/fs;

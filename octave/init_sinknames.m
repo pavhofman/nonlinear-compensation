@@ -1,8 +1,7 @@
 % init sinkNames
-sinkStruct.names = cell();
-if any(sinkStruct.sinks == PLAYREC_SINK)
-  sinkStruct.names{end + 1} = getPlayrecDevName(playRecConfig.playDeviceID);
+if structContains(sinkStruct, PLAYREC_SINK)
+  sinkStruct.(PLAYREC_SINK).name = getPlayrecDevName(playRecConfig.playDeviceID);
 endif
-if any(sinkStruct.sinks == MEMORY_SINK)
-  sinkStruct.names{end + 1} = 'memory buffer';
+if structContains(sinkStruct, MEMORY_SINK)
+  sinkStruct.(MEMORY_SINK).name = 'Recording';
 endif

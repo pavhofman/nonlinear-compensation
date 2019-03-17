@@ -1,6 +1,6 @@
 % start/restart recodring samples to memory
 % start recording
-sinkStruct.sinks = addItemToRow(sinkStruct.sinks, MEMORY_SINK);
+sinkStruct = addFieldToStruct(sinkStruct, MEMORY_SINK);
 % flush old recorded data
 recordedData = [];
 

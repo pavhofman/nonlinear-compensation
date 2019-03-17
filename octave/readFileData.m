@@ -1,4 +1,4 @@
-function [buffer, fs] = readFileData(fs, sourceStruct, chanList, cycleLength, doWait, restart)
+function [buffer, fs, sourceStruct] = readFileData(fs, sourceStruct, chanList, cycleLength, doWait, restart)
   persistent allSamples = [];
   persistent readPtr = 1;
   

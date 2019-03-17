@@ -107,12 +107,13 @@ global CMD_FILE_PLAY = 'cmd-play.info';
 DEVICE_REC_PREFIX = 'rec';
 DEVICE_PLAY_PREFIX = 'play';
 
+% source - numerical values
+global FILE_SRC = 1;
+global PLAYREC_SRC = 2;
 
-FILE_SRC = 1;
-PLAYREC_SRC = 2;
-
-MEMORY_SINK = 1;
-PLAYREC_SINK = 2;
+% sinks are fields of dynamic structs, must be strings
+global MEMORY_SINK = 'MEM';
+global PLAYREC_SINK = 'PR';
 
 
 ZEROMQ_PORT_REC = 5555;

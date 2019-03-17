@@ -1,11 +1,6 @@
 global sinkStruct = struct();
-sinkStruct.file = '';
-% default - no sinks
-sinkStruct.sinks = sinks;
-sinkStruct.names = cell();
-% current length or recorded data (in secs)
-sinkStruct.recLength = NA;
-
-
+if exist('sink', 'var')
+  sinkStruct = addFieldToStruct(sinkStruct, sink);
+endif
 % init sinkNames
 source 'init_sinknames.m';

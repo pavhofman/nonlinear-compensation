@@ -101,9 +101,10 @@ elseif (strcmp(cmd{1}, RECORD))
 
 elseif (strcmp(cmd{1}, STORE_RECORDED))
   % STORE_RECORDED filename
-  % write recorded samples to filename    
-  sinkStruct.file = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No sink audio file found in command STORE_RECORDED');
-  if ~isempty(sinkStruct.file)
+  % write recorded samples to filename
+  sinkStruct = addFieldToStruct(sinkStruct, MEMORY_SINK);
+  sinkStruct.(MEMORY_SINK).file = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No sink audio file found in command STORE_RECORDED');
+  if ~isempty(sinkStruct.(MEMORY_SINK).file)
     source 'store_recorded_data.m';
   endif
   % processing WRITEFILE completes the command immediately

@@ -152,7 +152,7 @@ while(true)
   endif
   
   % recording to memory if enabled
-  if containsItem(sinkStruct.sinks, MEMORY_SINK)
+  if structContains(sinkStruct, MEMORY_SINK)
     source 'record_data.m';
   endif
     
