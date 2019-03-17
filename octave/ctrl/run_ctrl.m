@@ -3,7 +3,7 @@ pkg load database;
 
 more off;
   
-function dirStruct = createDirStruct();
+function dirStruct = createDirStruct(dir);
   dirStruct = struct();
   dirStruct.plotPanels = cell(2);
   dirStruct.axes = cell(2);
@@ -19,6 +19,7 @@ function dirStruct = createDirStruct();
   dirStruct.calOffMenu = NA;
   dirStruct.sourceTxt = NA;
   dirStruct.sinkTxt = NA;
+  dirStruct.dir = dir;
   
 endfunction
 
@@ -108,11 +109,6 @@ function statusTxt = drawStatusTxt(id, panel, topY)
             );
 endfunction
 
-function clbkCalibrateFreqs(src, data)
-  % calling scheduler-enabled calibration
-  calibrateFreqsSched();
-endfunction
-
 function [plotStruct] = initPlot(plotPanel)
   axis = axes ('parent', plotPanel);
   x = [];
@@ -140,47 +136,6 @@ function [plotStruct] = initPlot(plotPanel)
   plotStruct.curLine = curLine;
   % line with last level points before calibration
   plotStruct.lastLine = lastLine;
-endfunction
-
-function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
-  global cmdFileRec;
-  global cmdFilePlay;
-  global COMPENSATE;
-  global PASS;
-  global DISTORT;
-  global GENERATE;
-
-  fPass = @(src, data, cmdFile) writeCmd(PASS, cmdFile);
-  fComp = @(src, data, cmdFile) writeCmd(COMPENSATE, cmdFile);
-
-  playMenu = uimenu (fig, "label", "&Playback");
-  uimenu(playMenu, "label", "Pass", "callback", {fPass, cmdFilePlay});
-  uimenu(playMenu, "label", "Compensate", "callback", {fComp, cmdFilePlay});
-  uimenu(playMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Playback Side', cmdFilePlay});
-  playStruct.genOffMenu = uimenu(playMenu, "label", "Stop Generating", 'visible', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFilePlay});  
-  playStruct.distortOnMenu = uimenu(playMenu, "label", "Distort", "callback", {@clbkDistort, 'Distort on Playback Side', cmdFilePlay});
-  playStruct.distortOffMenu = uimenu(playMenu, "label", "Stop Distorting", 'visible', 'off', "callback", {@clbkCmdOff, DISTORT, cmdFilePlay});
- 
-  recMenu = uimenu (fig, "label", "&Capture");
-  uimenu(recMenu, "label", "Pass", "callback", {fPass, cmdFileRec});
-  uimenu(recMenu, "label", "Compensate", "callback", {fComp, cmdFileRec});
-  recStruct.calSingleMenu = uimenu(recMenu, "label", "Calibrate Single Run", "callback", {@clbkCalib, false});
-  recStruct.calContMenu = uimenu(recMenu, "label", "Calibrate Continuously", "callback", {@clbkCalib, true});
-  recStruct.calOffMenu = uimenu(recMenu, "label", "Stop Calibrating", 'visible', 'off', "callback", @clbkCalibOff);
-  uimenu(recMenu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, 'Generate on Capture Side', cmdFileRec});
-  recStruct.genOffMenu = uimenu(recMenu, "label", "Stop Generating", 'visible', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFileRec});  
-  recStruct.distortOnMenu = uimenu(recMenu, "label", "Distort", "callback", {@clbkDistort, 'Distort on Capture Side', cmdFileRec});
-  recStruct.distortOffMenu = uimenu(recMenu, "label", "Stop Distorting", 'visible', 'off', "callback", {@clbkCmdOff, DISTORT, cmdFileRec});
-  
-  tasksMenu = uimenu (fig, "label", "&Tasks");
-  
-  uimenu(tasksMenu, "label", "Calibrate VD Freqs", 'callback', @clbkCalibrateFreqs);
-  uimenu(tasksMenu, "label", "Joint-Dev. Compen. VD", 'callback', @clbkCompenVD);
-  uimenu(tasksMenu, "label", "Calibrate LPF", 'callback', @clbkCalibrateLPF);
-  uimenu(tasksMenu, "label", "Joint-Dev. Compen. LPF", 'callback', @clbkCompenLPF);
-  uimenu(tasksMenu, "label", "Measure Filter", 'callback', @clbkMeasureFilter);
-  uimenu(tasksMenu, "label", "Split Calibration", 'callback', @clbkSplitCalibrate);
-  uimenu(tasksMenu, "label", "Split-Dev. Compen. Sides", 'callback', @clbkSplitCompen);
 endfunction
 
 
@@ -216,8 +171,8 @@ set(fig, "toolbar", "none");
 
 set(fig, 'DeleteFcn', @(h, e) doExit(fig));
 
-global playStruct = createDirStruct();
-global recStruct = createDirStruct();
+global playStruct = createDirStruct(DIR_PLAY);
+global recStruct = createDirStruct(DIR_REC);
 
 [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
