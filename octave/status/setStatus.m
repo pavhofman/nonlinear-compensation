@@ -2,5 +2,5 @@
 function setStatus(newStatus)
   global statusStruct;
   statusStruct = struct();
-  statusStruct.(newStatus) = struct();
+  statusStruct = addFieldToStruct(statusStruct, newStatus);
 endfunction

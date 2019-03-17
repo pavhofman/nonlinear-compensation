@@ -1,4 +1,4 @@
 function result = isStatus (testedStatus)
   global statusStruct;
-  result = numfields(statusStruct) == 1 && statusContains(testedStatus);
+  result = structContainsOnly(statusStruct, testedStatus);
 endfunction
