@@ -17,8 +17,8 @@ function dirStruct = createDirStruct();
   dirStruct.calSingleMenu = NA;
   dirStruct.calContMenu = NA;
   dirStruct.calOffMenu = NA;
-  dirStruct.inTxt = NA;
-  dirStruct.outTxt = NA;
+  dirStruct.sourceTxt = NA;
+  dirStruct.sinkTxt = NA;
   
 endfunction
 
@@ -39,7 +39,7 @@ function dirStruct = drawDirPanel(fig, x, width, title, dirStruct)
             "title", 'IN',
             "position", [0, devPanelY, 0.5, devPanelHeight]);
   maxDevPanelY = 0.88;
-  inTxt = uicontrol (inDevPanel,
+  sourceTxt = uicontrol (inDevPanel,
             "style", "text",
             "units", "normalized",
             "horizontalalignment", "left",
@@ -47,20 +47,20 @@ function dirStruct = drawDirPanel(fig, x, width, title, dirStruct)
             "position", [0.01, 0.01, 1, maxDevPanelY]
             );
 
-  dirStruct.inTxt = inTxt;
+  dirStruct.sourceTxt = sourceTxt;
 
   outDevPanel = uipanel(panel, 
             "title", 'OUT',
             "position", [0.5, devPanelY, 0.5, devPanelHeight]);
             
-  outTxt = uicontrol (outDevPanel,
+  sinkTxt = uicontrol (outDevPanel,
             "style", "text",
             "units", "normalized",
             "horizontalalignment", "left",
             "verticalalignment", "top",
             "position", [0.01, 0.01, 1, maxDevPanelY]
             );
-  dirStruct.outTxt = outTxt;          
+  dirStruct.sinkTxt = sinkTxt;          
   
   % initializing status txt fields
   statusTxts = cell(STATUS_TXT_CNT, 1);

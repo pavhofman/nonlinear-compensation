@@ -25,10 +25,42 @@ function processInfo(info, dirStruct)
   
   updatePlots(dirStruct, info);
   %disp(info);
-  
-  setFieldString(dirStruct.inTxt, info.sourceStruct.name);
-  setFieldString(dirStruct.outTxt, info.sinkStruct.names);
+    
+  updateSourceField(dirStruct.sourceTxt, info.sourceStruct);
+  updateSinkField(dirStruct.sinkTxt, info.sinkStruct);
 endfunction
+
+function updateSourceField(sourceTxt, sourceStruct)
+  global PLAYREC_SRC;
+  str = sourceStruct.name;
+  if sourceStruct.src == PLAYREC_SRC
+    str = ['DEV ' str];
+  else
+    str = ['FILE ' str];
+    if ~isna(sourceStruct.filePos)
+      str = [str ' ' num2str(ceil(sourceStruct.filePos)) '/' num2str(ceil(sourceStruct.fileLength)) 's'];
+    endif
+  endif
+  setFieldString(sourceTxt, str);
+endfunction
+
+function updateSinkField(sinkTxt, sinkStruct)
+  global PLAYREC_SINK;
+  lines = cell();
+  for [detailsStruct, sink] = sinkStruct
+    str = detailsStruct.name;
+    if strcmp(sink, PLAYREC_SINK)
+      str = ['DEV ' str];
+    else      
+      if ~isna(detailsStruct.recLength)
+        str = [str ' ' num2str(ceil(detailsStruct.recLength)) 's'];
+      endif
+    endif
+    lines{end + 1} = str;
+  endfor
+  setFieldString(sinkTxt, lines);
+endfunction
+
 
 function updateStatusTxts(dirStruct, info)
   persistent GREEN = [0, 0.5, 0];
