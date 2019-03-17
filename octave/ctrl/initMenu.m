@@ -27,14 +27,16 @@ function dirStruct = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
   global PASS;
   global DISTORT;
   global GENERATE;
+  global READFILE;
+  global RECORD;
+  global STORE_RECORDED;
   global DIR_REC;
   
-  fPass = @(src, data, cmdFile) writeCmd(PASS, cmdFile);
-  fComp = @(src, data, cmdFile) writeCmd(COMPENSATE, cmdFile);
+  fCmd = @(src, data, cmd, cmdFile) writeCmd(cmd, cmdFile);
 
   menu = uimenu (fig, "label", label);
-  uimenu(menu, "label", "Pass", "callback", {fPass, cmdFile});
-  uimenu(menu, "label", "Compensate", "callback", {fComp, cmdFile});
+  uimenu(menu, "label", "Pass", "callback", {fCmd, PASS, cmdFile});
+  uimenu(menu, "label", "Compensate", "callback", {fCmd, COMPENSATE, cmdFile});
   if (dirStruct.dir == DIR_REC)
     dirStruct.calSingleMenu = uimenu(menu, "label", "Calibrate Single Run", "callback", {@clbkCalib, false});
     dirStruct.calContMenu = uimenu(menu, "label", "Calibrate Continuously", "callback", {@clbkCalib, true});
@@ -44,4 +46,9 @@ function dirStruct = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
   dirStruct.genOffMenu = uimenu(menu, "label", "Stop Generating", 'visible', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFile});  
   dirStruct.distortOnMenu = uimenu(menu, "label", "Distort", "callback", {@clbkDistort, ['Distort on ' sideName ' Side'], cmdFile});
   dirStruct.distortOffMenu = uimenu(menu, "label", "Stop Distorting", 'visible', 'off', "callback", {@clbkCmdOff, DISTORT, cmdFile});
+  dirStruct.readfileMenu = uimenu(menu, "label", "Read from Audiofile", 'separator', 'on', "callback", {@clbkReadFile, cmdFile});
+  dirStruct.readfileOffMenu = uimenu(menu, "label", "Stop File Reading", 'enable', 'off', "callback", {@clbkCmdOff, READFILE, cmdFile});
+  dirStruct.recordMenu = uimenu(menu, "label", "Start Recording to Memory", 'separator', 'on', "callback", {fCmd, RECORD, cmdFile});
+  dirStruct.recordOffMenu = uimenu(menu, "label", "Stop Recording", 'enable', 'off', "callback", {@clbkCmdOff, RECORD, cmdFile});
+  dirStruct.storeRecordedMenu = uimenu(menu, "label", "Store Recording to File", 'enable', 'off', "callback", {@clbkStoreRec, cmdFile});  
 endfunction

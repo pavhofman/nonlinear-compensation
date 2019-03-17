@@ -11,12 +11,22 @@ function dirStruct = createDirStruct(dir);
   dirStruct.measPlots = cell(2);
   dirStruct.statusTxts = NA;
   dirStruct.detailTxts = cell(2);
+  
   dirStruct.distortOnMenu = NA;
   dirStruct.distortOffMenu = NA;
+  
   dirStruct.genOffMenu = NA;
+  
   dirStruct.calSingleMenu = NA;
   dirStruct.calContMenu = NA;
   dirStruct.calOffMenu = NA;
+  
+  dirStruct.readfileMenu = NA;
+  dirStruct.readfileOffMenu = NA;
+  dirStruct.recordMenu = NA;
+  dirStruct.recordOffMenu = NA;
+  dirStruct.storeRecordedMenu = NA;
+  
   dirStruct.sourceTxt = NA;
   dirStruct.sinkTxt = NA;
   dirStruct.dir = dir;

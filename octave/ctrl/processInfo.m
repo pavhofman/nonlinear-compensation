@@ -12,10 +12,6 @@ function processInfo(info, dirStruct)
   %info.calFreqs;
   %info.direction = direction;
   
-  %dirStruct.statusTxt = NA;
-  %dirStruct.detailTxts = cell(2);
-
-  
   updateStatusTxts(dirStruct, info);
   updateMenu(dirStruct, info);
 
@@ -251,6 +247,24 @@ function updateMenu(dirStruct, info)
       setEnabled(dirStruct.calSingleMenu, false);
       setEnabled(dirStruct.calContMenu, false);
     endif
+  endif
+  
+  global FILE_SRC;
+  if info.sourceStruct.src == FILE_SRC
+    % is running from file
+    setEnabled(dirStruct.readfileOffMenu, true);
+  else
+    setEnabled(dirStruct.readfileOffMenu, false);
+  endif
+  
+  global MEMORY_SINK;  
+  if structContains(info.sinkStruct, MEMORY_SINK)
+    % is recording
+    setEnabled(dirStruct.recordOffMenu, true);
+    setEnabled(dirStruct.storeRecordedMenu, true);
+  else
+    setEnabled(dirStruct.recordOffMenu, false);
+    setEnabled(dirStruct.storeRecordedMenu, false);
   endif
 endfunction
 
