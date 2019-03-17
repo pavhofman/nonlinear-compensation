@@ -1,5 +1,5 @@
 % writing to fileaudio
-function writeData(buffer, fs, sinkFile, closeFile, keepWriting)
+function writeData(buffer, fs, sinkStruct, closeFile, keepWriting)
   persistent contents = [];
   persistent currentFile = '';
   
@@ -13,7 +13,8 @@ function writeData(buffer, fs, sinkFile, closeFile, keepWriting)
   endif
   
   if keepWriting
-    currentFile = sinkFile;
+    currentFile = sinkStruct.file;
     contents = [contents; buffer];
+    sinkStruct.filePos = rows(contents)/fs;
   endif
 endfunction

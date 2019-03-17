@@ -1,4 +1,4 @@
-function [buffer, fs] = readFileData(fs, sourceFile, chanList, cycleLength, doWait, restart)
+function [buffer, fs] = readFileData(fs, sourceStruct, chanList, cycleLength, doWait, restart)
   persistent allSamples = [];
   persistent readPtr = 1;
   
@@ -8,7 +8,9 @@ function [buffer, fs] = readFileData(fs, sourceFile, chanList, cycleLength, doWa
   endif
 
   if (isempty(allSamples))
-    [allSamples, fs] = loadSamples(sourceFile, chanList);
+    [allSamples, fs] = audioreadAndCut(sourceStruct.file, chanList);
+    % in secs
+    sourceStruct.fileLength = rows(allSamples)/fs;
   endif
   
   cnt = fs * cycleLength;
@@ -23,19 +25,13 @@ function [buffer, fs] = readFileData(fs, sourceFile, chanList, cycleLength, doWa
     newPtr -= length(allSamples);
     buffer = [allSamples(readPtr:end, :); allSamples(1:newPtr, :)];
   endif
+  sourceStruct.filePos = newPtr/fs;
   readPtr = newPtr + 1;
   
   if doWait
     % emulating samplerate timing
     waitRemainingTime(length(buffer)/fs);
   endif
-endfunction
-
-function [samples, fs] = loadSamples(sourceFile, chanList)
-    [recorded, fs] = audioreadAndCut(sourceFile, chanList);
-    limit = floor(length(recorded)/fs) * fs;
-    samples = recorded(1:limit, :);
-    tic();
 endfunction
 
 function waitRemainingTime(bufferTime)

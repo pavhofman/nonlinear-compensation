@@ -14,7 +14,7 @@ else
 endif
     
 if sourceStruct.src == FILE_SRC
-  [buffer, fs] = readFileData(fs, sourceStruct.file, FILE_CHAN_LIST, CYCLE_LENGTH, ~hasWaited, restartReading);
+  [buffer, fs] = readFileData(fs, sourceStruct, FILE_CHAN_LIST, CYCLE_LENGTH, ~hasWaited, restartReading);
 endif
 
 restartReading = false;

@@ -150,10 +150,10 @@ while(true)
     % for all other statuses - clear compenCalFiles
     compenCalFiles = cell(columns(buffer), 1);
   endif
-
-  if containsItem(sinkStruct.sinks, FILE_SINK) || closeSinkFile
-    keepWriting = containsItem(sinkStruct.sinks, FILE_SINK);
-    writeData(buffer, fs, sinkStruct.file, closeSinkFile, keepWriting);
+  
+  shouldWriteFile = containsItem(sinkStruct.sinks, FILE_SINK);
+  if shouldWriteFile || closeSinkFile
+    writeData(buffer, fs, sinkStruct, closeSinkFile, shouldWriteFile);
     closeSinkFile = false;
   endif
     
