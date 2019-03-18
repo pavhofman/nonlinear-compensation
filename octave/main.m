@@ -33,7 +33,17 @@ endif
 
 transferFile = genDataPath('transf.dat');
 % default initial command - PASS
-cmd = cellstr(PASS);
+
+
+source 'init_sourcestruct.m';
+source 'init_sinkstruct.m';
+
+
+if sourceStruct.src == PLAYREC_SRC
+  cmd = cellstr(PASS);
+else
+  cmd = cellstr(PAUSE);
+endif
 
 % command ID
 cmdID = '';
@@ -62,9 +72,6 @@ calibrationSize = NA;
 contCal = false;
 
 recordedData = [];
-
-source 'init_sourcestruct.m';
-source 'init_sinkstruct.m';
 
 transfer = struct();
 
@@ -106,6 +113,7 @@ while(true)
   if (isStatus(PAUSED))
     % no reading/writing
     pause(0.5);
+    printf('Paused\n');
     % next cycle
     continue;
   endif
@@ -169,5 +177,5 @@ while(true)
     source 'run_splitting.m';
   endif
 
-  sendInfo(buildInfo(), zeromqPort);
+  %sendInfo(buildInfo(), zeromqPort);
 endwhile
