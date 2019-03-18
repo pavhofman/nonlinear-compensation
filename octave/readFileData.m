@@ -11,6 +11,10 @@ function [buffer, fs, sourceStruct] = readFileData(fs, sourceStruct, chanList, c
     [allSamples, fs] = audioreadAndCut(sourceStruct.file, chanList);
     % in secs
     sourceStruct.fileLength = rows(allSamples)/fs;
+    % only start timing when waiting required
+    if doWait
+      tic();
+    endif
   endif
   
   cnt = fs * cycleLength;
