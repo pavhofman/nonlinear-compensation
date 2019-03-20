@@ -110,13 +110,18 @@ elseif (strcmp(cmd{1}, STORE_RECORDED))
   % processing WRITEFILE completes the command immediately
   cmdDoneID = cmdID;
   
-elseif strcmp(cmd{1}, AVG) && (rows(cmd) > 1)
-  showFFTCfg.numAvg = str2num(cmd{2});
-  showFFTCfg.restartAvg = 1;
-
-elseif strcmp(cmd{1}, FFT) && (rows(cmd) > 1)
-  showFFTCfg.fftSize = str2num(cmd{2});
-  showFFTCfg.restartAvg = 1;
+elseif strcmp(cmd{1}, SHOW_FFT)
+  if length(cmd) > 1 && strcmp(cmd{2}, 'off')
+    % disable showing fftoff
+    closeFFTFigure();
+  else
+    showFFTCfg.enabled = true;
+    showFFTCfg.numAvg = findNumInCmd(cmd, CMD_FFTAVG_PREFIX, 0);
+    showFFTCfg.fftSize = findNumInCmd(cmd, CMD_FFTSIZE_PREFIX, 2^16);
+    showFFTCfg.restartAvg = 1;    
+  endif
+  % processing SHOWFFT completes the command immediately
+  cmdDoneID = cmdID;
 
 elseif strcmp(cmd{1}, GENERATE)
   if length(cmd) > 1 && strcmp(cmd{2}, 'off')

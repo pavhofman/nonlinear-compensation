@@ -164,7 +164,7 @@ while(true)
     source 'record_data.m';
   endif
     
-  if containsItem(showFFT, direction)
+  if showFFTCfg.enabled
     % should show FFT figure for this direction
     showFFTFigure(buffer, fs, direction)
   endif

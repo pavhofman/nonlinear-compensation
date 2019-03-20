@@ -12,6 +12,7 @@ function info = buildInfo()
   global reloadCalFiles;
   global sourceStruct;
   global sinkStruct;
+  global showFFTCfg;
   
 
   info.id = NA;
@@ -29,6 +30,8 @@ function info = buildInfo()
   
   info.sourceStruct = sourceStruct;
   info.sinkStruct = sinkStruct;
+  
+  info.showingFFT = showFFTCfg.enabled;
 
   info.fs = fs;
   info.cmdDoneID = cmdDoneID;

@@ -1,5 +1,4 @@
 function showFFTFigure(samples, fs, direction)
-  persistent fftFigure = 0;
   persistent fftLine = [];
   persistent fftSize = 0;
   persistent fftFs = 0;
@@ -8,20 +7,35 @@ function showFFTFigure(samples, fs, direction)
   persistent yavg;
   persistent yavgn;
   persistent sampleBuffer = [];
+  
   global showFFTCfg;
 
-  if fftFigure == 0
-    fftFigure = figure;
-    fftAxes = axes('parent', fftFigure, 'xlimmode', 'manual', 'ylimmode', 'manual', 'xscale', 'log', 'yscale', 'linear', 'xlim', [10 fs/2], 'ylim', [-160, 0]);
-    xlabel('Frequency (Hz)', 'fontsize', 10);
-    ylabel('Magnitude (dB)', 'fontsize', 10);
-    % change the tick labels of the graph from scientific notation to floating point:
-    xt = get(gca,'XTick');
-    set(gca,'XTickLabel', sprintf('%.0f|',xt))
-    addlistener(gca, 'xlim', @logXTickZoomHandler)
+  if isna(showFFTCfg.fig)
+    % initialization
+    global DIR_REC;
+    if direction == DIR_REC
+      side = 'Capture';
+    else
+      side = 'Playback';
+    endif
+  
+    showFFTCfg.fig = figure('numbertitle', 'off', 'name', [side ' side FFT']);
+    set(showFFTCfg.fig, 'DeleteFcn', @(h, e) closeFFTFigure());
+    fftAxes = axes('parent', showFFTCfg.fig, 'xlimmode', 'manual', 'ylimmode', 'manual', 'xscale', 'log', 'yscale', 'linear', 'xlim', [10 fs/2], 'ylim', [-160, 0]);
+    xlabel(fftAxes, 'Frequency (Hz)', 'fontsize', 10);
+    ylabel(fftAxes, 'Magnitude (dB)', 'fontsize', 10);
+    % change the tick labels of the graph from exponent to floating point:
+    xt = get(fftAxes,'XTick');
+    set(fftAxes,'XTickLabel', sprintf('%.0f|', xt))
+    addlistener(fftAxes, 'xlim', @logXTickZoomHandler)
+    % clearing vars
+    fftLine = [];
+    fftSize = 0;
+    fftFs = 0;
+    sampleBuffer = [];
   end
-  if (showFFTCfg.fftSize != fftSize) ...
-      || (fs != fftFs)
+  
+  if (showFFTCfg.fftSize != fftSize) || (fs != fftFs)
     fftFs = fs;
     fftSize = showFFTCfg.fftSize;
     fftXAxisData = (0 : (fftSize / 2)) * fs / fftSize;
@@ -30,7 +44,7 @@ function showFFTFigure(samples, fs, direction)
         if (i <= length(fftLine)) && ishandle(fftLine(i))
             delete(fftLine(i))
         end
-        fftLine(i) = line(
+        fftLine(i) = line(fftAxes,
                 'XData', fftXAxisData,
                 'YData', ones(1, fftSize/2 + 1),
                 'Color', char(colors(i)));
@@ -58,7 +72,7 @@ function showFFTFigure(samples, fs, direction)
     nsamples = rows(samples);
   end
 
-  if ishandle(fftFigure)
+  if ishandle(showFFTCfg.fig)
     recFFT = fft(samples .* winfun)';
     yc = recFFT(:, 1:fftSize/2 + 1) / (fftSize/2 * winmean);
     y = abs(yc);

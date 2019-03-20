@@ -8,8 +8,8 @@ global CALIBRATE = 'cal';
 global COMPENSATE = 'comp';
 global PASS = 'pass';
 global DISTORT = 'distort';
-AVG = 'avg';
-FFT = 'fft';
+% show fft chart ('off' to disable)
+global SHOW_FFT = 'showfft';
 % sine generator
 global GENERATE = 'gen';
 % measure transfer at frequency and channel
@@ -99,6 +99,11 @@ global CMD_CONT_PREFIX = '#CONT#';
 % for READFILE and STORE_RECORDED
 global CMD_FILEPATH_PREFIX = '#FILE#';
 
+% for SHOW_FFT - number of averages: #AVG#100
+global CMD_FFTAVG_PREFIX = '#AVG#';
+% for SHOW_FFT - fftsize: #SIZE#65536
+global CMD_FFTSIZE_PREFIX = '#SIZE#';
+
 % direction cmd.info files
 global CMD_FILE_REC = 'cmd.info';
 global CMD_FILE_PLAY = 'cmd-play.info';
@@ -128,15 +133,14 @@ CYCLE_LENGTH = 0.211;
 global MIN_DISTORT_LEVEL = db2mag(-138);
 
 global showFFTCfg = struct();
+showFFTCfg.fig = NA;
+showFFTCfg.enabled = false
 showFFTCfg.numAvg = 0;
 showFFTCfg.restartAvg = 0;
 showFFTCfg.fftSize = 2^16;
 
 % array of specific channel numbers from/to audio file or empty = all channels in input
 global FILE_CHAN_LIST = [];
-
-# show FFT charts in direction - array of DIR_REC, DIR_PLAY or empty
-global showFFT = [];
 
 % should send info (i.e. use zeroMQ library)
 useZeroMQ = true;
