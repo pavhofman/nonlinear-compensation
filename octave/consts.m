@@ -77,24 +77,24 @@ global FAILED_RESULT = -1; % finished, bad
 
 % CMD prefices
 % format: ID25
-global CMD_ID_PREFIX = "ID";
+global CMD_ID_PREFIX = "#ID#";
 % F3000
-global CMD_FREQ_PREFIX = 'F';
+global CMD_FREQ_PREFIX = '#F#';
 %A0.8945
-global CMD_AMPL_PREFIX = 'A';
+global CMD_AMPL_PREFIX = '#A#';
 %ECfilter
-global CMD_EXTRA_CIRCUIT_PREFIX = 'EC';
+global CMD_EXTRA_CIRCUIT_PREFIX = '#EC#';
 %DNrec8
-global CMD_DEVICE_NAME_PREFIX = 'DN';
+global CMD_DEVICE_NAME_PREFIX = '#DN#';
 % format for generator
 %CH[1000,0.85;2000,0.85]
-global CMD_CHANNEL_FUND_PREFIX = 'CH';
+global CMD_CHANNEL_FUND_PREFIX = '#CH#';
 % format for distortion - HL = Harmonic Level
 %HL[-120,NA,-130]
-global CMD_HARM_LEVELS_PREFIX = 'HL';
+global CMD_HARM_LEVELS_PREFIX = '#HL#';
 
 % continuous calibration ( cal #CONT1): 1 = yes, 0 = no (default)
-global CMD_CONT_PREFIX = '#CONT';
+global CMD_CONT_PREFIX = '#CONT#';
 
 % for READFILE and STORE_RECORDED
 global CMD_FILEPATH_PREFIX = '#FILE#';

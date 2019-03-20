@@ -32,7 +32,7 @@ function prompt = getPrompt(channelCnt, freqCnt)
       prompt{end + 1} = ['CH' num2str(channelID) ': Amplitude ' num2str(freqID) ' (<-1, 1>)'];
     endfor
   endfor
-  prompt{end + 1} = 'Command String: e.g. CH1[2000,0.4;3000,0.5] [2000,-0.4;3000,-0.5]';
+  prompt{end + 1} = 'Command String: e.g. #CH#[2000,0.4;3000,0.5] [2000,-0.4;3000,-0.5]';
 endfunction
 
 function rowscols = getRowscols(channelCnt, freqCnt)
