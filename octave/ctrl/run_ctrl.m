@@ -27,6 +27,9 @@ function dirStruct = createDirStruct(dir);
   dirStruct.recordOffMenu = NA;
   dirStruct.storeRecordedMenu = NA;
   
+  dirStruct.fftMenu = NA;
+  dirStruct.fftOffMenu = NA;
+  
   dirStruct.sourceTxt = NA;
   dirStruct.sinkTxt = NA;
   dirStruct.dir = dir;
