@@ -137,3 +137,6 @@ global FILE_CHAN_LIST = [];
 
 # show FFT charts in direction - array of DIR_REC, DIR_PLAY or empty
 global showFFT = [];
+
+% should send info (i.e. use zeroMQ library)
+useZeroMQ = true;

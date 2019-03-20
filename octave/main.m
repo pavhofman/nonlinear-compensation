@@ -177,5 +177,7 @@ while(true)
     source 'run_splitting.m';
   endif
 
-  %sendInfo(buildInfo(), zeromqPort);
+  if useZeroMQ
+    sendInfo(buildInfo(), zeromqPort);
+  endif
 endwhile
