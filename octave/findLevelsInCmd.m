@@ -16,7 +16,7 @@ function levels = findLevelsInCmd(cmd, prefix, defaultValue = [], defaultMsg = '
     % did not find any
     levels = defaultValue;
     if ~isempty(defaultMsg)
-      printf(defaultMsg);
+      writeLog('DEBUG', defaultMsg);
     endif
   endif
 endfunction

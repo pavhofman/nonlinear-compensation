@@ -233,9 +233,9 @@ while (~doQuit)
     recInfo = rcvInfo(recSock);
   until isempty(recInfo) || recInfo.time > time() - MAX_INFO_AGE
   if isempty(recInfo)
-    printf('Empty rec info\n');
+    writeLog('DEBUG', 'Empty rec info');
   else
-    printf('Processing rec info\n');
+    writeLog('DEBUG', 'Processing rec info');
     processInfo(recInfo, recStruct);
   endif
 
@@ -244,9 +244,9 @@ while (~doQuit)
     playInfo = rcvInfo(playSock);
   until isempty(playInfo) || playInfo.time > time() - MAX_INFO_AGE
   if isempty(playInfo)
-    printf('Empty play info\n');
+    writeLog('DEBUG', 'Empty play info');
   else
-    printf('Processing play info\n');
+    writeLog('DEBUG', 'Processing play info');
     processInfo(playInfo, playStruct);
   endif
 

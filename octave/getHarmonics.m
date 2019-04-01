@@ -28,11 +28,10 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
     [fundPeaksCh, errorMsgCh] = findFundPeaksCh(x, ycCh, yCh);
     if rows(fundPeaksCh) == 0
       % error, will PASS
-      printf("Did not find any fundPeaks\n");
+      writeLog('DEBUG', "Did not find any fundPeaks in channelID %d", channelID);
     elseif rows(fundPeaksCh) > 2
-      printf("Found fundPeaks for channel ID %d:\n", channelID);
-      disp(fundPeaksCh);
-      printf("That is more than 2 supported, will send no fund peaks\n");
+      writeLog('DEBUG', "Found fundPeaks for channel ID %d: %s", channelID, disp(fundPeaksCh));
+      writeLog('DEBUG', "That is more than 2 supported, will send no fund peaks");
       fundPeaksCh = [];
     endif
     % Must use double! Result of time() converted to single returns incorrect time.
@@ -50,10 +49,7 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
     endif    
   endfor  
  
-  printf('Determined fundamental peaks\n');
-  %disp(fundPeaks);
   if genDistortPeaks
-    printf('Determined distortion peaks\n');
-    %disp(distortPeaks);
+    writeLog('DEBUG', 'Determined distortion peaks: %s', disp(distortPeaks));
   endif
 endfunction

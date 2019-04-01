@@ -32,7 +32,7 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   endif
 
   runID += 1;
-  printf('Measuring calibration peaks for run ID %d\n', runID);    
+  writeLog('DEBUG', 'Measuring calibration peaks for run ID %d', runID);    
 
   % calculate FFT peaks
   [fundPeaks, distortPeaks] = getHarmonics(calBuffer, fs);
@@ -55,17 +55,15 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
       allDistortPeaks = cell(channelCnt, MAX_RUNS);
 
       % DEBUG printing values
-      printf('This round fundPeaksCh:')
-      disp(fundPeaksCh);
-      printf('Prev. round fundPeaksCh:')
-      disp(prevFundPeaksCh);
-      printf('Different/zero fund freqs or different ampls in run %d from previous run, resetting counter\n', runID);
+      writeLog('DEBUG', 'This round fundPeaksCh: %s', disp(fundPeaksCh));
+      writeLog('DEBUG', 'Prev. round fundPeaksCh: %s',disp(prevFundPeaksCh));
+      writeLog('WARN', 'Different/zero fund freqs or different ampls in run %d from previous run, resetting counter', runID);
       msg = 'Unstable/different freqs';
       result = FAILING_RESULT;
       % go to next channel
       break;
     else
-      printf('Same fund peaks as in previous run in in run %d, using for averaging\n', runID);
+      writeLog('DEBUG', 'Same fund peaks as in previous run in in run %d, using for averaging', runID);
       % same non-empty freqs from previous run, can continue
       sameFreqsCounter(channelID) += 1;
       % save peaks for averaging
@@ -92,7 +90,7 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
       
   if all(sameFreqsCounter >= CAL_RUNS)
     % enough stable runs, storing the average
-    printf('Enough runs, calibrating with measured peaks\n'); 
+    writeLog('INFO', 'Enough runs %d, calibrating with measured peaks', runID); 
     timestamp = time();
 
     % storing joint directions cal file
@@ -103,14 +101,14 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
       if hasAnyPeak(fundPeaksCh)
         saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit);
       else
-        printf('No fundaments found for channel ID %d, not storing its calibration file\n', channelID);
+        writeLog('WARN', 'No fundaments found for channel ID %d, not storing its calibration file', channelID);
       endif
     endfor
     global FINISHED_RESULT;
     result = FINISHED_RESULT;
     
   else
-    printf("Reached %d max runs yet did not have at least %d same fund peaks runs in all channels, failing the calibration\n", MAX_RUNS, CAL_RUNS);
+    writeLog('WARN', "Reached %d max runs yet did not have at least %d same fund peaks runs in all channels, failing the calibration", MAX_RUNS, CAL_RUNS);
     msg = 'Timed out without freqs';
     global FAILED_RESULT;
     result = FAILED_RESULT;
@@ -204,7 +202,7 @@ function avgPeaksCh = calculateAvgPeaks(mergedPeaksCh, runsCnt);
         avgPeak = [freq, abs(avgCValue), angle(avgCValue)];
         avgPeaksCh = [avgPeaksCh; avgPeak];
       else
-        printf('Distort freq %d occured only %d out of %d runs, below the required min count %d, not being included in avgPeaksCh\n', freq, valuesCnt, minRequiredCnt, runsCnt);
+        writeLog('WARN', 'Distort freq %d occured only %d out of %d runs, below the required min count %d, not being included in avgPeaksCh', freq, valuesCnt, minRequiredCnt, runsCnt);
       endif
     endif
   endfor

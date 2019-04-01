@@ -44,6 +44,7 @@ function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] 
       measuredPeaksCh = measuredPeaks{channelID};
       if hasAnyPeak(measuredPeaksCh)
         hasAnyChannelPeaks = true;
+        writeLog('DEBUG', 'Found fundPeaks for channel ID %d', channelID);
         if shouldGenCompenPeaks
           [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, calDeviceName, extraCircuit, channelID, channelCnt, reloadCalFiles);
           % removing rows with ampl < MIN_DISTORT_LEVEL
@@ -57,7 +58,7 @@ function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] 
           calFile = '';
         endif
       else
-        printf('Did not find any fundaments, channel ID %d PASSING\n', channelID);
+        writeLog('DEBUG', 'Did not find any fundaments, channel ID %d PASSING', channelID);
         % not generating compen peaks
         fundLevelsCh = [];
         distortPeaksCh = [];
@@ -118,7 +119,7 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
   else
     % same freqs from previous run, can continue
     sameFreqsCounter(channelID) += 1;
-    %printf('sameFreqsCounter(%d): %d\n', channelID, sameFreqsCounter(channelID));
+    %writeLog('DEBUG', 'sameFreqsCounter(%d): %d', channelID, sameFreqsCounter(channelID));
     if sameFreqsCounter(channelID) >= SAME_FREQS_ROUNDS
       if sameFreqsCounter(channelID) == SAME_FREQS_ROUNDS || reloadCalFiles
         % changed incoming frequency, has been stable for SAME_FREQS_ROUNDS, load from calfile (if exists)
@@ -155,9 +156,9 @@ function [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqs, fs, chann
     load(calFile);
     distortFreqsCh = calRec.distortFreqs;
     complAllPeaksCh = calRec.peaks;
-    printf('Distortion peaks for channel ID %d read from calibration file %s\n', channelID, calFile);
+    writeLog('INFO', 'Distortion peaks for channel ID %d read from calibration file %s', channelID, calFile);
   else
-    printf('Did not find calib file %s, channel ID %d PASSING\n', calFile, channelID);
+    writeLog('WARN', 'Did not find calib file %s, channel ID %d PASSING', calFile, channelID);
     calFile = '';    
   endif
 endfunction

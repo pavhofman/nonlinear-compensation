@@ -57,7 +57,7 @@ endfunction
 function levels = loadCalLevels(calFile)
   persistent AMPL_IDX = 4;  % = index of fundAmpl1
   if ~exist(calFile, 'file')
-    printf('The calfile %s does not exist, cannot load into cal plot!\n', calFile);
+    writeLog('WARN', 'The calfile %s does not exist, cannot load into cal plot!', calFile);
     levels = [];
     return;
   endif

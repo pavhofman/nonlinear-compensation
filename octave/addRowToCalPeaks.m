@@ -75,7 +75,7 @@ function [calPeaks, distortFreqs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh
   lowerLimit = newFundAmpl * (1/SAME_AMPL_TOL);
   sameRowIDs = find(calPeaks(:, AMPL_IDX) < upperLimit & calPeaks(:, AMPL_IDX) > lowerLimit);
   if ~isempty(sameRowIDs)
-    printf("Removing old close-amplitude rows IDs: %s\n", num2str(sameRowIDs));
+    writeLog('INFO', "Removing old close-amplitude rows IDs: %s", num2str(sameRowIDs));
     calPeaks(sameRowIDs, :) = [];
   endif
   

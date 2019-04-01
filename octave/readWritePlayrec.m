@@ -82,7 +82,7 @@ function [buffer, fs] = readWritePlayrec(playBuffer, cycleLength, restart)
         tic();
     end
 
-    printf('Sleeping for %f\n', cnt/fs - toc());
+    writeLog('DEBUG', 'Sleeping for %f', cnt/fs - toc());
     % blocking read on recording side
     playrec('block', pageNumList(1));
     buffer = playrec('getRec', pageNumList(1));
@@ -95,6 +95,6 @@ function [buffer, fs] = readWritePlayrec(playBuffer, cycleLength, restart)
     skipped = playrec('getSkippedSampleCount');
     if(skipped ~= 0)
         playrec('resetSkippedSampleCount');
-        printf('XRUN input: %d samples lost!!\n', skipped);
+        writeLog('WARN', 'XRUN input: %d samples lost!', skipped);
     end
 endfunction

@@ -9,12 +9,13 @@ for channelID = 1:columns(buffer)
   if hasAnyPeak(measuredPeaksCh) && hasAnyPeak(fundLevelsCh) && hasAnyPeak(distortPeaksCh)
     ref = genCompenReference(fundLevelsCh, distortPeaksCh, measuredPeaksCh, fs, startingT, rows(buffer));
     if find(isna(ref))
-      printf('ERROR - compensation signal contains NA values, investigate!');
+      writeLog('ERROR',  'Compensation signal contains NA values, investigate!');
     else
       buffer(:, channelID) += ref;
     endif
   else
     % even one channel on non-compensation means status failure
+    writeLog('DEBUG',  'No peaks available, compensation being skipped');
     result = FAILING_RESULT;
     % resetting calfile
     compenCalFiles{channelID} = '';

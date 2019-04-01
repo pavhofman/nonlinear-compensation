@@ -144,3 +144,5 @@ global FILE_CHAN_LIST = [];
 
 % should send info (i.e. use zeroMQ library)
 useZeroMQ = true;
+
+global MIN_LOG_LEVEL = 'DEBUG';

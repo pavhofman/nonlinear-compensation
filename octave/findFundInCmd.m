@@ -16,7 +16,7 @@ function funds = findFundInCmd(cmd, prefix, defaultValue = cell(), defaultMsg = 
     % did not find any
     funds = defaultValue;
     if ~isempty(defaultMsg)
-      printf(defaultMsg);
+      writeLog('DEBUG', defaultMsg);
     endif
   endif
 endfunction

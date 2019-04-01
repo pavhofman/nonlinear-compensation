@@ -113,7 +113,7 @@ while(true)
   if (isStatus(PAUSED))
     % no reading/writing
     pause(0.5);
-    printf('Paused\n');
+    writeLog('DEBUG', 'Paused');
     % next cycle
     continue;
   endif

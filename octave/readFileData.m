@@ -41,11 +41,11 @@ endfunction
 function waitRemainingTime(bufferTime)
   delay = toc();
   if (delay > bufferTime)
-    printf("XRUN: delay: %f, bufferTime %f\n", delay, bufferTime);
+    writeLog('WARN', "XRUN: delay: %f, bufferTime %f", delay, bufferTime);
   else
     % sleep for the remaining time
     sleepTime = bufferTime - delay;
-    printf("Sleeping in readFileData for %f\n", sleepTime);
+    writeLog('DEBUG', "Sleeping in readFileData for %f", sleepTime);
     pause(sleepTime);
   endif  
   tic();

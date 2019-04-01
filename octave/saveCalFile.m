@@ -39,7 +39,7 @@ function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timest
   
   disp(calRec);
   save(calFile, 'calRec');
-  printf('Saved calfile %s\n', calFile);
+  writeLog('INFO', 'Saved calfile %s', calFile);
   global FINISHED_RESULT;
   result = FINISHED_RESULT;
 endfunction

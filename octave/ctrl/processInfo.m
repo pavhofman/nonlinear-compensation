@@ -73,7 +73,7 @@ function updateStatusTxts(dirStruct, info)
   statusCnt = length(sortedStatuses);
   txtCnt = length(dirStruct.statusTxts);
   if statusCnt > txtCnt
-    printf('Too many statuses to show in statusTXT fields, showing only first %d\n', txtCnt);
+    writeLog('WARN', 'Too many statuses to show in statusTXT fields, showing only first %d', txtCnt);
     statusCnt = txtCnt;
   endif
 

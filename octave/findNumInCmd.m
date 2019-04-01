@@ -11,6 +11,6 @@ function value = findNumInCmd(cmd, prefix, defaultValue = [], defaultMsg = '');
   % did not find any
   value = defaultValue;
   if ~isempty(defaultMsg)
-    printf(defaultMsg);
+    writeLog('DEBUG', defaultMsg);
   endif
 endfunction
