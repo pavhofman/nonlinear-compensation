@@ -1,5 +1,5 @@
 % fundPeaksCh have at least one freq (row), distortPeaksCh can be empty (clean signal or single-sine fundament > fs/4 (i.e. no higher harmonics)
-function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit = '')
+function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit = '')
   % remove zero freq rows from distortPeaksCh
   if ~isempty(distortPeaksCh)
     rowIDs = distortPeaksCh(:, 1) == 0;
@@ -16,7 +16,7 @@ function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timest
     load(calFile);
     calPeaks = calRec.peaks;
     distortFreqs = calRec.distortFreqs;
-    [calPeaks, distortFreqs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh, calPeaks, distortFreqs, timestamp);
+    [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh, calPeaks, distortFreqs, timestamp);    
   else
     if isempty(distortPeaksCh)
       % no distortions, only fund  peaks
@@ -30,18 +30,19 @@ function result = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timest
     calPeaks = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC);
     % adding edge rows for extrapolation
     calPeaks = addEdgeCalPeaks(calPeaks);
-
+    % new calfile, always 3 rows
+    addedRowIDs = 1:3;
   endif
 
   calRec.fundFreqs = transpose(fundPeaksCh(:, 1));
   calRec.distortFreqs = distortFreqs;
   calRec.peaks = calPeaks;
+  writeLog('DEBUG', 'Updated (not stored yet) calRec for calfile %s: %s', calFile, disp(calRec));
   
-  disp(calRec);
-  save(calFile, 'calRec');
-  writeLog('INFO', 'Saved calfile %s', calFile);
-  global FINISHED_RESULT;
-  result = FINISHED_RESULT;
+  calFileStruct = struct();
+  calFileStruct.fileName = calFile;
+  calFileStruct.calRec = calRec;
+  calFileStruct.addedRowIDs = addedRowIDs;
 endfunction
 
 

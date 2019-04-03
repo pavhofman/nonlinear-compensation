@@ -70,12 +70,12 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
       if hasAnyPeak(distortPeaksCh)
         % time shift distortPeaks to zero phase of fundPeaks        
         distortPeaksCh = phasesAtZeroTimeCh(fundPeaksCh, distortPeaksCh);
-        % now distortPeaksCh are zero-time based. Phases in fundPeaksCh must be kept for storing into calfile!
+        % now distortPeaksCh are zero-time based.
       endif
       % store peaks of this run to persistent variable
       % some allXXXPeaks lines will stay empty, but calculateAvgPeaks() ignores them
       allFundPeaks{channelID, runID} = fundPeaksCh;
-      allDistortPeaks{channelID, runID} = distortPeaksCh;      
+      allDistortPeaks{channelID, runID} = distortPeaksCh;
       result = RUNNING_OK_RESULT;
     endif
   endfor
@@ -94,16 +94,39 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
     timestamp = time();
 
     % storing joint directions cal file
-    % each channel stored separately      
+    % each channel stored separately
+    calFileStructs = cell(channelCnt, 1);
     for channelID = 1:channelCnt
       % determine peaks from runs
+      writeLog('DEBUG', 'Determining avg peaks for channelID %d', channelID);
       [fundPeaksCh, distortPeaksCh] = detAveragePeaks(allFundPeaks(channelID, :), allDistortPeaks(channelID, :))
       if hasAnyPeak(fundPeaksCh)
-        saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit);
+        [calFileStructs(channelID)] = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit);
       else
         writeLog('WARN', 'No fundaments found for channel ID %d, not storing its calibration file', channelID);
       endif
     endfor
+    
+    if channelCnt >= 2
+      % at least two channels, we can measure/store avg. fund phase chan2 vs. chan1
+      avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS);
+    else
+      avgPhaseDiffs = NA;
+    endif
+    
+    % store calfile, update avgPhaseDiffs if required
+    for channelID = 1:channelCnt
+        calFileStruct = calFileStructs{channelID};
+        calRec = calFileStruct.calRec;
+        calFile = calFileStruct.fileName;
+        if ~isna(avgPhaseDiffs)
+          writeLog('DEBUG', 'Updating the newly-added rows to be stored to %s with non-zero avg phase difference of %s', calFile, disp(avgPhaseDiffs));
+          calRec.peaks = updatePhaseDiffsInPeaks(calRec.peaks, avgPhaseDiffs, calFileStruct.addedRowIDs);
+        endif
+        writeLog('INFO', 'Storing avg phase difference to newly-added rows in calfiles');
+        save(calFile, 'calRec');
+    endfor
+
     global FINISHED_RESULT;
     result = FINISHED_RESULT;
     
@@ -120,7 +143,32 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   allFundPeaks = cell(channelCnt, MAX_RUNS);
   allDistortPeaks = cell(channelCnt, MAX_RUNS);
 endfunction
+
+% determines average phase diffs between second and first channels.
+% avgPhaseDiffs = row vector, diff for each fundament
+function avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS)
+  writeLog('DEBUG', 'Determining avg fund phase diff between channel 2 and 1');
+  phaseDiffsC = cell();
+  for id = 1:MAX_RUNS
+    fundPeaksCh1 = allFundPeaks{1, id};
+    fundPeaksCh2 = allFundPeaks{2, id};
+    if hasAnyPeak(fundPeaksCh1) && isequal(fundPeaksCh1(:, 1), fundPeaksCh2(:, 1))
+      % both have a peak, both same freqs, store the phase diff
+      % NOTE - phases are not generally in <-pi, +pi> range which will produce nonsense when averaging. Averaging complex numbers instead      
+      phaseDiffsC{end + 1} = exp(i * fundPeaksCh2(:, 3)) ./ exp(i * fundPeaksCh1(:, 3));
+    endif
+  endfor
+  % remove first and last row to avoid transitions - same as for averaging peaks
+  if length(phaseDiffsC) > 2
+    phaseDiffsC(1) = [];
+    phaseDiffsC(end) = [];
+  endif
   
+  % cell array cannot be averaged -> converting to properly oriented matrix
+  phaseDiffsC = transpose(cell2mat(phaseDiffsC));
+  % averaging, only angle is required
+  avgPhaseDiffs = mean(angle(phaseDiffsC));
+endfunction
 
 % averaging fundPeaks amplitude, distortPeaks all for each frequency
 % allXXXPeaksCh - cell array(1, MAX_RUNS) of peaks matrices

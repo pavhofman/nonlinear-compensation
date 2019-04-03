@@ -1,7 +1,7 @@
 % adding row to calPeaks
 % distortPeaksCh can be empty
-function [calPeaks, distortFreqs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh, calPeaks, distortFreqs, timestamp)
-  % calPeaks: time, origFundPhase1, origFundPhase2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
+function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh, calPeaks, distortFreqs, timestamp)
+  % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
   persistent AMPL_IDX = 4;  % = index of fundAmpl1
   persistent PEAKS_START_IDX = 6;
   % fund amplitude within +/- SAME_AMPL_TOL considered same
@@ -100,4 +100,8 @@ function [calPeaks, distortFreqs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh
   
   % add fresh edge rows for extrapolation
   calPeaks = addEdgeCalPeaks(calPeaks);
+  
+  % HACK: addedRowIDs determined by its timestamp (incl. respective updated bordering edgeCalPeaks)
+  % row-vector needed - transposing
+  addedRowIDs = transpose(find(calPeaks(:, 1) == timestamp));
 endfunction

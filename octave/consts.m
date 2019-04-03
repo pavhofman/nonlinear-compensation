@@ -134,7 +134,7 @@ global MIN_DISTORT_LEVEL = db2mag(-138);
 
 global showFFTCfg = struct();
 showFFTCfg.fig = NA;
-showFFTCfg.enabled = false
+showFFTCfg.enabled = false;
 showFFTCfg.numAvg = 0;
 showFFTCfg.restartAvg = 0;
 showFFTCfg.fftSize = 2^16;

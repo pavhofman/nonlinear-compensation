@@ -1,9 +1,9 @@
 % building one row for calFIle.peaks. dPeaksC can be empty
 function complPeak = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC)
   % build new complPeak line
-  origFundPhases = fundPeaksCh(:, 3);
   fundAmpls = fundPeaksCh(:, 2);
-  complPeak = [timestamp, transpose(origFundPhases), transpose(fundAmpls), dPeaksC];
+  % fundPhaseDiff is added later on, zeros here  
+  complPeak = [timestamp, [0, 0], transpose(fundAmpls), dPeaksC];
 endfunction
 
 %!test
