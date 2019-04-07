@@ -80,12 +80,8 @@ global FAILED_RESULT = -1; % finished, bad
 global CMD_ID_PREFIX = "#ID#";
 % F3000
 global CMD_FREQ_PREFIX = '#F#';
-%A0.8945
-global CMD_AMPL_PREFIX = '#A#';
 %ECfilter
 global CMD_EXTRA_CIRCUIT_PREFIX = '#EC#';
-%DNrec8
-global CMD_DEVICE_NAME_PREFIX = '#DN#';
 % format for generator
 %CH[1000,0.85;2000,0.85]
 global CMD_CHANNEL_FUND_PREFIX = '#CH#';
@@ -95,6 +91,11 @@ global CMD_HARM_LEVELS_PREFIX = '#HL#';
 
 % continuous calibration ( cal #CONT1): 1 = yes, 0 = no (default)
 global CMD_CONT_PREFIX = '#CONT#';
+% channel ID (e.g. play-side channel ID for calibration
+global CMD_CHANNEL_ID_PREFIX = '#CHID#';
+
+% compensation type ID - see consts.m
+global CMD_COMP_TYPE_PREFIX = '#CT#';
 
 % for READFILE and STORE_RECORDED
 global CMD_FILEPATH_PREFIX = '#FILE#';
@@ -108,6 +109,9 @@ global CMD_FFTSIZE_PREFIX = '#SIZE#';
 global CMD_FILE_REC = 'cmd.info';
 global CMD_FILE_PLAY = 'cmd-play.info';
 
+
+global EXTRA_CIRCUIT_FILTER = 'filter';
+
 % prefices for device names (used in calibration file names)
 DEVICE_REC_PREFIX = 'rec';
 DEVICE_PLAY_PREFIX = 'play';
@@ -120,6 +124,22 @@ global PLAYREC_SRC = 2;
 global MEMORY_SINK = 'MEM';
 global PLAYREC_SINK = 'PR';
 
+% compensation types
+global COMP_TYPE_JOINT = 0;
+global COMP_TYPE_PLAY_SIDE = 1;
+global COMP_TYPE_REC_SIDE = 2;
+
+
+global showFFTCfg = struct();
+showFFTCfg.fig = NA;
+showFFTCfg.enabled = false;
+showFFTCfg.numAvg = 0;
+showFFTCfg.restartAvg = 0;
+showFFTCfg.fftSize = 2^16;
+
+%%%%%%%%%%%%%%%%%%%%%%%
+% configurable consts %
+%%%%%%%%%%%%%%%%%%%%%%%
 
 ZEROMQ_PORT_REC = 5555;
 ZEROMQ_PORT_PLAY = 5556;
@@ -131,13 +151,6 @@ CYCLE_LENGTH = 0.211;
 % minimum level of distortion peaks to be included into calibration profile
 % depends largely on soundcard performance
 global MIN_DISTORT_LEVEL = db2mag(-138);
-
-global showFFTCfg = struct();
-showFFTCfg.fig = NA;
-showFFTCfg.enabled = false;
-showFFTCfg.numAvg = 0;
-showFFTCfg.restartAvg = 0;
-showFFTCfg.fftSize = 2^16;
 
 % array of specific channel numbers from/to audio file or empty = all channels in input
 global FILE_CHAN_LIST = [];

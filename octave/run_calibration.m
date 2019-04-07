@@ -13,7 +13,7 @@ else
   
   if (statusContains(CALIBRATING))
     % running the actual calibration with calBuffer
-    [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calFreqs, jointDeviceName, calExtraCircuit, restartCal);
+    [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, restartCal);
     setStatusResult(CALIBRATING, result);
 
     % building complete status infomessage
@@ -27,7 +27,7 @@ else
         % new calfile, instruct analysis to reload
         reloadCalFiles = true;
       endif
-      if contCal
+      if calRequest.contCal;
         restartCal = true;
       else
         source 'stopCalibration.m';

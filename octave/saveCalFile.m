@@ -1,13 +1,10 @@
 % fundPeaksCh have at least one freq (row), distortPeaksCh can be empty (clean signal or single-sine fundament > fs/4 (i.e. no higher harmonics)
-function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit = '')
+function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp)
   % remove zero freq rows from distortPeaksCh
   if ~isempty(distortPeaksCh)
     rowIDs = distortPeaksCh(:, 1) == 0;
     distortPeaksCh(rowIDs, :) = [];
   endif
-  
-  freqs =  getFreqs(fundPeaksCh);
-  calFile = genCalFilename(freqs, fs, channelID, deviceName, extraCircuit);
   
   %% calFile line contains exactly 2 fundpeaks, therefore fundPeaksCh must contain so many rows!!
   fundPeaksCh = padWithZeros(fundPeaksCh, 2);

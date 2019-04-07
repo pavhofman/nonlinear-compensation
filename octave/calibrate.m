@@ -1,5 +1,5 @@
-% calFreqs - optional 1/2 values. If not empty, wait for these freqs to come (in both channels), with timeout
-function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calFreqs, deviceName, extraCircuit, restart)
+% calRequest.calFreqs - optional 1/2 values. If not empty, wait for these freqs to come (in both channels), with timeout
+function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, restart)
   persistent channelCnt = columns(calBuffer);
   % consts
   % number of consequent calibration runs which contribute to final averaged value
@@ -22,6 +22,8 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   persistent sameFreqsCounter = zeros(channelCnt, 1);
   
   msg = '';
+  
+  calFreqs = calRequest.freqs;
 
   if (restart)
     % resetting all relevant persistent vars
@@ -101,7 +103,10 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
       writeLog('DEBUG', 'Determining avg peaks for channelID %d', channelID);
       [fundPeaksCh, distortPeaksCh] = detAveragePeaks(allFundPeaks(channelID, :), allDistortPeaks(channelID, :))
       if hasAnyPeak(fundPeaksCh)
-        [calFileStructs(channelID)] = saveCalFile(fundPeaksCh, distortPeaksCh, fs, channelID, timestamp, deviceName, extraCircuit);
+        % storing to calFile
+        devSpecs = createCalFileDevSpecs(calRequest.compType, calRequest.playChannelID, channelID);
+        calFile = genCalFilename(getFreqs(fundPeaksCh), fs, devSpecs, calRequest.extraCircuit);
+        [calFileStructs(channelID)] = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp);
       else
         writeLog('WARN', 'No fundaments found for channel ID %d, not storing its calibration file', channelID);
       endif

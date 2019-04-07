@@ -11,8 +11,7 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     % add status - e.g. why compensation is running for incremental calibration
     addStatus(CALIBRATING);
     % optional continuous calibration, false = default
-    contCal = findNumInCmd(cmd, CMD_CONT_PREFIX, false);
-    
+    contCal = findNumInCmd(cmd, CMD_CONT_PREFIX, false);    
     % reading optional  extra circuit specifier string (will be stored in cal file name)
     calExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
     
@@ -26,6 +25,14 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     if length(calFreqs) > 1
       calFreqs = sort(calFreqs);
     endif
+    
+    % default = channel 2 (right)
+    playChannelID = findNumInCmd(cmd, CMD_CHANNEL_ID_PREFIX, 2);
+    % default = COMP_TYPE_JOINT
+    compType = findNumInCmd(cmd, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT);
+    
+    % building calibration request struct
+    calRequest = initCalRequest(calFreqs, compType, playChannelID, calExtraCircuit, contCal)
 
     % clearing calibration buffer
     restartCal = true;
@@ -37,10 +44,12 @@ elseif (strcmp(cmd{1}, COMPENSATE))
   addStatus(COMPENSATING);
   removeFromStatus(PASSING);
   addStatus(ANALYSING);
-  % reading optional deviceName string
-  calDeviceName = findStringInCmd(cmd, CMD_DEVICE_NAME_PREFIX, jointDeviceName);
+
   % reading optional extraCircuit string
   compExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
+  % default = COMP_TYPE_JOINT
+  compType = findNumInCmd(cmd, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT);
+  compRequest = initCompRequest(compType, 2, compExtraCircuit)
   
   reloadCalFiles = true;
   showFFTCfg.restartAvg = 1;
@@ -63,8 +72,7 @@ elseif (strcmp(cmd{1}, PASS))
   removeFromStatus(COMPENSATING);
   % keep analysis running all the time (without generating distortion peaks)
   addStatus(ANALYSING);
-  calDeviceName = "";
-  compExtraCircuit = "";
+  compRequest = NA;
 
   showFFTCfg.restartAvg = 1;
   % passing completes command immediately
