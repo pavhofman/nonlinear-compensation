@@ -158,6 +158,9 @@ global cmdFilePlay = genDataPath(CMD_FILE_PLAY);
 global fs = 48000;
 global freq = 3000;
 
+global POS_X = 100;
+global POS_Y = 100;
+
 global WIDTH = 1000;
 global HEIGHT = 600;
 
@@ -202,8 +205,8 @@ set(outBox, 'verticalalignment', 'top');
 set(outBox, 'max', 1000);
 
 % resizing figure to fix painting problems
-set(fig, 'position', [100, 100, WIDTH, HEIGHT + 1]);
-set(fig, 'position', [100, 100, WIDTH, HEIGHT]);
+set(fig, 'position', [POS_X, POS_Y, WIDTH, HEIGHT + 1]);
+set(fig, 'position', [POS_X, POS_Y, WIDTH, HEIGHT]);
 % queue for schedItems
 global schedQueue = cell();
 
