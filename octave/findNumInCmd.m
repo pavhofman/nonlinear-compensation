@@ -14,3 +14,13 @@ function value = findNumInCmd(cmd, prefix, defaultValue = [], defaultMsg = '');
     writeLog('DEBUG', defaultMsg);
   endif
 endfunction
+
+
+%!test
+%! cmd = {'CMD', 'whatever', '#A#1.05+2', 'whatever'};
+%! result = findNumInCmd(cmd, '#A#', 5);
+%! expected = [1.05; 2];
+%! assert(expected, result);
+% testing default value
+%! result = findNumInCmd(cmd, '#SOMETHINGELSE#', 5);
+%! expected = 5;
