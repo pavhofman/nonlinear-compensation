@@ -9,3 +9,12 @@ function freqs = getFreqs(peaksCh)
     freqs = [];
   endif
 endfunction
+
+%!test
+%! peaksCh = [1000, 0.5, 0.5; 2000, 0.4, 0.4];
+%! expected = [1000, 2000];
+%! assert(expected, getFreqs(peaksCh));
+% empty peaks
+%! peaksCh = [];
+%! expected = [];
+%! assert(expected, getFreqs(peaksCh));
