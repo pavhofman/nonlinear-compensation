@@ -23,14 +23,20 @@ else
     restartCal = false;
     if isResultFinished(result)
       % end of calibration
+
       if isResultOK(result)
         % new calfile, instruct analysis to reload
+        % NOTE - reloading calfiles makes sense only when calibration generates same calfiles as compensation is instructed to use
+        % which often is not the case
+        % Nevertheless relading calfiles makes no damage, let's keep it here
         reloadCalFiles = true;
       endif
-      if calRequest.contCal;
+            
+      if calRequest.contCal || (~isResultOK(result) && ~isempty(calRequest.calFreqReq));
+        % restarting calibration if continuous calibration OR some calibration frequency/level was requested  while calibration failed (i.e. freqs or levels not reached)
         restartCal = true;
       else
-        source 'stopCalibration.m';
+        source 'stop_calibration.m';
       endif
     endif
   endif

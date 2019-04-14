@@ -78,8 +78,11 @@ global FAILED_RESULT = -1; % finished, bad
 % CMD prefices
 % format: ID25
 global CMD_ID_PREFIX = "#ID#";
-% F3000
-global CMD_FREQ_PREFIX = '#F#';
+
+% format for calibration frequency info
+% #CHCF#[F1,minAmpl,maxAmpl;F2,minAmpl,maxAmpl] CHCF[F1,NA,NA; F2,NA,NA]
+global CMD_CALFREQS_PREFIX = '#CHCF#';
+
 %ECfilter
 global CMD_EXTRA_CIRCUIT_PREFIX = '#EC#';
 % format for generator
@@ -150,7 +153,7 @@ CYCLE_LENGTH = 0.211;
 
 % minimum level of distortion peaks to be included into calibration profile
 % depends largely on soundcard performance
-global MIN_DISTORT_LEVEL = db2mag(-138);
+global MIN_DISTORT_LEVEL = db2mag(-145);
 
 % array of specific channel numbers from/to audio file or empty = all channels in input
 global FILE_CHAN_LIST = [];

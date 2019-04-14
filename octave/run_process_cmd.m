@@ -15,15 +15,11 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     % reading optional  extra circuit specifier string (will be stored in cal file name)
     calExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
     
-    % optional calibration freqs (both channels) to wait for
-    calFreqs = findNumInCmd(cmd, CMD_FREQ_PREFIX);
-    % calFreqs must be asc-sorted row
-    if size(calFreqs, 1) > 1
-      % in rows, transpose to columns
-      calFreqs = transpose(calFreqs);
-    endif
-    if length(calFreqs) > 1
-      calFreqs = sort(calFreqs);
+    % optional calibration freqs + levels for both channels to wait for
+    calFreqReq = findMatricesInCmd(cmd, CMD_CALFREQS_PREFIX);
+    if ~isempty(calFreqReq)
+      % filling calFreqReq for each channel by copying last channel values up to channelCnt - must be columns!
+      calFreqReq(end + 1: channelCnt) = calFreqReq{end};
     endif
     
     % default = channel 2 (right)
@@ -32,7 +28,7 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     compType = findNumInCmd(cmd, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT);
     
     % building calibration request struct
-    calRequest = initCalRequest(calFreqs, compType, playChannelID, calExtraCircuit, contCal)
+    calRequest = initCalRequest(calFreqReq, compType, playChannelID, calExtraCircuit, contCal)
 
     % clearing calibration buffer
     restartCal = true;
@@ -49,10 +45,15 @@ elseif (strcmp(cmd{1}, COMPENSATE))
   compExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
   % default = COMP_TYPE_JOINT
   compType = findNumInCmd(cmd, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT);
-  compRequest = initCompRequest(compType, 2, compExtraCircuit)
+  compRequest = initCompRequest(compType, 2, compExtraCircuit);
   
   reloadCalFiles = true;
   showFFTCfg.restartAvg = 1;
+
+  % compensating completes command immediately
+  % TODO - really?
+  cmdDoneID = cmdID;
+  
 
 elseif strcmp(cmd{1}, DISTORT)
   if length(cmd) > 1 && strcmp(cmd{2}, 'off')
@@ -139,7 +140,7 @@ elseif strcmp(cmd{1}, GENERATE)
   else
     % gen freq
     % start generating sine at freq, at genAmpl level
-    genFunds = findFundInCmd(cmd, CMD_CHANNEL_FUND_PREFIX, defaultValue = {[1000, db2mag(-3)]}, defaultMsg = 'No generator fundamentals found in command, using 1000Hz@-3dB');
+    genFunds = findMatricesInCmd(cmd, CMD_CHANNEL_FUND_PREFIX, defaultValue = {[1000, db2mag(-3)]}, defaultMsg = 'No generator fundamentals found in command, using 1000Hz@-3dB');
     % zeroing time
     genStartingT = 0;
     

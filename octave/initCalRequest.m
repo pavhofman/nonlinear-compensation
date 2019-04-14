@@ -1,6 +1,6 @@
-function request = initCalRequest(freqs, compType, playChannelID, extraCircuit, contCal)  
+function request = initCalRequest(calFreqReq, compType, playChannelID, extraCircuit, contCal)  
   request = initCompRequest(compType, playChannelID, extraCircuit);
-  % plus calibration freqs
-  request.freqs = freqs;
+  % plus calibration-specific data
+  request.calFreqReq = calFreqReq;
   request.contCal = contCal;
 endfunction

@@ -64,11 +64,11 @@ global fs = NA;
 channelCnt = NA;
 global compenCalFiles = NA;
 
-global calFreqs = NA;
 prevFundPeaks = NA;
 calBuffer = [];
 calibrationSize = NA;
 
+global calRequest = NA;
 compRequest = NA;
 
 recordedData = [];

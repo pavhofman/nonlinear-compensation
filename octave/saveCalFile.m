@@ -1,5 +1,5 @@
 % fundPeaksCh have at least one freq (row), distortPeaksCh can be empty (clean signal or single-sine fundament > fs/4 (i.e. no higher harmonics)
-function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp)
+function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp, doSave = true)
   % remove zero freq rows from distortPeaksCh
   if ~isempty(distortPeaksCh)
     rowIDs = distortPeaksCh(:, 1) == 0;
@@ -34,12 +34,17 @@ function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, t
   calRec.fundFreqs = transpose(fundPeaksCh(:, 1));
   calRec.distortFreqs = distortFreqs;
   calRec.peaks = calPeaks;
-  writeLog('DEBUG', 'Updated (not stored yet) calRec for calfile %s: %s', calFile, disp(calRec));
+  writeLog('DEBUG', 'Updated calRec for calfile %s: %s', calFile, disp(calRec));
   
   calFileStruct = struct();
   calFileStruct.fileName = calFile;
   calFileStruct.calRec = calRec;
   calFileStruct.addedRowIDs = addedRowIDs;
+  
+  if doSave
+    save(calFile, 'calRec');
+    writeLog('INFO', 'Stored calRec into calfile %s', calFile);
+  endif
 endfunction
 
 

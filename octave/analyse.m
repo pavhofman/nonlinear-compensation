@@ -45,7 +45,7 @@ function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] 
       if hasAnyPeak(measuredPeaksCh)
         hasAnyChannelPeaks = true;
         writeLog('DEBUG', 'Found fundPeaks for channel ID %d', channelID);
-        if ~isna(compRequest)
+        if isstruct(compRequest)
           [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, compRequest, channelID, channelCnt, reloadCalFiles);
           % removing rows with ampl < MIN_DISTORT_LEVEL
           if ~isempty(distortPeaksCh)

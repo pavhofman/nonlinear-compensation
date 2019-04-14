@@ -51,8 +51,8 @@ function info = addStatusDetails(status, info)
       info.genFunds = genFunds;
       
     case CALIBRATING
-      global calFreqs;
-      info.calFreqs = calFreqs;
+      global calRequest;
+      info.calRequest = calRequest;
 
     case DISTORTING
       global distortHarmLevels;

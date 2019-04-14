@@ -23,7 +23,7 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   
   msg = '';
   
-  calFreqs = calRequest.freqs;
+  calFreqReq = calRequest.calFreqReq;
 
   if (restart)
     % resetting all relevant persistent vars
@@ -41,12 +41,18 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   for channelID = 1:channelCnt
     % shift distortPeaks to zero time of fundPeaks and store to runPeaks
     fundPeaksCh = fundPeaks{channelID};
-    distortPeaksCh = distortPeaks{channelID};    
-    prevFundPeaksCh = prevFundPeaks{channelID}
-    % check if exist, stable, resp. equal to calFreqs (calfreqs are already a sorted column - see run_process_cmd.m)
-    areSame = areSameExistingPeaks(fundPeaksCh, prevFundPeaksCh, MAX_AMPL_DIFF);
-    areCorrect = isempty(calFreqs) || isequal(calFreqs, getFreqs(fundPeaksCh));
-    areSameAndCorrect = areSame && areCorrect;
+    distortPeaksCh = distortPeaks{channelID};
+    prevFundPeaksCh = prevFundPeaks{channelID};
+    % check if exist, stable, resp. fitting the calFreqs specs
+    if ~isempty(calFreqReq)      
+      calFreqReqCh = calFreqReq{channelID};
+    else
+      calFreqReqCh = [];
+    end
+    areSameWithPrevious = areSameExistingPeaks(fundPeaksCh, prevFundPeaksCh, MAX_AMPL_DIFF);
+    haveCorrectFreqs = isempty(calFreqReqCh) || isequal(getFreqs(calFreqReqCh), getFreqs(fundPeaksCh));
+    haveCorrectFreqsAndLevels = haveCorrectFreqs && (isempty(calFreqReqCh) || checkCorrectLevels(calFreqReqCh, fundPeaksCh));
+    areSameAndCorrect = areSameWithPrevious && haveCorrectFreqsAndLevels;
     
     if ~areSameAndCorrect
       % are different or none
@@ -106,7 +112,8 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
         % storing to calFile
         devSpecs = createCalFileDevSpecs(calRequest.compType, calRequest.playChannelID, channelID);
         calFile = genCalFilename(getFreqs(fundPeaksCh), fs, devSpecs, calRequest.extraCircuit);
-        [calFileStructs(channelID)] = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp);
+        % param doSave = false - not storing yet
+        [calFileStructs(channelID)] = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp, false);
       else
         writeLog('WARN', 'No fundaments found for channel ID %d, not storing its calibration file', channelID);
       endif
@@ -147,6 +154,36 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   sameFreqsCounter = zeros(channelCnt, 1);
   allFundPeaks = cell(channelCnt, MAX_RUNS);
   allDistortPeaks = cell(channelCnt, MAX_RUNS);
+endfunction
+
+% have fundPeaksCh levels within range of calFreqsCh?
+% calFreqsCh, fundPeaksCh - never empty, always same freqs, sorted by freqs!
+function result = checkCorrectLevels(calFreqReqCh, fundPeaksCh)
+  % calFreqReqCh format: [F1,minAmpl,maxAmpl;F2,minAmpl,maxAmpl] OR [F1,NA,NA; F2,NA,NA]
+  for rowID = 1:rows(fundPeaksCh)
+    calFreqRow = calFreqReqCh(rowID, :);
+    minAmpl = calFreqRow(2);
+    if isna(minAmpl)
+      % minAmpl NA, no check
+      continue;
+    else
+      fundAmpl = fundPeaksCh(rowID, 2);
+      if fundAmpl < minAmpl
+        % too small
+        result = false;
+        return;
+      else
+        maxAmpl = calFreqRow(3);
+        if ~isna(maxAmpl) && fundAmpl> maxAmpl
+          % too large
+          result = false;
+          return;
+        endif
+      endif
+    endif
+  endfor
+  % found no problem, check OK
+  result = true;
 endfunction
 
 % determines average phase diffs between second and first channels.
