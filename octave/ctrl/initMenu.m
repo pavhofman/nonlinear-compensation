@@ -7,19 +7,21 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   
   tasksMenu = uimenu (fig, "label", "&Tasks");
   
+  uimenu(tasksMenu, "label", "Split-Calibrate", 'callback', @clbkSplitCalibrate);
   uimenu(tasksMenu, "label", "Calibrate VD Freqs", 'callback', @clbkCalibrateFreqs);
   uimenu(tasksMenu, "label", "Joint-Dev. Compen. VD", 'callback', @clbkCompenVD);
-  uimenu(tasksMenu, "label", "Calibrate LPF", 'callback', @clbkCalibrateLPF);
   uimenu(tasksMenu, "label", "Joint-Dev. Compen. LPF", 'callback', @clbkCompenLPF);
-  uimenu(tasksMenu, "label", "Measure Filter", 'callback', @clbkMeasureFilter);
-  uimenu(tasksMenu, "label", "Split Calibration", 'callback', @clbkSplitCalibrate);
-  uimenu(tasksMenu, "label", "Split-Dev. Compen. Sides", 'callback', @clbkSplitCompen);
 endfunction
 
 
 function clbkCalibrateFreqs(src, data)
   % calling scheduler-enabled calibration
   calibrateFreqsSched();
+endfunction
+
+function clbkSplitCalibrate(src, data)
+  % calling scheduler-enabled calibration
+  splitCalibrateSched();
 endfunction
 
 function dirStruct = initDirMenu(fig, dirStruct, cmdFile, label, sideName)

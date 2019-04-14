@@ -3,7 +3,7 @@ function calibrateFreqsSched(label = 1)
   % init section
   [P1, P2, P3, P4, ERROR] = enum();
   
-  persistent TIMEOUT = 5;
+  persistent TIMEOUT = 500;
   
   % fixed for now
   global freq;
@@ -13,7 +13,6 @@ function calibrateFreqsSched(label = 1)
   global GENERATE;
   global PASS;
   global CALIBRATE;
-  global CMD_FREQ_PREFIX;
   global CMD_CHANNEL_FUND_PREFIX;
   
   % current frequency of calibration
@@ -48,7 +47,14 @@ function calibrateFreqsSched(label = 1)
           case P3
             printStr(sprintf("Joint-device calibrating VD at %dHz", curFreq));
             % safety measure - requesting calibration only at curFreq
-            cmdID = writeCmd([CALIBRATE " " CMD_FREQ_PREFIX num2str(curFreq)], cmdFileRec);
+            % no amplitude specification (NAs)
+            calFreqReq = {[curFreq, NA, NA], [curFreq, db2mag(-12.50), db2mag(-12.40)]}
+            calFreqReqStr = getCalFreqReqStr(calFreqReq);
+            cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr], cmdFileRec);
+            
+            targetLevels = [NA, db2mag(-12.45)];
+            zoomCalLevels(calFreqReq, targetLevels)
+            
             % next frequency
             curFreq += freq;
             waitForCmdDone(cmdID, P2, TIMEOUT, ERROR, mfilename());

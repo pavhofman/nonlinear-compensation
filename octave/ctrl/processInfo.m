@@ -157,15 +157,16 @@ function details = addDetails(channelID, status, info, details)
       details = addPeaksStr(info.measuredPeaks{channelID}, 3, details);
       
     case CALIBRATING
-      calFreqs = info.calFreqs;
-      if ~isempty(calFreqs)
-        details{end + 1} = 'Calib. Freqs:';
-        freqsStr = '';
-        for id = 1:length(calFreqs)
-          calFreq = calFreqs(id);
-          freqsStr = [freqsStr '  ' num2str(calFreq) 'Hz'];
-        endfor
-        details{end + 1} = freqsStr;
+      calFreqReq = info.calRequest.calFreqReq;
+      if ~isempty(calFreqReq)
+        calFreqReqCh = calFreqReq{channelID};
+        if ~isempty(calFreqReqCh)
+          details{end + 1} = 'Calib. Freqs:';
+          for id = 1:rows(calFreqReqCh)
+            calFreqRow = calFreqReqCh(id, :);
+            details{end + 1} = getCalFreqRow(calFreqRow);
+          endfor
+        endif
       endif
 
     case DISTORTING
@@ -182,6 +183,14 @@ function details = addDetails(channelID, status, info, details)
 
   endswitch
   
+endfunction
+
+function str = getCalFreqRow(calFreqRow)
+  persistent format = '%7.2f';
+  str = [num2str(calFreqRow(1, 1)) 'Hz'];
+  if ~isna(calFreqRow(2))
+    str = [str ' <' num2str(20*log10(calFreqRow(1, 2)), format) ', ' num2str(20*log10(calFreqRow(1, 3)), format) '> dB'];
+  endif
 endfunction
 
 function str = addPeaksStr(peaksCh, decimals, str)

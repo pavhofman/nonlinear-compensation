@@ -1,5 +1,6 @@
 pkg load zeromq;
 pkg load database;
+pkg load optim;
 
 more off;
   
@@ -125,7 +126,7 @@ endfunction
 function [plotStruct] = initPlot(plotPanel)
   axis = axes ('parent', plotPanel);
   x = [];
-  % 2 lines - calibration levels, current levels
+  % 3 lines - calibration levels, current levels, last levels
   lines = plot(axis, 0, 0, '>r', 'markerfacecolor', 'r', 1, 0, '<r', 'markerfacecolor', 'b', 0.5, 0, '<r', 'markerfacecolor', 'g');
   % fixed limit
   set(axis, 'ylim', [-20,0]);
@@ -135,6 +136,9 @@ function [plotStruct] = initPlot(plotPanel)
   set(calLine, 'visible', 'off');
   set(curLine, 'visible', 'off');
   set(lastLine, 'visible', 'off');
+  
+  rangePatch = patch (axis, [], [], 'b');
+  set(rangePatch, 'visible', 'off');
   
   set(axis,'Xtick',[])
   set(axis, "ygrid", "on");
@@ -149,6 +153,8 @@ function [plotStruct] = initPlot(plotPanel)
   plotStruct.curLine = curLine;
   % line with last level points before calibration
   plotStruct.lastLine = lastLine;
+  % patch for calibration level range
+  plotStruct.rangePatch = rangePatch;
 endfunction
 
 
@@ -220,7 +226,7 @@ zmq_bind (recSock, ['tcp://*:' num2str(ZEROMQ_PORT_REC)]);
 zmq_bind (playSock, ['tcp://*:' num2str(ZEROMQ_PORT_PLAY)]);
 
 global recInfo = [];
-playInfo = [];
+global playInfo = [];
 
 % maximum age of received info for processing
 % older infos are skipped - flushing the incoming queue
@@ -233,23 +239,25 @@ while (~doQuit)
   runScheduled(recInfo, playInfo);
   
   do
-    recInfo = rcvInfo(recSock);
-  until isempty(recInfo) || recInfo.time > time() - MAX_INFO_AGE
-  if isempty(recInfo)
+    localRecInfo = rcvInfo(recSock);
+  until isempty(localRecInfo) || localRecInfo.time > time() - MAX_INFO_AGE
+  if isempty(localRecInfo)
     writeLog('DEBUG', 'Empty rec info');
   else
     writeLog('DEBUG', 'Processing rec info');
+    recInfo = localRecInfo;
     processInfo(recInfo, recStruct);
   endif
 
 
   do
-    playInfo = rcvInfo(playSock);
-  until isempty(playInfo) || playInfo.time > time() - MAX_INFO_AGE
-  if isempty(playInfo)
+    localPlayInfo = rcvInfo(playSock);
+  until isempty(localPlayInfo) || localPlayInfo.time > time() - MAX_INFO_AGE
+  if isempty(localPlayInfo)
     writeLog('DEBUG', 'Empty play info');
   else
     writeLog('DEBUG', 'Processing play info');
+    playInfo = localPlayInfo;
     processInfo(playInfo, playStruct);
   endif
 

@@ -15,7 +15,9 @@ function cmdID = writeCmd(cmd, cmdFilename, clear = false)
   if clear
     clearOutBox();
   endif
-  printStr(['Sent CMD: "' cmd '" to ' cmdFilename]);
+  infoMsg = ['Sent CMD: "' cmd '" to ' cmdFilename];
+  printStr(infoMsg);
+  writeLog('DEBUG', infoMsg);
   % incrementing integer part of command ID for next call
   ++intCmdID;
 endfunction
