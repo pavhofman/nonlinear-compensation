@@ -2,7 +2,7 @@
 % Only one-sine (one fundamental) is supported!!
 function splitCalibrateSched(label = 1)
   % init section
-  [P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, ERROR] = enum();
+  [P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, ERROR] = enum();
   
   persistent AUTO_TIMEOUT = 5;
   % manual calibration timeout - enough time to adjust the level into the range limits
@@ -233,7 +233,13 @@ function splitCalibrateSched(label = 1)
         waitForCmdDone(cmdID, P12, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
-      case P12
+      case P12        
+        printStr(sprintf('Generator Off'));
+        cmdID = writeCmd([GENERATE ' ' 'off'], cmdFilePlay);
+        waitForCmdDone(cmdID, P13, AUTO_TIMEOUT, ERROR, mfilename());
+        return;
+
+        case P13
         swStruct.calibrate = false;
         showSwitchWindow('Set switches for measuring DUT', swStruct');
         return;
