@@ -1,11 +1,11 @@
-function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, filterName)
+function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, vdName, lpName)
   global COMP_TYPE_JOINT;
   persistent AMPL_IDX = 4;  % = index of fundAmpl1 in cal peaks row
 
   % voltage divider
-  [peaksVDRow, distortVDFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID);
+  [peaksVDRow, distortVDFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, vdName);
   % LP filter (input - resistor 10k -RIGHT- capacitor 10nF - ground)
-  [peaksLPRow, distortLPFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, filterName);
+  [peaksLPRow, distortLPFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, lpName);
 
 
   fundAmplVD = peaksVDRow(1, AMPL_IDX);
@@ -70,7 +70,7 @@ function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, fi
     % "known" values for fitting
     y = [refVD; refLP];
 
-    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFiles(distortFreq, fs, playAmpl, playChID, analysedRecChID, filterName);
+    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFiles(distortFreq, fs, playAmpl, playChID, analysedRecChID, vdName, lpName);
     
     % AD harmonic phaseShift - caused by fundamental phase shift (i.e. fund * harmonic id)        
     phaseShiftAByLP = fundLPPhaseShift * N;
@@ -110,8 +110,8 @@ function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, fi
 endfunction
 
 function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, compType, timestamp)
-  devSpecs = createCalFileDevSpecs(compType, playChID, channelID);
-  calFile = genCalFilename(getFreqs(fundPeaksCh), fs, devSpecs, '');
+  % no extraCircuit
+  calFile = genCalFilename(getFreqs(fundPeaksCh), fs, compType, playChID, channelID, '');
   
   % always writing new file - delete first if exists
   deleteFile(calFile);  

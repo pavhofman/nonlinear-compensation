@@ -113,8 +113,6 @@ global CMD_FILE_REC = 'cmd.info';
 global CMD_FILE_PLAY = 'cmd-play.info';
 
 
-global EXTRA_CIRCUIT_FILTER = 'filter';
-
 % prefices for device names (used in calibration file names)
 DEVICE_REC_PREFIX = 'rec';
 DEVICE_PLAY_PREFIX = 'play';

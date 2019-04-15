@@ -150,8 +150,7 @@ function [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqs, fs, chann
   complAllPeaksCh = [];
   
   % re-reading cal file with one channel calib data
-  devSpecs = createCalFileDevSpecs(compRequest.compType, compRequest.playChannelID, channelID);
-  calFile = genCalFilename(freqs, fs, devSpecs, compRequest.extraCircuit);
+  calFile = genCalFilename(freqs, fs, compRequest.compType, compRequest.playChannelID, channelID, compRequest.extraCircuit);
   if (exist(calFile, 'file'))
     % loading calRec, initialising persistent vars
     load(calFile);

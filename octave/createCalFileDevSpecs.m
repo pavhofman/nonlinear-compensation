@@ -1,3 +1,4 @@
+% devSpec: rows of cells {devName, chID}
 function devSpecs = createCalFileDevSpecs(compType, playChannelID, channelID)
   global COMP_TYPE_JOINT;
   global COMP_TYPE_PLAY_SIDE;

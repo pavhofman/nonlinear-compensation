@@ -110,8 +110,7 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
       [fundPeaksCh, distortPeaksCh] = detAveragePeaks(allFundPeaks(channelID, :), allDistortPeaks(channelID, :))
       if hasAnyPeak(fundPeaksCh)
         % storing to calFile
-        devSpecs = createCalFileDevSpecs(calRequest.compType, calRequest.playChannelID, channelID);
-        calFile = genCalFilename(getFreqs(fundPeaksCh), fs, devSpecs, calRequest.extraCircuit);
+        calFile = genCalFilename(getFreqs(fundPeaksCh), fs, calRequest.compType, calRequest.playChannelID, channelID, calRequest.extraCircuit);
         % param doSave = false - not storing yet
         [calFileStructs(channelID)] = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp, false);
       else

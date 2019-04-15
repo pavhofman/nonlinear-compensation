@@ -17,6 +17,9 @@ function splitCalibrateSched(label = 1)
   % ID of output channel used for split calibration
   persistent playChID = 2;
   
+  persistent EXTRA_CIRCUIT_VD = 'vd';
+  persistent EXTRA_CIRCUIT_LP1 = 'lp1';
+  
   
   global cmdFileRec;
   global cmdFilePlay;
@@ -25,7 +28,6 @@ function splitCalibrateSched(label = 1)
   global CALIBRATE;
   global COMPENSATE;
   global CMD_EXTRA_CIRCUIT_PREFIX;
-  global EXTRA_CIRCUIT_FILTER;
   global CMD_CHANNEL_FUND_PREFIX;
   global CMD_COMP_TYPE_PREFIX;
   global COMP_TYPE_JOINT;
@@ -77,8 +79,8 @@ function splitCalibrateSched(label = 1)
         % we have to wait for command acceptance before issuing new commands (the cmd files could be deleted by new commands before they are consumed
         % waiting only for one of the pass commands, both sides run at same speed
         % after AUTO_TIMEOUT secs timeout call ERROR
-        % waitForCmdDone(cmdID, P2, AUTO_TIMEOUT, ERROR, mfilename());
-        waitForCmdDone(cmdID, P6, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdID, P2, AUTO_TIMEOUT, ERROR, mfilename());
+        %waitForCmdDone(cmdID, P6, AUTO_TIMEOUT, ERROR, mfilename());
         return;
 
       case {P2 P3}
@@ -97,7 +99,7 @@ function splitCalibrateSched(label = 1)
               % safety measure - requesting calibration only at curFreq
               % TODO - support for renewing calfile - always new calfile
               calFreqReqStr = getCalFreqReqStr({[curFreq, NA, NA]});
-              cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_FILTER], cmdFileRec);
+              cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1], cmdFileRec);
               % next frequency
               curFreq += origFreq;
               waitForCmdDone(cmdID, P2, AUTO_TIMEOUT, ERROR, mfilename());
@@ -109,7 +111,7 @@ function splitCalibrateSched(label = 1)
         showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
 
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
-        lpFundAmpl = loadCalFundAmpl(origFreq, fs, playChID, analysedChID);
+        lpFundAmpl = loadCalFundAmpl(origFreq, fs, playChID, analysedChID, EXTRA_CIRCUIT_LP1);
 
         curFreq = origFreq;
         clearOutBox();
@@ -149,7 +151,7 @@ function splitCalibrateSched(label = 1)
                 closeCalibPlot();
               endif
               
-              cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFileRec);
+              cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD], cmdFileRec);
               % next frequency
               curFreq += origFreq;
               waitForCmdDone(cmdID, P4, timeout, ERROR, mfilename());
@@ -163,7 +165,7 @@ function splitCalibrateSched(label = 1)
       case P6
         clearOutBox();
         printStr(sprintf('Calculating split calibration'));
-        calculateSplitCal(origFreq, fs, origPlayLevels(playChID), playChID, analysedChID, EXTRA_CIRCUIT_FILTER);
+        calculateSplitCal(origFreq, fs, origPlayLevels(playChID), playChID, analysedChID, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
         
         printStr(sprintf("Generating orig %dHz for split REC side calibration", origFreq));
         cmdID = sendGeneratorCmd(origFreq, origPlayLevels);
@@ -264,11 +266,10 @@ function targetLevels = getTargetLevelsForAnalysedCh(analysedAmpl, analysedChID)
   endif
 endfunction
 
-function lpFundAmpl = loadCalFundAmpl(freq, fs, playChID, analysedChID)
+function lpFundAmpl = loadCalFundAmpl(freq, fs, playChID, analysedChID, extraCircuit)
   global COMP_TYPE_JOINT;
-  global EXTRA_CIRCUIT_FILTER;
   persistent AMPL_IDX = 4;  % = index of fundAmpl1
   
-  [peaksRow, distortFreqs] = loadCalRow(freq, fs, COMP_TYPE_JOINT, playChID, analysedChID, EXTRA_CIRCUIT_FILTER);
+  [peaksRow, distortFreqs] = loadCalRow(freq, fs, COMP_TYPE_JOINT, playChID, analysedChID, extraCircuit);
   lpFundAmpl = peaksRow(1, AMPL_IDX);
 endfunction
