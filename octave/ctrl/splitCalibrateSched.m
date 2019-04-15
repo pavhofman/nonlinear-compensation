@@ -96,10 +96,14 @@ function splitCalibrateSched(label = 1)
 
             case P3
               printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", curFreq));
+
+              % deleting the calib file should it exist - always clean calibration
+              calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, EXTRA_CIRCUIT_LP1);
+              deleteFile(calFile);
+              
               % safety measure - requesting calibration only at curFreq
-              % TODO - support for renewing calfile - always new calfile
               calFreqReqStr = getCalFreqReqStr({[curFreq, NA, NA]});
-              cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1], cmdFileRec);
+              cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1], cmdFileRec);
               % next frequency
               curFreq += origFreq;
               waitForCmdDone(cmdID, P2, AUTO_TIMEOUT, ERROR, mfilename());
@@ -150,7 +154,10 @@ function splitCalibrateSched(label = 1)
                 timeout = AUTO_TIMEOUT;
                 closeCalibPlot();
               endif
-              
+              % deleting the calib file should it exist - always clean calibration
+              calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, EXTRA_CIRCUIT_VD);
+              deleteFile(calFile);
+
               cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD], cmdFileRec);
               % next frequency
               curFreq += origFreq;
@@ -182,6 +189,14 @@ function splitCalibrateSched(label = 1)
       case {P8, P9, P10}
         switch label
           case P8
+            % deleting the calib file for direct channel should it exist - always clean calibration
+            calFile = genCalFilename(origFreq, fs, COMP_TYPE_REC_SIDE, NA, getTheOtherChannelID(analysedChID), '');
+            deleteFile(calFile);
+
+            % the newly created calfile for analysedChID contains calculated data, not deleting
+            calFile = genCalFilename(origFreq, fs, COMP_TYPE_REC_SIDE, NA, analysedChID, '');
+            deleteFile(calFile);
+            
             expl = 'upper limit';
             adjustment = CAL_LEVEL_STEP;
             
@@ -202,7 +217,7 @@ function splitCalibrateSched(label = 1)
         % zooming calibration levels + plotting the range so that user can adjust precisely
         % target level = orig Rec level (not the increased range)
         zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, analysedChID));
-            
+        
         cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
         waitForCmdDone(cmdID, label + 1, MANUAL_TIMEOUT, ERROR, mfilename());
         return;
@@ -214,7 +229,7 @@ function splitCalibrateSched(label = 1)
         closeCalibPlot();
         
         printStr(sprintf('Compensating SPLIT REC side'));
-        cmdID = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX COMP_TYPE_REC_SIDE], cmdFileRec);
+        cmdID = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
         waitForCmdDone(cmdID, P12, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
