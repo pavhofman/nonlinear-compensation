@@ -219,10 +219,9 @@ function avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS)
       phaseDiffsC{end + 1} = exp(i * fundPeaksCh2(:, 3)) ./ exp(i * fundPeaksCh1(:, 3));
     endif
   endfor
-  % remove first and last row to avoid transitions - same as for averaging peaks
-  if length(phaseDiffsC) > 2
+  % remove first row to avoid transitions - same as for averaging peaks
+  if length(phaseDiffsC) > 1
     phaseDiffsC(1) = [];
-    phaseDiffsC(end) = [];
   endif
   
   % cell array cannot be averaged -> converting to properly oriented matrix
@@ -264,10 +263,9 @@ function [mergedPeaksCh, runsCnt] = mergePeaks(allPeaksCh)
   emptyIDs = find(cellfun('isempty', allPeaksCh));
   % remove empty cells
   allPeaksCh(:, emptyIDs) = [];
-  % remove first and last item - may contain transitional non-stable data
-  if size(allPeaksCh, 2) > 2
+  % remove first item - may contain transitional non-stable data
+  if size(allPeaksCh, 2) > 1
     allPeaksCh(:, 1) = [];
-    allPeaksCh(:, end) = [];
   endif
   
   runsCnt = size(allPeaksCh, 2);
