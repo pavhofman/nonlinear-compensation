@@ -7,10 +7,12 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   
   tasksMenu = uimenu (fig, "label", "&Tasks");
   
-  uimenu(tasksMenu, "label", "Split-Calibrate", 'callback', @clbkSplitCalibrate);
+  uimenu(tasksMenu, "label", "Calibrate Complete Split", 'callback', @clbkSplitCalibrate);
+  recStruct.calSingleMenu = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Single Run", 'separator', 'on', "callback", {@clbkCalib, false});
+  recStruct.calContMenu = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkCalib, true});
+  recStruct.calOffMenu = uimenu(tasksMenu, "label", "Stop Calibrating", 'enable', 'off', "callback", @clbkCalibOff);
+  
   uimenu(tasksMenu, "label", "Calibrate VD Freqs", 'callback', @clbkCalibrateFreqs);
-  uimenu(tasksMenu, "label", "Joint-Dev. Compen. VD", 'callback', @clbkCompenVD);
-  uimenu(tasksMenu, "label", "Joint-Dev. Compen. LPF", 'callback', @clbkCompenLPF);
 endfunction
 
 
@@ -34,22 +36,30 @@ function dirStruct = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
   global STORE_RECORDED;
   global SHOW_FFT;
   global DIR_REC;
+  global COMP_TYPE_JOINT;
+  global CMD_COMP_TYPE_PREFIX;
   
   fCmd = @(src, data, cmd, cmdFile) writeCmd(cmd, cmdFile);
 
   menu = uimenu (fig, "label", label);
   uimenu(menu, "label", "Pass", "callback", {fCmd, PASS, cmdFile});
-  uimenu(menu, "label", "Compensate", "callback", {fCmd, COMPENSATE, cmdFile});
+  
   if (dirStruct.dir == DIR_REC)
-    dirStruct.calSingleMenu = uimenu(menu, "label", "Calibrate Single Run", "callback", {@clbkCalib, false});
-    dirStruct.calContMenu = uimenu(menu, "label", "Calibrate Continuously", "callback", {@clbkCalib, true});
-    dirStruct.calOffMenu = uimenu(menu, "label", "Stop Calibrating", 'visible', 'off', "callback", @clbkCalibOff);
+    global COMP_TYPE_REC_SIDE;
+    compType = COMP_TYPE_REC_SIDE;
+  else
+    global COMP_TYPE_PLAY_SIDE;
+    compType = COMP_TYPE_PLAY_SIDE;
   endif
+  uimenu(menu, "label", ['Compensate Split ' sideName], "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(compType)], cmdFile});
+  
+  uimenu(menu, "label", 'Compensate Joint-Sides', "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFile});
+
   uimenu(menu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, ['Generate on ' sideName ' Side'], cmdFile});
-  dirStruct.genOffMenu = uimenu(menu, "label", "Stop Generating", 'visible', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFile});  
+  dirStruct.genOffMenu = uimenu(menu, "label", "Stop Generating", 'enable', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFile});  
 
   dirStruct.distortOnMenu = uimenu(menu, "label", "Distort", "callback", {@clbkDistort, ['Distort on ' sideName ' Side'], cmdFile});
-  dirStruct.distortOffMenu = uimenu(menu, "label", "Stop Distorting", 'visible', 'off', "callback", {@clbkCmdOff, DISTORT, cmdFile});
+  dirStruct.distortOffMenu = uimenu(menu, "label", "Stop Distorting", 'enable', 'off', "callback", {@clbkCmdOff, DISTORT, cmdFile});
 
   dirStruct.readfileMenu = uimenu(menu, "label", "Read from Audiofile", 'separator', 'on', "callback", {@clbkReadFile, cmdFile});
   dirStruct.readfileOffMenu = uimenu(menu, "label", "Stop File Reading", 'enable', 'off', "callback", {@clbkCmdOff, READFILE, cmdFile});

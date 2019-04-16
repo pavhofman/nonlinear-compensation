@@ -1,18 +1,18 @@
 function updateMenu(dirStruct, info)
   % setting distortion menu items visibility
   if isfield(info, 'distortHarmLevels') && ~isempty(info.distortHarmLevels)
-    setVisible(dirStruct.distortOnMenu, false);
-    setVisible(dirStruct.distortOffMenu, true);
+    setEnabled(dirStruct.distortOnMenu, false);
+    setEnabled(dirStruct.distortOffMenu, true);
   else
-    setVisible(dirStruct.distortOnMenu, true);
-    setVisible(dirStruct.distortOffMenu, false);
+    setEnabled(dirStruct.distortOnMenu, true);
+    setEnabled(dirStruct.distortOffMenu, false);
   endif
   
   % setting generation menu items visibility
   if isfield(info, 'genFunds') && ~isempty(info.genFunds)
-    setVisible(dirStruct.genOffMenu, true);
+    setEnabled(dirStruct.genOffMenu, true);
   else
-    setVisible(dirStruct.genOffMenu, false);
+    setEnabled(dirStruct.genOffMenu, false);
   endif
   
   global DIR_REC;
@@ -24,18 +24,18 @@ function updateMenu(dirStruct, info)
       global CALIBRATING;
       if isfield(info.status, CALIBRATING)
         % calibration running
-        setVisible(dirStruct.calOffMenu, true);
+        setEnabled(dirStruct.calOffMenu, true);
         setEnabled(dirStruct.calSingleMenu, false);
         setEnabled(dirStruct.calContMenu, false);
       else
         % calibration not running
-        setVisible(dirStruct.calOffMenu, false);
+        setEnabled(dirStruct.calOffMenu, false);
         setEnabled(dirStruct.calSingleMenu, true);
         setEnabled(dirStruct.calContMenu, true);          
       endif
     else
       % no analysis succcessful, cannot run calibration
-      setVisible(dirStruct.calOffMenu, false);
+      setEnabled(dirStruct.calOffMenu, false);
       setEnabled(dirStruct.calSingleMenu, false);
       setEnabled(dirStruct.calContMenu, false);
     endif
