@@ -83,6 +83,9 @@ global CMD_ID_PREFIX = "#ID#";
 % #CHCF#[F1,minAmpl,maxAmpl;F2,minAmpl,maxAmpl] CHCF[F1,NA,NA; F2,NA,NA]
 global CMD_CALFREQS_PREFIX = '#CHCF#';
 
+% number of calibration runs for averaging
+% #CALR#10
+global CMD_CALRUNS_PREFIX = '#CALR#';
 %ECfilter
 global CMD_EXTRA_CIRCUIT_PREFIX = '#EC#';
 % format for generator

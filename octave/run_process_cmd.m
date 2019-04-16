@@ -10,8 +10,10 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     % start/restart joint-device calibration
     % add status - e.g. why compensation is running for incremental calibration
     addStatus(CALIBRATING);
+    
     % optional continuous calibration, false = default
-    contCal = findNumInCmd(cmd, CMD_CONT_PREFIX, false);    
+    contCal = findNumInCmd(cmd, CMD_CONT_PREFIX, false);
+    
     % reading optional  extra circuit specifier string (will be stored in cal file name)
     calExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
     
@@ -24,11 +26,15 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     
     % default = channel 2 (right)
     playChannelID = findNumInCmd(cmd, CMD_CHANNEL_ID_PREFIX, 2);
+    
     % default = COMP_TYPE_JOINT
     compType = findNumInCmd(cmd, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT);
     
+    % optional number of averating calibration runs, 10 = default
+    calRuns = findNumInCmd(cmd, CMD_CALRUNS_PREFIX, 10);
+        
     % building calibration request struct
-    calRequest = initCalRequest(calFreqReq, compType, playChannelID, calExtraCircuit, contCal)
+    calRequest = initCalRequest(calFreqReq, compType, playChannelID, calExtraCircuit, contCal, calRuns)
 
     % clearing calibration buffer
     restartCal = true;

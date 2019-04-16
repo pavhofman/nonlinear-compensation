@@ -2,8 +2,6 @@
 function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, restart)
   persistent channelCnt = columns(calBuffer);
   % consts
-  % number of consequent calibration runs which contribute to final averaged value
-  persistent CAL_RUNS = 10;
   % max number of calibration runs. When reached, calibration quits with FAILED_RESULT
   persistent MAX_RUNS = 50;
   
@@ -109,14 +107,14 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
   endfor
   
   % runPeaks are updated, now checking RUN conditions
-  if any(correctRunsCounter < CAL_RUNS) && runID < MAX_RUNS
+  if any(correctRunsCounter < calRequest.calRuns) && runID < MAX_RUNS
     % some of the channels have not reached cal runs of same freqs
     % and still can run next time
     % result is already set
     return;
   end
       
-  if all(correctRunsCounter >= CAL_RUNS)
+  if all(correctRunsCounter >= calRequest.calRuns)
     % enough stable runs, storing the average
     writeLog('INFO', 'Enough runs %d, calibrating with measured peaks', runID); 
     timestamp = time();
@@ -162,7 +160,7 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
     result = FINISHED_RESULT;
     
   else
-    writeLog('WARN', "Reached %d max runs yet did not have at least %d same fund peaks runs in all channels, failing the calibration", MAX_RUNS, CAL_RUNS);
+    writeLog('WARN', "Reached %d max runs yet did not have at least %d same fund peaks runs in all channels, failing the calibration", MAX_RUNS, calRequest.calRuns);
     msg = 'Timed out without freqs';
     global FAILED_RESULT;
     result = FAILED_RESULT;
