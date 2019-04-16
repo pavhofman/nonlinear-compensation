@@ -13,11 +13,11 @@ else
   
   if (statusContains(CALIBRATING))
     % running the actual calibration with calBuffer
-    [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, restartCal);
+    [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, restartCal);
     setStatusResult(CALIBRATING, result);
 
     % building complete status infomessage
-    completeMsg = [num2str(sameFreqsCounter(1)) '-' num2str(sameFreqsCounter(2)) '/' num2str(runID) ' ' msg];
+    completeMsg = [num2str(correctRunsCounter(1)) '-' num2str(correctRunsCounter(2)) '/' num2str(runID) ' ' msg];
     setStatusMsg(CALIBRATING, completeMsg);
 
     restartCal = false;

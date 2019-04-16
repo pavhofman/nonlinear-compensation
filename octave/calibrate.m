@@ -1,5 +1,5 @@
 % calRequest.calFreqs - optional 1/2 values. If not empty, wait for these freqs to come (in both channels), with timeout
-function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, restart)
+function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, restart)
   persistent channelCnt = columns(calBuffer);
   % consts
   % number of consequent calibration runs which contribute to final averaged value
@@ -19,7 +19,7 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   global FAILING_RESULT;
   global RUNNING_OK_RESULT;
 
-  persistent sameFreqsCounter = zeros(channelCnt, 1);
+  persistent correctRunsCounter = zeros(channelCnt, 1);
   
   msg = '';
   
@@ -28,7 +28,7 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   if (restart)
     % resetting all relevant persistent vars
     runID = 0;
-    sameFreqsCounter = zeros(channelCnt, 1);
+    correctRunsCounter = zeros(channelCnt, 1);
     allFundPeaks = cell(channelCnt, MAX_RUNS);
     allDistortPeaks = cell(channelCnt, MAX_RUNS);    
   endif
@@ -49,15 +49,37 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
     else
       calFreqReqCh = [];
     end
-    areSameWithPrevious = areSameExistingPeaks(fundPeaksCh, prevFundPeaksCh, MAX_AMPL_DIFF);
-    haveCorrectFreqs = isempty(calFreqReqCh) || isequal(getFreqs(calFreqReqCh), getFreqs(fundPeaksCh));
-    haveCorrectFreqsAndLevels = haveCorrectFreqs && (isempty(calFreqReqCh) || checkCorrectLevels(calFreqReqCh, fundPeaksCh));
-    areSameAndCorrect = areSameWithPrevious && haveCorrectFreqsAndLevels;
-    
-    if ~areSameAndCorrect
-      % are different or none
+    checksOK = false;
+    % same freqs check
+    if areSameFreqs(fundPeaksCh, prevFundPeaksCh)
+      % same levels check
+      if areSameLevels(fundPeaksCh, prevFundPeaksCh, MAX_AMPL_DIFF)
+        % req. freqs check
+        if isempty(calFreqReqCh) || isequal(getFreqs(calFreqReqCh), getFreqs(fundPeaksCh))
+          % req. levels check 
+          if isempty(calFreqReqCh) || checkCorrectLevels(calFreqReqCh, fundPeaksCh)
+            % all checks OK, this run is OK
+            checksOK = true;
+          else
+            writeLog('WARN', 'Measured levels different from requested, resetting counter');
+            msg = 'Levels outside of the requested range';
+          endif          
+        else
+          writeLog('WARN', 'Different fund freqs from requested, resetting counter');
+          msg = 'Freqs different from requested';
+        endif        
+      else
+        writeLog('WARN', 'Different levels in run %d from previous run, resetting counter', runID);
+        msg = 'Unstable levels';
+      endif
+    else
+      writeLog('WARN', 'Different/zero fund freqs in run %d from previous run, resetting counter', runID);
+      msg = 'Unstable freqs';
+    endif
+            
+    if ~checksOK
       % reset the counter
-      sameFreqsCounter(channelID) = 0;
+      correctRunsCounter(channelID) = 0;
       % reset saved peaks from previous runs
       allFundPeaks = cell(channelCnt, MAX_RUNS);
       allDistortPeaks = cell(channelCnt, MAX_RUNS);
@@ -65,15 +87,13 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
       % DEBUG printing values
       writeLog('DEBUG', 'This round fundPeaksCh: %s', disp(fundPeaksCh));
       writeLog('DEBUG', 'Prev. round fundPeaksCh: %s',disp(prevFundPeaksCh));
-      writeLog('WARN', 'Different/zero fund freqs or different ampls in run %d from previous run, resetting counter', runID);
-      msg = 'Unstable/different freqs';
       result = FAILING_RESULT;
       % go to next channel
       break;
     else
       writeLog('DEBUG', 'Same fund peaks as in previous run in in run %d, using for averaging', runID);
       % same non-empty freqs from previous run, can continue
-      sameFreqsCounter(channelID) += 1;
+      correctRunsCounter(channelID) += 1;
       % save peaks for averaging
       if hasAnyPeak(distortPeaksCh)
         % time shift distortPeaks to zero phase of fundPeaks        
@@ -89,14 +109,14 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   endfor
   
   % runPeaks are updated, now checking RUN conditions
-  if any(sameFreqsCounter < CAL_RUNS) && runID < MAX_RUNS
+  if any(correctRunsCounter < CAL_RUNS) && runID < MAX_RUNS
     % some of the channels have not reached cal runs of same freqs
     % and still can run next time
     % result is already set
     return;
   end
       
-  if all(sameFreqsCounter >= CAL_RUNS)
+  if all(correctRunsCounter >= CAL_RUNS)
     % enough stable runs, storing the average
     writeLog('INFO', 'Enough runs %d, calibrating with measured peaks', runID); 
     timestamp = time();
@@ -150,7 +170,7 @@ function [result, runID, sameFreqsCounter, msg] = calibrate(calBuffer, prevFundP
   
   % reset values for next calibration
   runID = 0;
-  sameFreqsCounter = zeros(channelCnt, 1);
+  correctRunsCounter = zeros(channelCnt, 1);
   allFundPeaks = cell(channelCnt, MAX_RUNS);
   allDistortPeaks = cell(channelCnt, MAX_RUNS);
 endfunction
@@ -160,8 +180,8 @@ endfunction
 function result = checkCorrectLevels(calFreqReqCh, fundPeaksCh)
   % calFreqReqCh format: [F1,minAmpl,maxAmpl;F2,minAmpl,maxAmpl] OR [F1,NA,NA; F2,NA,NA]
   for rowID = 1:rows(fundPeaksCh)
-    calFreqRow = calFreqReqCh(rowID, :);
-    minAmpl = calFreqRow(2);
+    calFreqReqRow = calFreqReqCh(rowID, :);
+    minAmpl = calFreqReqRow(2);
     if isna(minAmpl)
       % minAmpl NA, no check
       continue;
@@ -172,7 +192,7 @@ function result = checkCorrectLevels(calFreqReqCh, fundPeaksCh)
         result = false;
         return;
       else
-        maxAmpl = calFreqRow(3);
+        maxAmpl = calFreqReqRow(3);
         if ~isna(maxAmpl) && fundAmpl> maxAmpl
           % too large
           result = false;
