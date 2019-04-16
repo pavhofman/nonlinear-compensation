@@ -6,7 +6,7 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
   persistent MAX_RUNS = 50;
   
   % maximum fund ampl. difference between subsequent runs to consider stable fundPeaks
-  persistent MAX_AMPL_DIFF = db2mag(-60);
+  persistent MAX_AMPL_DIFF = db2mag(-80);
   
   % memory of previous peaks, subjected to averaging  
   persistent allFundPeaks = cell(channelCnt, MAX_RUNS);
@@ -84,12 +84,12 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
 
       % DEBUG printing values
       writeLog('DEBUG', 'This round fundPeaksCh: %s', disp(fundPeaksCh));
-      writeLog('DEBUG', 'Prev. round fundPeaksCh: %s',disp(prevFundPeaksCh));
+      writeLog('DEBUG', 'Prev. round fundPeaksCh: %s', disp(prevFundPeaksCh));
       result = FAILING_RESULT;
       % go to next channel
       break;
     else
-      writeLog('DEBUG', 'Same fund peaks as in previous run in in run %d, using for averaging', runID);
+      writeLog('DEBUG', 'Same fund peaks as in previous run + correct freqs and levels in in run %d, using for averaging', runID);
       % same non-empty freqs from previous run, can continue
       correctRunsCounter(channelID) += 1;
       % save peaks for averaging
