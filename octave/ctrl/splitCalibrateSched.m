@@ -8,6 +8,10 @@ function splitCalibrateSched(label = 1)
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
   
+  % number of averaging calibration runs for calibrations yielding only fundamentals for transfer measuring
+  % keeping same as regular full count for now
+  persistent REDUCED_CALIB_RUNS = 10;
+  
   % step above and below exact calibration level to also calibrate for interpolation
   persistent CAL_LEVEL_STEP = db2mag(0.1);
   
@@ -30,6 +34,7 @@ function splitCalibrateSched(label = 1)
   global CMD_EXTRA_CIRCUIT_PREFIX;
   global CMD_CHANNEL_FUND_PREFIX;
   global CMD_COMP_TYPE_PREFIX;
+  global CMD_CALRUNS_PREFIX;
   global COMP_TYPE_JOINT;
   global COMP_TYPE_PLAY_SIDE;
   global COMP_TYPE_REC_SIDE;
@@ -103,7 +108,12 @@ function splitCalibrateSched(label = 1)
               
               % safety measure - requesting calibration only at curFreq
               calFreqReqStr = getCalFreqReqStr({[curFreq, NA, NA]});
-              cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1], cmdFileRec);
+              calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
+              if curFreq > origFreq
+                % calibrating at harmonics freqs - only the fundaments data are used for measuring LPF transfer - can use fewer averaging calruns                
+                calCmd = [calCmd ' ' CMD_CALRUNS_PREFIX num2str(REDUCED_CALIB_RUNS)];
+              endif
+              cmdID = writeCmd(calCmd, cmdFileRec);
               % next frequency
               curFreq += origFreq;
               waitForCmdDone(cmdID, P2, AUTO_TIMEOUT, ERROR, mfilename());
@@ -158,7 +168,14 @@ function splitCalibrateSched(label = 1)
               calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, EXTRA_CIRCUIT_VD);
               deleteFile(calFile);
 
-              cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD], cmdFileRec);
+              calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
+              
+              if curFreq > origFreq
+                % calibrating at harmonics freqs - only the fundaments data are used for measuring VD transfer - can use fewer averaging calruns                
+                calCmd = [calCmd ' ' CMD_CALRUNS_PREFIX num2str(REDUCED_CALIB_RUNS)];
+              endif
+
+              cmdID = writeCmd(calCmd, cmdFileRec);
               % next frequency
               curFreq += origFreq;
               waitForCmdDone(cmdID, P4, timeout, ERROR, mfilename());
