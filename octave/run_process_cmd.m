@@ -4,7 +4,7 @@ if (strcmp(cmd{1}, PAUSE))
 elseif (strcmp(cmd{1}, CALIBRATE))
     if length(cmd) > 1 && strcmp(cmd{2}, 'off')
     % calibration off
-    source 'stopCalibration.m';
+    source 'stop_calibration.m';
   else
     % cal extraCircuit
     % start/restart joint-device calibration
