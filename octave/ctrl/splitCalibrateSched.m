@@ -13,7 +13,7 @@ function splitCalibrateSched(label = 1)
   persistent REDUCED_CALIB_RUNS = 10;
   
   % step above and below exact calibration level to also calibrate for interpolation
-  persistent CAL_LEVEL_STEP = db2mag(0.1);
+  persistent CAL_LEVEL_STEP = db2mag(0.05);
   
   % right ch goes through LP or VD, left input channel is direct
   % fixed for now!
@@ -218,22 +218,27 @@ function splitCalibrateSched(label = 1)
             adjustment = CAL_LEVEL_STEP;
             
           case P9
+            expl = 'lower limit';
+            adjustment = 1/CAL_LEVEL_STEP;
+            
+          case P10
+            % last run at exact value - for now
             expl = 'exact value';
             adjustment = 1;
             
-          case P10
-            expl = 'lower limit';
-            adjustment = 1/CAL_LEVEL_STEP;            
         endswitch
         
         printStr(sprintf('Calibrating REC side at original recLevel of channel %d - %s', analysedChID, expl));
         
         % amplitude-constrained calibration
-        calFreqReq = getConstrainedLevelCalFreqReq(origRecLevel * adjustment, origFreq, analysedChID);
+        % TODO - for now using lpFundAmpl instead of origRecLevel to allow easy switching between LP and VD for result checking
+        % calFreqReq = getConstrainedLevelCalFreqReq(origRecLevel * adjustment, origFreq, analysedChID);
+        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl * adjustment, origFreq, analysedChID);
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
         % zooming calibration levels + plotting the range so that user can adjust precisely
         % target level = orig Rec level (not the increased range)
-        zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, analysedChID));
+        % zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, analysedChID));
+        zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(lpFundAmpl, analysedChID));
         
         cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
         waitForCmdDone(cmdID, label + 1, MANUAL_TIMEOUT, ERROR, mfilename());
@@ -281,7 +286,7 @@ endfunction
 
 function calFreqReq = getConstrainedLevelCalFreqReq(midAmpl, freq, analysedChID)
   % max. allowed deviation in each direction from midAmpl
-  persistent calTolerance = db2mag(0.05);
+  persistent calTolerance = db2mag(0.03);
 
   minAmpl = midAmpl/calTolerance;
   maxAmpl = midAmpl*calTolerance;
