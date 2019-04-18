@@ -129,10 +129,10 @@ function typeStr = getCompTypeStr(compRequest)
       typeStr = 'Joint-Sides';
     
     case COMP_TYPE_PLAY_SIDE
-      typeStr = 'Split Playback';
+      typeStr = 'Only Playback';
     
     case COMP_TYPE_REC_SIDE
-      typeStr = 'Split Capture';
+      typeStr = 'Only Capture';
   endswitch
   
   if ~isempty(compRequest.extraCircuit)
