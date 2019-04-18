@@ -44,6 +44,7 @@ function info = addStatusDetails(status, info)
   global GENERATING;
   global CALIBRATING;
   global DISTORTING;
+  global COMPENSATING;
   
   switch status
     case GENERATING
@@ -54,6 +55,10 @@ function info = addStatusDetails(status, info)
       global calRequest;
       info.calRequest = calRequest;
 
+    case COMPENSATING
+      global compRequest;
+      info.compRequest = compRequest;
+      
     case DISTORTING
       global distortHarmLevels;
       info.distortHarmLevels = distortHarmLevels;

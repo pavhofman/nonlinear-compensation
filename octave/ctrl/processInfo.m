@@ -63,7 +63,6 @@ function updateStatusTxts(dirStruct, info)
   persistent RED = [0.5, 0, 0];
   persistent BLACK = [0, 0, 0];
   
-  global COMPENSATING;
   statusStr = cell();
   
   statusStruct = info.status;
@@ -79,9 +78,9 @@ function updateStatusTxts(dirStruct, info)
 
   for id = 1 : statusCnt;
     status = sortedStatuses{id};
-    statusToShow = status;
+    statusToShow = getStatusToShow(status, info);
     
-    statusVal = statusStruct.(status);
+    statusVal = statusStruct.(status);    
     if isfield(statusVal, 'msg') && ~isempty(statusVal.msg)
       statusToShow = [statusToShow ': ' statusVal.msg];
     endif
@@ -105,7 +104,43 @@ function updateStatusTxts(dirStruct, info)
     setFieldString(dirStruct.statusTxts{id}, '');
   endfor
 endfunction
+
+function statusToShow = getStatusToShow(status, info)
+  global COMPENSATING;
+  global CALIBRATING;
   
+  statusToShow = status;
+  switch(status)
+      case COMPENSATING
+        statusToShow = [statusToShow ' ' getCompTypeStr(info.compRequest)];
+        
+      case CALIBRATING
+        statusToShow = [statusToShow ' ' getCompTypeStr(info.calRequest)];
+    endswitch
+endfunction
+
+function typeStr = getCompTypeStr(compRequest)
+  global COMP_TYPE_JOINT;
+  global COMP_TYPE_PLAY_SIDE;
+  global COMP_TYPE_REC_SIDE;
+  
+  switch(compRequest.compType)
+    case COMP_TYPE_JOINT
+      typeStr = 'Joint-Sides';
+    
+    case COMP_TYPE_PLAY_SIDE
+      typeStr = 'Split Playback';
+    
+    case COMP_TYPE_REC_SIDE
+      typeStr = 'Split Capture';
+  endswitch
+  
+  if ~isempty(compRequest.extraCircuit)
+    typeStr = [typeStr ' (' compRequest.extraCircuit ')'];
+  endif
+endfunction
+
+    
 function [detailsCh1, detailsCh2] = getStatusDetails(info)  
   statusStruct = info.status;
   global DETAILS_STATUS_ORDER;

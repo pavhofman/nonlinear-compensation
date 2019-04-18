@@ -69,7 +69,7 @@ calBuffer = [];
 calibrationSize = NA;
 
 global calRequest = NA;
-compRequest = NA;
+global compRequest = NA;
 
 recordedData = [];
 
