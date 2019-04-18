@@ -24,20 +24,17 @@ function updateMenu(dirStruct, info)
       global CALIBRATING;
       if isfield(info.status, CALIBRATING)
         % calibration running
-        setEnabled(dirStruct.calOffMenu, true);
-        setEnabled(dirStruct.calSingleMenu, false);
-        setEnabled(dirStruct.calContMenu, false);
+        setEnabled(dirStruct.calOnMenus, false);
+        setEnabled(dirStruct.calOffMenus, true);
       else
         % calibration not running
-        setEnabled(dirStruct.calOffMenu, false);
-        setEnabled(dirStruct.calSingleMenu, true);
-        setEnabled(dirStruct.calContMenu, true);          
+        setEnabled(dirStruct.calOnMenus, true);
+        setEnabled(dirStruct.calOffMenus, false);
       endif
     else
       % no analysis succcessful, cannot run calibration
-      setEnabled(dirStruct.calOffMenu, false);
-      setEnabled(dirStruct.calSingleMenu, false);
-      setEnabled(dirStruct.calContMenu, false);
+      setEnabled(dirStruct.calOnMenus, false);
+      setEnabled(dirStruct.calOffMenus, false);
     endif
   endif
   

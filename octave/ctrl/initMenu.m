@@ -1,18 +1,27 @@
 function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   global cmdFileRec;
   global cmdFilePlay;
+  global COMP_TYPE_JOINT;
 
-  playStruct = initDirMenu(fig, playStruct, cmdFilePlay, '&Playback', 'Playback');
-  recStruct = initDirMenu(fig, recStruct, cmdFileRec, '&Capture', 'Capture');
   
+  [playStruct, calOnMenusPlay, calOffMenusPlay] = initDirMenu(fig, playStruct, cmdFilePlay, '&Playback', 'Playback');  
+  [recStruct, calOnMenusRec, calOffMenusRec] = initDirMenu(fig, recStruct, cmdFileRec, '&Capture', 'Capture');
+
+  calOnMenusTasks = cell();
+  calOffMenusTasks = cell();
+
   tasksMenu = uimenu (fig, "label", "&Tasks");
   
-  uimenu(tasksMenu, "label", "Calibrate Complete Split", 'callback', @clbkSplitCalibrate);
-  recStruct.calSingleMenu = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Single Run", 'separator', 'on', "callback", {@clbkCalib, false});
-  recStruct.calContMenu = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkCalib, true});
-  recStruct.calOffMenu = uimenu(tasksMenu, "label", "Stop Calibrating", 'enable', 'off', "callback", @clbkCalibOff);
+  uimenu(tasksMenu, "label", "Calibrate Playback/Capture Split", 'callback', @clbkSplitCalibrate);
+  calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Single Run", 'separator', 'on', "callback", {@clbkCalib, COMP_TYPE_JOINT, false});
+  calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkCalib, COMP_TYPE_JOINT, true});
+  calOffMenusTasks{end+1} = uimenu(tasksMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
   
-  uimenu(tasksMenu, "label", "Calibrate VD Freqs", 'callback', @clbkCalibrateFreqs);
+  uimenu(tasksMenu, "label", "Devel - Calibrate VD Freqs", 'separator', 'on', 'callback', @clbkCalibrateFreqs);
+  
+  % array of menu items related to calibration start/stop - used to enable/disable all at once
+  recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
+  recStruct.calOffMenus = [cell2mat(calOffMenusPlay), cell2mat(calOffMenusRec), cell2mat(calOffMenusTasks)];
 endfunction
 
 
@@ -26,7 +35,7 @@ function clbkSplitCalibrate(src, data)
   splitCalibrateSched();
 endfunction
 
-function dirStruct = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
+function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
   global COMPENSATE;
   global PASS;
   global DISTORT;
@@ -40,6 +49,8 @@ function dirStruct = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
   global CMD_COMP_TYPE_PREFIX;
   
   fCmd = @(src, data, cmd, cmdFile) writeCmd(cmd, cmdFile);
+  calOnMenus = cell();
+  calOffMenus = cell();
 
   menu = uimenu (fig, "label", label);
   uimenu(menu, "label", "Pass", "callback", {fCmd, PASS, cmdFile});
@@ -51,10 +62,16 @@ function dirStruct = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
     global COMP_TYPE_PLAY_SIDE;
     compType = COMP_TYPE_PLAY_SIDE;
   endif
-  uimenu(menu, "label", ['Compensate Split ' sideName], "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(compType)], cmdFile});
+  uimenu(menu, "label", ['Compensate Only ' sideName], "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(compType)], cmdFile});
   
   uimenu(menu, "label", 'Compensate Joint-Sides', "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFile});
-
+  
+  calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate Only ' sideName ': Single Run'], 'separator', 'on', "callback", {@clbkCalib, compType, false});
+  calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate Only ' sideName ': Continuously'], "callback", {@clbkCalib, compType, true});
+  calOffMenus{end+1} = uimenu(menu, "label", "Stop Calibrating", 'enable', 'off', "callback", @clbkCalibOff);
+  
+  uimenu(menu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, ['Generate on ' sideName ' Side'], cmdFile});
+  
   uimenu(menu, "label", "Generate", 'separator', 'on', "callback", {@clbkGenerate, ['Generate on ' sideName ' Side'], cmdFile});
   dirStruct.genOffMenu = uimenu(menu, "label", "Stop Generating", 'enable', 'off', "callback", {@clbkCmdOff, GENERATE, cmdFile});  
 
