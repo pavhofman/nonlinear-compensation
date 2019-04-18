@@ -9,10 +9,11 @@ function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, vd
 
 
   fundAmplVD = peaksVDRow(1, AMPL_IDX);
-  % attenuation of voltage divider relative to generated amplitude on D side!
-  gainVD = fundAmplVD / playAmpl;
 
-  [fundLPGain, fundLPPhaseShift] = detTransfer(fundFreq, peaksVDRow, peaksLPRow, playAmpl);
+  % fundXXGain - attenuation of voltage divider relative to generated amplitude on D side!
+  % fundXXPhaseShift - phaseshift between analysed channel and direct channel
+  [fundVDGain, fundVDPhaseShift] = detTransfer(peaksVDRow, playAmpl);
+  [fundLPGain, fundLPPhaseShift] = detTransfer(peaksLPRow, playAmpl);
 
 
   % length of time series for nonlin_curvefit
@@ -28,9 +29,14 @@ function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, vd
   
   % VD and LP equations solve for the same DA/AD distortions. Same means they must be the the same time.
   % VD: time on AD side = time on DA side (no phaseShift considered). 
-  % LP: LP is calculated for time = 0 (fundPhase = 0 - peaksLPRow has time moved to zero phase by calibration). 
-  % But at time = 0 on DA side => on LP side the phase would be fundLPPhaseShift. Therefore refLP must be shifted by this time delay since 0-based peaksLPRow corresponds to time = -fundLPPhaseShift  
-  fundLPTimeOffset = fundLPPhaseShift/(2*pi*fundFreq);
+  % LP: LP is calculated for time = 0 (fundPhase = 0 - peaksLPRow has time moved to zero phase by calibration).
+  % But at time = 0 on DA side => on LP side the phase would be shifted. 
+  % Therefore refLP must be shifted by this time delay since 0-based peaksLPRow corresponds to time corresponding to this phase shift.
+  % All we have are phase shifts of analyzed channel vs. direct channel. This phase shift for VD is not zero - there are differences between the two channels
+  % We need phase shift between LP and VD. Therefore we must subtract the interchannel difference (fundVDPhaseShift) to get plain VD phaseshift
+  
+  fundLPvsVDPhaseShift = fundLPPhaseShift - fundVDPhaseShift;
+  fundLPvsVDTimeOffset = (fundLPvsVDPhaseShift)/(2*pi*fundFreq);
   
   while distortFreq < fs/2
     N = distortFreq/ fundFreq;
@@ -64,18 +70,21 @@ function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, vd
     % Dlp + Alp = LP where D, A, G are amplitude and phase (complex amplitude) for filter signal (measured at filter levels!)
     
     % LP levels!
-    % distort params are zero-based which does not correspond to time = 0, the sine must be shifted by fundLPTimeOffset
-    refLP = cos(2*pi * distortFreq * (t + fundLPTimeOffset) + distortPhaseLP) * distortAmplLP;
+    % distort params are zero-based which does not correspond to time = 0, the sine must be shifted by fundLPvsVDTimeOffset
+    refLP = cos(2*pi * distortFreq * (t + fundLPvsVDTimeOffset) + distortPhaseLP) * distortAmplLP;
 
     % "known" values for fitting
     y = [refVD; refLP];
 
-    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFiles(distortFreq, fs, playAmpl, playChID, analysedRecChID, vdName, lpName);
+    [distortVDGain, distortVDPhaseShift] = detTransferFromCalFile(distortFreq, fs, playAmpl, playChID, analysedRecChID, vdName);
+    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFile(distortFreq, fs, playAmpl, playChID, analysedRecChID, lpName);
+    distortLPvsVDPhaseShift = distortLPPhaseShift - distortVDPhaseShift;
+    
     
     % AD harmonic phaseShift - caused by fundamental phase shift (i.e. fund * harmonic id)        
-    phaseShiftAByLP = fundLPPhaseShift * N;
+    phaseShiftAByLPvsVD = fundLPvsVDPhaseShift * N;
 
-    f = @(p, x) vdlpEqs(t, distortFreq, p(1), p(2), p(3), p(4), gainVD, distortLPGain, distortLPPhaseShift, fundLPGain, phaseShiftAByLP);
+    f = @(p, x) vdlpEqs(t, distortFreq, p(1), p(2), p(3), p(4), fundVDGain, fundLPGain, distortVDGain, distortLPGain, distortLPvsVDPhaseShift, phaseShiftAByLPvsVD);
     % ampls half, phases zero
     init = [distortAmplVD/2; 0; distortAmplVD/2; 0];
 
