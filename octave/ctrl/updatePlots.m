@@ -39,12 +39,13 @@ function updatePlots(dirStruct, info)
     endif
     
     % determine current levels
-    measuredPeaksCh = info.measuredPeaks{channelID};
-    if ~isempty(measuredPeaksCh)
-      curLevels = info.measuredPeaks{channelID}(:, 2);
-      curLevels = 20*log10(curLevels);
-    else
-      curLevels = [];
+    curLevels = [];
+    if iscell(info.measuredPeaks)
+      measuredPeaksCh = info.measuredPeaks{channelID};
+      if ~isempty(measuredPeaksCh)
+        curLevels = info.measuredPeaks{channelID}(:, 2);
+        curLevels = 20*log10(curLevels);
+      endif
     endif
     
     % plotting current levels
