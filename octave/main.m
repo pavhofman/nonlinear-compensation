@@ -71,6 +71,12 @@ calibrationSize = NA;
 global calRequest = NA;
 global compRequest = NA;
 
+% row of equalizer coeffs for each channel - initialized at first run when channel count is known
+global equalizer = NA;
+
+% count of clipped samples in one cycle
+global clippedCnt = 0;
+
 recordedData = [];
 
 transfer = struct();
@@ -87,6 +93,9 @@ source 'run_common.m';
 firstCycle = true;
 
 while(true)
+  % resetting clipped counter
+  clippedCnt = 0;
+  
   % checking command file for new commands
   if (exist(cmdFile, 'file'))    
     lines = textread(cmdFile, '%s');
@@ -128,10 +137,16 @@ while(true)
     prevFundPeaks = cell(channelCnt, 1);
     firstCycle = false;
     calibrationSize = fs; % 1 second, resolution 1Hz
+    % ones
+    equalizer = ones(1, channelCnt);
   endif
 
   if (statusContains(GENERATING))
     source 'run_generator.m';
+  endif
+  
+  if direction == DIR_PLAY
+    source 'process_mode_play.m';
   endif
  
 
@@ -159,6 +174,10 @@ while(true)
     compenCalFiles = cell(columns(buffer), 1);
   endif
   
+  if direction == DIR_REC
+    source 'process_mode_rec.m';
+  endif
+
   % recording to memory if enabled
   if structContains(sinkStruct, MEMORY_SINK)
     source 'record_data.m';

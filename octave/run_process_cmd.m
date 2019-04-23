@@ -1,6 +1,13 @@
 if (strcmp(cmd{1}, PAUSE))
   setStatus(PAUSED);
   
+elseif (strcmp(cmd{1}, SET_MODE))
+  % default = MODE_DUAL
+  chMode = findNumInCmd(cmd, MODE_PREFIX, MODE_DUAL);
+  writeLog('INFO', 'Switched to mode %d', chMode);
+  % setting mode completes command immediately
+  cmdDoneID = cmdID;
+  
 elseif (strcmp(cmd{1}, CALIBRATE))
     if length(cmd) > 1 && strcmp(cmd{2}, 'off')
     % calibration off

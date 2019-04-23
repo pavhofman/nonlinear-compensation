@@ -25,6 +25,9 @@ global RECORD = 'rec';
 % store recorded output data into audio file
 global STORE_RECORDED = 'storerec';
 
+% set mode + mode value
+global SET_MODE = 'mode';
+
 NO_CMD = '';
 
 % statuses
@@ -79,6 +82,9 @@ global FAILED_RESULT = -1; % finished, bad
 % format: ID25
 global CMD_ID_PREFIX = "#ID#";
 
+% format for setting mode
+global MODE_PREFIX = "#MODE#";
+
 % format for calibration frequency info
 % #CHCF#[F1,minAmpl,maxAmpl;F2,minAmpl,maxAmpl] CHCF[F1,NA,NA; F2,NA,NA]
 global CMD_CALFREQS_PREFIX = '#CHCF#';
@@ -97,6 +103,7 @@ global CMD_HARM_LEVELS_PREFIX = '#HL#';
 
 % continuous calibration ( cal #CONT1): 1 = yes, 0 = no (default)
 global CMD_CONT_PREFIX = '#CONT#';
+
 % channel ID (e.g. play-side channel ID for calibration
 global CMD_CHANNEL_ID_PREFIX = '#CHID#';
 
@@ -133,6 +140,21 @@ global COMP_TYPE_JOINT = 0;
 global COMP_TYPE_PLAY_SIDE = 1;
 global COMP_TYPE_REC_SIDE = 2;
 
+% operation modes
+% values = index of corresponding radio buttons in CTRL!
+% dual/unbalanced/separate L, R
+global MODE_DUAL = 1;
+% id of channel to keep in MODE_BAL and MODE_SINGLE
+% RIGHT
+global KEEP_CHANNEL_ID = 2;
+
+% balanced - PLAY: L = -R(equalized), R = R
+%            REC: R = R - L(equalized)/2, L = R - L(equalized)/2
+global MODE_BAL = 2;
+% single channel - PLAY: L = 0, R = R
+%                  REC: R = R - L, L = R - L
+global MODE_SINGLE = 3;
+
 
 global showFFTCfg = struct();
 showFFTCfg.fig = NA;
@@ -163,3 +185,6 @@ global FILE_CHAN_LIST = [];
 useZeroMQ = true;
 
 global MIN_LOG_LEVEL = 'DEBUG';
+
+% default mode
+global chMode = MODE_DUAL;

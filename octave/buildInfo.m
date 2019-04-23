@@ -13,6 +13,7 @@ function info = buildInfo()
   global sourceStruct;
   global sinkStruct;
   global showFFTCfg;
+  global chMode;
   
 
   info.id = NA;
@@ -22,6 +23,8 @@ function info = buildInfo()
   for [val, statusItem ] = statusStruct
     info = addStatusDetails(statusItem, info);
   endfor
+  
+  info.chMode = chMode;
   
   info.measuredPeaks = measuredPeaks;
   info.distortPeaks = distortPeaks;
