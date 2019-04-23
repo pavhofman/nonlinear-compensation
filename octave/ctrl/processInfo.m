@@ -12,6 +12,8 @@ function processInfo(info, dirStruct)
   %info.calFreqs;
   %info.direction = direction;
   
+  showChMode(dirStruct.chModeGroup, info.chMode, dirStruct);
+  
   updateStatusTxts(dirStruct, info);
   updateMenu(dirStruct, info);
 
