@@ -1,8 +1,10 @@
-function request = initCalRequest(calFreqReq, compType, playChannelID, extraCircuit, contCal, calRuns)  
+function request = initCalRequest(calFreqReq, compType, playChannelID, extraCircuit, contCal, calRuns, chMode)  
   request = initCompRequest(compType, playChannelID, extraCircuit);
   % plus calibration-specific data
   request.calFreqReq = calFreqReq;
   request.contCal = contCal;
   % number of consequent calibration runs which contribute to final averaged value
-  request.calRuns = calRuns;  
+  request.calRuns = calRuns;
+  % chMode is part of created calfile name.
+  request.chMode = chMode;
 endfunction

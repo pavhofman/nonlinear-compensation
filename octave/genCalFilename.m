@@ -1,7 +1,7 @@
-% result: joint-sides version calDir/cal_freq1_freq2_FS48000_playDevName_CHchannelID_recDevName_CHchannelID_extracircuit.dat
-% split play-side version: calDir/cal_freq1_freq2_FS48000_playDevName_CHchannelID_extracircuit.dat
-% split rec-side version: calDir/cal_freq1_freq2_FS48000_recDevName_CHchannelID_extracircuit.dat
-function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelID, channelID, extraCircuit='')
+% result: joint-sides version calDir/cal_freq1_freq2_FS48000_playDevName_CHchannelID_recDevName_CHchannelID_MchannelMode_extracircuit.dat
+% split play-side version: calDir/cal_freq1_freq2_FS48000_playDevName_CHchannelID_MchannelMode_extracircuit.dat
+% split rec-side version: calDir/cal_freq1_freq2_FS48000_recDevName_CHchannelID_MchannelMode_extracircuit.dat
+function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelID, channelID, chMode, extraCircuit='')
   global dataDir;
   
   devSpecs = createCalFileDevSpecs(compType, playChannelID, channelID);
@@ -27,6 +27,9 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
     filename = [filename '_' devSpec{1} '_CH' int2str(devSpec{2})];
   endfor
   
+  % adding channel mode
+  filename = [filename '_M' num2str(chMode)];
+  
   filename = [filename extraCircuit '.dat'];
   filename = genDataPath(filename);
 endfunction
@@ -51,13 +54,14 @@ endfunction
 %! compType = COMP_TYPE_JOINT;
 %! playChannelID = 2;
 %! channelID = 1;
+%! chMode = 1;
 %! extraCircuit = 'filter1';
-%! expected = '/tmp/cal_1000_2000_FS48000_play8_CH2_rec8_CH1_filter1.dat';
-%! assert(expected, genCalFilename(freqs, fs, compType, playChannelID, channelID, extraCircuit));
+%! expected = '/tmp/cal_1000_2000_FS48000_play8_CH2_rec8_CH1_M1_filter1.dat';
+%! assert(expected, genCalFilename(freqs, fs, compType, playChannelID, channelID, chMode, extraCircuit));
 %!
 %! compType = COMP_TYPE_REC_SIDE;
 %! playChannelID = NA;
 %! channelID = 1;
 %! extraCircuit = '';
-%! expected = '/tmp/cal_1000_2000_FS48000_rec8_CH1.dat';
-%! assert(expected, genCalFilename(freqs, fs, compType, playChannelID, channelID, extraCircuit));
+%! expected = '/tmp/cal_1000_2000_FS48000_rec8_CH1_M1.dat';
+%! assert(expected, genCalFilename(freqs, fs, compType, playChannelID, channelID, chMode, extraCircuit));

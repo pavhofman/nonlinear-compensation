@@ -1,11 +1,11 @@
-function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, vdName, lpName)
+function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, chMode, vdName, lpName)
   global COMP_TYPE_JOINT;
   persistent AMPL_IDX = 4;  % = index of fundAmpl1 in cal peaks row
 
   % voltage divider
-  [peaksVDRow, distortVDFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, vdName);
+  [peaksVDRow, distortVDFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, vdName);
   % LP filter (input - resistor 10k -RIGHT- capacitor 10nF - ground)
-  [peaksLPRow, distortLPFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, lpName);
+  [peaksLPRow, distortLPFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, lpName);
 
 
   fundAmplVD = peaksVDRow(1, AMPL_IDX);
@@ -76,8 +76,8 @@ function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, vd
     % "known" values for fitting
     y = [refVD; refLP];
 
-    [distortVDGain, distortVDPhaseShift] = detTransferFromCalFile(distortFreq, fs, playAmpl, playChID, analysedRecChID, vdName);
-    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFile(distortFreq, fs, playAmpl, playChID, analysedRecChID, lpName);
+    [distortVDGain, distortVDPhaseShift] = detTransferFromCalFile(distortFreq, fs, playAmpl, playChID, analysedRecChID, chMode, vdName);
+    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFile(distortFreq, fs, playAmpl, playChID, analysedRecChID, chMode, lpName);
     distortLPvsVDPhaseShift = distortLPPhaseShift - distortVDPhaseShift;
     
     
@@ -111,16 +111,16 @@ function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, vd
   
   % A-values
   global COMP_TYPE_REC_SIDE;
-  saveNewCalFile(fs, fundPeaksACh, distortPeaksACh, NA, analysedRecChID, COMP_TYPE_REC_SIDE, timestamp);
+  saveNewCalFile(fs, fundPeaksACh, distortPeaksACh, NA, analysedRecChID, chMode, COMP_TYPE_REC_SIDE, timestamp);
 
   % D-values
   global COMP_TYPE_PLAY_SIDE;
-  saveNewCalFile(fs, fundPeaksDCh, distortPeaksDCh, NA, playChID, COMP_TYPE_PLAY_SIDE, timestamp);  
+  saveNewCalFile(fs, fundPeaksDCh, distortPeaksDCh, NA, playChID, chMode, COMP_TYPE_PLAY_SIDE, timestamp);  
 endfunction
 
-function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, compType, timestamp)
+function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, chMode, compType, timestamp)
   % no extraCircuit
-  calFile = genCalFilename(getFreqs(fundPeaksCh), fs, compType, playChID, channelID, '');
+  calFile = genCalFilename(getFreqs(fundPeaksCh), fs, compType, playChID, channelID, chMode, '');
   
   % always writing new file - delete first if exists
   deleteFile(calFile);  

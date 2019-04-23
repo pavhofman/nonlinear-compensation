@@ -39,6 +39,8 @@ function splitCalibrateSched(label = 1)
   global COMP_TYPE_PLAY_SIDE;
   global COMP_TYPE_REC_SIDE;
   
+  global MODE_DUAL;
+  
   persistent lpFundAmpl = NA;
   
   % current frequency of calibration
@@ -103,7 +105,7 @@ function splitCalibrateSched(label = 1)
               printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", curFreq));
 
               % deleting the calib file should it exist - always clean calibration
-              calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, EXTRA_CIRCUIT_LP1);
+              calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
               deleteFile(calFile);
               
               % safety measure - requesting calibration only at curFreq
@@ -165,7 +167,7 @@ function splitCalibrateSched(label = 1)
                 closeCalibPlot();
               endif
               % deleting the calib file should it exist - always clean calibration
-              calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, EXTRA_CIRCUIT_VD);
+              calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD);
               deleteFile(calFile);
 
               calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
@@ -189,7 +191,7 @@ function splitCalibrateSched(label = 1)
       case P6
         clearOutBox();
         printStr(sprintf('Calculating split calibration'));
-        calculateSplitCal(origFreq, fs, origPlayLevels(playChID), playChID, analysedChID, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
+        calculateSplitCal(origFreq, fs, origPlayLevels(playChID), playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
         
         printStr(sprintf("Generating orig %dHz for split REC side calibration", origFreq));
         cmdID = sendGeneratorCmd(origFreq, origPlayLevels);
@@ -207,11 +209,11 @@ function splitCalibrateSched(label = 1)
         switch label
           case P8
             % deleting the calib file for direct channel should it exist - always clean calibration
-            calFile = genCalFilename(origFreq, fs, COMP_TYPE_REC_SIDE, NA, getTheOtherChannelID(analysedChID), '');
+            calFile = genCalFilename(origFreq, fs, COMP_TYPE_REC_SIDE, NA, getTheOtherChannelID(analysedChID), MODE_DUAL, '');
             deleteFile(calFile);
 
             % the newly created calfile for analysedChID contains calculated data, not deleting
-            calFile = genCalFilename(origFreq, fs, COMP_TYPE_REC_SIDE, NA, analysedChID, '');
+            calFile = genCalFilename(origFreq, fs, COMP_TYPE_REC_SIDE, NA, analysedChID, MODE_DUAL, '');
             deleteFile(calFile);
             
             expl = 'upper limit';

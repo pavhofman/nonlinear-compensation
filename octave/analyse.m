@@ -145,12 +145,14 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
 endfunction  
 
 function [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqs, fs, channelID, compRequest)
+  global chMode;
+  
   % values for no signal/no calfile
   distortFreqsCh = [];
   complAllPeaksCh = [];
   
   % re-reading cal file with one channel calib data
-  calFile = genCalFilename(freqs, fs, compRequest.compType, compRequest.playChannelID, channelID, compRequest.extraCircuit);
+  calFile = genCalFilename(freqs, fs, compRequest.compType, compRequest.playChannelID, channelID, chMode, compRequest.extraCircuit);
   if (exist(calFile, 'file'))
     % loading calRec, initialising persistent vars
     load(calFile);
