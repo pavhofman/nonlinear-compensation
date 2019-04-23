@@ -191,10 +191,6 @@ while(true)
   if (isStatus(MEASURING))
     source 'run_measuring.m';
   endif
-  
-  if (isStatus(SPLITTING))
-    source 'run_splitting.m';
-  endif
 
   if useZeroMQ
     sendInfo(buildInfo(), zeromqPort);

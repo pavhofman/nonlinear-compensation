@@ -14,9 +14,6 @@ global SHOW_FFT = 'showfft';
 global GENERATE = 'gen';
 % measure transfer at frequency and channel
 global MEASURE = 'meas';
-% splitting joint calibration to DAC and ADC components
-global SPLIT = 'split';
-global SPLIT2 = 'split2';
 
 % reading from audio file
 global READFILE = 'readfile';
@@ -39,7 +36,6 @@ global COMPENSATING = 'Compensating';
 global DISTORTING = 'Distorting';
 global GENERATING = 'Generating';
 global MEASURING = 'Measuring';
-global SPLITTING = 'Splitting';
 
 % order of statuses shown in statusTxt fields. Not listed statuses go last.
 global TXT_STATUS_ORDER = {

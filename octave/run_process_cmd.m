@@ -173,11 +173,7 @@ elseif strcmp(cmd{1}, MEASURE) && (rows(cmd) > 2)
   % channel ID for transfer measurement. The other channel receives the original signal
   transfer.channel = str2num(cmd{3});
   restartMeasuring = true;
-    
-elseif (strcmp(cmd{1}, SPLIT))
-  % split joint-device calibration to DAC/ADC sides. Requires direct cal file, filter cal file at same freq, measured filter transfer file containing freq harmonics
-  setStatus(SPLITTING);
-  
+ 
 endif
 % clear new command
 cmd = cellstr(NO_CMD);
