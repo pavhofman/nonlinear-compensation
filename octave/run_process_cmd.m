@@ -3,7 +3,7 @@ if (strcmp(cmd{1}, PAUSE))
   
 elseif (strcmp(cmd{1}, SET_MODE))
   % default = MODE_DUAL
-  chMode = findNumInCmd(cmd, MODE_PREFIX, MODE_DUAL);
+  chMode = findNumInCmd(cmd, CMD_MODE_PREFIX, MODE_DUAL);
   writeLog('INFO', 'Switched to mode %d', chMode);
 
   % calfiles are specific for each mode - reloading at change
@@ -46,7 +46,7 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     
     % stored calFile can have a different chMode to current one, e.g. when split-calibrating playback side (runs always on rec side)
     % default = current chMode
-    calChMode = findNumInCmd(cmd, MODE_PREFIX, chMode);
+    calChMode = findNumInCmd(cmd, CMD_MODE_PREFIX, chMode);
 
         
     % building calibration request struct

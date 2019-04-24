@@ -79,7 +79,7 @@ global FAILED_RESULT = -1; % finished, bad
 global CMD_ID_PREFIX = "#ID#";
 
 % format for setting mode
-global MODE_PREFIX = "#MODE#";
+global CMD_MODE_PREFIX = "#MODE#";
 
 % format for calibration frequency info
 % #CHCF#[F1,minAmpl,maxAmpl;F2,minAmpl,maxAmpl] CHCF[F1,NA,NA; F2,NA,NA]
