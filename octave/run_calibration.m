@@ -13,7 +13,7 @@ else
   
   if (statusContains(CALIBRATING))
     % running the actual calibration with calBuffer
-    [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, restartCal);
+    [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, chMode, restartCal);
     setStatusResult(CALIBRATING, result);
 
     % building complete status infomessage

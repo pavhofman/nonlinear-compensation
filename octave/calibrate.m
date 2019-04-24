@@ -1,5 +1,5 @@
 % calRequest.calFreqs - optional 1/2 values. If not empty, wait for these freqs to come (in both channels), with timeout
-function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, restart)
+function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, chMode, restart)
   persistent channelCnt = columns(calBuffer);
   % consts
   % max number of calibration runs. When reached, calibration quits with FAILED_RESULT
@@ -16,7 +16,9 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
   global NOT_FINISHED_RESULT;
   global FAILING_RESULT;
   global RUNNING_OK_RESULT;
-
+  
+  global MODE_SINGLE;
+  
   persistent correctRunsCounter = zeros(channelCnt, 1);
   
   msg = '';
@@ -32,11 +34,13 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
   endif
 
   runID += 1;
-  writeLog('DEBUG', 'Measuring calibration peaks for run ID %d', runID);    
+  writeLog('DEBUG', 'Measuring calibration peaks for run ID %d', runID);
 
   % calculate FFT peaks
   [fundPeaks, distortPeaks] = getHarmonics(calBuffer, fs);
-  for channelID = 1:channelCnt
+  activeChannelIDs = getActiveChannelIDs(chMode, channelCnt);
+  for channelID = activeChannelIDs
+    
     % shift distortPeaks to zero time of fundPeaks and store to runPeaks
     fundPeaksCh = fundPeaks{channelID};
     distortPeaksCh = distortPeaks{channelID};
@@ -107,14 +111,14 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
   endfor
   
   % runPeaks are updated, now checking RUN conditions
-  if any(correctRunsCounter < calRequest.calRuns) && runID < MAX_RUNS
+  if any(correctRunsCounter(activeChannelIDs) < calRequest.calRuns) && runID < MAX_RUNS
     % some of the channels have not reached cal runs of same freqs
     % and still can run next time
     % result is already set
     return;
   end
       
-  if all(correctRunsCounter >= calRequest.calRuns)
+  if all(correctRunsCounter(activeChannelIDs) >= calRequest.calRuns)
     % enough stable runs, storing the average
     writeLog('INFO', 'Enough runs %d, calibrating with measured peaks', runID); 
     timestamp = time();
@@ -122,7 +126,7 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
     % storing joint directions cal file
     % each channel stored separately
     calFileStructs = cell(channelCnt, 1);
-    for channelID = 1:channelCnt
+    for channelID = activeChannelIDs
       % determine peaks from runs
       writeLog('DEBUG', 'Determining avg peaks for channelID %d', channelID);
       [fundPeaksCh, distortPeaksCh] = detAveragePeaks(allFundPeaks(channelID, :), allDistortPeaks(channelID, :))
@@ -136,7 +140,7 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
       endif
     endfor
     
-    if channelCnt >= 2
+    if chMode != MODE_SINGLE && channelCnt >= 2
       % at least two channels, we can measure/store avg. fund phase chan2 vs. chan1
       avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS);
     else
@@ -144,7 +148,7 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
     endif
     
     % store calfile, update avgPhaseDiffs if required
-    for channelID = 1:channelCnt
+    for channelID = activeChannelIDs
         calFileStruct = calFileStructs{channelID};
         calRec = calFileStruct.calRec;
         calFile = calFileStruct.fileName;

@@ -2,7 +2,7 @@
 % generating buffer-length of compensation reference
 result = RUNNING_OK_RESULT;
 msg = '';
-for channelID = 1:columns(buffer)
+for channelID = getActiveChannelIDs(chMode, channelCnt)
   measuredPeaksCh = measuredPeaks{channelID};
   distortPeaksCh = distortPeaks{channelID};
   fundLevelsCh = fundLevels{channelID};

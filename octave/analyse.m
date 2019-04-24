@@ -6,7 +6,7 @@
 % fundLevels, distortPeaks - read from calibration file corresponding to current stream freqs
 %
 % fundLevels: since distortPeaks are ALWAYS zero-time based, i.e. phase = 0 for all fundamental frequencies, fundLevels only contains frequency and level, no phases
-function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] = analyse(buffer, fs, compRequest, reloadCalFiles)
+function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] = analyse(buffer, fs, compRequest, chMode, reloadCalFiles)
   persistent analysisBuffer = [];
   persistent channelCnt = columns(buffer);
   
@@ -40,13 +40,13 @@ function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] 
     hasAnyChannelPeaks = false;
     % each channel handled separately
     global MIN_DISTORT_LEVEL;
-    for channelID = 1:channelCnt
+    for channelID = getActiveChannelIDs(chMode, channelCnt)      
       measuredPeaksCh = measuredPeaks{channelID};
       if hasAnyPeak(measuredPeaksCh)
         hasAnyChannelPeaks = true;
         writeLog('TRACE', 'Found fundPeaks for channel ID %d', channelID);
         if isstruct(compRequest)
-          [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, compRequest, channelID, channelCnt, reloadCalFiles);
+          [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, compRequest, channelID, chMode, channelCnt, reloadCalFiles);
           % removing rows with ampl < MIN_DISTORT_LEVEL
           if ~isempty(distortPeaksCh)
             distortPeaksCh(distortPeaksCh(:, 2) < MIN_DISTORT_LEVEL, :) = [];
@@ -88,7 +88,7 @@ function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] 
 endfunction
 
 
-function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, compRequest, channelID, channelCnt, reloadCalFiles);
+function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, compRequest, channelID, chMode, channelCnt, reloadCalFiles);
   
   persistent distortFreqs = cell(channelCnt, 1);
   persistent complAllPeaks = cell(channelCnt, 1);
@@ -123,7 +123,7 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
     if sameFreqsCounter(channelID) >= SAME_FREQS_ROUNDS
       if sameFreqsCounter(channelID) == SAME_FREQS_ROUNDS || reloadCalFiles
         % changed incoming frequency, has been stable for SAME_FREQS_ROUNDS, load from calfile (if exists)
-        [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqsCh, fs, channelID, compRequest);
+        [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqsCh, fs, channelID, chMode, compRequest);
         % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
         if find(isna(complAllPeaksCh))
           complAllPeaksCh = fillMissingCalPeaks(complAllPeaksCh);
@@ -144,8 +144,7 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
   endif
 endfunction  
 
-function [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqs, fs, channelID, compRequest)
-  global chMode;
+function [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqs, fs, channelID, chMode, compRequest)
   
   % values for no signal/no calfile
   distortFreqsCh = [];

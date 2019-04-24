@@ -5,6 +5,10 @@ elseif (strcmp(cmd{1}, SET_MODE))
   % default = MODE_DUAL
   chMode = findNumInCmd(cmd, MODE_PREFIX, MODE_DUAL);
   writeLog('INFO', 'Switched to mode %d', chMode);
+
+  % calfiles are specific for each mode - reloading at change
+  reloadCalFiles = true;
+
   % setting mode completes command immediately
   cmdDoneID = cmdID;
   
