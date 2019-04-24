@@ -12,7 +12,7 @@ function clbkDistort(src, data, title, cmdFile)
       if ~isempty(values{end})
         harmLevelsStr = values{end};
       else
-        harmLevelsStr = buildHarmLevelsStr(values, HARMS);
+        harmLevelsStr = buildHarmAmplsStr(values, HARMS);
       endif
       cmd = [DISTORT ' ' harmLevelsStr];
       % sending command      

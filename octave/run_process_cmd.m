@@ -80,10 +80,10 @@ elseif (strcmp(cmd{1}, COMPENSATE))
 elseif strcmp(cmd{1}, DISTORT)
   if length(cmd) > 1 && strcmp(cmd{2}, 'off')
     % distortion off
-    distortHarmLevels = [];
+    distortHarmAmpls = [];
     removeFromStatus(DISTORTING);
   else
-    distortHarmLevels = findLevelsInCmd(cmd, CMD_HARM_LEVELS_PREFIX, defaultValue = [-120, -120], defaultMsg = 'No distortion harmonic levels found in command, using 2nd@-120dB, 3rd@-120dB');
+    distortHarmAmpls = findAmplsInCmd(cmd, CMD_AMPLS_PREFIX, defaultValue = [1e-06, 1e-06], defaultMsg = 'No distortion harmonic levels found in command, using 2nd@-120dB, 3rd@-120dB');
     % enable distortion
     addStatus(DISTORTING);
   endif

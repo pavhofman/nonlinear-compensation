@@ -94,8 +94,8 @@ global CMD_EXTRA_CIRCUIT_PREFIX = '#EC#';
 %CH[1000,0.85;2000,0.85]
 global CMD_CHANNEL_FUND_PREFIX = '#CH#';
 % format for distortion - HL = Harmonic Level
-%HL[-120,NA,-130]
-global CMD_HARM_LEVELS_PREFIX = '#HL#';
+%AMPL[0.00001,NA,0.000001]
+global CMD_AMPLS_PREFIX = '#AMPL#';
 
 % continuous calibration ( cal #CONT1): 1 = yes, 0 = no (default)
 global CMD_CONT_PREFIX = '#CONT#';

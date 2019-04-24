@@ -63,8 +63,8 @@ function info = addStatusDetails(status, info)
       info.compRequest = compRequest;
       
     case DISTORTING
-      global distortHarmLevels;
-      info.distortHarmLevels = distortHarmLevels;
+      global distortHarmAmpls;
+      info.distortHarmAmpls = distortHarmAmpls;
       
   endswitch
 endfunction

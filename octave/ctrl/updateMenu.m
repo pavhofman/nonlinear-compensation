@@ -1,6 +1,6 @@
 function updateMenu(dirStruct, info)
   % setting distortion menu items visibility
-  if isfield(info, 'distortHarmLevels') && ~isempty(info.distortHarmLevels)
+  if isfield(info, 'distortHarmAmpls') && ~isempty(info.distortHarmAmpls)
     setEnabled(dirStruct.distortOnMenu, false);
     setEnabled(dirStruct.distortOffMenu, true);
   else

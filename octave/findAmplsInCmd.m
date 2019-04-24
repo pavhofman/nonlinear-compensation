@@ -1,20 +1,20 @@
 % iterates cmd items starting from second (the first is command string), looking for CH[1000,0.85;2000,0.85]
 % if found, returns the levels array, otherwise default value and print defaultMsg
-function levels = findLevelsInCmd(cmd, prefix, defaultValue = [], defaultMsg = '');
-  levels = [];
+function ampls = findAmplsInCmd(cmd, prefix, defaultValue = [], defaultMsg = '');
+  ampls = [];
   
   % only one item, both channels same
   for id = 2:numel(cmd)
     str = cmd{id};
-    levelStr = sscanf(str, [prefix '%s']);
-    if ~isempty(levelStr)
-      levels = eval(levelStr);
+    amplStr = sscanf(str, [prefix '%s']);
+    if ~isempty(amplStr)
+      ampls = eval(amplStr);
     endif
   endfor
   
-  if isempty(levels)
+  if isempty(ampls)
     % did not find any
-    levels = defaultValue;
+    ampls = defaultValue;
     if ~isempty(defaultMsg)
       writeLog('DEBUG', defaultMsg);
     endif
@@ -23,7 +23,7 @@ endfunction
 
 
 %!test
-%! cmd = {'distort', 'HL[-140,NA,-120]'};
-%! levels = findLevelsInCmd(cmd, 'HL');
-%! expected = [-140, NA, -120];
+%! cmd = {'distort', 'AMPL[0.1,NA,0.5]'};
+%! levels = findAmplsInCmd(cmd, 'AMPL');
+%! expected = [0.1, NA, 0.5];
 %! assert(expected, levels);

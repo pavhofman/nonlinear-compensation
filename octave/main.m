@@ -57,7 +57,7 @@ global fundLevels = NA;
 global distortPeaks = NA;
 
 global genFunds = NA;
-global distortHarmLevels = [];
+global distortHarmAmpls = [];
 
 global fs = NA;
 

@@ -1,14 +1,14 @@
-% generating distortion polynomial. distortHarmLevels are already in absolute values, not in dB!
-function distortPoly = genDistortPoly(distortHarmLevels)
-  harmCnt = length(distortHarmLevels);
+% generating distortion polynomial. distortHarmAmpls are in absolute values, not in dB!
+function distortPoly = genDistortPoly(distortHarmAmpls)
+  harmCnt = length(distortHarmAmpls);
   distortPoly = zeros(1, harmCnt + 2);
   % first harm at 100%
   distortPoly = addPoly(chebyshevpoly(1, 1), distortPoly);
   
   for id = 1: harmCnt
-    harmLevel = distortHarmLevels(id);
-    if harmLevel > 0
-      poly = harmLevel * chebyshevpoly(1, id + 1);
+    harmAmpl = distortHarmAmpls(id);
+    if harmAmpl > 0
+      poly = harmAmpl * chebyshevpoly(1, id + 1);
       distortPoly = addPoly(poly, distortPoly);
     endif
   endfor

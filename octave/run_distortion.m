@@ -1,5 +1,5 @@
 % introduce distortion to buffer
-if ~isempty(distortHarmLevels)
+if ~isempty(distortHarmAmpls)
   % default value
   result = FAILING_RESULT;
   msg = '';
@@ -14,10 +14,10 @@ if ~isempty(distortHarmLevels)
       
       % adjusting distortion levels to account for signal level, converting from dB to abs values
       % note - db2mag(NA) fails, we have to skip this
-      scaledLevels = zeros(1, length(distortHarmLevels));
-      existIDs = find(~isna(distortHarmLevels));
+      scaledLevels = zeros(1, length(distortHarmAmpls));
+      existIDs = find(~isna(distortHarmAmpls));
       % only levels at existIDs
-      scaledLevels(existIDs) = db2mag(distortHarmLevels(existIDs)) / avgAmpl;
+      scaledLevels(existIDs) = distortHarmAmpls(existIDs) / avgAmpl;
       
       distortPoly = genDistortPoly(scaledLevels);
 

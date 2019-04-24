@@ -207,12 +207,13 @@ function details = addDetails(channelID, status, info, details)
       endif
 
     case DISTORTING
-      distortHarmLevels = info.distortHarmLevels;
-      if ~isempty(distortHarmLevels)
+      distortHarmAmpls = info.distortHarmAmpls;
+      if ~isempty(distortHarmAmpls)
         details{end + 1} = 'Distortion Levels Added:';
-        for id = 1:length(distortHarmLevels)
-          level = distortHarmLevels(id);
+        for id = 1:length(distortHarmAmpls)
+          level = distortHarmAmpls(id);
           if ~isna(level)
+            level = 20 * log10(level);
             details{end + 1} = ['Harmonics ' num2str(id + 1) ': ' num2str(level) 'dB'];
           endif
         endfor
