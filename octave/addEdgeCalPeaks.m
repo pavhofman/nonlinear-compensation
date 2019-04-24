@@ -1,6 +1,6 @@
 function calPeaks = addEdgeCalPeaks(calPeaks)
-  persistent AMPL_IDX = 4;  % = index of fundAmpl1
-  persistent PEAKS_START_IDX = 6;
+  global AMPL_IDX;  % = index of fundAmpl1
+  global PEAKS_START_IDX;
   
   % calPeaks must be are sorted by fundAmpl!
 

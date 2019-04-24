@@ -168,8 +168,8 @@ endfunction
 function [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs, complAllPeaks)
   % complAllPeaks: time, fundPhaseDiff1, fundPhaseDiff2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
   % WARN: ALL peaks must be known (no NA values!)
-  persistent AMPL_IDX = 4;  % = index of fundAmpl1
-  persistent PEAKS_START_IDX = 6; 
+  global AMPL_IDX;  % = index of fundAmpl1
+  global PEAKS_START_IDX; 
   distortPeaksCh = [];
   
   allDPeaksC = complAllPeaks(:, PEAKS_START_IDX:end);

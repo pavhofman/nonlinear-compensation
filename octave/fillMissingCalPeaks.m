@@ -2,7 +2,7 @@
 % values between are interpolated. All NA values in sequence from highest level downward are replaced with zero
 function calPeaks = fillMissingCalPeaks(calPeaks)
   % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
-  persistent AMPL_IDX = 4;  % = index of fundAmpl1
+  global AMPL_IDX;  % = index of fundAmpl1
  
   % levels = AMPL_IDX column
   levels = calPeaks(:, AMPL_IDX);

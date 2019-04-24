@@ -184,3 +184,12 @@ global MIN_LOG_LEVEL = 'DEBUG';
 
 % default mode
 global chMode = MODE_DUAL;
+
+% calPeaks constants
+% calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
+% index of fundAmpl1
+global AMPL_IDX = 4;  
+global PEAKS_START_IDX = 6;
+global PHASEDIFF_IDX = 2;
+% fund amplitude within +/- SAME_AMPL_TOL considered same
+global SAME_AMPL_TOL = db2mag(0.01);

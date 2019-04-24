@@ -2,10 +2,10 @@
 % distortPeaksCh can be empty
 function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh, calPeaks, distortFreqs, timestamp)
   % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
-  persistent AMPL_IDX = 4;  % = index of fundAmpl1
-  persistent PEAKS_START_IDX = 6;
+  global AMPL_IDX;  % = index of fundAmpl1
+  global PEAKS_START_IDX;
   % fund amplitude within +/- SAME_AMPL_TOL considered same
-  persistent SAME_AMPL_TOL = db2mag(0.01);
+  global SAME_AMPL_TOL;
   
   % edge rows can be changed if new row min or max. The easiest way is removing them first and adding newly calculated at the end
   % remove edge extrapolation rows

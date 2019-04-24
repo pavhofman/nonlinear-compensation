@@ -56,7 +56,7 @@ function updatePlots(dirStruct, info)
 endfunction
 
 function levels = loadCalLevels(calFile)
-  persistent AMPL_IDX = 4;  % = index of fundAmpl1
+  global AMPL_IDX;  % = index of fundAmpl1
   if ~exist(calFile, 'file')
     writeLog('WARN', 'The calfile %s does not exist, cannot load into cal plot!', calFile);
     levels = [];

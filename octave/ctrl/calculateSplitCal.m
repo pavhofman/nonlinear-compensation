@@ -1,6 +1,6 @@
 function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, chMode, vdName, lpName)
   global COMP_TYPE_JOINT;
-  persistent AMPL_IDX = 4;  % = index of fundAmpl1 in cal peaks row
+  global AMPL_IDX;  % = index of fundAmpl1 in cal peaks row
 
   % voltage divider
   [peaksVDRow, distortVDFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, vdName);
@@ -130,7 +130,7 @@ endfunction
 
 % of not found, returns empty
 function distortPeak = getDistortPeakForFreq(freq, peaksRow, distortFreqs)
-  persistent PEAKS_START_IDX = 6;
+  global PEAKS_START_IDX;
   % index of freq in distortFreqs
   freqID = find(distortFreqs == freq);
   if ~isempty(freqID)

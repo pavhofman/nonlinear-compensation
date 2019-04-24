@@ -313,7 +313,7 @@ endfunction
 
 function lpFundAmpl = loadCalFundAmpl(freq, fs, playChID, analysedChID, extraCircuit)
   global COMP_TYPE_JOINT;
-  persistent AMPL_IDX = 4;  % = index of fundAmpl1
+  global AMPL_IDX;  % = index of fundAmpl1
   
   [peaksRow, distortFreqs] = loadCalRow(freq, fs, COMP_TYPE_JOINT, playChID, analysedChID, extraCircuit);
   lpFundAmpl = peaksRow(1, AMPL_IDX);
