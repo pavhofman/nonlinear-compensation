@@ -124,7 +124,7 @@ function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, ch
   
   % always writing new file - delete first if exists
   deleteFile(calFile);  
-  saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp);
+  saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, NA, timestamp);
   writeLog('INFO', 'Saved calculated split calibration into %s', calFile);
 endfunction
 

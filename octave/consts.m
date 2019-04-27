@@ -85,17 +85,25 @@ global CMD_MODE_PREFIX = "#MODE#";
 % #CHCF#[F1,minAmpl,maxAmpl;F2,minAmpl,maxAmpl] CHCF[F1,NA,NA; F2,NA,NA]
 global CMD_CALFREQS_PREFIX = '#CHCF#';
 
+% format for play amplitude levels - info for calibration
+%PAMPL[0.5,0.5]
+global CMD_PLAY_AMPLS_PREFIX = '#PAMPL#';
+
 % number of calibration runs for averaging
 % #CALR#10
 global CMD_CALRUNS_PREFIX = '#CALR#';
+
 %ECfilter
 global CMD_EXTRA_CIRCUIT_PREFIX = '#EC#';
+
 % format for generator
 %CH[1000,0.85;2000,0.85]
 global CMD_CHANNEL_FUND_PREFIX = '#CH#';
-% format for distortion - HL = Harmonic Level
+
+% format for distortion - AMPL = Harmonic Level
 %AMPL[0.00001,NA,0.000001]
 global CMD_AMPLS_PREFIX = '#AMPL#';
+
 
 % continuous calibration ( cal #CONT1): 1 = yes, 0 = no (default)
 global CMD_CONT_PREFIX = '#CONT#';
@@ -186,10 +194,12 @@ global MIN_LOG_LEVEL = 'DEBUG';
 global chMode = MODE_DUAL;
 
 % calPeaks constants
-% calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
+% calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, playFundAmpl1, playFundAmpl2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
 % index of fundAmpl1
-global AMPL_IDX = 4;  
-global PEAKS_START_IDX = 6;
+global AMPL_IDX = 6;
+% index of fundAmpl1 of playback side for COMP_TYPE_JOINT
+global PLAY_AMPL_IDX = 4;
+global PEAKS_START_IDX = 8;
 global PHASEDIFF_IDX = 2;
 % fund amplitude within +/- SAME_AMPL_TOL considered same
 global SAME_AMPL_TOL = db2mag(0.01);

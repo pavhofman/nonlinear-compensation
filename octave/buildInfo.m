@@ -14,6 +14,7 @@ function info = buildInfo()
   global sinkStruct;
   global showFFTCfg;
   global chMode;
+  global equalizer;
   
 
   info.id = NA;
@@ -25,6 +26,7 @@ function info = buildInfo()
   endfor
   
   info.chMode = chMode;
+  info.equalizer = equalizer;
   
   info.measuredPeaks = measuredPeaks;
   info.distortPeaks = distortPeaks;

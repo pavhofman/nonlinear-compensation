@@ -1,5 +1,5 @@
 % fundPeaksCh have at least one freq (row), distortPeaksCh can be empty (clean signal or single-sine fundament > fs/4 (i.e. no higher harmonics)
-function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp, doSave = true)
+function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, playAmplsCh, timestamp, doSave = true)
   % remove zero freq rows from distortPeaksCh
   if ~isempty(distortPeaksCh)
     rowIDs = distortPeaksCh(:, 1) == 0;
@@ -13,7 +13,7 @@ function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, t
     load(calFile);
     calPeaks = calRec.peaks;
     distortFreqs = calRec.distortFreqs;
-    [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh, calPeaks, distortFreqs, timestamp);    
+    [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh, calPeaks, distortFreqs, playAmplsCh, timestamp);    
   else
     if isempty(distortPeaksCh)
       % no distortions, only fund  peaks
@@ -24,7 +24,7 @@ function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, t
       % build new/first complPeak line - convert peaks to complex numbers and transpose
       dPeaksC = transpose(distortPeaksCh(:, 2) .* exp(i * distortPeaksCh(:, 3)));
     endif
-    calPeaks = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC);
+    calPeaks = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC, playAmplsCh);
     % adding edge rows for extrapolation
     calPeaks = addEdgeCalPeaks(calPeaks);
     % new calfile, always 3 rows

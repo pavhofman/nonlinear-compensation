@@ -1,7 +1,7 @@
 % adding row to calPeaks
 % distortPeaksCh can be empty
-function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh, calPeaks, distortFreqs, timestamp)
-  % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
+function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, distortPeaksCh, calPeaks, distortFreqs, playAmplsCh, timestamp)
+  % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, playAmpl1, playAmpl2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
   global AMPL_IDX;  % = index of fundAmpl1
   global PEAKS_START_IDX;
   % fund amplitude within +/- SAME_AMPL_TOL considered same
@@ -67,7 +67,7 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
   endif
   
   % build new complPeak line
-  complPeak = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC);
+  complPeak = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC, playAmplsCh);
 
   % remove existing rows (if any) with amplitude within tolerance SAME_AMPL_TOL apart from fundAmpl1 - we have newer values
   newFundAmpl = fundPeaksCh(1, 2);
@@ -85,12 +85,15 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
   
   % the removed row could create a frequency with all peaks unknown. Remove such columns
   knownIDs = ~isna(calPeaks);
+  % but skip all NAs before distortion peaks
+  knownIDs(:, 1: PEAKS_START_IDX - 1) = 1;
+  
   % number of known values in columns
   knownIDsCnt = sum(knownIDs, 1);
   % find columns with known == 0 , i.e. only the frequency
   zeroColIDs = find(knownIDsCnt == 0);
   if !isempty(zeroColIDs)
-    % found index on all-NA collumn, remove from peaks and freqs
+    % found index of all-NA collumn, remove from peaks and freqs
     calPeaks(:, zeroColIDs) = [];
     distortFreqs(:, zeroColIDs - PEAKS_START_IDX + 1) = [];
   endif

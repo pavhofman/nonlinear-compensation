@@ -133,8 +133,9 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
       if hasAnyPeak(fundPeaksCh)
         % storing to calFile
         calFile = genCalFilename(getFreqs(fundPeaksCh), fs, calRequest.compType, calRequest.playChannelID, channelID, calRequest.chMode, calRequest.extraCircuit);
-        % param doSave = false - not storing yet
-        [calFileStructs(channelID)] = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, timestamp, false);
+        playAmplsCh = calRequest.playAmpls{channelID};
+        % param doSave = false - not storing yet        
+        [calFileStructs(channelID)] = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, playAmplsCh, timestamp, false);
       else
         writeLog('WARN', 'No fundaments found for channel ID %d, not storing its calibration file', channelID);
       endif
@@ -228,8 +229,12 @@ function avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS)
   
   % cell array cannot be averaged -> converting to properly oriented matrix
   phaseDiffsC = transpose(cell2mat(phaseDiffsC));
-  % averaging, only angle is required
-  avgPhaseDiffs = mean(angle(phaseDiffsC));
+  if ~isempty(phaseDiffsC)
+    % averaging, only angle is required
+    avgPhaseDiffs = mean(angle(phaseDiffsC));
+  else
+    avgPhaseDiffs = [0, 0];
+  endif
 endfunction
 
 % averaging fundPeaks amplitude, distortPeaks all for each frequency

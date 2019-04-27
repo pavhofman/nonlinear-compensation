@@ -22,8 +22,7 @@ function splitCalibrateSched(label = 1)
   persistent playChID = 2;
   
   persistent EXTRA_CIRCUIT_VD = 'vd';
-  persistent EXTRA_CIRCUIT_LP1 = 'lp1';
-  
+  persistent EXTRA_CIRCUIT_LP1 = 'lp1';  
   
   global cmdFileRec;
   global cmdFilePlay;
@@ -35,6 +34,7 @@ function splitCalibrateSched(label = 1)
   global CMD_CHANNEL_FUND_PREFIX;
   global CMD_COMP_TYPE_PREFIX;
   global CMD_CALRUNS_PREFIX;
+  global CMD_PLAY_AMPLS_PREFIX;
   global COMP_TYPE_JOINT;
   global COMP_TYPE_PLAY_SIDE;
   global COMP_TYPE_REC_SIDE;
@@ -63,12 +63,16 @@ function splitCalibrateSched(label = 1)
 
         % loading current values from analysis
         fs = recInfo.fs;
-        % TODO - checks
+        % TODO - checks - only one fundament freq!!
         origFreq = recInfo.measuredPeaks{analysedChID}(1, 1);
         origRecLevel = recInfo.measuredPeaks{analysedChID}(:, 2);
-        origPlayLevels = [playInfo.measuredPeaks{1}(:, 2), playInfo.measuredPeaks{2}(:, 2)];
-
+        % two channels, only first fundament freqs (the only freq!)
+        origPlayLevels = {playInfo.measuredPeaks{1}(1, 2), playInfo.measuredPeaks{2}(1, 2)};
         
+        % playLevels are measure BEHIND equalizer in play process. When generating, one must take the equalizer into account to reach identical play levels
+        % only values for first two channels to fit origPlayLevels
+        playEqualizer = playInfo.equalizer(1:2);
+
         % starting with origFreq
         curFreq = origFreq;
         
@@ -97,7 +101,7 @@ function splitCalibrateSched(label = 1)
 
             case P2            
               printStr(sprintf("Generating %dHz", curFreq));
-              cmdID = sendGeneratorCmd(curFreq, origPlayLevels);
+              cmdID = sendGeneratorCmd(curFreq, origPlayLevels, playEqualizer);
               waitForCmdDone(cmdID, P3, AUTO_TIMEOUT, ERROR, mfilename());
               return;
 
@@ -110,7 +114,7 @@ function splitCalibrateSched(label = 1)
               
               % safety measure - requesting calibration only at curFreq
               calFreqReqStr = getCalFreqReqStr({[curFreq, NA, NA]});
-              calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
+              calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
               if curFreq > origFreq
                 % calibrating at harmonics freqs - only the fundaments data are used for measuring LPF transfer - can use fewer averaging calruns                
                 calCmd = [calCmd ' ' CMD_CALRUNS_PREFIX num2str(REDUCED_CALIB_RUNS)];
@@ -144,7 +148,7 @@ function splitCalibrateSched(label = 1)
           
             case P4
               printStr(sprintf("Generating %dHz", curFreq));
-              cmdID = sendGeneratorCmd(curFreq, origPlayLevels);
+              cmdID = sendGeneratorCmd(curFreq, origPlayLevels, playEqualizer);
               waitForCmdDone(cmdID, P5, AUTO_TIMEOUT, ERROR, mfilename());
               return;
               
@@ -170,7 +174,7 @@ function splitCalibrateSched(label = 1)
               calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD);
               deleteFile(calFile);
 
-              calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
+              calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
               
               if curFreq > origFreq
                 % calibrating at harmonics freqs - only the fundaments data are used for measuring VD transfer - can use fewer averaging calruns                
@@ -191,10 +195,10 @@ function splitCalibrateSched(label = 1)
       case P6
         clearOutBox();
         printStr(sprintf('Calculating split calibration'));
-        calculateSplitCal(origFreq, fs, origPlayLevels(playChID), playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
+        calculateSplitCal(origFreq, fs, origPlayLevels{playChID}, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
         
         printStr(sprintf("Generating orig %dHz for split REC side calibration", origFreq));
-        cmdID = sendGeneratorCmd(origFreq, origPlayLevels);
+        cmdID = sendGeneratorCmd(origFreq, origPlayLevels, playEqualizer);
         waitForCmdDone(cmdID, P7, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
@@ -277,11 +281,18 @@ function splitCalibrateSched(label = 1)
 endfunction
 
 
-function cmdID = sendGeneratorCmd(freq, origPlayLevels)
+function cmdID = sendGeneratorCmd(freq, origPlayLevels, playEqualizer)
   global cmdFilePlay;
   
   % frequency at same output levels
-  genFund = {[freq, origPlayLevels(1)], [freq, origPlayLevels(2)]};
+  genFund = cell();
+  for channelID = 1:2
+    % generator is BEFORE equalizer. Analyser which measures play levels is after equalizer
+    % therefore generated ampls must be adjusted for the equalizer value
+    genFundCh = [freq, origPlayLevels{channelID} / playEqualizer(channelID)];
+    genFund{end + 1} = genFundCh;
+  endfor
+  
   cmdID = writeCmd(getGeneratorCmdStr(genFund), cmdFilePlay);
 endfunction
 

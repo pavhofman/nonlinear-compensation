@@ -137,12 +137,39 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
       % interpolating
       if !isempty(complAllPeaks{channelID})
         % interpolate to current measured level
-        [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs{channelID}, complAllPeaks{channelID});
+        complAllPeaksCh = complAllPeaks{channelID};
+        % if JOINT compensation on playback side - peaks must be scaled to playAmpl levels
+        global COMP_TYPE_JOINT;
+        global DIR_PLAY;
+        global direction;
+        if compRequest.compType == COMP_TYPE_JOINT && direction == DIR_PLAY
+          complAllPeaksCh = scalePeaksToPlayAmpls(complAllPeaksCh);
+        endif
+        [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs{channelID}, complAllPeaksCh);
         calFile = calFiles{channelID};
       endif
     endif
   endif
-endfunction  
+endfunction
+
+% distortion peaks in complAllPeaksCh are scaled at ratio playAmpl/fundAmpl
+function complAllPeaksCh = scalePeaksToPlayAmpls(complAllPeaksCh)
+  global AMPL_IDX;  % = index of fundAmpl1
+  global PLAY_AMPL_IDX;
+  global PEAKS_START_IDX; 
+  
+  % TODO - scaling only by first fundamentals for now!
+  playAmpls = complAllPeaksCh(:, PLAY_AMPL_IDX);
+  knownPlayRowIDs = find(~isna(playAmpls));
+  % not scaling first row - all fundAmpls are zero
+  % removing first index
+  knownPlayRowIDs(knownPlayRowIDs == 1) = [];
+  % each row can have different scale
+  scales = complAllPeaksCh(knownPlayRowIDs, PLAY_AMPL_IDX) ./ complAllPeaksCh(knownPlayRowIDs, AMPL_IDX);
+  complAllPeaksCh(knownPlayRowIDs, AMPL_IDX:end) = complAllPeaksCh(knownPlayRowIDs, AMPL_IDX:end) .* scales;
+  % must be sorted by AMPL_IDX for interpolation - order can have changed after scaling
+  complAllPeaksCh = sortrows(complAllPeaksCh, AMPL_IDX);
+endfunction
 
 function [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqs, fs, channelID, chMode, compRequest)
   
@@ -166,7 +193,7 @@ endfunction
 
 
 function [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs, complAllPeaks)
-  % complAllPeaks: time, fundPhaseDiff1, fundPhaseDiff2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
+  % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, playFundAmpl1, playFundAmpl2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
   % WARN: ALL peaks must be known (no NA values!)
   global AMPL_IDX;  % = index of fundAmpl1
   global PEAKS_START_IDX; 

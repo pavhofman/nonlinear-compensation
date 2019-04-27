@@ -1,14 +1,17 @@
 % fill all missing (NA) distortion peaks
 % values between are interpolated. All NA values in sequence from highest level downward are replaced with zero
 function calPeaks = fillMissingCalPeaks(calPeaks)
-  % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
+  % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, playAmpl1, playAmpl2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
   global AMPL_IDX;  % = index of fundAmpl1
+  global PEAKS_START_IDX;
  
   % levels = AMPL_IDX column
   levels = calPeaks(:, AMPL_IDX);
   
-  % only distort peaks can be missing, it is safe to search whole calPeaks
+  % search whole calPeaks
   missingPeaksIDs = isnan(calPeaks);
+  % but skip all NAs before distortion peaks - these are not interpolated
+  missingPeaksIDs(:, 1: PEAKS_START_IDX - 1) = 0;
   
   % interpolate for each frequency with missing values
   % indices of columns with MISSING value

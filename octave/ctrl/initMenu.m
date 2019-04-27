@@ -1,8 +1,6 @@
 function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   global cmdFileRec;
   global cmdFilePlay;
-  global COMP_TYPE_JOINT;
-
   
   [playStruct, calOnMenusPlay, calOffMenusPlay] = initDirMenu(fig, playStruct, cmdFilePlay, '&Playback', 'Playback');  
   [recStruct, calOnMenusRec, calOffMenusRec] = initDirMenu(fig, recStruct, cmdFileRec, '&Capture', 'Capture');
@@ -13,8 +11,8 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   tasksMenu = uimenu (fig, "label", "&Tasks");
   
   uimenu(tasksMenu, "label", "Calibrate Playback/Capture Split", 'callback', @clbkSplitCalibrate);
-  calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Single Run", 'separator', 'on', "callback", {@clbkCalib, COMP_TYPE_JOINT, false});
-  calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkCalib, COMP_TYPE_JOINT, true});
+  calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Single Run", 'separator', 'on', "callback", {@clbkJointCalib, false});
+  calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});
   calOffMenusTasks{end+1} = uimenu(tasksMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
   
   uimenu(tasksMenu, "label", "Devel - Calibrate VD Freqs", 'separator', 'on', 'callback', @clbkCalibrateFreqs);
