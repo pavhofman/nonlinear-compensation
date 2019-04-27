@@ -1,6 +1,7 @@
-function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, chMode, vdName, lpName)
+function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdName, lpName)
   global COMP_TYPE_JOINT;
   global AMPL_IDX;  % = index of fundAmpl1 in cal peaks row
+  global PLAY_AMPL_IDX;  % = index of playAmpl1 in cal peaks row
 
   % voltage divider
   [peaksVDRow, distortVDFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, vdName);
@@ -9,11 +10,13 @@ function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, ch
 
 
   fundAmplVD = peaksVDRow(1, AMPL_IDX);
+  % both VD and LP peaks must have been measured with the same play amplitude!
+  playAmpl = peaksVDRow(1, PLAY_AMPL_IDX);
 
   % fundXXGain - attenuation of voltage divider relative to generated amplitude on D side!
   % fundXXPhaseShift - phaseshift between analysed channel and direct channel
-  [fundVDGain, fundVDPhaseShift] = detTransfer(peaksVDRow, playAmpl);
-  [fundLPGain, fundLPPhaseShift] = detTransfer(peaksLPRow, playAmpl);
+  [fundVDGain, fundVDPhaseShift] = detTransfer(peaksVDRow);
+  [fundLPGain, fundLPPhaseShift] = detTransfer(peaksLPRow);
 
 
   % length of time series for nonlin_curvefit
@@ -76,8 +79,8 @@ function calculateSplitCal(fundFreq, fs, playAmpl, playChID, analysedRecChID, ch
     % "known" values for fitting
     y = [refVD; refLP];
 
-    [distortVDGain, distortVDPhaseShift] = detTransferFromCalFile(distortFreq, fs, playAmpl, playChID, analysedRecChID, chMode, vdName);
-    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFile(distortFreq, fs, playAmpl, playChID, analysedRecChID, chMode, lpName);
+    [distortVDGain, distortVDPhaseShift] = detTransferFromCalFile(distortFreq, fs, playChID, analysedRecChID, chMode, vdName);
+    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFile(distortFreq, fs, playChID, analysedRecChID, chMode, lpName);
     distortLPvsVDPhaseShift = distortLPPhaseShift - distortVDPhaseShift;
     
     

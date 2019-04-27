@@ -195,7 +195,7 @@ function splitCalibrateSched(label = 1)
       case P6
         clearOutBox();
         printStr(sprintf('Calculating split calibration'));
-        calculateSplitCal(origFreq, fs, origPlayLevels{playChID}, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
+        calculateSplitCal(origFreq, fs, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
         
         printStr(sprintf("Generating orig %dHz for split REC side calibration", origFreq));
         cmdID = sendGeneratorCmd(origFreq, origPlayLevels, playEqualizer);
