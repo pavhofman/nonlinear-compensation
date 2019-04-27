@@ -3,7 +3,7 @@ if ~isempty(distortHarmAmpls)
   % default value
   result = FAILING_RESULT;
   msg = '';
-  for channelID = 1:columns(buffer)
+  for channelID = 1:channelCnt
     measuredPeaksCh = measuredPeaks{channelID};
     if hasAnyPeak(measuredPeaksCh)
       % distort
@@ -25,7 +25,7 @@ if ~isempty(distortHarmAmpls)
       bufferCh = polyval(distortPoly, bufferCh);
       % scaling back to original amplitude
       bufferCh *= avgAmpl;
-      % copying distorting channel back to buffer
+      % copying distorted channel back to buffer
       buffer(:, channelID) = bufferCh;
       % one channel already means OK
       result = RUNNING_OK_RESULT;
