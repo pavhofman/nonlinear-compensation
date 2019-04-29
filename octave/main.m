@@ -46,7 +46,7 @@ else
 endif
 
 % command ID
-cmdID = '';
+cmdID = NA;
 % ID of finished/done command
 global cmdDoneID = '';
 
@@ -100,12 +100,12 @@ while(true)
   if (exist(cmdFile, 'file'))    
     lines = textread(cmdFile, '%s');
     % first line could be command ID if starts with ID
-    if length(lines) > 1 && strncmp(lines{1}, CMD_ID_PREFIX, length(CMD_ID_PREFIX))
-      cmdID = lines{1};
-      cmd = lines(2:end);
-    else
-      % no cmd ID as first item
+    cmdID = findNumInCmd(lines, CMD_ID_PREFIX, defaultValue = NA);
+    if isna(cmdID)
+      % no command id
       cmd = lines;
+    else
+      cmd = lines(2:end);
     endif
     delete(cmdFile);
   endif;

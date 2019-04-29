@@ -1,16 +1,21 @@
 % scheduler-eanbled wait for incoming cmdDoneID message with timeout
 % if recInfo or playInfo has cmdDoneID, return nextLabel. If timout reached, return timeoutLabel
-function waitForCmdDone(cmdDoneID, nextLabel, timeout, timeoutLabel, fname);
+function waitForCmdDone(cmdDoneIDs, nextLabel, timeout, timeoutLabel, fname);
   global schedQueue;
   reqTime = time() + timeout;
-  getLabel = @(curTime, recInfo, playInfo) decideLabelFor(curTime,  reqTime, cmdDoneID, nextLabel, timeoutLabel, recInfo, playInfo);
-  schedQueue{end + 1} =  createSchedItem(getLabel, fname);
+  getLabel = @(curTime, recInfo, playInfo, schedItem) decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedItem);
+  schedItem = createSchedItem(getLabel, fname, cmdDoneIDs);
+  schedItem.remainingCmdIDs = cmdDoneIDs;
+  schedQueue{end + 1} = schedItem;
 endfunction
 
 % determine label: if recInfo or playInfo has cmdDoneID, return nextLabel. If timout reached, return timeoutLabel
-function newLabel = decideLabelFor(curTime,  reqTime, cmdDoneID, nextLabel, timeoutLabel, recInfo, playInfo);
-  if hasCmdDone(recInfo, cmdDoneID) || hasCmdDone(playInfo, cmdDoneID)
-    % command done, go to nextLabel
+function newLabel = decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedItem)
+  % removing this cmdDoneID from the remaining ids
+  schedItem.remainingCmdIDs(schedItem.remainingCmdIDs == getCmdDoneID(recInfo)) = [];
+  schedItem.remainingCmdIDs(schedItem.remainingCmdIDs == getCmdDoneID(playInfo)) = [];
+  if isempty(schedItem.remainingCmdIDs)
+    % all commands done, go to nextLabel
     newLabel = nextLabel;  
   elseif curTime > reqTime
     % timeout occured
@@ -21,6 +26,10 @@ function newLabel = decideLabelFor(curTime,  reqTime, cmdDoneID, nextLabel, time
   endif
 endfunction
 
-function result = hasCmdDone(info, cmdDoneID)
-  result = ~isempty(info) && strcmp(info.cmdDoneID, cmdDoneID)
+function cmdDoneID = getCmdDoneID(info)
+  if ~isempty(info)
+    cmdDoneID = info.cmdDoneID;
+  else
+    cmdDoneID = NA;
+  endif
 endfunction

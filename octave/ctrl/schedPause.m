@@ -3,12 +3,12 @@
 function schedPause(timeout, nextLabel, fname)
   global schedQueue;
   reqTime = time() + timeout;
-  getLabel = @(curTime, recInfo, playInfo) nextLabelWhen(curTime,  reqTime, nextLabel);
+  getLabel = @(curTime, recInfo, playInfo, schedItem) nextLabelWhen(curTime,  reqTime, nextLabel, schedItem);
   schedQueue{end + 1} =  createSchedItem(getLabel, fname);
 endfunction
 
 % determine label with respect to current time vs. required time
-function newLabel = nextLabelWhen(curTime, reqTime, nextLabel)
+function newLabel = nextLabelWhen(curTime, reqTime, nextLabel, schedItem)
   %printf('checkTime: %f, %f, %s\n', curTime, reqTime, nextLabel);
   if curTime > reqTime
     newLabel = nextLabel;

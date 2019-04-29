@@ -1,14 +1,17 @@
 % atomic writing commands to cmd file
 % clear - clear outbox before printStr, default false
 function cmdID = writeCmd(cmd, cmdFilename, clear = false)  
-  persistent intCmdID = 1;
+  persistent cmdID = 0;
   global CMD_ID_PREFIX;
   
+  % new call - incrementing cmdID
+  ++cmdID;
+  
   % ID5
-  cmdID = [CMD_ID_PREFIX int2str(intCmdID)];
+  cmdIDStr = [CMD_ID_PREFIX int2str(cmdID)];
   
   [tmpfid, tmpFilename] = mkstemp([ tempdir() 'XXXXXX' ], true);
-  fprintf(tmpfid,"%s %s", cmdID, cmd);
+  fprintf(tmpfid,"%s %s", cmdIDStr, cmd);
   fclose(tmpfid);
   movefile(tmpFilename, cmdFilename);
   unlink(tmpFilename);
@@ -18,6 +21,4 @@ function cmdID = writeCmd(cmd, cmdFilename, clear = false)
   infoMsg = ['Sent CMD: "' cmd '" to ' cmdFilename];
   printStr(infoMsg);
   writeLog('DEBUG', infoMsg);
-  % incrementing integer part of command ID for next call
-  ++intCmdID;
 endfunction

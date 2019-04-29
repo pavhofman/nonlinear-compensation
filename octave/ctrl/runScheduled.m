@@ -5,12 +5,12 @@ function runScheduled(recInfo, playInfo);
   curTime = time();
   % loop all scheduled items
   for id = 1:cnt    
-    s = schedQueue{id};
-    % determine new label for current time and received infos
-    newLabel = s.getLabel(curTime, recInfo, playInfo);
+    item = schedQueue{id};
+    % determine new label for current time and received infos, passing scheduledItem
+    newLabel = item.getLabel(curTime, recInfo, playInfo, item);
     if ~isna(newLabel)
       % some label returned, executing fname
-      feval(s.fname, newLabel);
+      feval(item.fname, newLabel);
       
       % add id of this item for removal
       idsToRemove = [idsToRemove, id];
