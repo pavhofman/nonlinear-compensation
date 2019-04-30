@@ -15,7 +15,7 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});
   calOffMenusTasks{end+1} = uimenu(tasksMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
   
-  uimenu(tasksMenu, "label", "Devel - Calibrate VD Freqs", 'separator', 'on', 'callback', @clbkCalibrateFreqs);
+  uimenu(tasksMenu, "label", "Measure LP/VD Transfer", 'separator', 'on', 'callback', @clbkMeasureTransfers);
   
   % array of menu items related to calibration start/stop - used to enable/disable all at once
   recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
@@ -23,9 +23,9 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 endfunction
 
 
-function clbkCalibrateFreqs(src, data)
+function clbkMeasureTransfers(src, data)
   % calling scheduler-enabled calibration
-  calibrateFreqsSched();
+  measureTransferSched();
 endfunction
 
 function clbkSplitCalibrate(src, data)
