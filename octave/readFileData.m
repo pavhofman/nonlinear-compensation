@@ -45,7 +45,7 @@ function waitRemainingTime(bufferTime)
   else
     % sleep for the remaining time
     sleepTime = bufferTime - delay;
-    writeLog('DEBUG', "Sleeping in readFileData for %f", sleepTime);
+    writeLog('TRACE', "Sleeping in readFileData for %f", sleepTime);
     pause(sleepTime);
   endif  
   tic();

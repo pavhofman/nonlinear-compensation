@@ -82,7 +82,7 @@ function [buffer, fs] = readWritePlayrec(playBuffer, cycleLength, restart)
         tic();
     end
 
-    writeLog('DEBUG', 'Sleeping for %f', cnt/fs - toc());
+    writeLog('TRACE', 'Sleeping for %f', cnt/fs - toc());
     % blocking read on recording side
     playrec('block', pageNumList(1));
     buffer = playrec('getRec', pageNumList(1));

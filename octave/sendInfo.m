@@ -8,7 +8,7 @@ function sendInfo(info, zeromqPort)
   info.time = time();
   info.id = id;
   ser = var2bytea(info);
-  writeLog('DEBUG', "Sending info: %d bytes", length(ser));
+  writeLog('TRACE', "Sending info: %d bytes", length(ser));
   zmq_send (sock, ser, ZMQ_DONTWAIT);  
   id += 1;
 endfunction

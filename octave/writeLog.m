@@ -1,7 +1,7 @@
 % writing to global logPath levels >= global MIN_LOG_LEVEL.
 % logPath - either string with path, or integer with stdout/stderr file descriptor
 function writeLog(level, msg, varargin)
-  persistent LEVELS = {'ERROR', 'WARN', 'INFO', 'DEBUG'};  
+  persistent LEVELS = {'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'};  
   persistent TO_SECS = 3600*24;
   
   global MIN_LOG_LEVEL;

@@ -242,9 +242,9 @@ while (~doQuit)
     localRecInfo = rcvInfo(recSock);
   until isempty(localRecInfo) || localRecInfo.time > time() - MAX_INFO_AGE
   if isempty(localRecInfo)
-    writeLog('DEBUG', 'Empty rec info');
+    writeLog('TRACE', 'Empty rec info');
   else
-    writeLog('DEBUG', 'Processing rec info');
+    writeLog('TRACE', 'Processing rec info');
     recInfo = localRecInfo;
     processInfo(recInfo, recStruct);
   endif
@@ -254,9 +254,9 @@ while (~doQuit)
     localPlayInfo = rcvInfo(playSock);
   until isempty(localPlayInfo) || localPlayInfo.time > time() - MAX_INFO_AGE
   if isempty(localPlayInfo)
-    writeLog('DEBUG', 'Empty play info');
+    writeLog('TRACE', 'Empty play info');
   else
-    writeLog('DEBUG', 'Processing play info');
+    writeLog('TRACE', 'Processing play info');
     playInfo = localPlayInfo;
     processInfo(playInfo, playStruct);
   endif
