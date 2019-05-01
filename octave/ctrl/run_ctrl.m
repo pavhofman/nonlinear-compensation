@@ -41,8 +41,8 @@ function dirStruct = createDirStruct(dir)
   
 endfunction
 
-global cmdFileRec = genDataPath(CMD_FILE_REC);
-global cmdFilePlay = genDataPath(CMD_FILE_PLAY);
+global cmdFileRec = genDataPath(CMD_FILE_REC, dataDir);
+global cmdFilePlay = genDataPath(CMD_FILE_PLAY, dataDir);
 
 global fs = 48000;
 global freq = 3000;

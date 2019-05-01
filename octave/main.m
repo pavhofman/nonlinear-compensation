@@ -24,14 +24,14 @@ source 'config.m';
 if direction == DIR_PLAY
   % overriden playback config values
   source 'configPlay.m';
-  cmdFile = genDataPath(CMD_FILE_PLAY);
+  cmdFile = genDataPath(CMD_FILE_PLAY, dataDir);
   zeromqPort = ZEROMQ_PORT_PLAY;
 else
-  cmdFile = genDataPath(CMD_FILE_REC);
+  cmdFile = genDataPath(CMD_FILE_REC, dataDir);
   zeromqPort = ZEROMQ_PORT_REC;
 endif
 
-transferFile = genDataPath('transf.dat');
+transferFile = genDataPath('transf.dat', dataDir);
 % default initial command - PASS
 
 

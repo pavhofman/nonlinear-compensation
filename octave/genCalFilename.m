@@ -12,10 +12,6 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
     freqsPart = [freqsPart,  int2str(floor(freqs(i))), '_'];
   endfor
   
-  if (length(extraCircuit) > 0)
-    extraCircuit = ['_' extraCircuit];
-  endif
-  
   filename = ['cal_' freqsPart 'FS' int2str(fs)];
   
   % wrap single-device devSpecs
@@ -29,9 +25,26 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
   
   % adding channel mode
   filename = [filename '_M' num2str(chMode)];
+
+  if length(extraCircuit) > 0
+    filename = [filename '_' extraCircuit];
+  endif
   
-  filename = [filename extraCircuit '.dat'];
-  filename = genDataPath(filename);
+  % suffix
+  filename = [filename '.dat'];
+  
+  if isempty(extraCircuit)    
+    filedir = dataDir;
+  else
+    filedir = [dataDir '_' extraCircuit];
+  endif
+  
+  % creating the directory should it not exist
+  if !exist(filedir, 'dir')
+    mkdir(filedir);
+  endif
+
+  filename = genDataPath(filename, filedir);
 endfunction
 
 

@@ -1,4 +1,3 @@
-function path = genDataPath(filename)
-  global dataDir;
-  path = [dataDir filesep() filename];
+function path = genDataPath(filename, filedir)
+  path = [filedir filesep() filename];
 endfunction
