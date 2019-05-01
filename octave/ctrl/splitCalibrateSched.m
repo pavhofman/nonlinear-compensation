@@ -3,7 +3,7 @@
 % calibrating at current freq, requires pre-measured VD and LPF!
 function splitCalibrateSched(label = 1)
   % init section
-  [P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, ERROR] = enum();
+  [PASSING_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL, COMP_REC_LABEL, GEN_OFF_LABEL, DONE_LABEL, ERROR] = enum();
   
   persistent AUTO_TIMEOUT = 10;
   % manual calibration timeout - enough time to adjust the level into the range limits
@@ -58,7 +58,7 @@ function splitCalibrateSched(label = 1)
   while true
     switch(label)
     
-      case P1
+      case PASSING_LABEL
         
         global playInfo;
         global recInfo;
@@ -89,10 +89,10 @@ function splitCalibrateSched(label = 1)
         % we have to wait for command acceptance before issuing new commands (the cmd files could be deleted by new commands before they are consumed
         % waiting only for one of the pass commands, both sides run at same speed
         % after AUTO_TIMEOUT secs timeout call ERROR
-        waitForCmdDone([cmdIDPlay, cmdIDRec], P2, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone([cmdIDPlay, cmdIDRec], MODE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
-      case P2
+      case MODE_LABEL
         
         global SET_MODE;
         global CMD_MODE_PREFIX;
@@ -101,11 +101,18 @@ function splitCalibrateSched(label = 1)
         cmdStr = [SET_MODE ' ' CMD_MODE_PREFIX num2str(MODE_DUAL)];
         cmdIDPlay = writeCmd(cmdStr, cmdFilePlay);
         cmdIDRec = writeCmd(cmdStr, cmdFileRec);
-        waitForCmdDone([cmdIDPlay, cmdIDRec], P3, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone([cmdIDPlay, cmdIDRec], WAIT_FOR_LP_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
+        
+      case WAIT_FOR_LP_LABEL
+        % after switching to LPF + mode we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
+        schedPause(1, CAL_LP_LABEL, mfilename());
+        return;
+        
 
-      case P3
+      case CAL_LP_LABEL
         % calibrating LPF at origFreq
+        % generator is not strictly required since it generates same signal as currently incoming. But for safety of calibration it is safer to generate our own stable signal
         printStr(sprintf("Generating %dHz", origFreq));
         cmdIDPlay = sendPlayGeneratorCmd(origFreq, origPlayLevels, playEqualizer);
         
@@ -113,27 +120,30 @@ function splitCalibrateSched(label = 1)
         % deleting the calib file should it exist - always clean calibration
         calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);
+        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_LP1);
+        deleteFile(calFile);
         
         % safety measure - requesting calibration only at curFreq
         calFreqReqStr = getCalFreqReqStr({[origFreq, NA, NA]});
         calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
         cmdIDRec = writeCmd(calCmd, cmdFileRec);
         % next frequency
-        waitForCmdDone([cmdIDPlay, cmdIDRec], P4, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone([cmdIDPlay, cmdIDRec], WAIT_FOR_VD_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
-      case P4
-        % VD calibration
+      case WAIT_FOR_VD_LABEL
         swStruct.vd = true;
         showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
-
+        % after switching LPF -> VD we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
+        schedPause(1, CAL_VD_LABEL, mfilename());
+        return;
+        
+      case CAL_VD_LABEL
+        % VD calibration        
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         lpFundAmpl = loadCalFundAmpl(origFreq, fs, playChID, analysedChID, EXTRA_CIRCUIT_LP1);
 
         clearOutBox();
-        
-        printStr(sprintf("Generating %dHz", origFreq));
-        cmdIDPlay = sendPlayGeneratorCmd(origFreq, origPlayLevels, playEqualizer);
         
         printStr(sprintf("Joint-device calibrating VD at frequency %dHz:", origFreq));
         % VD at fundament (origFreq) must be calibrated at exactly the same level as LP so that the distortion characteristics of ADC are same
@@ -149,49 +159,47 @@ function splitCalibrateSched(label = 1)
         % deleting the calib file should it exist - always clean calibration
         calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD);
         deleteFile(calFile);
+        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_VD);
+        deleteFile(calFile);
 
         calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
               
         cmdIDRec = writeCmd(calCmd, cmdFileRec);
         % long waiting - manual level adjustment
-        waitForCmdDone([cmdIDPlay, cmdIDRec], P5, MANUAL_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdIDRec, SPLIT_CAL_LABEL, MANUAL_TIMEOUT, ERROR, mfilename());
         return;
 
-      case P5
+      case SPLIT_CAL_LABEL
         % range calibrations finished, closing the zoomed calib plot
         closeCalibPlot();
 
         clearOutBox();
         printStr(sprintf('Calculating split calibration'));
         calculateSplitCal(origFreq, fs, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
-        
-        printStr(sprintf("Generating orig %dHz for split REC side calibration", origFreq));
-        cmdIDPlay = sendPlayGeneratorCmd(origFreq, origPlayLevels, playEqualizer);
 
+        % going to the next label. This could be processed in one label, but separating split calibration from play-side compensation makes the code cleaner
+        label = COMP_PLAY_LABEL;
+        continue;
+        
+
+      case COMP_PLAY_LABEL
         printStr(sprintf('Compensating PLAY side first'));
-        cmdIDRec = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_PLAY_SIDE)], cmdFilePlay);
-        waitForCmdDone([cmdIDPlay, cmdIDRec], P6, AUTO_TIMEOUT, ERROR, mfilename());
+        cmdIDPlay = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_PLAY_SIDE)], cmdFilePlay);
+        %waitForCmdDone(cmdIDPlay, CAL_REC_UP_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdIDPlay, GEN_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
-      case {P6, P7, P8}
+      case {CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL}
         switch label
-          case P6
-            % deleting the calib file for direct channel should it exist - always clean calibration
-            calFile = genCalFilename(origFreq, fs, COMP_TYPE_REC_SIDE, NA, getTheOtherChannelID(analysedChID), MODE_DUAL, '');
-            deleteFile(calFile);
-
-            % the newly created calfile for analysedChID contains calculated data, not deleting
-            calFile = genCalFilename(origFreq, fs, COMP_TYPE_REC_SIDE, NA, analysedChID, MODE_DUAL, '');
-            deleteFile(calFile);
-            
+          case CAL_REC_UP_LABEL           
             expl = 'upper limit';
             adjustment = CAL_LEVEL_STEP;
             
-          case P7
+          case CAL_REC_DOWN_LABEL
             expl = 'lower limit';
             adjustment = 1/CAL_LEVEL_STEP;
             
-          case P8
+          case CAL_REC_EX_LABEL
             % last run at exact value - for now
             expl = 'exact value';
             adjustment = 1;
@@ -219,7 +227,7 @@ function splitCalibrateSched(label = 1)
         waitForCmdDone(cmdID, label + 1, MANUAL_TIMEOUT, ERROR, mfilename());
         return;
         
-      case P9
+      case COMP_REC_LABEL
         clearOutBox();
         
         % all calibrations finished, closing the zoomed calib plot
@@ -227,16 +235,16 @@ function splitCalibrateSched(label = 1)
         
         printStr(sprintf('Compensating SPLIT REC side'));
         cmdID = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
-        waitForCmdDone(cmdID, P10, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdID, GEN_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
-      case P10
+      case GEN_OFF_LABEL
         printStr(sprintf('Generator Off'));
         cmdID = writeCmd([GENERATE ' ' 'off'], cmdFilePlay);
-        waitForCmdDone(cmdID, P11, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdID, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
 
-      case P11
+      case DONE_LABEL
         swStruct.calibrate = false;
         showSwitchWindow('Set switches for measuring DUT', swStruct');
         return;

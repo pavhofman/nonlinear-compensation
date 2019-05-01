@@ -2,7 +2,7 @@
 % Only one-sine (one fundamental) is supported!!
 function measureTransferSched(label = 1)
   % init section
-  [P1, P2, P3, P4, P5, P6, ERROR] = enum();
+  [PASSING_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_VD_LABEL, GEN_OFF_LABEL, DONE_LABEL, ERROR] = enum();
   
   persistent AUTO_TIMEOUT = 10;
   % manual calibration timeout - enough time to adjust the level into the range limits
@@ -49,7 +49,7 @@ function measureTransferSched(label = 1)
   while true
     switch(label)
     
-      case P1
+      case PASSING_LABEL
         
         global playInfo;
         global recInfo;
@@ -60,7 +60,7 @@ function measureTransferSched(label = 1)
         origFreq = recInfo.measuredPeaks{analysedChID}(1, 1);
         
 
-        % starting at last measured freq
+        % LPF measurement starts at last measured freq. We need values for fundamental freq in order to determine lpFundAmpl to align VD to same value
         curFreq = origFreq;
         
         swStruct.calibrate = true;
@@ -71,7 +71,7 @@ function measureTransferSched(label = 1)
         showSwitchWindow(sprintf('Set switches for LP calibration/measurement of input channel ', analysedChID), swStruct);
 
         clearOutBox();
-        printStr(sprintf("Joint-device calibrating LP at all harmonic frequencies of %dHz:", curFreq));
+        printStr(sprintf("Joint-device calibrating LP at all harmonic frequencies of %dHz:", origFreq));
         
         % setting pass status on both sides
         cmdIDPlay = writeCmd(PASS, cmdFilePlay);
@@ -79,10 +79,10 @@ function measureTransferSched(label = 1)
         % we have to wait for command acceptance before issuing new commands (the cmd files could be deleted by new commands before they are consumed
         % waiting only for one of the pass commands, both sides run at same speed
         % after AUTO_TIMEOUT secs timeout call ERROR
-        waitForCmdDone([cmdIDPlay, cmdIDRec], P2, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone([cmdIDPlay, cmdIDRec], MODE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
 
-      case P2
+      case MODE_LABEL
         
         global SET_MODE;
         global CMD_MODE_PREFIX;
@@ -91,11 +91,16 @@ function measureTransferSched(label = 1)
         cmdStr = [SET_MODE ' ' CMD_MODE_PREFIX num2str(MODE_DUAL)];
         cmdIDPlay = writeCmd(cmdStr, cmdFilePlay);
         cmdIDRec = writeCmd(cmdStr, cmdFileRec);
-        waitForCmdDone([cmdIDPlay, cmdIDRec], P3, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone([cmdIDPlay, cmdIDRec], WAIT_FOR_LP_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
-
-      case P3
-        % calibrating direct connection at freq harmonics
+        
+      case WAIT_FOR_LP_LABEL
+        % after switching to LPF + mode we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
+        schedPause(1, CAL_LP_LABEL, mfilename());
+        return;
+        
+      case CAL_LP_LABEL
+        % calibrating LPF connection at freq harmonics
         while curFreq < fs/2
           printStr(sprintf("Generating %dHz", curFreq));
           cmdIDPlay = sendPlayGeneratorCmd(curFreq, PLAY_LEVELS);
@@ -103,6 +108,8 @@ function measureTransferSched(label = 1)
           printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", curFreq));
           % deleting the calib file should it exist - always clean calibration
           calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+          deleteFile(calFile);
+          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_LP1);
           deleteFile(calFile);
           
           % safety measure - requesting calibration only at curFreq
@@ -112,26 +119,26 @@ function measureTransferSched(label = 1)
 
           % next frequency
           curFreq += origFreq;
-          waitForCmdDone([cmdIDPlay, cmdIDRec], P3, AUTO_TIMEOUT, ERROR, mfilename());
+          waitForCmdDone([cmdIDPlay, cmdIDRec], CAL_LP_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
           return;            
         endwhile
         % VD calibration
         swStruct.vd = true;
         showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
-
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         lpFundAmpl = loadCalFundAmpl(origFreq, fs, playChID, analysedChID, EXTRA_CIRCUIT_LP1);
 
         % resetting curFreq to fundament
         curFreq = origFreq;
         clearOutBox();
-        printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", curFreq));
+        printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", origFreq));
 
-        label = P4;
-        % goto label - next loop
-        continue;
+        % after switching to VD we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
+        schedPause(1, CAL_VD_LABEL, mfilename());
+        return;
+        
 
-      case P4
+      case CAL_VD_LABEL
         % calibrating LP connection at freq harmonics
         while curFreq < fs/2
           printStr(sprintf("Generating %dHz", curFreq));
@@ -163,25 +170,27 @@ function measureTransferSched(label = 1)
           % deleting the calib file should it exist - always clean calibration
           calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD);
           deleteFile(calFile);
+          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_VD);
+          deleteFile(calFile);
 
           calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
           cmdIDRec = writeCmd(calCmd, cmdFileRec);
           % next frequency
           curFreq += origFreq;
-          waitForCmdDone([cmdIDPlay, cmdIDRec], P4, timeout, ERROR, mfilename());
+          waitForCmdDone([cmdIDPlay, cmdIDRec], CAL_VD_LABEL, timeout, ERROR, mfilename());
           return;
         endwhile
-        label = P5;
+        label = GEN_OFF_LABEL;
         % goto label - next loop
         continue;
 
-      case P5
+      case GEN_OFF_LABEL
         printStr(sprintf('Generator Off'));
         cmdID = writeCmd([GENERATE ' ' 'off'], cmdFilePlay);
-        waitForCmdDone(cmdID, P6, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdID, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
 
-      case P6
+      case DONE_LABEL
         swStruct.calibrate = false;
         showSwitchWindow('Set switches for measuring DUT', swStruct');
         return;
