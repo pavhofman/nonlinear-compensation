@@ -1,4 +1,16 @@
 function updateMenu(dirStruct, info)
+  % running only once a second
+  persistent UPDATE_INTERVAL = 1;
+  persistent lastUpdateTime = time();
+  
+  
+  curTime = time();
+  if curTime() > lastUpdateTime + UPDATE_INTERVAL
+    lastUpdateTime = curTime;
+  else
+    return;
+  endif
+    
   % setting distortion menu items visibility
   if isfield(info, 'distortHarmAmpls') && ~isempty(info.distortHarmAmpls)
     setEnabled(dirStruct.distortOnMenu, false);
