@@ -12,8 +12,6 @@ global DISTORT = 'distort';
 global SHOW_FFT = 'showfft';
 % sine generator
 global GENERATE = 'gen';
-% measure transfer at frequency and channel
-global MEASURE = 'meas';
 
 % reading from audio file
 global READFILE = 'readfile';
@@ -35,7 +33,6 @@ global ANALYSING = 'Analysing';
 global COMPENSATING = 'Compensating';
 global DISTORTING = 'Distorting';
 global GENERATING = 'Generating';
-global MEASURING = 'Measuring';
 
 % order of statuses shown in statusTxt fields. Not listed statuses go last.
 global TXT_STATUS_ORDER = {

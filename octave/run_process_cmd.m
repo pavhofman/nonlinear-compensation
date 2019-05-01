@@ -176,16 +176,7 @@ elseif strcmp(cmd{1}, GENERATE)
   endif
   % generating completes command immediately
   cmdDoneID = cmdID;
-  
-elseif strcmp(cmd{1}, MEASURE) && (rows(cmd) > 2)
-  % meas freq channelID
-  % measure transfer of channelID against the other channel at freq, store to transf.dat
-  setStatus(MEASURING);
-  transfer.freq = str2num(cmd{2});
-  % channel ID for transfer measurement. The other channel receives the original signal
-  transfer.channel = str2num(cmd{3});
-  restartMeasuring = true;
- 
+
 endif
 % clear new command
 cmd = cellstr(NO_CMD);

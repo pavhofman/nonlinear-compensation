@@ -31,7 +31,6 @@ else
   zeromqPort = ZEROMQ_PORT_REC;
 endif
 
-transferFile = genDataPath('transf.dat', dataDir);
 % default initial command - PASS
 
 
@@ -78,8 +77,6 @@ global equalizer = NA;
 global clippedCnt = 0;
 
 recordedData = [];
-
-transfer = struct();
 
 global reloadCalFiles = false;
 % first run -> restart, reading all files
@@ -186,10 +183,6 @@ while(true)
   if showFFTCfg.enabled
     % should show FFT figure for this direction
     showFFTFigure(buffer, fs, direction)
-  endif
-  
-  if (isStatus(MEASURING))
-    source 'run_measuring.m';
   endif
 
   if useZeroMQ
