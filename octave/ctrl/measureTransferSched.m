@@ -14,8 +14,9 @@ function measureTransferSched(label = 1)
   % ID of output channel used for split calibration
   persistent playChID = 2;
   
-  persistent EXTRA_CIRCUIT_VD = 'vd';
-  persistent EXTRA_CIRCUIT_LP1 = 'lp1';  
+  global EXTRA_CIRCUIT_VD;
+  global EXTRA_CIRCUIT_LP1;
+  global EXTRA_TRANSFER_DIR;
   
   global cmdFileRec;
   global cmdFilePlay;
@@ -24,6 +25,7 @@ function measureTransferSched(label = 1)
   global CALIBRATE;
   global COMPENSATE;
   global CMD_EXTRA_CIRCUIT_PREFIX;
+  global CMD_EXTRA_DIR_PREFIX;
   global CMD_CHANNEL_FUND_PREFIX;
   global CMD_COMP_TYPE_PREFIX;
   global CMD_CALRUNS_PREFIX;
@@ -107,14 +109,15 @@ function measureTransferSched(label = 1)
 
           printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", curFreq));
           % deleting the calib file should it exist - always clean calibration
-          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_LP1, EXTRA_TRANSFER_DIR);
           deleteFile(calFile);
-          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_LP1);
+          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_LP1, EXTRA_TRANSFER_DIR);
           deleteFile(calFile);
           
           % safety measure - requesting calibration only at curFreq
           calFreqReqStr = getCalFreqReqStr({[curFreq, NA, NA]});
-          calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
+          calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ...
+            ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1 ' ' CMD_EXTRA_DIR_PREFIX EXTRA_TRANSFER_DIR];
           cmdIDRec = writeCmd(calCmd, cmdFileRec);
 
           % next frequency
@@ -126,7 +129,7 @@ function measureTransferSched(label = 1)
         swStruct.vd = true;
         showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
-        lpFundAmpl = loadCalFundAmpl(origFreq, fs, playChID, analysedChID, EXTRA_CIRCUIT_LP1);
+        lpFundAmpl = loadCalFundAmpl(origFreq, fs, playChID, analysedChID, EXTRA_CIRCUIT_LP1, EXTRA_TRANSFER_DIR);
 
         % resetting curFreq to fundament
         curFreq = origFreq;
@@ -168,12 +171,13 @@ function measureTransferSched(label = 1)
             closeCalibPlot();
           endif
           % deleting the calib file should it exist - always clean calibration
-          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD);
+          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_TRANSFER_DIR);
           deleteFile(calFile);
-          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_VD);
+          calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_TRANSFER_DIR);
           deleteFile(calFile);
 
-          calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
+          calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ...
+            ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD ' ' CMD_EXTRA_DIR_PREFIX EXTRA_TRANSFER_DIR];
           cmdIDRec = writeCmd(calCmd, cmdFileRec);
           % next frequency
           curFreq += origFreq;

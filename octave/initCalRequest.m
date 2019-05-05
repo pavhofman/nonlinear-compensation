@@ -1,4 +1,4 @@
-function request = initCalRequest(calFreqReq, compType, playChannelID, playAmpls, extraCircuit, contCal, calRuns, chMode)  
+function request = initCalRequest(calFreqReq, compType, playChannelID, playAmpls, extraCircuit, extraDir, contCal, calRuns, chMode)  
   request = initCompRequest(compType, playChannelID, extraCircuit);
   % plus calibration-specific data
   request.calFreqReq = calFreqReq;
@@ -9,4 +9,6 @@ function request = initCalRequest(calFreqReq, compType, playChannelID, playAmpls
   request.chMode = chMode;
   % current playback ampls generating the calibrated signal on rec side. Real values passed only in compType COMP_TYPE_JOINT!
   request.playAmpls = playAmpls;
+  % extra directory specifier. For now used only by calibration, not included in initCompRequest
+  request.extraDir = extraDir;
 endfunction

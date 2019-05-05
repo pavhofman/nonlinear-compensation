@@ -93,6 +93,9 @@ global CMD_CALRUNS_PREFIX = '#CALR#';
 %ECfilter
 global CMD_EXTRA_CIRCUIT_PREFIX = '#EC#';
 
+%EDtransfer
+global CMD_EXTRA_DIR_PREFIX = '#ED#';
+
 % format for generator
 %CH[1000,0.85;2000,0.85]
 global CMD_CHANNEL_FUND_PREFIX = '#CH#';
@@ -200,3 +203,8 @@ global PEAKS_START_IDX = 8;
 global PHASEDIFF_IDX = 2;
 % fund amplitude within +/- SAME_AMPL_TOL considered same
 global SAME_AMPL_TOL = db2mag(0.01);
+
+global EXTRA_CIRCUIT_VD = 'vd';
+global EXTRA_CIRCUIT_LP1 = 'lp1';  
+global EXTRA_TRANSFER_DIR = 'transfer';  
+

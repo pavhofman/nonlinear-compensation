@@ -22,8 +22,8 @@ function splitCalibrateSched(label = 1)
   % ID of output channel used for split calibration
   persistent playChID = 2;
   
-  persistent EXTRA_CIRCUIT_VD = 'vd';
-  persistent EXTRA_CIRCUIT_LP1 = 'lp1';  
+  global EXTRA_CIRCUIT_VD;
+  global EXTRA_CIRCUIT_LP1;
   
   global cmdFileRec;
   global cmdFilePlay;

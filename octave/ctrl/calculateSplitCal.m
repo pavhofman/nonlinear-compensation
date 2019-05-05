@@ -2,6 +2,7 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   global COMP_TYPE_JOINT;
   global AMPL_IDX;  % = index of fundAmpl1 in cal peaks row
   global PLAY_AMPL_IDX;  % = index of playAmpl1 in cal peaks row
+  global EXTRA_TRANSFER_DIR;
 
   % voltage divider
   [peaksVDRow, distortVDFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, vdName);
@@ -30,7 +31,7 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   % starting with second harmonic
   distortFreq = 2 * fundFreq;
   
-  % VD and LP equations solve for the same DA/AD distortions. Same means they must be the the same time.
+  % VD and LP equations solve for the same DA/AD distortions. Same means they must be at the same time.
   % VD: time on AD side = time on DA side (no phaseShift considered). 
   % LP: LP is calculated for time = 0 (fundPhase = 0 - peaksLPRow has time moved to zero phase by calibration).
   % But at time = 0 on DA side => on LP side the phase would be shifted. 
@@ -79,8 +80,9 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
     % "known" values for fitting
     y = [refVD; refLP];
 
-    [distortVDGain, distortVDPhaseShift] = detTransferFromCalFile(distortFreq, fs, playChID, analysedRecChID, chMode, vdName);
-    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFile(distortFreq, fs, playChID, analysedRecChID, chMode, lpName);
+    % transfer calibration profiles for LP and VD are stored in EXTRA_TRANSFER_DIR
+    [distortVDGain, distortVDPhaseShift] = detTransferFromCalFile(distortFreq, fs, playChID, analysedRecChID, chMode, vdName, EXTRA_TRANSFER_DIR);
+    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFile(distortFreq, fs, playChID, analysedRecChID, chMode, lpName, EXTRA_TRANSFER_DIR);
     distortLPvsVDPhaseShift = distortLPPhaseShift - distortVDPhaseShift;
     
     

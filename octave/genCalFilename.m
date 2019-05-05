@@ -1,7 +1,7 @@
 % result: joint-sides version calDir/cal_freq1_freq2_FS48000_playDevName_CHchannelID_recDevName_CHchannelID_MchannelMode_extracircuit.dat
 % split play-side version: calDir/cal_freq1_freq2_FS48000_playDevName_CHchannelID_MchannelMode_extracircuit.dat
 % split rec-side version: calDir/cal_freq1_freq2_FS48000_recDevName_CHchannelID_MchannelMode_extracircuit.dat
-function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelID, channelID, chMode, extraCircuit='')
+function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelID, channelID, chMode, extraCircuit='', extraDir='')
   global dataDir;
   
   devSpecs = createCalFileDevSpecs(compType, playChannelID, channelID);
@@ -33,10 +33,10 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
   % suffix
   filename = [filename '.dat'];
   
-  if isempty(extraCircuit)    
+  if isempty(extraDir)    
     filedir = dataDir;
   else
-    filedir = [dataDir '_' extraCircuit];
+    filedir = [dataDir '_' extraDir];
   endif
   
   % creating the directory should it not exist
