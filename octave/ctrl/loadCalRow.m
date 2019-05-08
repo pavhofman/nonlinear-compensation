@@ -1,5 +1,4 @@
-function [peaksRow, distortFreqs] = loadCalRow(freqs, fs, compType, playChID, analysedChID, chMode, extraCircuit = '', extraDir = '')
-  calFile = genCalFilename(freqs, fs, compType, playChID, analysedChID, chMode, extraCircuit, extraDir);
+function [peaksRow, distortFreqs] = loadCalRow(calFile)
   % loading calRec structure
   load(calFile);
   

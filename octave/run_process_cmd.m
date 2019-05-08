@@ -27,9 +27,6 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     
     % reading optional  extra circuit specifier string (will be stored in cal file name)
     calExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
-
-    % reading optional  extra directory specifier string (calfile will be stored in datadir_extraDir directory)
-    calExtraDir = findStringInCmd(cmd, CMD_EXTRA_DIR_PREFIX);
     
     % optional calibration freqs + levels for both channels to wait for
     calFreqReq = findMatricesInCmd(cmd, CMD_CALFREQS_PREFIX);
@@ -56,7 +53,7 @@ elseif (strcmp(cmd{1}, CALIBRATE))
 
         
     % building calibration request struct
-    calRequest = initCalRequest(calFreqReq, compType, playChannelID, playAmpls, calExtraCircuit, calExtraDir, contCal, calRuns, calChMode);
+    calRequest = initCalRequest(calFreqReq, compType, playChannelID, playAmpls, calExtraCircuit, contCal, calRuns, calChMode);
 
     % clearing calibration buffer
     restartCal = true;

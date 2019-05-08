@@ -5,9 +5,11 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   global EXTRA_TRANSFER_DIR;
 
   % voltage divider
-  [peaksVDRow, distortVDFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, vdName);
+  calFile = genCalFilename(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, vdName);
+  [peaksVDRow, distortVDFreqs] = loadCalRow(calFile);
   % LP filter (input - resistor 10k -RIGHT- capacitor 10nF - ground)
-  [peaksLPRow, distortLPFreqs] = loadCalRow(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, lpName);
+  calFile = genCalFilename(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, lpName);
+  [peaksLPRow, distortLPFreqs] = loadCalRow(calFile);
 
 
   fundAmplVD = peaksVDRow(1, AMPL_IDX);
@@ -80,9 +82,8 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
     % "known" values for fitting
     y = [refVD; refLP];
 
-    % transfer calibration profiles for LP and VD are stored in EXTRA_TRANSFER_DIR
-    [distortVDGain, distortVDPhaseShift] = detTransferFromCalFile(distortFreq, fs, playChID, analysedRecChID, chMode, vdName, EXTRA_TRANSFER_DIR);
-    [distortLPGain, distortLPPhaseShift] = detTransferFromCalFile(distortFreq, fs, playChID, analysedRecChID, chMode, lpName, EXTRA_TRANSFER_DIR);
+    [distortVDGain, distortVDPhaseShift] = detTransferFromTransferFile(distortFreq, vdName);
+    [distortLPGain, distortLPPhaseShift] = detTransferFromTransferFile(distortFreq, lpName);
     distortLPvsVDPhaseShift = distortLPPhaseShift - distortVDPhaseShift;
     
     

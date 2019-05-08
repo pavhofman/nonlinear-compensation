@@ -93,9 +93,6 @@ global CMD_CALRUNS_PREFIX = '#CALR#';
 %ECfilter
 global CMD_EXTRA_CIRCUIT_PREFIX = '#EC#';
 
-%EDtransfer
-global CMD_EXTRA_DIR_PREFIX = '#ED#';
-
 % format for generator
 %CH[1000,0.85;2000,0.85]
 global CMD_CHANNEL_FUND_PREFIX = '#CH#';
@@ -208,3 +205,6 @@ global EXTRA_CIRCUIT_VD = 'vd';
 global EXTRA_CIRCUIT_LP1 = 'lp1';  
 global EXTRA_TRANSFER_DIR = 'transfer';  
 
+
+% transfer file/record maximum age to be accepted - 3 days
+global MAX_TRANSFER_AGE = 60 * 60 * 24 * 3;
