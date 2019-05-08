@@ -4,6 +4,6 @@ function printStr(str)
   if (rows(contents) == 0)
     contents = {};
   endif
-  contents(rows(contents) + 1) = str;
+  contents(end + 1) = str;
   set(outBox, 'string', contents);
 endfunction
