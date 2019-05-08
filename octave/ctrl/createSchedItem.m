@@ -1,6 +1,8 @@
 % creates new scheduler item to be added into schedQueue
-function s = createSchedItem(getLabelFunc, fname)
+function s = createSchedItem(getNextPointerFunc)
   s = struct();
-  s.fname = fname;
-  s.getLabel = getLabelFunc;
+  s.getNextPointer = getNextPointerFunc;  
+  s.keepInQueue = false;
+  s.newLabel = NA;
+  s.fName = '';
 endfunction

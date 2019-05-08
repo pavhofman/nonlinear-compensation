@@ -1,29 +1,29 @@
 % scheduler-eanbled wait for incoming cmdDoneID message with timeout
 % if recInfo or playInfo has cmdDoneID, return nextLabel. If timout reached, return timeoutLabel
-function waitForCmdDone(cmdDoneIDs, nextLabel, timeout, timeoutLabel, fname);
+function waitForCmdDone(cmdDoneIDs, nextLabel, timeout, timeoutLabel, callingFName);
   global schedQueue;
   reqTime = time() + timeout;
-  getLabel = @(curTime, recInfo, playInfo, schedItem) decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedItem);
-  schedItem = createSchedItem(getLabel, fname, cmdDoneIDs);
+  getLabel = @(curTime, recInfo, playInfo, schedItem) decideLabelFor(curTime,  reqTime, callingFName, nextLabel, timeoutLabel, recInfo, playInfo, schedItem);
+  schedItem = createSchedItem(getLabel);
   schedItem.remainingCmdIDs = cmdDoneIDs;
   schedQueue{end + 1} = schedItem;
 endfunction
 
 % determine label: if recInfo or playInfo has cmdDoneID, return nextLabel. If timout reached, return timeoutLabel
-function newLabel = decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedItem)
+function schedItem = decideLabelFor(curTime,  reqTime, callingFName, nextLabel, timeoutLabel, recInfo, playInfo, schedItem)
   % removing this cmdDoneID from the remaining ids
   schedItem.remainingCmdIDs(schedItem.remainingCmdIDs == getCmdDoneID(recInfo)) = [];
   schedItem.remainingCmdIDs(schedItem.remainingCmdIDs == getCmdDoneID(playInfo)) = [];
   if isempty(schedItem.remainingCmdIDs)
     % all commands done, go to nextLabel
-    newLabel = nextLabel;  
+    schedItem.newLabel = nextLabel;
+    schedItem.fName = callingFName;
   elseif curTime > reqTime
     % timeout occured
-    newLabel = timeoutLabel;
-  else
-    % keep waiting, no label
-    newLabel = NA;
+    schedItem.newLabel = timeoutLabel;
+    schedItem.fName = callingFName;    
   endif
+  % else keep waiting
 endfunction
 
 function cmdDoneID = getCmdDoneID(info)

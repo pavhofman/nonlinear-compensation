@@ -1,19 +1,16 @@
 % scheduled pause for timeout. 
-% Upon expiration, fname is called with nextLabel param - feval(fname, nextlabel)
-function schedPause(timeout, nextLabel, fname)
+% Upon expiration, fName is called with nextLabel param - feval(fname, nextlabel)
+function schedPause(timeout, nextLabel, callingFName)
   global schedQueue;
   reqTime = time() + timeout;
-  getLabel = @(curTime, recInfo, playInfo, schedItem) nextLabelWhen(curTime,  reqTime, nextLabel, schedItem);
-  schedQueue{end + 1} =  createSchedItem(getLabel, fname);
+  getLabel = @(curTime, recInfo, playInfo, schedItem) nextLabelWhen(curTime,  reqTime, callingFName, nextLabel, schedItem);
+  schedQueue{end + 1} =  createSchedItem(getLabel);
 endfunction
 
 % determine label with respect to current time vs. required time
-function newLabel = nextLabelWhen(curTime, reqTime, nextLabel, schedItem)
-  %printf('checkTime: %f, %f, %s\n', curTime, reqTime, nextLabel);
+function schedItem = nextLabelWhen(curTime,  reqTime, callingFName, nextLabel, schedItem)
   if curTime > reqTime
-    newLabel = nextLabel;
-  else
-    % keep waiting, no label
-    newLabel = NA;
+    schedItem.newLabel = nextLabel;
+    schedItem.fName = callingFName;
   endif
 endfunction

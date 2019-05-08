@@ -1,6 +1,9 @@
 % scheduler-enabled function for measuring VD and LPF transfer via regular joint-sides calibration
 % Only one-sine (one fundamental) is supported!!
-function measureTransferSched(label = 1)
+function result = measureTransferSched(label = 1, schedItem = [])
+  result = NA;
+  persistent NAME = 'Measuring LP & VD Transfer';
+  
   % init section
   [PASSING_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_VD_LABEL, GEN_OFF_LABEL, DONE_LABEL, ERROR] = enum();
   
@@ -56,6 +59,8 @@ function measureTransferSched(label = 1)
         global playInfo;
         global recInfo;
 
+        addTaskName(NAME);
+
         % loading current values from analysis
         fs = recInfo.fs;
         % TODO - checks - only one fundament freq!!
@@ -70,7 +75,12 @@ function measureTransferSched(label = 1)
         swStruct.inputR = (playChID == 2);
         swStruct.vd = false;
         swStruct.analysedR = (analysedChID == 2);
-        showSwitchWindow(sprintf('Set switches for LP calibration/measurement of input channel ', analysedChID), swStruct);
+        
+        figResult = showSwitchWindow(sprintf('Set switches for LP calibration/measurement of input channel ', analysedChID), swStruct);
+        if ~figResult
+          label = ERROR;
+          continue;
+        endif
 
         clearOutBox();
         printStr(sprintf("Joint-device calibrating LP at all harmonic frequencies of %dHz:", origFreq));
@@ -127,7 +137,12 @@ function measureTransferSched(label = 1)
         endwhile
         % VD calibration
         swStruct.vd = true;
-        showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
+        figResult = showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
+        if ~figResult
+          label = ERROR;
+          continue;
+        endif
+        
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         lpFundAmpl = loadCalFundAmpl(origFreq, fs, playChID, analysedChID, EXTRA_CIRCUIT_LP1, EXTRA_TRANSFER_DIR);
 
@@ -189,20 +204,34 @@ function measureTransferSched(label = 1)
         continue;
 
       case GEN_OFF_LABEL
-        printStr(sprintf('Generator Off'));
-        cmdID = writeCmd([GENERATE ' ' 'off'], cmdFilePlay);
+        cmdID = sendStopGeneratorCmd();
         waitForCmdDone(cmdID, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
 
       case DONE_LABEL
-        swStruct.calibrate = false;
-        showSwitchWindow('Set switches for measuring DUT', swStruct');
-        return;
+        if ~isempty(getRunTaskItemIDFor(mfilename()))
+          % called from waitForFunction scheduler - not showing the final switchWindow
+        else
+          swStruct.calibrate = false;
+          showSwitchWindow('Set switches for measuring DUT', swStruct');
+        endif
+        break;
         
       case ERROR
-        printStr('Timeout waiting for command done, exiting callback');
+        msg = 'Timeout waiting for command done or function aborted, exiting measuring transfer';
+        printStr(msg);
+        writeLog('INFO', msg);
+        sendStopGeneratorCmd();
+        % failed
+        result = false;
+        removeTaskName(NAME);
         return;
     endswitch
   endwhile
-  printStr('Calibration finished, both sides compensating, measuring');  
+  msg = 'Measuring transfer finished';
+  printStr(msg);
+  writeLog('INFO', msg);
+  % finished OK
+  result = true;
+  removeTaskName(NAME);
 endfunction

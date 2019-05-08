@@ -1,10 +1,13 @@
 % scheduler-enabled function for complete split calibration
 % Only one-sine (one fundamental) is supported!!
 % calibrating at current freq, requires pre-measured VD and LPF!
-function splitCalibrateSched(label = 1)
+function result = splitCalibrateSched(label = 1)
+  result = NA;
   % init section
-  [PASSING_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL, COMP_REC_LABEL, GEN_OFF_LABEL, DONE_LABEL, ERROR] = enum();
+  [CHECKING_LABEL, PASSING_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
+      CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL, COMP_REC_LABEL, GEN_OFF_LABEL, DONE_LABEL, ERROR] = enum();
   
+  persistent NAME = 'Split-Calibrating PLAY Side';
   persistent AUTO_TIMEOUT = 10;
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
@@ -58,10 +61,12 @@ function splitCalibrateSched(label = 1)
   while true
     switch(label)
     
-      case PASSING_LABEL
+      case CHECKING_LABEL
         
         global playInfo;
         global recInfo;
+        
+        addTaskName(NAME);
 
         % loading current values from analysis
         fs = recInfo.fs;
@@ -75,12 +80,20 @@ function splitCalibrateSched(label = 1)
         % only values for first two channels to fit origPlayLevels
         playEqualizer = playInfo.equalizer(1:2);
 
+        waitForTaskFinish('measureTransferSched', PASSING_LABEL, ERROR, mfilename());
+        return;
+        
+      case PASSING_LABEL        
         swStruct.calibrate = true;
         % for now calibrating right output channel only
         swStruct.inputR = (playChID == 2);
         swStruct.vd = false;
         swStruct.analysedR = (analysedChID == 2);
-        showSwitchWindow(sprintf('Set switches for LP calibration/measurement of input channel ', analysedChID), swStruct);
+        figResult = showSwitchWindow(sprintf('Set switches for LP calibration', analysedChID), swStruct);
+        if ~figResult
+          label = ERROR;
+          continue;
+        endif
 
         clearOutBox();
         printStr(sprintf("Joint-device calibrating LP at current frequency %dHz:", origFreq));
@@ -133,7 +146,12 @@ function splitCalibrateSched(label = 1)
         
       case WAIT_FOR_VD_LABEL
         swStruct.vd = true;
-        showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
+        figResult = showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
+        if ~figResult
+          label = ERROR;
+          continue;
+        endif
+
         % after switching LPF -> VD we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
         schedPause(1, CAL_VD_LABEL, mfilename());
         return;
@@ -239,20 +257,26 @@ function splitCalibrateSched(label = 1)
         return;
         
       case GEN_OFF_LABEL
-        printStr(sprintf('Generator Off'));
-        cmdID = writeCmd([GENERATE ' ' 'off'], cmdFilePlay);
+        cmdID = sendStopGeneratorCmd();
         waitForCmdDone(cmdID, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
 
       case DONE_LABEL
         swStruct.calibrate = false;
         showSwitchWindow('Set switches for measuring DUT', swStruct');
-        return;
+        break;
         
       case ERROR
-        printStr('Timeout waiting for command done, exiting callback');
+        msg = 'Timeout waiting for command done or function aborted, exiting splitting calibration';
+        printStr(msg);
+        writeLog('INFO', msg);
+        sendStopGeneratorCmd();
+        result = false;
+        removeTaskName(NAME);        
         return;
     endswitch
   endwhile
   printStr('Calibration finished, both sides compensating, measuring');  
+  result = true;
+  removeTaskName(NAME);
 endfunction

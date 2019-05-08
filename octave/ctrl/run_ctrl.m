@@ -60,6 +60,8 @@ global CH_DISTANCE_X = 0.3
 global TXT_FIELD_HEIGHT = 0.026
 
 global doQuit = false;
+% list of task strings to show
+global taskNames = {};
 
 function doExit(fig)
   global doQuit;
@@ -85,11 +87,17 @@ recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "C
 
 
 % buttom panel with outBox
-global outBox = uicontrol(fig, "style", "edit", "units", "normalized", 'position', [0, 0, 1, 0.1]);
+global outBox = uicontrol(fig, "style", "edit", "units", "normalized", 'position', [0, 0, 0.7, 0.1]);
 % outbox requires configuration
 set(outBox, 'horizontalalignment', 'left');
 set(outBox, 'verticalalignment', 'top');
 set(outBox, 'max', 1000);
+
+global taskNamesBox = uicontrol(fig, "style", "edit", "units", "normalized", 'position', [0.7, 0, 0.3, 0.1]);
+setFieldColor(taskNamesBox,  [0, 0.5, 0]);
+set(taskNamesBox, 'horizontalalignment', 'left');
+set(taskNamesBox, 'verticalalignment', 'top');
+set(taskNamesBox, 'max', 5);
 
 % resizing figure to fix painting problems
 set(fig, 'position', [POS_X, POS_Y, WIDTH, HEIGHT + 1]);

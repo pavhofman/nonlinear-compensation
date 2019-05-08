@@ -1,5 +1,6 @@
 % scheduler-enabled function for calibrating joint-device freqs
-function calibrateFreqsSched(label = 1)
+function result = calibrateFreqsSched(label = 1)
+  result = NA;
   % init section
   [P1, P2, P3, P4, ERROR] = enum();
   
