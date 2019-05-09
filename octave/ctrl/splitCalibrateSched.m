@@ -79,9 +79,16 @@ function result = splitCalibrateSched(label = 1)
         % playLevels are measured BEHIND equalizer in play process. When generating, one must take the equalizer into account to reach identical play levels
         % only values for first two channels to fit origPlayLevels
         playEqualizer = playInfo.equalizer(1:2);
-
-        waitForTaskFinish('measureTransferSched', PASSING_LABEL, ERROR, mfilename());
-        return;
+        
+        % checking if all transfer files are available
+        if ~isempty(getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_LP1)) || ~isempty(getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_VD))
+          % some are missing, ask for measuring transfer
+          waitForTaskFinish('measureTransferSched', PASSING_LABEL, ERROR, mfilename());
+          return;
+        else
+          label = PASSING_LABEL;
+          continue;
+        endif
         
       case PASSING_LABEL        
         swStruct.calibrate = true;
