@@ -4,3 +4,5 @@ octave/playrec.mex
 cal*.dat
 transf*.dat
 octave-workspace
+.idea
+playrec.mex
