@@ -207,4 +207,5 @@ global EXTRA_TRANSFER_DIR = 'transfer';
 
 
 % transfer file/record maximum age to be accepted - 3 days
-global MAX_TRANSFER_AGE = 60 * 60 * 24 * 3;
+global MAX_TRANSFER_AGE_DAYS = 3;
+global MAX_TRANSFER_AGE = 60 * 60 * 24 * MAX_TRANSFER_AGE_DAYS;

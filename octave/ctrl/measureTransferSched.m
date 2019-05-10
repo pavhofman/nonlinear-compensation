@@ -54,6 +54,8 @@ function result = measureTransferSched(label= 1, schedItem = [])
   persistent swStruct = initSwitchStruct();
   persistent lpFundAmpl = NA;
   
+  persistent didMeasureLPF = false;
+  
   while true
     switch(label)
     
@@ -75,7 +77,10 @@ function result = measureTransferSched(label= 1, schedItem = [])
         if isempty(freqs)
           % no need to measure LP, going to VD
           label = PREPARE_VD_LABEL;
+          didMeasureLPF = false;
           continue;
+        else
+          didMeasureLPF = true;
         endif
         
         swStruct.calibrate = true;
@@ -168,6 +173,11 @@ function result = measureTransferSched(label= 1, schedItem = [])
         
         if isempty(freqs)
           % all transfers available for VD, ending
+          if ~didMeasureLPF
+            % informing user that all freqs are already measured
+            global MAX_TRANSFER_AGE_DAYS;
+            msgbox(['All LPF and VD frequencies already measured and still valid (< ' num2str(MAX_TRANSFER_AGE_DAYS) ' days)']);
+          endif
           label = GEN_OFF_LABEL;
           continue;
         endif
