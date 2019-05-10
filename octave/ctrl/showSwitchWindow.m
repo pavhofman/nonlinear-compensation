@@ -1,6 +1,16 @@
 function result = showSwitchWindow(label, swStruct)
+  persistent prevSwStruct = initSwitchStruct();
   % default - result OK
   result = true;
+  
+  if isequaln(swStruct, prevSwStruct)
+    % no reason to display/do anything
+    return;
+  else
+    prevSwStruct = swStruct;
+  endif
+  
+  
   persistent WIDTH = 800;
   persistent HEIGHT = 400;
   
