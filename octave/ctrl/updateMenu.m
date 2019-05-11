@@ -1,12 +1,15 @@
 function updateMenu(dirStruct, info)
   % running only once a second
   persistent UPDATE_INTERVAL = 1;
-  persistent lastUpdateTime = time();
+  % for each direction
+  persistent lastUpdateTimes = cell(2, 1);
   
   
   curTime = time();
-  if curTime() > lastUpdateTime + UPDATE_INTERVAL
-    lastUpdateTime = curTime;
+  % checking for each direction independently
+  dir = info.direction;
+  if isempty(lastUpdateTimes{dir}) ||  (curTime > lastUpdateTimes{dir} + UPDATE_INTERVAL)
+    lastUpdateTimes{dir} = curTime;
   else
     return;
   endif
