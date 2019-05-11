@@ -1,11 +1,12 @@
 % scheduler-enabled function for complete split calibration
 % Only one-sine (one fundamental) is supported!!
 % calibrating at current freq, requires pre-measured VD and LPF!
+% result: NA = not finished yet, false = error/failed, true = finished OK
 function result = splitCalibrateSched(label = 1)
   result = NA;
   % init section
-  [CHECKING_LABEL, PASSING_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
-      CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL, COMP_REC_LABEL, GEN_OFF_LABEL, DONE_LABEL, ERROR] = enum();
+  [CHECKING_LABEL, START_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
+      CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL, COMP_REC_LABEL, ALL_OFF_LABEL, DONE_LABEL, ERROR] = enum();
   
   persistent NAME = 'Split-Calibrating PLAY Side';
   persistent AUTO_TIMEOUT = 10;
@@ -44,6 +45,7 @@ function result = splitCalibrateSched(label = 1)
   global COMP_TYPE_REC_SIDE;
   
   global MODE_DUAL;
+  global ABORT;
   
   persistent lpFundAmpl = NA;
   
@@ -57,6 +59,7 @@ function result = splitCalibrateSched(label = 1)
   persistent playEqualizer = NA;
   
   persistent swStruct = initSwitchStruct();
+  persistent wasAborted = false;
 
   while true
     switch(label)
@@ -66,8 +69,10 @@ function result = splitCalibrateSched(label = 1)
         global playInfo;
         global recInfo;
         
-        addTaskName(NAME);
-
+        addTask(mfilename(), NAME);
+        % init value
+        wasAborted = false;
+        
         % loading current values from analysis
         fs = recInfo.fs;
         % TODO - checks - only one fundament freq!!
@@ -82,15 +87,15 @@ function result = splitCalibrateSched(label = 1)
         
         % checking if all transfer files are available
         if ~isempty(getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_LP1)) || ~isempty(getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_VD))
-          % some are missing, ask for measuring transfer
-          waitForTaskFinish('measureTransferSched', PASSING_LABEL, ERROR, mfilename());
+          % some are missing, ask for measuring transfer. failed label = ABORT
+          waitForTaskFinish('measureTransferSched', START_LABEL, ABORT, mfilename());
           return;
         else
-          label = PASSING_LABEL;
+          label = START_LABEL;
           continue;
         endif
         
-      case PASSING_LABEL        
+      case START_LABEL
         swStruct.calibrate = true;
         % for now calibrating right output channel only
         swStruct.inputR = (playChID == 2);
@@ -98,7 +103,7 @@ function result = splitCalibrateSched(label = 1)
         swStruct.analysedR = (analysedChID == 2);
         figResult = showSwitchWindow(sprintf('Set switches for LP calibration', analysedChID), swStruct);
         if ~figResult
-          label = ERROR;
+          label = ABORT;
           continue;
         endif
 
@@ -155,7 +160,7 @@ function result = splitCalibrateSched(label = 1)
         swStruct.vd = true;
         figResult = showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
         if ~figResult
-          label = ERROR;
+          label = ABORT;
           continue;
         endif
 
@@ -211,7 +216,7 @@ function result = splitCalibrateSched(label = 1)
         printStr(sprintf('Compensating PLAY side first'));
         cmdIDPlay = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_PLAY_SIDE)], cmdFilePlay);
         %waitForCmdDone(cmdIDPlay, CAL_REC_UP_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
-        waitForCmdDone(cmdIDPlay, GEN_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdIDPlay, ALL_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
       case {CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL}
@@ -260,30 +265,45 @@ function result = splitCalibrateSched(label = 1)
         
         printStr(sprintf('Compensating SPLIT REC side'));
         cmdID = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
-        waitForCmdDone(cmdID, GEN_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdID, ALL_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
-      case GEN_OFF_LABEL
-        cmdID = sendStopGeneratorCmd();
-        waitForCmdDone(cmdID, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
-        return;
+      case ABORT
+        wasAborted= true;
+        label = ALL_OFF_LABEL;
+        continue;
+
+      case ALL_OFF_LABEL
+        cmdIDs = sendAllOffCmds();
+        if ~isempty(cmdIDs)
+          waitForCmdDone(cmdIDs, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+          return;
+        else
+          label = DONE_LABEL;
+          continue;
+        endif
 
       case DONE_LABEL
         swStruct.calibrate = false;
         showSwitchWindow('Set switches for measuring DUT', swStruct');
+        if wasAborted
+          result = false;
+        else
+          printStr('Split Calibration finished');  
+          result = true;
+        endif
         break;
         
       case ERROR
-        msg = 'Timeout waiting for command done or function aborted, exiting splitting calibration';
+        msg = 'Timeout waiting for command done, exiting splitting calibration';
         printStr(msg);
         writeLog('INFO', msg);
-        sendStopGeneratorCmd();
+        errordlg(msg);
         result = false;
-        removeTaskName(NAME);        
-        return;
+        break;        
     endswitch
   endwhile
-  printStr('Calibration finished, both sides compensating, measuring');  
-  result = true;
-  removeTaskName(NAME);
+  
+  removeTask(mfilename(), NAME);
+  
 endfunction

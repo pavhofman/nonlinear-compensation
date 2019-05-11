@@ -60,8 +60,14 @@ global CH_DISTANCE_X = 0.3
 global TXT_FIELD_HEIGHT = 0.026
 
 global doQuit = false;
+
+global ABORT = -1;
+% list of currently running task functions
+global taskFNames = {};
 % list of task strings to show
-global taskNames = {};
+global taskLabels = {};
+% fname of task to abort in next runScheduled call
+global fNameToAbort = '';
 
 function doExit(fig)
   global doQuit;
@@ -87,17 +93,40 @@ recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "C
 
 
 % buttom panel with outBox
-global outBox = uicontrol(fig, "style", "edit", "units", "normalized", 'position', [0, 0, 0.7, 0.1]);
+outBoxPanel = uipanel(fig,
+            "title", 'Messages',
+            "position", [0, 0, 0.7, 0.1]);
+
+global outBox = uicontrol(outBoxPanel,
+            "style", "edit",
+             "units", "normalized", 'position', [0, 0, 1, 0.95]);
 % outbox requires configuration
 set(outBox, 'horizontalalignment', 'left');
 set(outBox, 'verticalalignment', 'top');
 set(outBox, 'max', 1000);
 
-global taskNamesBox = uicontrol(fig, "style", "edit", "units", "normalized", 'position', [0.7, 0, 0.3, 0.1]);
-setFieldColor(taskNamesBox,  [0, 0.5, 0]);
-set(taskNamesBox, 'horizontalalignment', 'left');
-set(taskNamesBox, 'verticalalignment', 'top');
-set(taskNamesBox, 'max', 5);
+
+tasksPanel = uipanel(fig,
+            "title", 'Running Tasks',
+            "position", [0.7, 0, 0.3, 0.1]);
+
+
+global taskLabelsBox = uicontrol(tasksPanel, "style", "text",
+            "units", "normalized",
+            'position', [0, 0, 0.6, 0.95]);
+
+setFieldColor(taskLabelsBox,  [0, 0.5, 0]);
+set(taskLabelsBox, 'horizontalalignment', 'left');
+set(taskLabelsBox, 'verticalalignment', 'middle');
+
+
+global abortTasksButton = uicontrol(tasksPanel, 'style', 'pushbutton',
+            'string', 'Abort',
+            "units", "normalized",
+            'enable', 'off',
+            "units", "normalized",
+            'callback',  @(h, e) abortLastTask(),
+             "position",[0.65 0.2 0.3 0.6]);
 
 % resizing figure to fix painting problems
 set(fig, 'position', [POS_X, POS_Y, WIDTH, HEIGHT + 1]);

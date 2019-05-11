@@ -1,11 +1,12 @@
 % scheduler-enabled function for measuring VD and LPF transfer via regular joint-sides calibration
 % Only one-sine (one fundamental) is supported!!
+% result: NA = not finished yet, false = error/failed, true = finished OK
 function result = measureTransferSched(label= 1, schedItem = [])
   result = NA;
   persistent NAME = 'Measuring LP & VD Transfer';
   
   % init section
-  [PASSING_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, PREPARE_VD_LABEL, CAL_VD_LABEL, CAL_VD_FINISHED_LABEL, GEN_OFF_LABEL, DONE_LABEL, ERROR] = enum();
+  [START_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, PREPARE_VD_LABEL, CAL_VD_LABEL, CAL_VD_FINISHED_LABEL, ALL_OFF_LABEL, DONE_LABEL, ERROR] = enum();
   
   persistent AUTO_TIMEOUT = 10;
   % manual calibration timeout - enough time to adjust the level into the range limits
@@ -37,6 +38,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
   global COMP_TYPE_REC_SIDE;
   
   global MODE_DUAL;
+  global ABORT;
   
   % current frequency of calibration
   % all set in first P1 branch
@@ -55,16 +57,19 @@ function result = measureTransferSched(label= 1, schedItem = [])
   persistent lpFundAmpl = NA;
   
   persistent didMeasureLPF = false;
+  persistent wasAborted = false;
   
   while true
     switch(label)
     
-      case PASSING_LABEL
+      case START_LABEL
         
         global playInfo;
         global recInfo;
 
-        addTaskName(NAME);
+        addTask(mfilename(), NAME);
+        % init value
+        wasAborted = false;
 
         % loading current values from analysis
         fs = recInfo.fs;
@@ -73,6 +78,9 @@ function result = measureTransferSched(label= 1, schedItem = [])
         
         % LPF measurement starts at last measured freq. We need values for fundamental freq in order to determine lpFundAmpl to align VD to same value
         freqs = getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_LP1);
+        freqID = 1;
+        
+        writeLog('DEBUG', 'Missing transfer freqs for %s: %s', EXTRA_CIRCUIT_LP1, disp(freqs));
         
         if isempty(freqs)
           % no need to measure LP, going to VD
@@ -89,9 +97,9 @@ function result = measureTransferSched(label= 1, schedItem = [])
         swStruct.vd = false;
         swStruct.analysedR = (analysedChID == 2);
         
-        figResult = showSwitchWindow(sprintf('Set switches for LPF measurent with output channel %d and input channel %d', playChID, analysedChID), swStruct);
+        figResult = showSwitchWindow(sprintf('Set switches for LPF measurement with output channel %d and input channel %d', playChID, analysedChID), swStruct);
         if ~figResult
-          label = ERROR;
+          label = ABORT;
           continue;
         endif
 
@@ -169,6 +177,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
         % VD calibration
         % loading freqs for VD
         freqs = getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_VD);
+        writeLog('DEBUG', 'Missing transfer freqs for %s: %s', EXTRA_CIRCUIT_VD, disp(freqs));
         freqID = 1;
         
         if isempty(freqs)
@@ -178,7 +187,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
             global MAX_TRANSFER_AGE_DAYS;
             msgbox(['All LPF and VD frequencies already measured and still valid (< ' num2str(MAX_TRANSFER_AGE_DAYS) ' days)']);
           endif
-          label = GEN_OFF_LABEL;
+          label = ALL_OFF_LABEL;
           continue;
         endif
 
@@ -188,7 +197,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
         swStruct.vd = true;
         figResult = showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
         if ~figResult
-          label = ERROR;
+          label = ABORT;
           continue;
         endif
         
@@ -258,14 +267,24 @@ function result = measureTransferSched(label= 1, schedItem = [])
           endswitch
           
         endwhile
-        label = GEN_OFF_LABEL;
+        label = ALL_OFF_LABEL;
         % goto label - next loop
         continue;
 
-      case GEN_OFF_LABEL
-        cmdID = sendStopGeneratorCmd();
-        waitForCmdDone(cmdID, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
-        return;
+      case ABORT
+        wasAborted= true;
+        label = ALL_OFF_LABEL;
+        continue;
+
+      case ALL_OFF_LABEL
+        cmdIDs = sendAllOffCmds();
+        if ~isempty(cmdIDs)
+          waitForCmdDone(cmdIDs, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+          return;
+        else
+          label = DONE_LABEL;
+          continue;
+        endif
 
       case DONE_LABEL
         if ~isempty(getRunTaskItemIDFor(mfilename()))
@@ -274,25 +293,32 @@ function result = measureTransferSched(label= 1, schedItem = [])
           swStruct.calibrate = false;
           showSwitchWindow('Set switches for measuring DUT', swStruct);
         endif
+        if wasAborted
+          msg = 'Measuring transfer was aborted';
+          result = false;
+        else
+          msg = 'Measuring transfer finished';
+          result = true;
+        endif
+        
+        printStr(msg);
+        writeLog('INFO', msg);
         break;
         
       case ERROR
-        msg = 'Timeout waiting for command done or function aborted, exiting measuring transfer';
+        msg = 'Timeout waiting for command done, exiting measuring transfer';
         printStr(msg);
         writeLog('INFO', msg);
-        sendStopGeneratorCmd();
+        % displaying message box
+        errordlg(msg);
         % failed
         result = false;
-        removeTaskName(NAME);
-        return;
+        break;
+        
     endswitch
   endwhile
-  msg = 'Measuring transfer finished';
-  printStr(msg);
-  writeLog('INFO', msg);
-  % finished OK
-  result = true;
-  removeTaskName(NAME);
+
+  removeTask(mfilename(), NAME);
 endfunction
 
 function moveCalToTransferFile(calFile, freq, fs, playChID, analysedChID, extraCircuit)

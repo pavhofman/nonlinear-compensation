@@ -50,7 +50,7 @@ function result = showSwitchWindow(label, swStruct)
   uicontrol(fig, 'style', 'pushbutton',
     'string', 'Switches set, continue',
     'units', 'normalized',
-    'position', [0.3 0.01 0.4 0.05],
+    'position', [0.3 0.01 0.4 0.06],
     'callback', @(h, e) closeSwWindow(fig, false));
   
   waitfor(fig);
