@@ -1,4 +1,6 @@
+% we cannot call 'clear all' since it clears all functions => also all breakpoints in functions
 clear;
+
 currDir = fileparts(mfilename('fullpath'));
 addpath(currDir);
 ctrlDir = [currDir filesep() 'ctrl'];
