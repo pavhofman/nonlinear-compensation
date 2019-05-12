@@ -10,12 +10,11 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
   tasksMenu = uimenu (fig, "label", "&Tasks");
   
-  uimenu(tasksMenu, "label", "Calibrate Playback/Capture Split", 'callback', @clbkSplitCalibrate);
+  uimenu(tasksMenu, "label", "Measure LP/VD Transfer", 'separator', 'on', 'callback', @clbkMeasureTransfers);
+  
   calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Single Run", 'separator', 'on', "callback", {@clbkJointCalib, false});
   calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});
   calOffMenusTasks{end+1} = uimenu(tasksMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
-  
-  uimenu(tasksMenu, "label", "Measure LP/VD Transfer", 'separator', 'on', 'callback', @clbkMeasureTransfers);
   
   % array of menu items related to calibration start/stop - used to enable/disable all at once
   recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
@@ -28,9 +27,14 @@ function clbkMeasureTransfers(src, data)
   measureTransferSched();
 endfunction
 
-function clbkSplitCalibrate(src, data)
+function clbkSplitCalibPlay(src, data)
   % calling scheduler-enabled calibration
-  splitCalibrateSched();
+  splitCalibPlaySched();
+endfunction
+
+function clbkRangeCalibRec(src, data)
+  % calling scheduler-enabled calibration
+  rangeCalibRecSched();
 endfunction
 
 function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
@@ -53,7 +57,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   menu = uimenu (fig, "label", label);
   uimenu(menu, "label", "Pass", "callback", {fCmd, PASS, cmdFile});
   
-  if (dirStruct.dir == DIR_REC)
+  if dirStruct.dir == DIR_REC
     global COMP_TYPE_REC_SIDE;
     compType = COMP_TYPE_REC_SIDE;
   else
@@ -62,8 +66,13 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   endif
   uimenu(menu, "label", ['Compensate Only ' sideName], "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(compType)], cmdFile});
   
-  uimenu(menu, "label", 'Compensate Joint-Sides', "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFile});
+  if dirStruct.dir == DIR_REC
+    calOnMenus{end+1} = uimenu(menu, "label", ['Range-Calibrate Capture Side'], 'separator', 'on', "callback", @clbkRangeCalibRec);
+  else
+    calOnMenus{end+1} = uimenu(menu, "label", ['Split-Calibrate Playback Side'], 'separator', 'on', "callback", @clbkSplitCalibPlay);
+  endif
   
+  uimenu(menu, "label", 'Compensate Joint-Sides', 'separator', 'on', "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFile});  
   calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate Only ' sideName ': Single Run'], 'separator', 'on', "callback", {@clbkCalib, compType, false});
   calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate Only ' sideName ': Continuously'], "callback", {@clbkCalib, compType, true});
   calOffMenus{end+1} = uimenu(menu, "label", "Stop Calibrating", 'enable', 'off', "callback", @clbkCalibOff);

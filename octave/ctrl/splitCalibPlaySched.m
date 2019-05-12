@@ -1,25 +1,19 @@
-% scheduler-enabled function for complete split calibration
+% scheduler-enabled function for split calibration of PLAY side
 % Only one-sine (one fundamental) is supported!!
-% calibrating at current freq, requires pre-measured VD and LPF!
+% calibrating at current freq. If some pre-measured VD and LPF transfer is missing, runs measureTransferSched task
 % result: NA = not finished yet, false = error/failed, true = finished OK
-function result = splitCalibrateSched(label = 1)
+function result = splitCalibPlaySched(label = 1)
   result = NA;
   % init section
   [CHECKING_LABEL, START_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
-      CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL, COMP_REC_LABEL, ALL_OFF_LABEL, DONE_LABEL, ERROR] = enum();
+      ALL_OFF_LABEL, DONE_LABEL, ERROR] = enum();
   
   persistent NAME = 'Split-Calibrating PLAY Side';
+
   persistent AUTO_TIMEOUT = 10;
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
-  
-  % number of averaging calibration runs for calibrations yielding only fundamentals for transfer measuring
-  % keeping same as regular full count for now
-  persistent REDUCED_CALIB_RUNS = 10;
-  
-  % step above and below exact calibration level to also calibrate for interpolation
-  persistent CAL_LEVEL_STEP = db2mag(0.05);
-  
+
   % right ch goes through LP or VD, left input channel is direct
   % fixed for now!
   persistent analysedChID = 2;
@@ -38,12 +32,10 @@ function result = splitCalibrateSched(label = 1)
   global CMD_EXTRA_CIRCUIT_PREFIX;
   global CMD_CHANNEL_FUND_PREFIX;
   global CMD_COMP_TYPE_PREFIX;
-  global CMD_CALRUNS_PREFIX;
   global CMD_PLAY_AMPLS_PREFIX;
   global COMP_TYPE_JOINT;
   global COMP_TYPE_PLAY_SIDE;
-  global COMP_TYPE_REC_SIDE;
-  
+
   global MODE_DUAL;
   global ABORT;
   
@@ -54,7 +46,6 @@ function result = splitCalibrateSched(label = 1)
   persistent curFreq = NA;
   persistent fs = NA;
   persistent origFreq = NA;
-  persistent origRecLevel = NA;
   persistent origPlayLevels = NA;
   persistent playEqualizer = NA;
   
@@ -77,7 +68,6 @@ function result = splitCalibrateSched(label = 1)
         fs = recInfo.fs;
         % TODO - checks - only one fundament freq!!
         origFreq = recInfo.measuredPeaks{analysedChID}(1, 1);
-        origRecLevel = recInfo.measuredPeaks{analysedChID}(:, 2);
         % two channels, only first fundament freqs (the only freq!)
         origPlayLevels = {playInfo.measuredPeaks{1}(1, 2), playInfo.measuredPeaks{2}(1, 2)};
         
@@ -213,61 +203,11 @@ function result = splitCalibrateSched(label = 1)
         
 
       case COMP_PLAY_LABEL
-        printStr(sprintf('Compensating PLAY side first'));
+        printStr(sprintf('Compensating PLAY side'));
         cmdIDPlay = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_PLAY_SIDE)], cmdFilePlay);
-        %waitForCmdDone(cmdIDPlay, CAL_REC_UP_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         waitForCmdDone(cmdIDPlay, ALL_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
-        
-      case {CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL}
-        switch label
-          case CAL_REC_UP_LABEL           
-            expl = 'upper limit';
-            adjustment = CAL_LEVEL_STEP;
-            
-          case CAL_REC_DOWN_LABEL
-            expl = 'lower limit';
-            adjustment = 1/CAL_LEVEL_STEP;
-            
-          case CAL_REC_EX_LABEL
-            % last run at exact value - for now
-            expl = 'exact value';
-            adjustment = 1;
-            
-        endswitch
-        
-        printStr(sprintf('Calibrating REC side at original recLevel of channel %d - %s', analysedChID, expl));
-        
-        % amplitude-constrained calibration
-        % TODO - for now using lpFundAmpl instead of origRecLevel to allow easy switching between LP and VD for result checking
-        % calFreqReq = getConstrainedLevelCalFreqReq(origRecLevel * adjustment, origFreq, analysedChID);
-        
-        % max. allowed deviation in each direction from midAmpl
-        % the tolerance really does not matter much here
-        calTolerance = db2mag(0.05);
 
-        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl * adjustment, origFreq, analysedChID, calTolerance);
-        calFreqReqStr = getCalFreqReqStr(calFreqReq);
-        % zooming calibration levels + plotting the range so that user can adjust precisely
-        % target level = orig Rec level (not the increased range)
-        % zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, analysedChID));
-        zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(lpFundAmpl, analysedChID));
-        
-        cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
-        waitForCmdDone(cmdID, label + 1, MANUAL_TIMEOUT, ERROR, mfilename());
-        return;
-        
-      case COMP_REC_LABEL
-        clearOutBox();
-        
-        % all calibrations finished, closing the zoomed calib plot
-        closeCalibPlot();
-        
-        printStr(sprintf('Compensating SPLIT REC side'));
-        cmdID = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
-        waitForCmdDone(cmdID, ALL_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
-        return;
-        
       case ABORT
         wasAborted= true;
         label = ALL_OFF_LABEL;
@@ -295,7 +235,7 @@ function result = splitCalibrateSched(label = 1)
         break;
         
       case ERROR
-        msg = 'Timeout waiting for command done, exiting splitting calibration';
+        msg = 'Timeout waiting for command done, exiting splitting calibration of PLAY side';
         printStr(msg);
         writeLog('INFO', msg);
         errordlg(msg);
@@ -304,6 +244,8 @@ function result = splitCalibrateSched(label = 1)
     endswitch
   endwhile
   
+  % just in case the task was aborted with calib plot zoomed in
+  closeCalibPlot();
   removeTask(mfilename(), NAME);
   
 endfunction

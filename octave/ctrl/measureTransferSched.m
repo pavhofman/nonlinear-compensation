@@ -226,7 +226,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
                 % amplitude-constrained calibration
 
                 % max. allowed deviation in each direction from midAmpl
-                % similar level of VD to LPF provides similar phaseshift of VD to when measured in splitCalibrateSched. Here it is not so critical
+                % similar level of VD to LPF provides similar phaseshift of VD to when measured in splitCalibPlaySched. Here it is not so critical
                 calTolerance = db2mag(0.08);
 
                 calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origFreq, analysedChID, calTolerance);
