@@ -27,6 +27,9 @@ else
     endif
 end
 
-global inputDeviceName = [DEVICE_REC_PREFIX num2str(inputDeviceID)];
-global outputDeviceName = [DEVICE_PLAY_PREFIX num2str(outputDeviceID)];
-global jointDeviceName = [DEVICE_REC_PREFIX num2str(inputDeviceID) '_' DEVICE_PLAY_PREFIX num2str(outputDeviceID)];
+global inputDeviceName;
+inputDeviceName = [DEVICE_REC_PREFIX num2str(inputDeviceID)];
+global outputDeviceName;
+outputDeviceName = [DEVICE_PLAY_PREFIX num2str(outputDeviceID)];
+global jointDeviceName;
+jointDeviceName = [DEVICE_REC_PREFIX num2str(inputDeviceID) '_' DEVICE_PLAY_PREFIX num2str(outputDeviceID)];

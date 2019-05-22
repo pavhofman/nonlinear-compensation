@@ -1,5 +1,5 @@
 % calRequest.calFreqs - optional 1/2 values. If not empty, wait for these freqs to come (in both channels), with timeout
-function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, chMode, restart)
+function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, chMode, restart)
   persistent channelCnt = columns(calBuffer);
   % consts
   % max number of calibration runs. When reached, calibration quits with FAILED_RESULT
@@ -115,6 +115,8 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
     % some of the channels have not reached cal runs of same freqs
     % and still can run next time
     % result is already set
+    lastRunID = runID;
+    lastCorrectRunsCounter = correctRunsCounter;
     return;
   end
       
@@ -176,6 +178,8 @@ function [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFun
   correctRunsCounter = zeros(channelCnt, 1);
   allFundPeaks = cell(channelCnt, MAX_RUNS);
   allDistortPeaks = cell(channelCnt, MAX_RUNS);
+  lastRunID = runID;
+  lastCorrectRunsCounter = correctRunsCounter;  
 endfunction
 
 % have fundPeaksCh levels within range of calFreqsCh?

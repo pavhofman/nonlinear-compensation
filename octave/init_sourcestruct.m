@@ -1,4 +1,5 @@
-global sourceStruct = struct();
+global sourceStruct;
+sourceStruct = struct();
 sourceStruct.file = '';
 % default - no source
 sourceStruct.src = src;

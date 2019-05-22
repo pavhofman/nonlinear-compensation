@@ -47,38 +47,52 @@ endif
 % command ID
 cmdID = NA;
 % ID of finished/done command
-global cmdDoneID = '';
+global cmdDoneID;
+cmdDoneID = '';
 
-global statusStruct = struct()
+global statusStruct;
+statusStruct = struct();
 
-global measuredPeaks = NA;
-global fundLevels = NA;
-global distortPeaks = NA;
+global measuredPeaks;
+measuredPeaks = NA;
+global fundLevels;
+fundLevels = NA;
+global distortPeaks;
+distortPeaks = NA;
 
-global genFunds = NA;
-global distortHarmAmpls = [];
+global genFunds;
+genFunds = NA;
+global distortHarmAmpls;
+distortHarmAmpls = [];
 
-global fs = NA;
+global fs;
+fs = NA;
 
 channelCnt = NA;
-global compenCalFiles = NA;
+global compenCalFiles;
+compenCalFiles = NA;
 
 prevFundPeaks = NA;
 calBuffer = [];
 calibrationSize = NA;
 
-global calRequest = NA;
-global compRequest = NA;
+global calRequest;
+calRequest = NA;
+global compRequest;
+compRequest = NA;
 
 % row of equalizer coeffs for each channel - initialized at first run when channel count is known
-global equalizer = NA;
+global equalizer;
+equalizer = NA;
 
 % count of clipped samples in one cycle
-global clippedCnt = 0;
+global clippedCnt;
+clippedCnt = 0;
 
 recordedData = [];
 
-global reloadCalFiles = false;
+global reloadCalFiles;
+reloadCalFiles = false;
 % first run -> restart, reading all files
 source 'restart_chain.m';
 
@@ -94,8 +108,9 @@ while(true)
   clippedCnt = 0;
   
   % checking command file for new commands
-  if (exist(cmdFile, 'file'))    
-    lines = textread(cmdFile, '%s');
+  if (exist(cmdFile, 'file'))
+    lines = textscan(fopen(cmdFile), '%s');
+    lines = lines{1};
     % first line could be command ID if starts with ID
     cmdID = findNumInCmd(lines, CMD_ID_PREFIX, defaultValue = NA);
     if isna(cmdID)

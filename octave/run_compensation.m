@@ -29,4 +29,4 @@ endfor
 setStatusResult(COMPENSATING, result);
 setStatusMsg(COMPENSATING, msg);
 % advancing startingT to next cycle
-startingT += rows(buffer) * 1/fs;
+startingT = startingT + rows(buffer) * 1/fs;

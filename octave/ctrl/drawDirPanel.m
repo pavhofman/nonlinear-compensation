@@ -126,7 +126,7 @@ function [statusTxt, y] = drawStatusTxt(id, panel, topY)
   statusTxt = uicontrol (panel,
             "style", "text",
             "units", "normalized",
-            "fontweight", "demi", 
+            "fontweight", "bold",
             "horizontalalignment", "left",
             "verticalalignment", "top",
             "position", [0.01, y, 1, TXT_FIELD_HEIGHT]
@@ -148,7 +148,7 @@ function [plotStruct] = initPlot(plotPanel)
   set(curLine, 'visible', 'off');
   set(lastLine, 'visible', 'off');
   
-  rangePatch = patch (axis, [], [], 'b');
+  rangePatch = patch (axis, NA, NA, 'b');
   set(rangePatch, 'visible', 'off');
   
   set(axis,'Xtick',[])

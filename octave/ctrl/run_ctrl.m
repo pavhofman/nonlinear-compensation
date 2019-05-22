@@ -41,11 +41,10 @@ function dirStruct = createDirStruct(dir)
   
 endfunction
 
-global cmdFileRec = genDataPath(CMD_FILE_REC, dataDir);
-global cmdFilePlay = genDataPath(CMD_FILE_PLAY, dataDir);
-
-global fs = 48000;
-global freq = 3000;
+global cmdFileRec;
+cmdFileRec = genDataPath(CMD_FILE_REC, dataDir);
+global cmdFilePlay;
+cmdFilePlay = genDataPath(CMD_FILE_PLAY, dataDir);
 
 global POS_X = 100;
 global POS_Y = 100;
@@ -59,15 +58,19 @@ global DIR_PANEL_REL_WIDTH = 0.5;
 global CH_DISTANCE_X = 0.3
 global TXT_FIELD_HEIGHT = 0.026
 
-global doQuit = false;
+global doQuit;
+doQuit = false;
 
 global ABORT = -1;
 % list of currently running task functions
-global taskFNames = {};
+global taskFNames;
+taskFNames = {};
 % list of task strings to show
-global taskLabels = {};
+global taskLabels;
+taskLabels = {};
 % fname of task to abort in next runScheduled call
-global fNameToAbort = '';
+global fNameToAbort;
+fNameToAbort = '';
 
 function doExit(fig)
   global doQuit;
@@ -82,8 +85,10 @@ set(fig, "toolbar", "none");
 
 set(fig, 'DeleteFcn', @(h, e) doExit(fig));
 
-global playStruct = createDirStruct(DIR_PLAY);
-global recStruct = createDirStruct(DIR_REC);
+global playStruct;
+playStruct = createDirStruct(DIR_PLAY);
+global recStruct;
+recStruct = createDirStruct(DIR_REC);
 
 [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
@@ -96,8 +101,8 @@ recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "C
 outBoxPanel = uipanel(fig,
             "title", 'Messages',
             "position", [0, 0, 0.7, 0.1]);
-
-global outBox = uicontrol(outBoxPanel,
+global outBox;
+outBox = uicontrol(outBoxPanel,
             "style", "edit",
              "units", "normalized", 'position', [0, 0, 1, 0.95]);
 % outbox requires configuration
@@ -110,8 +115,8 @@ tasksPanel = uipanel(fig,
             "title", 'Running Tasks',
             "position", [0.7, 0, 0.3, 0.1]);
 
-
-global taskLabelsBox = uicontrol(tasksPanel, "style", "text",
+global taskLabelsBox;
+taskLabelsBox = uicontrol(tasksPanel, "style", "text",
             "units", "normalized",
             'position', [0, 0, 0.6, 0.95]);
 
@@ -119,8 +124,8 @@ setFieldColor(taskLabelsBox,  [0, 0.5, 0]);
 set(taskLabelsBox, 'horizontalalignment', 'left');
 set(taskLabelsBox, 'verticalalignment', 'middle');
 
-
-global abortTasksButton = uicontrol(tasksPanel, 'style', 'pushbutton',
+global abortTasksButton;
+abortTasksButton = uicontrol(tasksPanel, 'style', 'pushbutton',
             'string', 'Abort',
             "units", "normalized",
             'enable', 'off',
@@ -132,7 +137,8 @@ global abortTasksButton = uicontrol(tasksPanel, 'style', 'pushbutton',
 set(fig, 'position', [POS_X, POS_Y, WIDTH, HEIGHT + 1]);
 set(fig, 'position', [POS_X, POS_Y, WIDTH, HEIGHT]);
 % queue for schedItems
-global schedQueue = cell();
+global schedQueue;
+schedQueue = cell();
 
 
 % create  PAIR sockets
@@ -143,8 +149,10 @@ playSock = zmq_socket(ZMQ_PAIR);
 zmq_bind (recSock, ['tcp://*:' num2str(ZEROMQ_PORT_REC)]);
 zmq_bind (playSock, ['tcp://*:' num2str(ZEROMQ_PORT_PLAY)]);
 
-global recInfo = [];
-global playInfo = [];
+global recInfo;
+recInfo = [];
+global playInfo;
+playInfo = [];
 
 % maximum age of received info for processing
 % older infos are skipped - flushing the incoming queue

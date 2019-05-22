@@ -1,6 +1,6 @@
 % atomic writing commands to cmd file
 % clear - clear outbox before printStr, default false
-function cmdID = writeCmd(cmd, cmdFilename, clear = false)  
+function lastCmdID = writeCmd(cmd, cmdFilename, clear = false)
   persistent cmdID = 0;
   global CMD_ID_PREFIX;
   
@@ -21,4 +21,5 @@ function cmdID = writeCmd(cmd, cmdFilename, clear = false)
   infoMsg = ['Sent CMD: "' cmd '" to ' cmdFilename];
   printStr(infoMsg);
   writeLog('DEBUG', infoMsg);
+  lastCmdID = cmdID;
 endfunction

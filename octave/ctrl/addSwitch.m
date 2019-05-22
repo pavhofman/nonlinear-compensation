@@ -32,7 +32,7 @@ endfunction
 
 function weight = getTxtWeight(selected)
   if selected
-    weight = 'demi';
+    weight = 'bold';
   else
     weight = 'normal';
   endif
