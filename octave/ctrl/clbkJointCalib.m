@@ -8,7 +8,12 @@ function clbkJointCalib(src, data, contCalib)
   measuredPeaks = playInfo.measuredPeaks;
   playAmpls = cell();
   for channelID = 1:length(measuredPeaks)
-    playAmpls{end + 1} = transpose(measuredPeaks{channelID}(:, 2));
+    measuredPeaksCh = measuredPeaks{channelID};
+    if ~isempty(measuredPeaksCh)
+      playAmpls{end + 1} = transpose(measuredPeaksCh(:, 2));
+    else
+      playAmpls{end + 1} = [];
+    endif
   endfor
   
   extraCmd = getMatrixCellsToCmdStr(playAmpls, CMD_PLAY_AMPLS_PREFIX);  
