@@ -165,7 +165,7 @@ function details = addDetails(channelID, status, info, details)
   global ANALYSING;
   global CALIBRATING;
   global DISTORTING;
-  
+
   % empty line before second+ statuses
   if ~isempty(details)
     details{end + 1} = '';
@@ -178,6 +178,15 @@ function details = addDetails(channelID, status, info, details)
       details = addPeaksStr(abs(info.genFunds{channelID}), 3, details);
     
     case COMPENSATING
+      % consts
+      persistent COMP_DECIMALS = 1;
+      persistent COMP_DECIMALS_MULTIPLIER = 10^COMP_DECIMALS;
+
+      % cached results - linux octave is VERY inefficient!
+      persistent compAmpls = cell(2, 2);
+      persistent compDetails = cell(2, 2);
+
+
       % sorting distortPeaks by amplitude
       peaks = info.distortPeaks{channelID};
       if ~isempty(peaks)
@@ -186,7 +195,15 @@ function details = addDetails(channelID, status, info, details)
           details{end + 1} = info.compenCalFiles{channelID};
         endif
         peaks = sortrows(info.distortPeaks{channelID}, -2);
-        details = addPeaksStr(peaks, 1, details);
+        % replacing log ampl values
+        peaks(:, 2) = floor(20*log10(abs(peaks(:, 2))) * COMP_DECIMALS_MULTIPLIER)/COMP_DECIMALS_MULTIPLIER;
+        if ~isequal(peaks(:, 2), compAmpls{info.direction, channelID})
+          % log values changed, recalculating/generatingg string details
+          compDetails{info.direction, channelID} = addLogPeaksStr(peaks, COMP_DECIMALS, {});
+          compAmpls{info.direction, channelID} = peaks(:, 2);
+        endif
+        % adding comp details
+        details = [details, compDetails{info.direction, channelID}];
       endif
       
     case ANALYSING
@@ -232,12 +249,20 @@ function str = getCalFreqRow(calFreqRow)
 endfunction
 
 function str = addPeaksStr(peaksCh, decimals, str)
+  if ~isempty(peaksCh)
+    peaksCh(:, 2) = 20*log10(abs(peaksCh(:, 2)));
+    str = addLogPeaksStr(peaksCh, decimals, str);
+  endif
+endfunction
+
+function str = addLogPeaksStr(peaksCh, decimals, str)
   % consts
   persistent MAX_LINES = 20;
   format = ['%7.' int2str(decimals) 'f'];
-  cnt = rows(peaksCh);
+  cnt = rows(peaksCh);  
   id = 0;
   while id < cnt
+  %while false
     ++id;
     if id > MAX_LINES
       % enough lines, add ...
@@ -248,7 +273,7 @@ function str = addPeaksStr(peaksCh, decimals, str)
     peak = peaksCh(id, :);
     % adding only peaks with freq > 0 (i.e. real values)
     if peak(1) > 0
-      str{end + 1} = ['  ' num2str(peak(1)) 'Hz   ' num2str(20*log10(abs(peak(2))), format) 'dB'];
+      str{end + 1} = ['  ' num2str(peak(1)) 'Hz   ' num2str(peak(2), format) 'dB'];
     endif
   endwhile
 endfunction
