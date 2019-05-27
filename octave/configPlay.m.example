@@ -1,4 +1,9 @@
-% config overrides for config.m on PLAY side
+% config overrides for configRec.m on PLAY side
+
+% capture/recording playrec device ID on PLAY side - see output of mainListPlayrecDevs.m
+% typically the loopback device
 playRecConfig.recDeviceID = 19; % octave_loop
+
+% playback playrec device ID on PLAY side - see output of mainListPlayrecDevs.m
+% typically the physical soundcard
 playRecConfig.playDeviceID = 8; % quartet analog
-playRecConfig.otherDirectionDeviceID = 8;

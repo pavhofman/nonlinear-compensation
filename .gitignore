@@ -1,4 +1,4 @@
-octave/config.m
+octave/configRec.m
 octave/configPlay.m
 octave/playrec.mex
 cal*.dat

@@ -12,12 +12,12 @@ addpath(internalDir);
 
 source 'consts.m';
 
-% we need some global settings - assuming recording direction (corresponding to config.m)
+% we need some global settings - assuming recording direction (corresponding to configRec.m)
 direction = DIR_REC;
 global logPath;
 logPath = stdout;
 
-source 'config.m';
+source 'configRec.m';
 source 'init_sourcestruct.m';
 source 'run_common.m';
 

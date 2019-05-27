@@ -19,7 +19,7 @@ addpath(statusDir);
 internalDir = [currDir filesep() 'internal'];
 addpath(internalDir);
 
-source 'config.m';
+source 'configRec.m';
 
 if direction == DIR_PLAY
   % overriden playback config values

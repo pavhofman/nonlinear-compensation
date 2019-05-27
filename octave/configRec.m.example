@@ -1,0 +1,19 @@
+%% Config file for REC side and for mainCtrl process
+%% NOTE - configPlay.m overrides these settings in mainPlay process - both are loaded
+
+% INPUT: soundcard (= playrec)
+src = PLAYREC_SRC;
+
+% OUTPUT: soundcard
+sink = PLAYREC_SINK;
+
+% samplerate - same for REC and PLAY. Different samplerates NOT supported!
+playRecConfig.sampleRate = 48000;
+
+% capture/recording playrec device ID - see output of mainListPlayrecDevs.m
+% typically the physical soundcard
+playRecConfig.recDeviceID = 8; % infrasonic
+
+% playback playrec device ID - see output of mainListPlayrecDevs.m
+% typically the looback device
+playRecConfig.playDeviceID = 19; % loop 0
