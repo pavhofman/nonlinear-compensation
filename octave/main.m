@@ -157,9 +157,8 @@ while(true)
     source 'run_generator.m';
   endif
   
-  if direction == DIR_PLAY
-    source 'process_mode_play.m';
-  endif
+
+  source 'pre_process_stream.m';
  
 
   if (statusContains(ANALYSING))
@@ -186,9 +185,7 @@ while(true)
     compenCalFiles = cell(columns(buffer), 1);
   endif
   
-  if direction == DIR_REC
-    source 'process_mode_rec.m';
-  endif
+  source 'post_process_stream.m';
 
   % recording to memory if enabled
   if structContains(sinkStruct, MEMORY_SINK)
