@@ -13,6 +13,7 @@
 function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidth=1)
   % consts
   global MIN_DISTORT_LEVEL;
+  global MAX_DISTORT_ID;
   distortPeaksCh = [];
   fundPeakBins = [];
   nffto2 = rows(y);
@@ -21,7 +22,7 @@ function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidt
       bb = round(f / binwidth) + 1;
       fundPeakBins = [fundPeakBins; bb];
       % TODO - fix limits!
-      for nh = 1:20
+      for nh = 1:MAX_DISTORT_ID
           i = (nh * (bb - 1)) + 1;
           if i > nffto2 - 1
               % ignore aliased frequencies
@@ -39,8 +40,8 @@ function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidt
 
   if rows(fundPeaks) == 2
       % compute intermodulations between two strongest frequencies
-      % TODO - fix limits!      
-      for imd_order = 2:20
+
+      for imd_order = 2:MAX_DISTORT_ID
           for o1 = 1 : (imd_order-1)
               o2 = imd_order - o1;
               i1 = o1 * (fundPeakBins(1) - 1);
