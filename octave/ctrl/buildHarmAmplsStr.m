@@ -18,8 +18,8 @@ endfunction
 %!test
 %! harmCnt = 3;
 %! global CMD_AMPLS_PREFIX;
-%! CMD_AMPLS_PREFIX = 'AMPL';
+%! CMD_AMPLS_PREFIX = '#AMPL#';
 %! values = {'-120', '', '-140'};
-%! expected = 'AMPL[1e-06,NA,1e-07]';
+%! expected = '#AMPL#[1e-06,NA,1e-07]';
 %! harmAmplsStr = buildHarmAmplsStr(values, harmCnt);
 %! assert(harmAmplsStr, expected);

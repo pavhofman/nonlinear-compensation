@@ -28,7 +28,7 @@ function prompt = getPrompt(harmCnt)
   for harmID = 1:harmCnt
     prompt{end + 1} = ['Harmonics ' num2str(harmID + 1) ' Level (dB, none = empty)'];
   endfor
-  prompt{end + 1} = 'Command String: e.g. #HL#[-120,NA,-140]';
+  prompt{end + 1} = 'Command String: e.g. #AMPL#[1e-06,NA,1e-07]';
 endfunction
 
 function rowscols = getRowscols(harmCnt)
