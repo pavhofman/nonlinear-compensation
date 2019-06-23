@@ -170,9 +170,12 @@ function result = measureTransferSched(label= 1, schedItem = [])
             endswitch
               
         endwhile
-        label = PREPARE_VD_LABEL;
-        continue;
-      
+        % returning back to orig freq
+        sendPlayGeneratorCmd(origFreq, PLAY_LEVELS);
+        % wait a bit for the change to propagate (to see the origFreq in capture analysis UI)
+        schedPause(1, PREPARE_VD_LABEL, mfilename());
+        return;
+
       case PREPARE_VD_LABEL      
         % VD calibration
         % loading freqs for VD
