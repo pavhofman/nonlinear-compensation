@@ -232,7 +232,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
                 % similar level of VD to LPF provides similar phaseshift of VD to when measured in splitCalibPlaySched. Here it is not so critical
                 calTolerance = db2mag(0.08);
 
-                calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origFreq, analysedChID, calTolerance);
+                calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origFreq, analysedChID, calTolerance, true);
                 calFreqReqStr = getCalFreqReqStr(calFreqReq);
                 % much more time for manual level adjustment
                 timeout = MANUAL_TIMEOUT;

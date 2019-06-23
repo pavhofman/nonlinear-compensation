@@ -218,7 +218,8 @@ function details = addDetails(channelID, status, info, details)
           details{end + 1} = 'Calib. Freqs:';
           for id = 1:rows(calFreqReqCh)
             calFreqRow = calFreqReqCh(id, :);
-            details{end + 1} = getCalFreqRow(calFreqRow);
+            % append all rows to details
+            details = {details{:}, getCalFreqStrs(calFreqRow){:}};
           endfor
         endif
       endif
@@ -240,11 +241,19 @@ function details = addDetails(channelID, status, info, details)
   
 endfunction
 
-function str = getCalFreqRow(calFreqRow)
-  persistent format = '%7.2f';
+function strs = getCalFreqStrs(calFreqRow)
+  strs = cell();
+  persistent format = '%7.3f';
   str = [num2str(calFreqRow(1, 1)) 'Hz'];
-  if ~isna(calFreqRow(2))
-    str = [str ' <' num2str(20*log10(calFreqRow(1, 2)), format) ', ' num2str(20*log10(calFreqRow(1, 3)), format) '> dB'];
+  if columns(calFreqRow) >= 4 && ~isna(calFreqRow(1, 4))
+    % exact level
+    str = [str '@' num2str(20*log10(calFreqRow(1, 4)), format) 'dB'];
+  endif
+  strs{end + 1} = str;
+
+  if ~isna(calFreqRow(1, 2))
+    str = [' <' num2str(20*log10(calFreqRow(1, 2)), format) ', ' num2str(20*log10(calFreqRow(1, 3)), format) '> dB'];
+    strs{end + 1} = str;
   endif
 endfunction
 

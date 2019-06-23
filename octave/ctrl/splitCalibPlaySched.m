@@ -170,7 +170,7 @@ function result = splitCalibPlaySched(label = 1)
         % amplitude-constrained calibration
         % we need same ADC distortion profile for LP and VD => the level must be VERY similar
         calTolerance = db2mag(0.03);
-        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origFreq, analysedChID, calTolerance);
+        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origFreq, analysedChID, calTolerance, true);
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
         % much more time for manual level adjustment
         timeout = MANUAL_TIMEOUT;

@@ -133,7 +133,8 @@ function result = rangeCalibRecSched(label = 1)
         % the tolerance really does not matter much here
         calTolerance = db2mag(0.05);
 
-        calFreqReq = getConstrainedLevelCalFreqReq(origRecLevel * adjustment, origFreq, analysedChID, calTolerance);
+        % including mid ampl only for exact value
+        calFreqReq = getConstrainedLevelCalFreqReq(origRecLevel * adjustment, origFreq, analysedChID, calTolerance, adjustment == 1);
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
         % zooming calibration levels + plotting the range so that user can adjust precisely
         % target level = orig Rec level (not the increased range)
