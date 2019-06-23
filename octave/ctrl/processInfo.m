@@ -208,7 +208,7 @@ function details = addDetails(channelID, status, info, details)
       
     case ANALYSING
       details{end + 1} = 'Measured Funds:';
-      details = addPeaksStr(info.measuredPeaks{channelID}, 3, details);
+      details = addPeaksStr(info.measuredPeaks{channelID}, 5, details);
       
     case CALIBRATING
       calFreqReq = info.calRequest.calFreqReq;
