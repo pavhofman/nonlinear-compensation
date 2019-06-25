@@ -177,7 +177,10 @@ CYCLE_LENGTH = 0.211;
 
 % minimum level of distortion peaks to be included into calibration profile
 % depends largely on soundcard performance
-global MIN_DISTORT_LEVEL = db2mag(-145);
+% low number raises CPU load - more harmonics to be compensated
+% too high number causes a harmonic is not included in split-sides compensation, even if playback-side distortion is rather high
+% keep as low as the CPU allows.
+global MIN_DISTORT_LEVEL = db2mag(-155);
 
 % maximum number of detected distortions
 global MAX_DISTORT_ID = 40;
