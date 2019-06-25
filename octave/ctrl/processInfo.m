@@ -197,9 +197,18 @@ function details = addDetails(channelID, status, info, details)
         peaks = sortrows(info.distortPeaks{channelID}, -2);
         % replacing log ampl values
         peaks(:, 2) = floor(20*log10(abs(peaks(:, 2))) * COMP_DECIMALS_MULTIPLIER)/COMP_DECIMALS_MULTIPLIER;
-        if ~isequal(peaks(:, 2), compAmpls{info.direction, channelID})
+        if ~isequal(peaks(:, 2), compAmpls{info.direction, channelID})          
+          % determining fundamental frequency for harmonic ID calculation in addLogPeaksStr
+          fundPeaksCh = info.measuredPeaks{channelID};
+          % showing harmonic ID makes sense only for one fundamental freq
+          if rows(fundPeaksCh) == 1            
+            fundFreq = fundPeaksCh(1, 1);
+          else
+            fundFreq = NA;
+          endif
+          
           % log values changed, recalculating/generatingg string details
-          compDetails{info.direction, channelID} = addLogPeaksStr(peaks, COMP_DECIMALS, {});
+          compDetails{info.direction, channelID} = addLogPeaksStr(peaks, COMP_DECIMALS, {}, fundFreq);
           compAmpls{info.direction, channelID} = peaks(:, 2);
         endif
         % adding comp details
@@ -264,12 +273,17 @@ function str = addPeaksStr(peaksCh, decimals, str)
   endif
 endfunction
 
-function str = addLogPeaksStr(peaksCh, decimals, str)
+function str = addLogPeaksStr(peaksCh, decimals, str, fundFreq = NA)
   % consts
   persistent MAX_LINES = 20;
-  format = ['%7.' int2str(decimals) 'f'];
+  persistent PEAK_FMT = '  %5dHz  %*.*fdB';
+  persistent HARM_PEAK_FMT = ['%2d:' PEAK_FMT];
+  % number of positions before decimals: -120.
+  persistent BEFORE_DECIMALS = 5;
+  width = BEFORE_DECIMALS + decimals;
   cnt = rows(peaksCh);  
   id = 0;
+  
   while id < cnt
   %while false
     ++id;
@@ -279,10 +293,20 @@ function str = addLogPeaksStr(peaksCh, decimals, str)
       % quit loop
       break
     endif
+    
     peak = peaksCh(id, :);
     % adding only peaks with freq > 0 (i.e. real values)
     if peak(1) > 0
-      str{end + 1} = ['  ' num2str(peak(1)) 'Hz   ' num2str(peak(2), format) 'dB'];
+      freq = peak(1);
+      ampl = peak(2);
+      if ~isna(fundFreq)
+        % adding harmonic ID
+        harmID = peak(1) ./ fundFreq;
+        str{end + 1} = sprintf(HARM_PEAK_FMT, harmID, freq, width, decimals, ampl);
+      else
+        str{end + 1} = sprintf(PEAK_FMT, freq, width, decimals, ampl);
+      endif              
     endif
+    
   endwhile
 endfunction
