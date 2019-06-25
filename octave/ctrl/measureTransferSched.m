@@ -128,7 +128,13 @@ function result = measureTransferSched(label= 1, schedItem = [])
         return;
         
       case WAIT_FOR_LP_LABEL
-        % after switching to LPF + mode we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
+        % Now switched to LPF + mode. We start the generator at first freq and wait for all the changes topropagate through the chain. 1 sec should be enough
+        % The reason for waiting is if no freq change occured and it takes too long for the new PLAY_LEVELS amplitude to propagate, calibration will finish at the old levels of DUT, not of the measured transfer.
+        if ~isempty(freqs)
+          printStr(sprintf("Generating %dHz", freqs(1)));
+          sendPlayGeneratorCmd(freqs(1), PLAY_LEVELS);
+        endif
+
         schedPause(1, CAL_LP_LABEL, mfilename());
         return;
         
@@ -138,6 +144,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
           curFreq = freqs(freqID);
           switch label
             case CAL_LP_LABEL
+              % we can resend the first freq generator command even if it was already sent at WAIT_FOR_LP_LABEL section. It's better to have the sections as independent as possible
               printStr(sprintf("Generating %dHz", curFreq));
               cmdIDPlay = sendPlayGeneratorCmd(curFreq, PLAY_LEVELS);
 
@@ -146,7 +153,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
               calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
               deleteFile(calFile);
 
-              % safety measure - requesting calibration only at curFreq
+              % safety measure - requesting calibration only at curFreq (no level known, unfortunately)
               calFreqReqStr = getCalFreqReqStr({[curFreq, NA, NA]});
               calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
               cmdIDRec = writeCmd(calCmd, cmdFileRec);
@@ -208,10 +215,16 @@ function result = measureTransferSched(label= 1, schedItem = [])
         clearOutBox();
         printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", origFreq));
 
-        % after switching to VD we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
+        % Now switched to VD + mode. We start the generator at first freq and wait for all the changes topropagate through the chain. 1 sec should be enough
+        % The reason for waiting is if no freq change occured and it takes too long for the new PLAY_LEVELS amplitude to propagate, calibration will finish at the old levels of DUT, not of the measured transfer.
+        if ~isempty(freqs)
+          printStr(sprintf("Generating %dHz", freqs(1)));
+          sendPlayGeneratorCmd(freqs(1), PLAY_LEVELS);
+        endif
+
+        % after switching to VD we have to wait for the new levels to propagate through the chain. 1 sec should be enough
         schedPause(1, CAL_VD_LABEL, mfilename());
         return;
-        
 
       case {CAL_VD_LABEL, CAL_VD_FINISHED_LABEL}
         % calibrating LP connection at freq harmonics
@@ -219,6 +232,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
           curFreq = freqs(freqID);
           switch label
             case CAL_VD_LABEL
+              % we can resend the first freq generator command even if it was already sent at PREPARE_VD_LABEL section. It's better to have the sections as independent as possible
               printStr(sprintf("Generating %dHz", curFreq));
               cmdIDPlay = sendPlayGeneratorCmd(curFreq, PLAY_LEVELS);
 
