@@ -69,7 +69,17 @@ function result = splitCalibPlaySched(label = 1)
         % TODO - checks - only one fundament freq!!
         origFreq = recInfo.measuredPeaks{analysedChID}(1, 1);
         % two channels, only first fundament freqs (the only freq!)
-        origPlayLevels = {playInfo.measuredPeaks{1}(1, 2), playInfo.measuredPeaks{2}(1, 2)};
+        origPlayLevels = cell();
+        for channelID = 1:length(playInfo.measuredPeaks)
+          measuredPeaksCh = playInfo.measuredPeaks{channelID};
+          if isempty(measuredPeaksCh)
+            % no signal = zero amplitude
+            levelCh = 0;
+          else
+            levelCh = measuredPeaksCh(1, 2);
+          endif
+          origPlayLevels{end + 1} = levelCh;
+        endfor
         
         % playLevels are measured BEHIND equalizer in play process. When generating, one must take the equalizer into account to reach identical play levels
         % only values for first two channels to fit origPlayLevels
