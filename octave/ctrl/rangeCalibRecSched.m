@@ -15,9 +15,11 @@ function result = rangeCalibRecSched(label = 1)
   % step above and below exact calibration level to also calibrate for interpolation
   persistent CAL_LEVEL_STEP = db2mag(0.05);
   
-  persistent analysedChID = 2;
+  % analysed input ch goes through LP or VD, the other input channel is direct
+  global ANALYSED_CH_ID;
+
   % ID of output channel used for split calibration
-  persistent playChID = 2;
+  global PLAY_CH_ID;
   
   global cmdFileRec;
   global cmdFilePlay;
@@ -62,8 +64,8 @@ function result = rangeCalibRecSched(label = 1)
         
         % loading current values from analysis
         fs = recInfo.fs;
-        origFreq = recInfo.measuredPeaks{analysedChID}(1, 1);
-        origRecLevel = recInfo.measuredPeaks{analysedChID}(:, 2);
+        origFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+        origRecLevel = recInfo.measuredPeaks{ANALYSED_CH_ID}(:, 2);
         % two channels, any freqs
         origPlayLevels = {playInfo.measuredPeaks{1}(:, 2), playInfo.measuredPeaks{2}(:, 2)};
         
@@ -76,10 +78,10 @@ function result = rangeCalibRecSched(label = 1)
       case START_LABEL
         swStruct.calibrate = true;
         % for now calibrating right output channel only
-        swStruct.inputR = (playChID == 2);
+        swStruct.inputR = (PLAY_CH_ID == 2);
         swStruct.vd = true;
-        swStruct.analysedR = (analysedChID == 2);
-        figResult = showSwitchWindow(sprintf('Set switches for calibration through VD', analysedChID), swStruct);
+        swStruct.analysedR = (ANALYSED_CH_ID == 2);
+        figResult = showSwitchWindow(sprintf('Set switches for calibration through VD', ANALYSED_CH_ID), swStruct);
         if ~figResult
           label = ABORT;
           continue;
@@ -123,23 +125,23 @@ function result = rangeCalibRecSched(label = 1)
             
         endswitch
         
-        printStr(sprintf('Calibrating REC side at original recLevel of channel %d - %s', analysedChID, expl));
+        printStr(sprintf('Calibrating REC side at original recLevel of channel %d - %s', ANALYSED_CH_ID, expl));
         
         % amplitude-constrained calibration
         % TODO - for now using lpFundAmpl instead of origRecLevel to allow easy switching between LP and VD for result checking
-        % calFreqReq = getConstrainedLevelCalFreqReq(origRecLevel * adjustment, origFreq, analysedChID);
+        % calFreqReq = getConstrainedLevelCalFreqReq(origRecLevel * adjustment, origFreq, ANALYSED_CH_ID);
         
         % max. allowed deviation in each direction from midAmpl
         % the tolerance really does not matter much here
         calTolerance = db2mag(0.05);
 
         % including mid ampl only for exact value
-        calFreqReq = getConstrainedLevelCalFreqReq(origRecLevel * adjustment, origFreq, analysedChID, calTolerance, adjustment == 1);
+        calFreqReq = getConstrainedLevelCalFreqReq(origRecLevel * adjustment, origFreq, ANALYSED_CH_ID, calTolerance, adjustment == 1);
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
         % zooming calibration levels + plotting the range so that user can adjust precisely
         % target level = orig Rec level (not the increased range)
-        % zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, analysedChID));
-        zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, analysedChID));
+        % zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, ANALYSED_CH_ID));
+        zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, ANALYSED_CH_ID));
         
         cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
         waitForCmdDone(cmdID, label + 1, MANUAL_TIMEOUT, ERROR, mfilename());

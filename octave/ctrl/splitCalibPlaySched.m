@@ -14,11 +14,10 @@ function result = splitCalibPlaySched(label = 1)
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
 
-  % right ch goes through LP or VD, left input channel is direct
-  % fixed for now!
-  persistent analysedChID = 2;
+  % analysed input ch goes through LP or VD, the other input channel is direct
+  global ANALYSED_CH_ID;
   % ID of output channel used for split calibration
-  persistent playChID = 2;
+  global PLAY_CH_ID;
   
   global EXTRA_CIRCUIT_VD;
   global EXTRA_CIRCUIT_LP1;
@@ -67,7 +66,7 @@ function result = splitCalibPlaySched(label = 1)
         % loading current values from analysis
         fs = recInfo.fs;
         % TODO - checks - only one fundament freq!!
-        origFreq = recInfo.measuredPeaks{analysedChID}(1, 1);
+        origFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
         % two channels, only first fundament freqs (the only freq!)
         origPlayLevels = cell();
         for channelID = 1:length(playInfo.measuredPeaks)
@@ -98,10 +97,10 @@ function result = splitCalibPlaySched(label = 1)
       case START_LABEL
         swStruct.calibrate = true;
         % for now calibrating right output channel only
-        swStruct.inputR = (playChID == 2);
+        swStruct.inputR = (PLAY_CH_ID == 2);
         swStruct.vd = false;
-        swStruct.analysedR = (analysedChID == 2);
-        figResult = showSwitchWindow(sprintf('Set switches for LP calibration', analysedChID), swStruct);
+        swStruct.analysedR = (ANALYSED_CH_ID == 2);
+        figResult = showSwitchWindow(sprintf('Set switches for LP calibration', ANALYSED_CH_ID), swStruct);
         if ~figResult
           label = ABORT;
           continue;
@@ -143,9 +142,9 @@ function result = splitCalibPlaySched(label = 1)
         
         printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", origFreq));
         % deleting the calib file should it exist - always clean calibration
-        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);
-        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_LP1);
+        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);
         
         % safety measure - requesting calibration only at curFreq
@@ -158,7 +157,7 @@ function result = splitCalibPlaySched(label = 1)
         
       case WAIT_FOR_VD_LABEL
         swStruct.vd = true;
-        figResult = showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', analysedChID)}, swStruct);
+        figResult = showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', ANALYSED_CH_ID)}, swStruct);
         if ~figResult
           label = ABORT;
           continue;
@@ -171,7 +170,7 @@ function result = splitCalibPlaySched(label = 1)
       case CAL_VD_LABEL
         % VD calibration        
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
-        lpFundAmpl = loadCalFundAmpl(origFreq, fs, playChID, analysedChID, EXTRA_CIRCUIT_LP1);
+        lpFundAmpl = loadCalFundAmpl(origFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
 
         clearOutBox();
         
@@ -180,16 +179,16 @@ function result = splitCalibPlaySched(label = 1)
         % amplitude-constrained calibration
         % we need same ADC distortion profile for LP and VD => the level must be VERY similar
         calTolerance = db2mag(0.03);
-        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origFreq, analysedChID, calTolerance, true);
+        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origFreq, ANALYSED_CH_ID, calTolerance, true);
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
         % much more time for manual level adjustment
         timeout = MANUAL_TIMEOUT;
         % zooming calibration levels + plotting the range so that user can adjust precisely                
-        zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(lpFundAmpl, analysedChID));
+        zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(lpFundAmpl, ANALYSED_CH_ID));
         % deleting the calib file should it exist - always clean calibration
-        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD);
+        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD);
         deleteFile(calFile);
-        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, playChID, getTheOtherChannelID(analysedChID), MODE_DUAL, EXTRA_CIRCUIT_VD);
+        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_VD);
         deleteFile(calFile);
 
         calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
@@ -205,7 +204,7 @@ function result = splitCalibPlaySched(label = 1)
 
         clearOutBox();
         printStr(sprintf('Calculating split calibration'));
-        calculateSplitCal(origFreq, fs, playChID, analysedChID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
+        calculateSplitCal(origFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
 
         % going to the next label. This could be processed in one label, but separating split calibration from play-side compensation makes the code cleaner
         label = COMP_PLAY_LABEL;

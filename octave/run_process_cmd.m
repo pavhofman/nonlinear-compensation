@@ -35,8 +35,8 @@ elseif (strcmp(cmd{1}, CALIBRATE))
       calFreqReq(end + 1: channelCnt) = calFreqReq{end};
     endif
     
-    % default = channel 2 (right)
-    playChannelID = findNumInCmd(cmd, CMD_CHANNEL_ID_PREFIX, 2);
+    % default = PLAY_CH_ID
+    playChannelID = findNumInCmd(cmd, CMD_CHANNEL_ID_PREFIX, PLAY_CH_ID);
     
     % default = COMP_TYPE_JOINT
     compType = findNumInCmd(cmd, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT);
@@ -70,7 +70,7 @@ elseif (strcmp(cmd{1}, COMPENSATE))
   compExtraCircuit = findStringInCmd(cmd, CMD_EXTRA_CIRCUIT_PREFIX);
   % default = COMP_TYPE_JOINT
   compType = findNumInCmd(cmd, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT);
-  compRequest = initCompRequest(compType, 2, compExtraCircuit);
+  compRequest = initCompRequest(compType, PLAY_CH_ID, compExtraCircuit);
   
   reloadCalFiles = true;
   showFFTCfg.restartAvg = 1;
