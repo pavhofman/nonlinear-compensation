@@ -207,6 +207,10 @@ global PHASEDIFF_IDX = 2;
 % fund amplitude within +/- AMPL_TO_REPLACE_TOLERANCE considered same
 global AMPL_TO_REPLACE_TOLERANCE = db2mag(0.01);
 
+% maximum fund ampl. difference between subsequent runs to consider stable fundPeaks
+% use the lowest value your soundcard stability allows
+global MAX_AMPL_DIFF = db2mag(-100);
+
 global EXTRA_CIRCUIT_VD = 'vd';
 global EXTRA_CIRCUIT_LP1 = 'lp1';  
 global EXTRA_TRANSFER_DIR = 'transfer';  

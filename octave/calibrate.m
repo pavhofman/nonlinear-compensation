@@ -6,7 +6,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
   persistent MAX_RUNS = 50;
   
   % maximum fund ampl. difference between subsequent runs to consider stable fundPeaks
-  persistent MAX_AMPL_DIFF = db2mag(-80);
+  global MAX_AMPL_DIFF;
   
   % memory of previous peaks, subjected to averaging  
   persistent allFundPeaks = cell(channelCnt, MAX_RUNS);
