@@ -204,8 +204,8 @@ global AMPL_IDX = 6;
 global PLAY_AMPL_IDX = 4;
 global PEAKS_START_IDX = 8;
 global PHASEDIFF_IDX = 2;
-% fund amplitude within +/- SAME_AMPL_TOL considered same
-global SAME_AMPL_TOL = db2mag(0.01);
+% fund amplitude within +/- AMPL_TO_REPLACE_TOLERANCE considered same
+global AMPL_TO_REPLACE_TOLERANCE = db2mag(0.01);
 
 global EXTRA_CIRCUIT_VD = 'vd';
 global EXTRA_CIRCUIT_LP1 = 'lp1';  

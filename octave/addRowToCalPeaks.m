@@ -4,8 +4,8 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
   % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, playAmpl1, playAmpl2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
   global AMPL_IDX;  % = index of fundAmpl1
   global PEAKS_START_IDX;
-  % fund amplitude within +/- SAME_AMPL_TOL considered same
-  global SAME_AMPL_TOL;
+  % fund amplitude within +/- AMPL_TO_REPLACE_TOLERANCE considered same
+  global AMPL_TO_REPLACE_TOLERANCE;
   
   % edge rows can be changed if new row min or max. The easiest way is removing them first and adding newly calculated at the end
   % remove edge extrapolation rows
@@ -69,10 +69,10 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
   % build new complPeak line
   complPeak = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC, playAmplsCh);
 
-  % remove existing rows (if any) with amplitude within tolerance SAME_AMPL_TOL apart from fundAmpl1 - we have newer values
+  % remove existing rows (if any) with amplitude within tolerance AMPL_TO_REPLACE_TOLERANCE apart from fundAmpl1 - we have newer values
   newFundAmpl = fundPeaksCh(1, 2);
-  upperLimit = newFundAmpl * SAME_AMPL_TOL;
-  lowerLimit = newFundAmpl * (1/SAME_AMPL_TOL);
+  upperLimit = newFundAmpl * AMPL_TO_REPLACE_TOLERANCE;
+  lowerLimit = newFundAmpl * (1/AMPL_TO_REPLACE_TOLERANCE);
   sameRowIDs = find(calPeaks(:, AMPL_IDX) < upperLimit & calPeaks(:, AMPL_IDX) > lowerLimit);
   if ~isempty(sameRowIDs)
     writeLog('INFO', "Removing old close-amplitude rows IDs: %s", num2str(sameRowIDs));
