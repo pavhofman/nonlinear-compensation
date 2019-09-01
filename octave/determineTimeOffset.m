@@ -39,41 +39,8 @@ endfunction
 % Typically first = calibration time, second = measure time
 % Time offset can be determined precisely only for this specific case: both frequencies must be integer-divisable by their difference
 % E.g. 13k + 14k OK, 10k + 12k OK, 9960 + 9980 OK, but 9k + 11k FAIL
-function timeOffset = determineDualToneTimeOffset(firstFundPeaksCh, secondFundPeaksCh)  
-  % sorting by frequency desc
-  firstFundPeaksCh = sortrows(firstFundPeaksCh, -1);
-  secondFundPeaksCh = sortrows(secondFundPeaksCh, -1);
-  
-  % now f1 > f2 => period2 > period1
-  f1 = firstFundPeaksCh(1, 1);
-  f2 = firstFundPeaksCh(2, 1);
-  % periods at secs
-  per1 = 1/f1;
-  per2 = 1/f2;
-  
-  % fractional delay of phase2 behind phase1 at time per1 (phase1 = 0 at per1 time)
-  fractDelay2AtPer1 = (per2 - per1)/per2;
-  
-  % every per1 time the phase difference grows by
-  phaseDiffEveryPer1 = fractDelay2AtPer1 * 2 *pi;
-  
-  
-  % phase diff at first time
-  ph1 = firstFundPeaksCh(1, 3);
-  ph2 = firstFundPeaksCh(2, 3);
-  % f1 is ahead of f2 by calPhaseDiff at cal time
-  firstPhaseDiff = getPositivePhaseDiff(ph2, ph1);
- 
-
-  % phase diff at second time
-  mph1 = secondFundPeaksCh(1, 3);
-  mph2 = secondFundPeaksCh(2, 3);
-  % second f1 is ahead of second f2 by secondPhaseDiff at second time
-  secondPhaseDiff = getPositivePhaseDiff(mph2, mph1);
-  
-  % the difference between them
-  firstSecondphaseDiff = getPositivePhaseDiff(firstPhaseDiff, secondPhaseDiff);
-  
-  % it took this long to accummulate this phase difference:
-  timeOffset = (firstSecondphaseDiff/phaseDiffEveryPer1) * per1;
+function timeOffset = determineDualToneTimeOffset(firstFundPeaksCh, secondFundPeaksCh)
+  zeroT1 = determineZeroTime(firstFundPeaksCh);
+  zeroT2 = determineZeroTime(secondFundPeaksCh);
+  timeOffset = zeroT2 - zeroT1;
 endfunction
