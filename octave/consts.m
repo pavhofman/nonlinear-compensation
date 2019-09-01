@@ -183,7 +183,7 @@ CYCLE_LENGTH = 0.211;
 global MIN_DISTORT_LEVEL = db2mag(-155);
 
 % maximum number of detected distortions
-global MAX_DISTORT_ID = 40;
+global MAX_DISTORT_ID = 100;
 
 % array of specific channel numbers from/to audio file or empty = all channels in input
 global FILE_CHAN_LIST = [];
