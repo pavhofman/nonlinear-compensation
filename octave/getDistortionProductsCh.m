@@ -14,11 +14,14 @@ function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidt
   % consts
   global MIN_DISTORT_LEVEL;
   global MAX_DISTORT_ID;
+  %const
+  persistent IMD_RANGE = 8;
+
   distortPeaksCh = [];
   fundPeakBins = [];
   nffto2 = rows(y);
   ymax = max(fundPeaks(:, 2));
-  for f = fundPeaks(:, 1)'
+  for f = transpose(fundPeaks(:, 1))
       bb = round(f / binwidth) + 1;
       fundPeakBins = [fundPeakBins; bb];
       % TODO - fix limits!
@@ -39,27 +42,25 @@ function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidt
   fundPeakBins = sort(fundPeakBins);
 
   if rows(fundPeaks) == 2
-      % compute intermodulations between two strongest frequencies
-
-      for imd_order = 2:MAX_DISTORT_ID
-          for o1 = 1 : (imd_order-1)
-              o2 = imd_order - o1;
-              i1 = o1 * (fundPeakBins(1) - 1);
-              i2 = o2 * (fundPeakBins(2) - 1);
-              for i = [ i1 + i2 + 1, i1 - i2 + 1, i2 - i1 + 1 ];
-                if ...
-                  % ignore aliased frequencies
-                  (i < 2) || (i > nffto2 - 1) ...
-                  % ignore frequencies stronger than 1/10 (-20dB) of the strongest one
-                  || (y(i) >= (ymax / 10)) ...
-                  % ignore frequencies waker than MIN_LEVEL
-                  || (y(i) < MIN_DISTORT_LEVEL)
-                  continue
-                end
-                distortPeaksCh = [distortPeaksCh; x(i), y(i), arg(yc(i))];
-              end
-          end
-      end
-  end
+    % compute intermodulations between two strongest frequencies
+    f1 = (fundPeakBins(1) - 1);
+    f2 = (fundPeakBins(2) - 1);
+    for m1 = -IMD_RANGE: IMD_RANGE
+      for m2 = -IMD_RANGE: IMD_RANGE
+        f = f1*m1 + f2*m2;
+        idx = f + 1;
+        if ...
+          % ignore aliased frequencies
+          (f < 1) || (f > nffto2) ...
+          % ignore frequencies stronger than 1/10 (-20dB) of the strongest one
+          || (y(idx) >= (ymax / 10)) ...
+          % ignore frequencies waker than MIN_LEVEL
+          || (y(idx) < MIN_DISTORT_LEVEL)
+          continue
+        endif
+        distortPeaksCh = [distortPeaksCh; x(idx), y(idx), arg(yc(idx))];                
+      endfor
+    endfor
+  endif
   distortPeaksCh = unique(distortPeaksCh, 'rows');
 endfunction
