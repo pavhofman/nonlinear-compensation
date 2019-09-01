@@ -12,10 +12,9 @@
 %   x - freqencies
 %   y - amplitudes_in_abs_value
 %
-function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, genDistortPeaks = true, window_name = 'hanning')  
-  %consts
-  persistent maxDistortPeaksCnt = getMaxDistortPeaksCnt();
-  
+function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, genDistortPeaks = true, window_name = 'hanning')
+  global MAX_DISTORT_ID;
+
   [x, yc, nfft] = computeFFT(samples, Fs, window_name);
   y = abs(yc);
   % peaks for all channels must have equal row cnt so that can be stored in 3D matrix
@@ -41,9 +40,9 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
     if (genDistortPeaks && hasAnyPeak(fundPeaksCh))
       [distortPeaksCh] = getDistortionProductsCh(fundPeaksCh, x, ycCh, yCh, Fs / nfft);
       % limit distortPeak to maxDistortCnt rows
-      if rows(distortPeaksCh) > maxDistortPeaksCnt
+      if rows(distortPeaksCh) > MAX_DISTORT_ID
           % take distortPeaks strongest harmonics, keep unsorted
-          distortPeaksCh = resize(sortrows(distortPeaksCh,-2), maxDistortPeaksCnt,3);
+          distortPeaksCh = resize(sortrows(distortPeaksCh,-2), MAX_DISTORT_ID,3);
       end
       distortPeaks{channelID} = double(distortPeaksCh);
     endif    
