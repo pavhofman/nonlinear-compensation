@@ -12,7 +12,7 @@
 %   x - freqencies
 %   y - amplitudes_in_abs_value
 %
-function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, genDistortPeaks = true, window_name = 'hanning')
+function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, genDistortPeaks = true, window_name = 'rect')
   global MAX_DISTORT_ID;
 
   [x, yc, nfft] = computeFFT(samples, Fs, window_name);

@@ -10,7 +10,7 @@
 %   yc - complex amplitudes
 %   nfft - number of FFT points
 %
-function [x, yc, nfft] = computeFFT(samples, Fs, window_name = 'hanning')
+function [x, yc, nfft] = computeFFT(samples, Fs, window_name = 'rect')
   nfft = Fs * floor(length(samples)/Fs);
   data = samples(1:nfft, :);
   switch (window_name)
