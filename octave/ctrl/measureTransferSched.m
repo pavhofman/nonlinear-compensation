@@ -92,11 +92,8 @@ function result = measureTransferSched(label= 1, schedItem = [])
         endif
         
         swStruct.calibrate = true;
-        % for now calibrating right output channel only
-        swStruct.inputR = (PLAY_CH_ID == 2);
         swStruct.vd = false;
-        swStruct.analysedR = (ANALYSED_CH_ID == 2);
-        
+
         figResult = showSwitchWindow(sprintf('Set switches for LPF measurement with output channel %d and input channel %d', PLAY_CH_ID, ANALYSED_CH_ID), swStruct);
         if ~figResult
           label = ABORT;

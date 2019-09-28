@@ -18,9 +18,6 @@ function result = rangeCalibRecSched(label = 1)
   % analysed input ch goes through LP or VD, the other input channel is direct
   global ANALYSED_CH_ID;
 
-  % ID of output channel used for split calibration
-  global PLAY_CH_ID;
-  
   global cmdFileRec;
   global cmdFilePlay;
   global GENERATE;
@@ -77,10 +74,7 @@ function result = rangeCalibRecSched(label = 1)
         
       case START_LABEL
         swStruct.calibrate = true;
-        % for now calibrating right output channel only
-        swStruct.inputR = (PLAY_CH_ID == 2);
         swStruct.vd = true;
-        swStruct.analysedR = (ANALYSED_CH_ID == 2);
         figResult = showSwitchWindow(sprintf('Set switches for calibration through VD', ANALYSED_CH_ID), swStruct);
         if ~figResult
           label = ABORT;

@@ -97,9 +97,7 @@ function result = splitCalibPlaySched(label = 1)
       case START_LABEL
         swStruct.calibrate = true;
         % for now calibrating right output channel only
-        swStruct.inputR = (PLAY_CH_ID == 2);
         swStruct.vd = false;
-        swStruct.analysedR = (ANALYSED_CH_ID == 2);
         figResult = showSwitchWindow(sprintf('Set switches for LP calibration', ANALYSED_CH_ID), swStruct);
         if ~figResult
           label = ABORT;
