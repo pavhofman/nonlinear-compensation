@@ -213,7 +213,8 @@ global MAX_AMPL_DIFF = db2mag(-100);
 
 
 % ID of output channel used for split calibration
-global PLAY_CH_ID = 1;
+% the most logical setting is using the same channel as in MODE_SINGLE and MODE_BALANCED
+global PLAY_CH_ID = KEEP_CHANNEL_ID;
 
 % analysed input ch goes through LP or VD, the other input channel is direct
 global ANALYSED_CH_ID = 2;
