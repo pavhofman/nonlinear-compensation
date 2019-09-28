@@ -23,8 +23,9 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
     filename = [filename '_' devSpec{1} '_CH' int2str(devSpec{2})];
   endfor
   
+  %% TODO - for now ignoring chMode in calfile names (the current implementation is incorrect)
   % adding channel mode
-  filename = [filename '_M' num2str(chMode)];
+  %filename = [filename '_M' num2str(chMode)];
 
   if length(extraCircuit) > 0
     filename = [filename '_' extraCircuit];
@@ -76,12 +77,12 @@ endfunction
 %! channelID = 1;
 %! chMode = 1;
 %! extraCircuit = 'filter1';
-%! expected = '/tmp/cal_1000_2000_FS48000_play8_CH2_rec8_CH1_M1_filter1.dat';
+%! expected = '/tmp/cal_1000_2000_FS48000_play8_CH2_rec8_CH1_filter1.dat';
 %! assert(expected, genCalFilename(freqs, fs, compType, playChannelID, channelID, chMode, extraCircuit));
 %!
 %! compType = COMP_TYPE_REC_SIDE;
 %! playChannelID = NA;
 %! channelID = 1;
 %! extraCircuit = '';
-%! expected = '/tmp/cal_1000_2000_FS48000_rec8_CH1_M1.dat';
+%! expected = '/tmp/cal_1000_2000_FS48000_rec8_CH1.dat';
 %! assert(expected, genCalFilename(freqs, fs, compType, playChannelID, channelID, chMode, extraCircuit));
