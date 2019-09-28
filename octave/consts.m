@@ -147,7 +147,7 @@ global COMP_TYPE_REC_SIDE = 2;
 global MODE_DUAL = 1;
 % id of channel to keep in MODE_BAL and MODE_SINGLE
 % RIGHT
-global KEEP_CHANNEL_ID = 2;
+global KEEP_CHANNEL_ID = 1;
 
 % balanced - PLAY: L = -R(equalized), R = R
 %            REC: R = R - L(equalized)/2, L = R - L(equalized)/2
@@ -174,6 +174,9 @@ ZEROMQ_PORT_PLAY = 5556;
 % length of one loop cycle in secs. 
 % Intentionally chosen time which is not integer multiple of standard measuring frequencies/harmonics. Integer multiple (e.g. 200ms) hides errors in calculations.
 CYCLE_LENGTH = 0.211;
+
+% period size (soundcard fragment size)
+global PERIOD_SIZE = 20000;
 
 % minimum level of distortion peaks to be included into calibration profile
 % depends largely on soundcard performance

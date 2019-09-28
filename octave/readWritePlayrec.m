@@ -1,5 +1,6 @@
 function [buffer, fs] = readWritePlayrec(playBuffer, cycleLength, restart)
     global playRecConfig;
+    global PERIOD_SIZE;
     persistent pageNumList;
     
     % clearing playBuffer at restart
@@ -66,7 +67,7 @@ function [buffer, fs] = readWritePlayrec(playBuffer, cycleLength, restart)
           playrec('reset');
         endif
         fprintf('Initialising playrec to use sample rate: %d, recDeviceID: %d , playDeviceID: %d\n', fs, recDeviceID, playDeviceID);
-          playrec('init', fs, playDeviceID, recDeviceID, 2, 2, 10000)
+          playrec('init', fs, playDeviceID, recDeviceID, 2, 2, PERIOD_SIZE)
         if(~playrec('isInitialised'))
             error ('Unable to initialise playrec correctly');
         elseif(playrec('getRecMaxChannel')<max(recChanList))
