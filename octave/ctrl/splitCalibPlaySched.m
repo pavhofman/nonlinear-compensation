@@ -202,7 +202,7 @@ function result = splitCalibPlaySched(label = 1)
 
         clearOutBox();
         printStr(sprintf('Calculating split calibration'));
-        calculateSplitCal(origFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
+        calculateSplitCal2(origFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
 
         % going to the next label. This could be processed in one label, but separating split calibration from play-side compensation makes the code cleaner
         label = COMP_PLAY_LABEL;
