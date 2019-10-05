@@ -23,9 +23,10 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
 
 
   % length of time series for nonlin_curvefit
-  % 1 period for 100Hz, for now
-  cnt = floor(fs/100);
-  t = linspace(0, (cnt - 1)/fs, cnt);
+  % 5 fundamental periods, approx 200 numbers per period, times not at boundary of each period (1001/5=200.2)
+  periods = 5;
+  totalCnt = 1001;
+  t = linspace(0, periods/fundFreq, totalCnt);
 
   distortPeaksACh = [];
   distortPeaksDCh = [];

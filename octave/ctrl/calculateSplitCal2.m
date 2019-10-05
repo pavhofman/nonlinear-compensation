@@ -25,9 +25,10 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
 
 
   % length of time series for nonlin_curvefit
-  % 1 period for 100Hz, for now
-  cnt = floor(fs/100);
-  t = linspace(0, (cnt - 1)/fs, cnt);
+  % 5 fundamental periods, approx 200 numbers per period, times not at boundary of each period (1001/5=200.2)
+  periods = 5;
+  totalCnt = 1001;
+  t = linspace(0, periods/fundFreq, totalCnt);
 
   distortPeaksACh = [];
   distortPeaksDCh = [];
@@ -81,9 +82,9 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
     f = @(p, x) vdlpEqs2(t, distortFreq, p(1), p(2), p(3), p(4), fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP);
     % ampls half, phases zero
     init = [distortAmplVD/2; 0; distortAmplVD/2; 0];
-
+tic();
     [p, model_values, cvg, outp] = nonlin_curvefit(f, init, t, y);
-
+toc();
 
     [amplA, phaseA] = fixMeasuredAmplPhase(p(1), p(2));
     [amplD, phaseD] = fixMeasuredAmplPhase(p(3), p(4));
