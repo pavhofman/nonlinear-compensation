@@ -34,14 +34,7 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
   
   % starting with second harmonic
   distortFreq = 2 * fundFreq;
-  
-  % VD and LP equations solve for the same DA/AD distortions. Same means they must be at the same time.
-  % The measured values loaded from cal files are on AD side and zero-time based (time-shifted to zero fundamental phase)
-  % At time = 0 on ADC side => the DAC side is preceeding by timeOffset
- 
-  timeOffsetVD = (fundPhaseShiftVD)/(PI2 * fundFreq);
-  timeOffsetLP = (fundPhaseShiftLP)/(PI2 * fundFreq);
-  
+   
   while distortFreq < fs/2
     N = distortFreq/ fundFreq;
     % only freqs available for LP and VD can be calculated
@@ -79,8 +72,13 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
     [distortGainVD, distortPhaseShiftVD] = detTransferFromTransferFile(distortFreq, vdName);
     [distortGainLP, distortPhaseShiftLP] = detTransferFromTransferFile(distortFreq, lpName);
     
+    % VD and LP equations solve for the same DA/AD distortions. Same means they must be at the same time.
+    % The measured values loaded from cal files are on AD side and zero-time based (time-shifted to zero fundamental phase)
+    % At time = 0 on ADC side => the DAC side phase shift of every n-th harmonic (incl. the fundamental) is preceeding by the n-th multiple of the filter phase shift at fundamental
+    phaseShiftByFundVD = N * fundPhaseShiftVD;
+    phaseShiftByFundLP = N * fundPhaseShiftLP;
     
-    f = @(p, x) vdlpEqs2(t, distortFreq, p(1), p(2), p(3), p(4), fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, timeOffsetVD, timeOffsetLP);
+    f = @(p, x) vdlpEqs2(t, distortFreq, p(1), p(2), p(3), p(4), fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP);
     % ampls half, phases zero
     init = [distortAmplVD/2; 0; distortAmplVD/2; 0];
 
