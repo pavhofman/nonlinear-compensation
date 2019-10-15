@@ -1,5 +1,5 @@
 function showFFT(series, label, plotID, fs, plotsCnt, fundFreq=0)
-  [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(series, fs, 'rect', 0, fundFreq);
+  [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(series, fs, true);
   drawHarmonics(x, y, label, plotID, plotsCnt);
   format short;
   fprintf([label ':\n']);
@@ -7,7 +7,9 @@ function showFFT(series, label, plotID, fs, plotsCnt, fundFreq=0)
     fprintf('Channel %d:\n', channelID);
     fprintf('Fund Peaks:\n');
     fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', transpose(convertPeaksToPrintable(fundPeaks{channelID})));
-    fprintf('Distort Peaks:\n');
-    fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', transpose(convertPeaksToPrintable(distortPeaks{channelID})));
+    if ~isempty(distortPeaks{channelID})
+      fprintf('Distort Peaks:\n');
+      fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', transpose(convertPeaksToPrintable(distortPeaks{channelID})));
+    endif
   endfor
 endfunction
