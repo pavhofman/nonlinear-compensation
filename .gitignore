@@ -1,8 +1,7 @@
 octave/configRec.m
 octave/configPlay.m
 octave/playrec.mex
-cal*.dat
-transf*.dat
+*.dat
 octave-workspace
 .idea
 playrec.mex
