@@ -8,5 +8,5 @@ genFunds(end + 1: channelCnt) = genFunds{end};
 
 buffer = genSine(genFunds, fs, genStartingT, rows(buffer));
 setStatusResult(GENERATING, RUNNING_OK_RESULT);
-% advancing startingT to next cycle
+% advancing genStartingT to next cycle
 genStartingT = genStartingT + rows(buffer) * 1/fs;

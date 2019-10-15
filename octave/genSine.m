@@ -1,8 +1,8 @@
-% Generates samplesCnt of cosine signal starting at startingT
-function signal = genSine(genFunds, fs, startingT, samplesCnt)
+% Generates samplesCnt of cosine signal starting at genStartingT
+function signal = genSine(genFunds, fs, genStartingT, samplesCnt)
   step = 1/fs;
   signal = [];
-  t = linspace(startingT, startingT + (samplesCnt - 1) * step, samplesCnt);
+  t = linspace(genStartingT, genStartingT + (samplesCnt - 1) * step, samplesCnt);
   for channelID = 1 : length(genFunds)    
     freqs = genFunds{channelID}(:, 1);
     ampls = genFunds{channelID}(:, 2);
