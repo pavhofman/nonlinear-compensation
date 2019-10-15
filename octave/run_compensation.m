@@ -7,7 +7,7 @@ for channelID = getActiveChannelIDs(chMode, channelCnt)
   distortPeaksCh = distortPeaks{channelID};
   fundLevelsCh = fundLevels{channelID};
   if hasAnyPeak(measuredPeaksCh) && hasAnyPeak(fundLevelsCh) && hasAnyPeak(distortPeaksCh)
-    ref = genCompenReference(fundLevelsCh, distortPeaksCh, measuredPeaksCh, fs, startingT, rows(buffer));
+    ref = genCompenReference(fundLevelsCh, distortPeaksCh, measuredPeaksCh, fs, startingTs{channelID}, rows(buffer));
     if find(isna(ref))
       writeLog('ERROR',  'Compensation signal contains NA values, investigate!');
     else
@@ -28,5 +28,5 @@ endfor
 
 setStatusResult(COMPENSATING, result);
 setStatusMsg(COMPENSATING, msg);
-% advancing startingT to next cycle
-startingT = startingT + rows(buffer) * 1/fs;
+% advancing startingsTs to next cycle
+startingTs = cellfun(@(x) x + rows(buffer) * 1/fs, startingTs,'un',0);

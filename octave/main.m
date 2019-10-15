@@ -96,7 +96,7 @@ reloadCalFiles = false;
 % first run -> restart, reading all files
 source 'restart_chain.m';
 
-startingT = 0;
+startingTs = NA;
 buffer = [0];
 
 source 'run_common.m';

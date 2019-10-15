@@ -6,7 +6,7 @@
 % fundLevels, distortPeaks - read from calibration file corresponding to current stream freqs
 %
 % fundLevels: since distortPeaks are ALWAYS zero-time based, i.e. phase = 0 for all fundamental frequencies, fundLevels only contains frequency and level, no phases
-function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] = analyse(buffer, fs, compRequest, chMode, reloadCalFiles)
+function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = analyse(buffer, fs, compRequest, chMode, reloadCalFiles)
   persistent analysisBuffer = [];
   persistent channelCnt = columns(buffer);
   
@@ -20,7 +20,7 @@ function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] 
   fundLevels = cell(channelCnt, 1);
   distortPeaks = cell(channelCnt, 1);
 
-  paramsAdvanceT = -1;
+  advanceTs = cell(channelCnt, 1);
   
   analysisBuffer = [analysisBuffer; buffer];
 
@@ -36,7 +36,15 @@ function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] 
     analysisBuffer = analysisBuffer(rows(analysisBuffer) - freqAnalysisSize + 1: end, :);
     % enough data, measure fundLevels, distortPeaks are ignored (not calibration signal)
     measuredPeaks = getHarmonics(analysisBuffer, fs, false);
-    
+    activeChIDs = getActiveChannelIDs(chMode, channelCnt);
+
+    % measuredPeaks are calculated for time at start of analysisBuffer
+    % but compensation will work on the current buffer
+    % advance time of measuredPeaks relative to the start of buffer which is located at the end of analysisBuffer [analysisBuffer [ buffer]]
+    for channelID = activeChIDs
+      advanceTs{channelID} = (rows(analysisBuffer) - rows(buffer))/fs;
+    endfor
+
     hasAnyChannelPeaks = false;
     % each channel handled separately
     global MIN_DISTORT_LEVEL;
@@ -77,12 +85,7 @@ function [measuredPeaks, paramsAdvanceT, fundLevels, distortPeaks, result, msg] 
       msg = 'No fundamentals in any channel found';
       result = FAILED_RESULT;
     endif
-
-    % measuredPeaks are calculated for time at start of analysisBuffer
-    % but compensation will work on the current buffer
-    % advance time of measuredPeaks relative to the start of buffer which is located at the end of analysisBuffer [analysisBuffer [ buffer]]
-    paramsAdvanceT = (rows(analysisBuffer) - rows(buffer))/fs;    
-    % finished OK    
+    % finished OK
     return;
   endif
 endfunction
