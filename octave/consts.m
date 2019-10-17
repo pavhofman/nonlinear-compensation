@@ -212,7 +212,10 @@ global AMPL_TO_REPLACE_TOLERANCE = db2mag(0.01);
 
 % maximum fund ampl. difference between subsequent runs to consider stable fundPeaks
 % use the lowest value your soundcard stability allows
-global MAX_AMPL_DIFF = db2mag(-100);
+global MAX_AMPL_DIFF = db2mag(-80);
+
+% number of decimal points at which frequencies must be stable for calibration to start
+global MAX_FREQ_DIFF_DECIMALS = 2;
 
 
 % ID of output channel used for split calibration
