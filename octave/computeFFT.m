@@ -2,29 +2,26 @@
 %
 % computes FFT from number of samples that is maximum whole multiple of Fs
 %
-% hanning window is used if precise_amplitude is 0
-% flattop window is used if precise_amplitude is 1
-%
 % returns:
-%   x - freqencies
+%   x - bin IDs
 %   yc - complex amplitudes
 %   nfft - number of FFT points
 %
-function [x, yc, nfft] = computeFFT(samples, Fs, window_name = 'rect')
-  nfft = Fs * floor(length(samples)/Fs);
+function [x, yc, nfft] = computeFFT(samples, fftLength, window_name = 'rect')
+  nfft = fftLength * floor(rows(samples)/fftLength);
   data = samples(1:nfft, :);
   switch (window_name)
       case { 'rect', 'rectangular' }
           winweight = 1;
       case { 'hann', 'hanning' }
-          [data, winweight] = applyWindow(data, hanning(rows(data)));
+          [data, winweight] = applyWindow(data, hanning(nfft));
       case { 'flattop' }
-          [data, winweight] = applyWindow(data, flattopwin(rows(data)));
+          [data, winweight] = applyWindow(data, flattopwin(nfft));
       otherwise
           error(sprintf('unknown window %s\n', window_name));
   endswitch
   nffto2 = (nfft / 2) + 1;
-  x = double(Fs/2) * linspace(0, 1, nffto2);
+  x = double(fftLength/2) * linspace(0, 1, nffto2);
   yc = fft(data)(1:nffto2, :) / (nffto2 * winweight);
 endfunction
 
