@@ -44,16 +44,16 @@ function devSpecs = createCalFileDevSpecs(compType, playChannelID, channelID)
   global COMP_TYPE_PLAY_SIDE;
   global COMP_TYPE_REC_SIDE;
 
-  global inputDeviceName;
-  global outputDeviceName;
+  global recDeviceName;
+  global playDeviceName;
 
   switch compType
     case COMP_TYPE_JOINT
-      devSpecs = {{outputDeviceName, playChannelID}; {inputDeviceName, channelID}};
+      devSpecs = {{playDeviceName, playChannelID}; {recDeviceName, channelID}};
     case COMP_TYPE_PLAY_SIDE
-      devSpecs = {outputDeviceName, channelID};
+      devSpecs = {playDeviceName, channelID};
     case COMP_TYPE_REC_SIDE
-      devSpecs = {inputDeviceName, channelID};
+      devSpecs = {recDeviceName, channelID};
   endswitch
 endfunction
 

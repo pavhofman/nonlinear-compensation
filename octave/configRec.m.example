@@ -12,8 +12,11 @@ playRecConfig.sampleRate = 48000;
 
 % capture/recording playrec device ID - see output of mainListPlayrecDevs.m
 % typically the physical soundcard
-playRecConfig.recDeviceID = 8; % infrasonic
+playRecConfig.recDeviceID = 23; % EMU
 
 % playback playrec device ID - see output of mainListPlayrecDevs.m
 % typically the looback device
-playRecConfig.playDeviceID = 19; % loop 0
+playRecConfig.playDeviceID = 21; % loop 0
+
+% "executive" sound device ID in the other direction
+playRecConfig.otherDeviceID = 8; % infrasonic

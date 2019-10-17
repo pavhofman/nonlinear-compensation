@@ -2,8 +2,11 @@
 
 % capture/recording playrec device ID on PLAY side - see output of mainListPlayrecDevs.m
 % typically the loopback device
-playRecConfig.recDeviceID = 19; % octave_loop
+playRecConfig.recDeviceID = 21; % octave_loop
 
 % playback playrec device ID on PLAY side - see output of mainListPlayrecDevs.m
 % typically the physical soundcard
-playRecConfig.playDeviceID = 8; % quartet analog
+playRecConfig.playDeviceID = 8; % Infrasonic
+
+% "executive" sound device ID in the other direction
+playRecConfig.otherDeviceID = 23; % E-MU
