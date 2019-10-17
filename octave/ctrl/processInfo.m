@@ -217,7 +217,7 @@ function details = addDetails(channelID, status, info, details)
       
     case ANALYSING
       details{end + 1} = 'Measured Funds:';
-      details = addPeaksStr(info.measuredPeaks{channelID}, 5, details);
+      details = addPeaksStr(info.measuredPeaks{channelID}, 4, details);
       
     case CALIBRATING
       calFreqReq = info.calRequest.calFreqReq;
@@ -266,21 +266,22 @@ function strs = getCalFreqStrs(calFreqRow)
   endif
 endfunction
 
-function str = addPeaksStr(peaksCh, decimals, str)
+function str = addPeaksStr(peaksCh, logDecimals, str)
   if ~isempty(peaksCh)
     peaksCh(:, 2) = 20*log10(abs(peaksCh(:, 2)));
-    str = addLogPeaksStr(peaksCh, decimals, str);
+    str = addLogPeaksStr(peaksCh, logDecimals, str);
   endif
 endfunction
 
-function str = addLogPeaksStr(peaksCh, decimals, str, fundFreq = NA)
+function str = addLogPeaksStr(peaksCh, logDecimals, str, fundFreq = NA)
   % consts
   persistent MAX_LINES = 20;
-  persistent PEAK_FMT = '  %5dHz  %*.*fdB';
-  persistent HARM_PEAK_FMT = ['%2d:' PEAK_FMT];
-  % number of positions before decimals: -120.
   persistent BEFORE_DECIMALS = 5;
-  width = BEFORE_DECIMALS + decimals;
+
+  persistent PEAK_FMT = [' %8' getFreqDecimals() 'fHz  %*.*fdB'];
+  persistent HARM_PEAK_FMT = ['%2d:' PEAK_FMT];
+  % number of positions before logDecimals: -120.
+  width = BEFORE_DECIMALS + logDecimals;
   cnt = rows(peaksCh);  
   id = 0;
   
@@ -302,11 +303,20 @@ function str = addLogPeaksStr(peaksCh, decimals, str, fundFreq = NA)
       if ~isna(fundFreq)
         % adding harmonic ID
         harmID = peak(1) ./ fundFreq;
-        str{end + 1} = sprintf(HARM_PEAK_FMT, harmID, freq, width, decimals, ampl);
+        str{end + 1} = sprintf(HARM_PEAK_FMT, harmID, freq, width, logDecimals, ampl);
       else
-        str{end + 1} = sprintf(PEAK_FMT, freq, width, decimals, ampl);
+        str{end + 1} = sprintf(PEAK_FMT, freq, width, logDecimals, ampl);
       endif              
     endif
     
   endwhile
+endfunction
+
+function decimalsStr = getFreqDecimals()
+  global nonInteger;
+  if nonInteger
+    decimalsStr = '.3';
+  else
+    decimalsStr = '.0';
+  endif
 endfunction

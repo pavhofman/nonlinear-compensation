@@ -242,3 +242,6 @@ global playRecConfig = struct();
 playRecConfig.pageBufCount = 5;
 playRecConfig.recChanList = [1 2];
 playRecConfig.playChanList = [1 2];
+
+% support for non-integer frequencies
+global nonInteger = true;
