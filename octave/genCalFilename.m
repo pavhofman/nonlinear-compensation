@@ -9,7 +9,8 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
   % freq1_freq2_...
   freqsPart = '';
   for i = 1:length(freqs)
-    freqsPart = [freqsPart,  int2str(floor(freqs(i))), '_'];
+    % for now rounding freqs to int value
+    freqsPart = [freqsPart,  int2str(round(freqs(i))), '_'];
   endfor
   
   filename = ['cal_' freqsPart 'FS' int2str(fs)];
