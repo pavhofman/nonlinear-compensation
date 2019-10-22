@@ -15,6 +15,7 @@ function info = buildInfo()
   global showFFTCfg;
   global chMode;
   global equalizer;
+  global nonInteger;
   
 
   info.id = NA;
@@ -40,6 +41,7 @@ function info = buildInfo()
 
   info.fs = fs;
   info.cmdDoneID = cmdDoneID;
+  info.nonInteger = nonInteger;
   info.direction = direction;
 endfunction
 

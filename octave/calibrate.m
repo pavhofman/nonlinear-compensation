@@ -1,9 +1,11 @@
 % calRequest.calFreqs - optional 1/2 values. If not empty, wait for these freqs to come (in both channels), with timeout
-function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, chMode, restart)
+function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer, measuredPeaks, fs, calRequest, chMode, restart, nonInteger)
   persistent channelCnt = columns(calBuffer);
+  persistent prevFundPeaks = cell(channelCnt, 1);
+
   % consts
   % max number of calibration runs. When reached, calibration quits with FAILED_RESULT
-  persistent MAX_RUNS = 50;
+  persistent MAX_RUNS = 100;
   
   % maximum fund ampl. difference between subsequent runs to consider stable fundPeaks
   global MAX_AMPL_DIFF;
@@ -30,75 +32,84 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
     runID = 0;
     correctRunsCounter = zeros(channelCnt, 1);
     allFundPeaks = cell(channelCnt, MAX_RUNS);
-    allDistortPeaks = cell(channelCnt, MAX_RUNS);    
+    allDistortPeaks = cell(channelCnt, MAX_RUNS);
+    prevFundPeaks = cell(channelCnt, 1);
   endif
 
   runID += 1;
   writeLog('DEBUG', 'Measuring calibration peaks for run ID %d', runID);
 
-  % calculate FFT peaks
-  [fundPeaks, distortPeaks] = getHarmonics(calBuffer, fs);
   activeChannelIDs = getActiveChannelIDs(chMode, channelCnt);
+  % calculate FFT peaks
+  if ~nonInteger
+    % integer freq mode
+    % all channels at once with FFT, with length = fs
+    [fundPeaks, distortPeaks] = getHarmonics(fs, calBuffer(rows(calBuffer) - fs + 1:end, :), fs, 'rect');
+  else
+    % empty, will calculate for each channel in loop
+    fundPeaks = cell(channelCnt, 1);
+    distortPeaks = cell(channelCnt, 1);
+  endif
+
+
   for channelID = activeChannelIDs
-    
-    % shift distortPeaks to zero time of fundPeaks and store to runPeaks
-    fundPeaksCh = fundPeaks{channelID};
-    distortPeaksCh = distortPeaks{channelID};
     prevFundPeaksCh = prevFundPeaks{channelID};
+    measuredPeaksCh = measuredPeaks{channelID};
     % check if exist, stable, resp. fitting the calFreqs specs
     if ~isempty(calFreqReq)      
       calFreqReqCh = calFreqReq{channelID};
     else
       calFreqReqCh = [];
     end
+
+    if nonInteger
+      % each channel has FFT length
+      newLength = getFFTLength(fs, measuredPeaksCh, floor(rows(calBuffer)/2));
+      [fundPeaksChCell, distortPeaksChCell] = getHarmonics(newLength, calBuffer(rows(calBuffer) - newLength + 1:end, channelID), fs, true, 'hanning');
+      fundPeaksCh = fundPeaksChCell{1};
+      distortPeaksCh = distortPeaksChCell{1};
+    else
+      % already calculated before the loop by all-channels FFT
+      fundPeaksCh = fundPeaks{channelID};
+      distortPeaksCh = distortPeaks{channelID};
+    endif
+
+
+    % default value
     checksOK = false;
     % same freqs check
-    if areSameFreqs(fundPeaksCh, prevFundPeaksCh)
-      % same levels check
-      if areSameLevels(fundPeaksCh, prevFundPeaksCh, MAX_AMPL_DIFF)
-        % req. freqs check
-        if isempty(calFreqReqCh) || isequal(getFreqs(calFreqReqCh), getFreqs(fundPeaksCh))
-          % req. levels check 
-          if isempty(calFreqReqCh) || checkCorrectLevels(calFreqReqCh, fundPeaksCh)
-            % all checks OK, this run is OK
-            checksOK = true;
-          else
-            writeLog('WARN', 'Measured levels different from requested, resetting counter');
-            msg = 'Levels outside of the requested range';
-          endif          
-        else
-          writeLog('WARN', 'Different fund freqs from requested, resetting counter');
-          msg = 'Freqs different from requested';
-        endif        
-      else
-        writeLog('WARN', 'Different levels in run %d from previous run, resetting counter', runID);
-        msg = 'Unstable levels';
-      endif
-    else
+    if ~areSameFreqs(fundPeaksCh, prevFundPeaksCh)
       writeLog('WARN', 'Different/zero fund freqs in run %d from previous run, resetting counter', runID);
       msg = 'Unstable freqs';
-    endif
-            
-    if ~checksOK
-      % reset the counter
-      correctRunsCounter(channelID) = 0;
-      % reset saved peaks from previous runs
-      allFundPeaks = cell(channelCnt, MAX_RUNS);
-      allDistortPeaks = cell(channelCnt, MAX_RUNS);
-
-      % DEBUG printing values
-      writeLog('DEBUG', 'This round fundPeaksCh: %s', disp(fundPeaksCh));
-      writeLog('DEBUG', 'Prev. round fundPeaksCh: %s', disp(prevFundPeaksCh));
-      result = FAILING_RESULT;
-      % go to next channel
-      break;
+    % stable levels check
+    elseif ~areSameLevels(fundPeaksCh, prevFundPeaksCh, MAX_AMPL_DIFF)
+      writeLog('WARN', 'Different levels in run %d from previous run, resetting counter', runID);
+      msg = 'Unstable levels';
+    % req freqs check
+    elseif ~isempty(calFreqReqCh) && ~areSameFreqs(calFreqReqCh, fundPeaksCh)
+      writeLog('WARN', 'Different fund freqs from requested, resetting counter');
+      msg = 'Freqs different from requested';
+    %req levels check
+    elseif ~isempty(calFreqReqCh) && ~checkCorrectLevels(calFreqReqCh, fundPeaksCh)
+      writeLog('WARN', 'Measured levels different from requested, resetting counter');
+      msg = 'Levels outside of the requested range';
     else
+      % all checks OK, this run is OK
+      checksOK = true;
+    endif
+
+    % remember for next round - using peaks calculated by analysis which uses the same procedure
+    prevFundPeaks{channelID} = fundPeaksCh;
+
+    if checksOK
+      % OK, actual calibration
       writeLog('DEBUG', 'Same fund peaks as in previous run + correct freqs and levels in in run %d, using for averaging', runID);
+
       % same non-empty freqs from previous run, can continue
       correctRunsCounter(channelID) += 1;
       % save peaks for averaging
       if hasAnyPeak(distortPeaksCh)
-        % time shift distortPeaks to zero phase of fundPeaks        
+        % time shift distortPeaks to zero phase of fundPeaks
         distortPeaksCh = phasesAtZeroTimeCh(fundPeaksCh, distortPeaksCh);
         % now distortPeaksCh are zero-time based.
       endif
@@ -107,6 +118,17 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
       allFundPeaks{channelID, runID} = fundPeaksCh;
       allDistortPeaks{channelID, runID} = distortPeaksCh;
       result = RUNNING_OK_RESULT;
+    else
+      % reset the counter
+      correctRunsCounter(channelID) = 0;
+      % reset saved peaks from previous runs
+      allFundPeaks = cell(channelCnt, MAX_RUNS);
+      allDistortPeaks = cell(channelCnt, MAX_RUNS);
+
+      % DEBUG printing values
+      writeLog('DEBUG', 'This round fundPeaksCh: %s', disp(fundPeaksCh));
+      writeLog('DEBUG', 'Prev. round prevFundPeaksCh: %s', disp(prevFundPeaksCh));
+      result = FAILING_RESULT;
     endif
   endfor
   
@@ -297,21 +319,23 @@ function avgPeaksCh = calculateAvgPeaks(mergedPeaksCh, runsCnt);
   % minimum occurence of given frequency distortion in all runsCnt to be included in the averaged peaks
   % 30%
   persistent MIN_OCCURENCE_LIMIT = 0.3;
+  % tolerance for grouping in unique (in Hz)
+  persistent UNIQUE_FREQ_TOLERANCE = 0.1;
   avgPeaksCh = [];
   
-  uniqFreqs = unique(mergedPeaksCh(:, 1));
-  uniqFreqs = sort(uniqFreqs);
-  
+  [uniqFreqs, ~, sameRowIDs] = uniqueWithTol(mergedPeaksCh(:, 1), UNIQUE_FREQ_TOLERANCE);
   % include only frequencies which occur minRequiredCnt out of runsCnt
   % less frequent frequencies must be ignored because their interpolation during compensation creates false compensation signals
   minRequiredCnt = runsCnt * MIN_OCCURENCE_LIMIT;
   % average for each freq
-  for freq = transpose(uniqFreqs)
+
+  for freqID = 1:length(uniqFreqs)
+    freq = uniqFreqs(freqID);
     % only for nonzero freqs
     if (freq > 0)
-      freqIDs = find(mergedPeaksCh(:, 1) == freq);
+      thisFreqPeaksIDs = find(sameRowIDs == freqID);
       % averaging requires complex values    
-      valuesOfFreq = mergedPeaksCh(freqIDs, 2:3);
+      valuesOfFreq = mergedPeaksCh(thisFreqPeaksIDs, 2:3);
       valuesCnt = rows(valuesOfFreq);
       if valuesCnt >= minRequiredCnt
         % only frequencies measured in almost every run can be considered for compensation
@@ -324,4 +348,6 @@ function avgPeaksCh = calculateAvgPeaks(mergedPeaksCh, runsCnt);
       endif
     endif
   endfor
+  % sorting by freq ASC
+  avgPeaksCh = sortrows(avgPeaksCh, 1);
 endfunction

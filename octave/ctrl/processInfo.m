@@ -175,7 +175,7 @@ function details = addDetails(channelID, status, info, details)
     case GENERATING
       % showing generator freq and amplitude
       details{end + 1} = 'Gen. Frequencies:';
-      details = addPeaksStr(abs(info.genFunds{channelID}), 3, details);
+      details = addPeaksStr(abs(info.genFunds{channelID}), 3, details, info.nonInteger);
     
     case COMPENSATING
       % consts
@@ -208,7 +208,7 @@ function details = addDetails(channelID, status, info, details)
           endif
           
           % log values changed, recalculating/generatingg string details
-          compDetails{info.direction, channelID} = addLogPeaksStr(peaks, COMP_DECIMALS, {}, fundFreq);
+          compDetails{info.direction, channelID} = addLogPeaksStr(peaks, COMP_DECIMALS, {}, info.nonInteger, fundFreq);
           compAmpls{info.direction, channelID} = peaks(:, 2);
         endif
         % adding comp details
@@ -217,7 +217,7 @@ function details = addDetails(channelID, status, info, details)
       
     case ANALYSING
       details{end + 1} = 'Measured Funds:';
-      details = addPeaksStr(info.measuredPeaks{channelID}, 4, details);
+      details = addPeaksStr(info.measuredPeaks{channelID}, 4, details, info.nonInteger);
       
     case CALIBRATING
       calFreqReq = info.calRequest.calFreqReq;
@@ -252,34 +252,34 @@ endfunction
 
 function strs = getCalFreqStrs(calFreqRow)
   strs = cell();
-  persistent format = '%7.3f';
+  persistent FORMAT = '%7.3f';
   str = [num2str(calFreqRow(1, 1)) 'Hz'];
   if columns(calFreqRow) >= 4 && ~isna(calFreqRow(1, 4))
     % exact level
-    str = [str '@' num2str(20*log10(calFreqRow(1, 4)), format) 'dB'];
+    str = [str '@' num2str(20*log10(calFreqRow(1, 4)), FORMAT) 'dB'];
   endif
   strs{end + 1} = str;
 
   if ~isna(calFreqRow(1, 2))
-    str = [' <' num2str(20*log10(calFreqRow(1, 2)), format) ', ' num2str(20*log10(calFreqRow(1, 3)), format) '> dB'];
+    str = [' <' num2str(20*log10(calFreqRow(1, 2)), FORMAT) ', ' num2str(20*log10(calFreqRow(1, 3)), FORMAT) '> dB'];
     strs{end + 1} = str;
   endif
 endfunction
 
-function str = addPeaksStr(peaksCh, logDecimals, str)
+function str = addPeaksStr(peaksCh, logDecimals, str, nonInteger)
   if ~isempty(peaksCh)
     peaksCh(:, 2) = 20*log10(abs(peaksCh(:, 2)));
-    str = addLogPeaksStr(peaksCh, logDecimals, str);
+    str = addLogPeaksStr(peaksCh, logDecimals, str, nonInteger);
   endif
 endfunction
 
-function str = addLogPeaksStr(peaksCh, logDecimals, str, fundFreq = NA)
+function str = addLogPeaksStr(peaksCh, logDecimals, str, nonInteger, fundFreq = NA)
   % consts
   persistent MAX_LINES = 20;
   persistent BEFORE_DECIMALS = 5;
 
-  persistent PEAK_FMT = [' %8' getFreqDecimals() 'fHz  %*.*fdB'];
-  persistent HARM_PEAK_FMT = ['%2d:' PEAK_FMT];
+  peakFmt = [' %8' getFreqDecimals(nonInteger) 'fHz  %*.*fdB'];
+  harmPeakFmt = ['%2d:' peakFmt];
   % number of positions before logDecimals: -120.
   width = BEFORE_DECIMALS + logDecimals;
   cnt = rows(peaksCh);  
@@ -303,17 +303,16 @@ function str = addLogPeaksStr(peaksCh, logDecimals, str, fundFreq = NA)
       if ~isna(fundFreq)
         % adding harmonic ID
         harmID = peak(1) ./ fundFreq;
-        str{end + 1} = sprintf(HARM_PEAK_FMT, harmID, freq, width, logDecimals, ampl);
+        str{end + 1} = sprintf(harmPeakFmt, harmID, freq, width, logDecimals, ampl);
       else
-        str{end + 1} = sprintf(PEAK_FMT, freq, width, logDecimals, ampl);
+        str{end + 1} = sprintf(peakFmt, freq, width, logDecimals, ampl);
       endif              
     endif
     
   endwhile
 endfunction
 
-function decimalsStr = getFreqDecimals()
-  global nonInteger;
+function decimalsStr = getFreqDecimals(nonInteger)
   if nonInteger
     decimalsStr = '.3';
   else

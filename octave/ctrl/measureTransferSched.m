@@ -8,7 +8,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
   % init section
   [START_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, PREPARE_VD_LABEL, CAL_VD_LABEL, CAL_VD_FINISHED_LABEL, ALL_OFF_LABEL, DONE_LABEL, ERROR] = enum();
   
-  persistent AUTO_TIMEOUT = 10;
+  persistent AUTO_TIMEOUT = 20;
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
   
@@ -42,12 +42,13 @@ function result = measureTransferSched(label= 1, schedItem = [])
   
   % current frequency of calibration
   % all set in first P1 branch
-  persistent curFreq = NA;
-  persistent freqs = NA;
+  persistent playFreqs = NA;
+  persistent recFreqs = NA;
   persistent freqID = 1;
   persistent fs = NA;
-  persistent origFreq = NA;
-  
+  persistent origPlayFreq = NA;
+  persistent origRecFreq = NA;
+
   persistent calFile = '';
   
   % measured at fixed levels
@@ -73,16 +74,24 @@ function result = measureTransferSched(label= 1, schedItem = [])
 
         % loading current values from analysis
         fs = recInfo.fs;
+
         % TODO - checks - only one fundament freq!!
-        origFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+        % if playback freq is known, use it (playback will be generating). If no (playback has no signal, rec fed by an external generator, use recInfo)
+        if length(playInfo.measuredPeaks) >= ANALYSED_CH_ID && ~ isempty(playInfo.measuredPeaks{ANALYSED_CH_ID})
+          origPlayFreq = playInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+        else
+          origPlayFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+        endif
+        
+        origRecFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
         
         % LPF measurement starts at last measured freq. We need values for fundamental freq in order to determine lpFundAmpl to align VD to same value
-        freqs = getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_LP1);
+        [playFreqs, recFreqs] = getMissingTransferFreqs(origPlayFreq, origRecFreq, fs, EXTRA_CIRCUIT_LP1, recInfo.nonInteger);
         freqID = 1;
         
-        writeLog('DEBUG', 'Missing transfer freqs for %s: %s', EXTRA_CIRCUIT_LP1, disp(freqs));
+        writeLog('DEBUG', 'Missing transfer recFreqs for %s: %s', EXTRA_CIRCUIT_LP1, disp(recFreqs));
         
-        if isempty(freqs)
+        if isempty(recFreqs)
           % no need to measure LP, going to VD
           label = PREPARE_VD_LABEL;
           didMeasureLPF = false;
@@ -101,7 +110,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
         endif
 
         clearOutBox();
-        printStr(sprintf("Joint-device calibrating LP at harmonic frequencies of %dHz:", origFreq));
+        printStr(sprintf("Joint-device calibrating LP at harmonic frequencies of %dHz:", recFreqs(freqID)));
         
         % setting pass status on both sides
         cmdIDPlay = writeCmd(PASS, cmdFilePlay);
@@ -127,9 +136,9 @@ function result = measureTransferSched(label= 1, schedItem = [])
       case WAIT_FOR_LP_LABEL
         % Now switched to LPF + mode. We start the generator at first freq and wait for all the changes topropagate through the chain. 1 sec should be enough
         % The reason for waiting is if no freq change occured and it takes too long for the new PLAY_LEVELS amplitude to propagate, calibration will finish at the old levels of DUT, not of the measured transfer.
-        if ~isempty(freqs)
-          printStr(sprintf("Generating %dHz", freqs(1)));
-          sendPlayGeneratorCmd(freqs(1), PLAY_LEVELS);
+        if ~isempty(recFreqs)
+          printStr(sprintf("Generating %dHz", recFreqs(1)));
+          sendPlayGeneratorCmd(recFreqs(1), PLAY_LEVELS);
         endif
 
         schedPause(1, CAL_LP_LABEL, mfilename());
@@ -137,21 +146,20 @@ function result = measureTransferSched(label= 1, schedItem = [])
         
       case {CAL_LP_LABEL, CAL_LP_FINISHED_LABEL}
         % calibrating LPF connection at freq harmonics
-        while freqID <= length(freqs)
-          curFreq = freqs(freqID);
+        while freqID <= length(playFreqs)
           switch label
             case CAL_LP_LABEL
               % we can resend the first freq generator command even if it was already sent at WAIT_FOR_LP_LABEL section. It's better to have the sections as independent as possible
-              printStr(sprintf("Generating %dHz", curFreq));
-              cmdIDPlay = sendPlayGeneratorCmd(curFreq, PLAY_LEVELS);
+              printStr(sprintf("Generating %dHz", playFreqs(freqID)));
+              cmdIDPlay = sendPlayGeneratorCmd(playFreqs(freqID), PLAY_LEVELS);
 
-              printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", curFreq));
+              printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", recFreqs(freqID)));
               % deleting the calib file should it exist - always clean calibration
-              calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+              calFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
               deleteFile(calFile);
 
-              % safety measure - requesting calibration only at curFreq (no level known, unfortunately)
-              calFreqReqStr = getCalFreqReqStr({[curFreq, NA, NA]});
+              % safety measure - requesting calibration only at current rec freq (no level known, unfortunately)
+              calFreqReqStr = getCalFreqReqStr({[recFreqs(freqID), NA, NA]});
               calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
               cmdIDRec = writeCmd(calCmd, cmdFileRec);
 
@@ -160,10 +168,10 @@ function result = measureTransferSched(label= 1, schedItem = [])
               
             case CAL_LP_FINISHED_LABEL
               % moving calfile for ANALYSED_CH_ID to transfer file
-              moveCalToTransferFile(calFile, curFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
+              moveCalToTransferFile(calFile, recFreqs(freqID), fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
 
               % removing the other channel calfile - useless
-              otherCalFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_LP1, EXTRA_TRANSFER_DIR);
+              otherCalFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_LP1, EXTRA_TRANSFER_DIR);
               deleteFile(otherCalFile);
               
               % next frequency
@@ -175,22 +183,23 @@ function result = measureTransferSched(label= 1, schedItem = [])
               
         endwhile
         % returning back to orig freq
-        sendPlayGeneratorCmd(origFreq, PLAY_LEVELS);
-        % wait a bit for the change to propagate (to see the origFreq in capture analysis UI)
+        sendPlayGeneratorCmd(origPlayFreq, PLAY_LEVELS);
+        % wait a bit for the change to propagate (to see the origPlayFreq in capture analysis UI)
         schedPause(1, PREPARE_VD_LABEL, mfilename());
         return;
 
       case PREPARE_VD_LABEL      
         % VD calibration
-        % loading freqs for VD
-        freqs = getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_VD);
-        writeLog('DEBUG', 'Missing transfer freqs for %s: %s', EXTRA_CIRCUIT_VD, disp(freqs));
+        % loading recFreqs for VD
+        global recInfo;
+        [playFreqs, recFreqs] = getMissingTransferFreqs(origPlayFreq, origRecFreq, fs, EXTRA_CIRCUIT_VD, recInfo.nonInteger);
+        writeLog('DEBUG', 'Missing transfer recFreqs for %s: %s', EXTRA_CIRCUIT_VD, disp(recFreqs));
         freqID = 1;
         
-        if isempty(freqs)
+        if isempty(playFreqs)
           % all transfers available for VD, ending
           if ~didMeasureLPF
-            % informing user that all freqs are already measured
+            % informing user that all recFreqs are already measured
             global MAX_TRANSFER_AGE_DAYS;
             msgbox(['All LPF and VD frequencies already measured and still valid (< ' num2str(MAX_TRANSFER_AGE_DAYS) ' days)']);
           endif
@@ -199,7 +208,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
         endif
 
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
-        lpFundAmpl = loadAmplFromTransfer(origFreq, EXTRA_CIRCUIT_LP1);
+        lpFundAmpl = loadRecAmplFromTransfer(origRecFreq, EXTRA_CIRCUIT_LP1);
 
         swStruct.vd = true;
         figResult = showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', ANALYSED_CH_ID)}, swStruct);
@@ -210,13 +219,13 @@ function result = measureTransferSched(label= 1, schedItem = [])
         
 
         clearOutBox();
-        printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", origFreq));
+        printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", recFreqs(freqID)));
 
         % Now switched to VD + mode. We start the generator at first freq and wait for all the changes topropagate through the chain. 1 sec should be enough
         % The reason for waiting is if no freq change occured and it takes too long for the new PLAY_LEVELS amplitude to propagate, calibration will finish at the old levels of DUT, not of the measured transfer.
-        if ~isempty(freqs)
-          printStr(sprintf("Generating %dHz", freqs(1)));
-          sendPlayGeneratorCmd(freqs(1), PLAY_LEVELS);
+        if ~isempty(playFreqs)
+          printStr(sprintf("Generating %dHz", playFreqs(1)));
+          sendPlayGeneratorCmd(playFreqs(1), PLAY_LEVELS);
         endif
 
         % after switching to VD we have to wait for the new levels to propagate through the chain. 1 sec should be enough
@@ -225,16 +234,15 @@ function result = measureTransferSched(label= 1, schedItem = [])
 
       case {CAL_VD_LABEL, CAL_VD_FINISHED_LABEL}
         % calibrating LP connection at freq harmonics
-        while freqID <= length(freqs)
-          curFreq = freqs(freqID);
+        while freqID <= length(playFreqs)
           switch label
             case CAL_VD_LABEL
               % we can resend the first freq generator command even if it was already sent at PREPARE_VD_LABEL section. It's better to have the sections as independent as possible
-              printStr(sprintf("Generating %dHz", curFreq));
-              cmdIDPlay = sendPlayGeneratorCmd(curFreq, PLAY_LEVELS);
+              printStr(sprintf("Generating %dHz", playFreqs(freqID)));
+              cmdIDPlay = sendPlayGeneratorCmd(playFreqs(freqID), PLAY_LEVELS);
 
-              printStr(sprintf("Joint-device calibrating VD at %dHz", curFreq));
-              if curFreq == origFreq
+              printStr(sprintf("Joint-device calibrating VD at %dHz", recFreqs(freqID)));
+              if recFreqs(freqID) == origRecFreq
                 % VD at fundament (origFreq) must be calibrated at exactly the same level as LP so that the distortion characteristics of ADC are same
                 
                 % amplitude-constrained calibration
@@ -243,21 +251,21 @@ function result = measureTransferSched(label= 1, schedItem = [])
                 % similar level of VD to LPF provides similar phaseshift of VD to when measured in splitCalibPlaySched. Here it is not so critical
                 calTolerance = db2mag(0.08);
 
-                calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origFreq, ANALYSED_CH_ID, calTolerance, true);
+                calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origRecFreq, ANALYSED_CH_ID, calTolerance, true);
                 calFreqReqStr = getCalFreqReqStr(calFreqReq);
                 % much more time for manual level adjustment
                 timeout = MANUAL_TIMEOUT;
                 % zooming calibration levels + plotting the range so that user can adjust precisely                
                 zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(lpFundAmpl, ANALYSED_CH_ID));
               else
-                % harmonic freqs, level is not important, only waiting from stable frequency
-                calFreqReqStr = getCalFreqReqStr({[curFreq, NA, NA]});
+                % harmonic recFreqs, level is not important, only waiting from stable frequency
+                calFreqReqStr = getCalFreqReqStr({[recFreqs(freqID), NA, NA]});
                 % regular (= short) timeout
                 timeout = AUTO_TIMEOUT;
                 closeCalibPlot();
               endif
               % deleting the calib file should it exist - always clean calibration
-              calFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD);
+              calFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD);
               deleteFile(calFile);
 
               calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
@@ -268,10 +276,10 @@ function result = measureTransferSched(label= 1, schedItem = [])
               
             case CAL_VD_FINISHED_LABEL
               % moving calFile to transfers
-              moveCalToTransferFile(calFile, curFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_VD);
+              moveCalToTransferFile(calFile, recFreqs(freqID), fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_VD);
 
               % removing useless calfile for the other channel
-              otherCalFile = genCalFilename(curFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_VD);
+              otherCalFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_VD);
               deleteFile(otherCalFile);
               
               % next frequency
@@ -356,7 +364,7 @@ function moveCalToTransferFile(calFile, freq, fs, playChID, analysedChID, extraC
   delete(calFile);
 endfunction
 
-function ampl = loadAmplFromTransfer(freq, extraCircuit)
+function ampl = loadRecAmplFromTransfer(freq, extraCircuit)
   global AMPL_IDX;
   
   transferFilename = getTransferFilename(freq, extraCircuit);

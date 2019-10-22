@@ -21,14 +21,28 @@ addpath(internalDir);
 
 source 'configRec.m';
 
+global nonInteger;
 if direction == DIR_PLAY
   % overriden playback config values
   source 'configPlay.m';
   cmdFile = genDataPath(CMD_FILE_PLAY, dataDir);
   zeromqPort = ZEROMQ_PORT_PLAY;
+  % support for non-integer frequencies - by default off on playback side
+  nonInteger = false;
 else
   cmdFile = genDataPath(CMD_FILE_REC, dataDir);
   zeromqPort = ZEROMQ_PORT_REC;
+
+  % support for non-integer frequencies on rec side - depends if the same device is used on playback side
+  nonInteger = (playRecConfig.recDeviceID ~= playRecConfig.otherDeviceID);
+endif
+
+if nonInteger
+  cycleLength = NONINTEGER_CYCLE_LENGTH;
+  periodSize = NONINTEGER_PERIOD_SIZE;
+else
+  cycleLength = INTEGER_CYCLE_LENGTH;
+  periodSize = INTEGER_PERIOD_SIZE;
 endif
 
 % default initial command - PASS
@@ -72,9 +86,8 @@ channelCnt = NA;
 global compenCalFiles;
 compenCalFiles = NA;
 
-prevFundPeaks = NA;
 calBuffer = [];
-calibrationSize = NA;
+calBufferSize = NA;
 
 global calRequest;
 calRequest = NA;
@@ -146,9 +159,16 @@ while(true)
   if firstCycle
     channelCnt = columns(buffer);
     compenCalFiles = cell(channelCnt, 1);
-    prevFundPeaks = cell(channelCnt, 1);
+    prevMeasuredPeaks = cell(channelCnt, 1);
     firstCycle = false;
-    calibrationSize = fs; % 1 second, resolution 1Hz
+
+    if nonInteger
+      calBufferSize = NONINTEGER_CAL_BUF_FS_MULTIPLE * fs;
+    else
+      % integer Hz, i.e. FFT at fs-length
+      calBufferSize = 1 * fs;
+    endif
+
     % ones
     equalizer = ones(1, channelCnt);
   endif

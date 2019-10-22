@@ -3,6 +3,10 @@
 % peaksCh - at least one fundamental required!
 % zeroT - single zero time, or empty if none determined (i.e. error)
 function zeroT = determineZeroTime(peaksCh)
+  % function works only for integer values. Rounding frequencies to integers.
+  % Determined zero time will be scaled at the end to original frequency
+  origPeaksCh = peaksCh;
+  peaksCh(:, 1) = round(peaksCh(:, 1));
   % details - row freq, period, phaseTime. Row per freq
   details = getDetails(peaksCh);
   % sorting by phaseTime DESC
@@ -45,6 +49,9 @@ function zeroT = determineZeroTime(peaksCh)
 
   if ~isempty(finalZeroTimes)
     zeroT = finalZeroTimes(1);
+    % scaling time to correspond to floating-point frequencies
+    % using first freq - if orig freq was above its rounded value, the resultant time is smaller
+    zeroT *=  peaksCh(1, 1) / origPeaksCh(1, 1);
   else
     zeroT = [];
   endif

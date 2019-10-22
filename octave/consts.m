@@ -171,12 +171,19 @@ showFFTCfg.fftSize = 2^16;
 ZEROMQ_PORT_REC = 5555;
 ZEROMQ_PORT_PLAY = 5556;
 
-% length of one loop cycle in secs. 
+% length of one loop cycle in secs.
 % Intentionally chosen time which is not integer multiple of standard measuring frequencies/harmonics. Integer multiple (e.g. 200ms) hides errors in calculations.
-CYCLE_LENGTH = 0.211;
+% integer mode determines fundamental freq by FFT, no slow nonlinear regression for measuring frequency
+INTEGER_CYCLE_LENGTH = 0.211;
+% non-integer mode measures the fundamentals with very slow nonlinear regression - needs more time to avoid xruns
+NONINTEGER_CYCLE_LENGTH = 0.511;
+
+% length of calibration buffer in multiples of FS for noninteger mode
+NONINTEGER_CAL_BUF_FS_MULTIPLE = 4;
 
 % period size (soundcard fragment size)
-global PERIOD_SIZE = 20000;
+INTEGER_PERIOD_SIZE = 40000;
+NONINTEGER_PERIOD_SIZE = 40000;
 
 % minimum level of distortion peaks to be included into calibration profile
 % depends largely on soundcard performance
@@ -242,6 +249,3 @@ global playRecConfig = struct();
 playRecConfig.pageBufCount = 5;
 playRecConfig.recChanList = [1 2];
 playRecConfig.playChanList = [1 2];
-
-% support for non-integer frequencies
-global nonInteger = true;

@@ -1,6 +1,6 @@
 % calculating FFT + harmonics up to Fs
 %
-% computes FFT from number of samples that is maximum whole multiple of Fs
+% computes FFT from fftLength samples
 %
 % hanning window is used if precise_amplitude is 0
 % flattop window is used if precise_amplitude is 1
@@ -12,10 +12,10 @@
 %   x - freqencies
 %   y - amplitudes_in_abs_value
 %
-function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, genDistortPeaks = true, window_name = 'rect')
+function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(fftLength, samples, Fs, genDistortPeaks = true, window_name = 'rect')
   global MAX_DISTORT_ID;
 
-  [x, yc, nfft] = computeFFT(samples, Fs, window_name);
+  [x, yc, nfft] = computeFFT(samples, fftLength, window_name);
   y = abs(yc);
   % peaks for all channels must have equal row cnt so that can be stored in 3D matrix
   channelCnt = columns(yc);
@@ -25,28 +25,41 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(samples, Fs, g
     ycCh = yc(:, channelID);
     yCh = y(:, channelID);
     [fundPeaksCh, errorMsgCh] = findFundPeaksCh(x, ycCh, yCh);
+    errorMsg(:, channelID) = cellstr(errorMsgCh);
     if rows(fundPeaksCh) == 0
       % error, will PASS
       writeLog('DEBUG', "Did not find any fundPeaks in channelID %d", channelID);
-    elseif rows(fundPeaksCh) > 2
-      writeLog('DEBUG', "Found fundPeaks for channel ID %d: %s", channelID, disp(fundPeaksCh));
-      writeLog('DEBUG', "That is more than 2 supported, will send no fund peaks");
-      fundPeaksCh = [];
     endif
-    % Must use double! Result of time() converted to single returns incorrect time.
-    fundPeaks{channelID} = double(fundPeaksCh);
-    errorMsg(:, channelID) = cellstr(errorMsgCh);
-    
+
+    % generating distortion peaks
     if (genDistortPeaks && hasAnyPeak(fundPeaksCh))
-      [distortPeaksCh] = getDistortionProductsCh(fundPeaksCh, x, ycCh, yCh, Fs / nfft);
+      [distortPeaksCh] = getDistortionProductsCh(fundPeaksCh, x, ycCh, yCh, fftLength / nfft);
       % limit distortPeak to maxDistortCnt rows
       if rows(distortPeaksCh) > MAX_DISTORT_ID
           % take distortPeaks strongest harmonics, keep unsorted
           distortPeaksCh = resize(sortrows(distortPeaksCh,-2), MAX_DISTORT_ID,3);
       end
-      distortPeaks{channelID} = double(distortPeaksCh);
-    endif    
-  endfor  
+      if ~isempty(distortPeaksCh)
+        % converting bin ID to Hz
+        distortPeaksCh(:, 1) = distortPeaksCh(:, 1) * Fs / fftLength;
+        % storing
+        distortPeaks{channelID} = double(distortPeaksCh);
+      endif
+    endif
+
+    if ~isempty(fundPeaksCh)
+      % converting bin ID to Hz
+      fundPeaksCh(:, 1) = fundPeaksCh(:, 1) * Fs / fftLength;
+      % storing. Must use double! Result of time() converted to single returns incorrect time.
+      fundPeaks{channelID} = double(fundPeaksCh);
+    endif
+
+    if rows(fundPeaksCh) > 2
+      writeLog('DEBUG', "Found fundPeaks for channel ID %d: %s", channelID, disp(fundPeaksCh));
+      writeLog('DEBUG', "That is more than 2 supported, will send no fund peaks");
+      fundPeaksCh = [];
+    endif
+  endfor
  
   if genDistortPeaks
     writeLog('DEBUG', 'Determined distortion peaks: %s', disp(distortPeaks));

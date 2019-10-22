@@ -2,11 +2,12 @@
 % if result == NOT_FINISHED_RESULT, send more data
 % if result == FINISHED_RESULT, then output:
 % measuredPeaks - measured fundamental peaks
-% paramsAdvanceT - advance time of measuredParams related to the end of buffer (use t = paramsAdvanceT for starting sample of next buffer in compenReference calculation)
+% advanceTs - advance time of measuredParams related to the end of buffer (use t = paramsAdvanceT for starting sample of next buffer in compenReference calculation)
+%             cell array - element for each active channel
 % fundLevels, distortPeaks - read from calibration file corresponding to current stream freqs
 %
 % fundLevels: since distortPeaks are ALWAYS zero-time based, i.e. phase = 0 for all fundamental frequencies, fundLevels only contains frequency and level, no phases
-function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = analyse(buffer, fs, compRequest, chMode, reloadCalFiles)
+function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = analyse(buffer, fs, compRequest, chMode, reloadCalFiles, nonInteger)
   persistent analysisBuffer = [];
   persistent channelCnt = columns(buffer);
   
@@ -35,7 +36,7 @@ function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = ana
     % purging old samples from analysis buffer to cut analysisBuffer to freqAnalysisSize     
     analysisBuffer = analysisBuffer(rows(analysisBuffer) - freqAnalysisSize + 1: end, :);
     % enough data, measure fundLevels, distortPeaks are ignored (not calibration signal)
-    measuredPeaks = getHarmonics(analysisBuffer, fs, false);
+    measuredPeaks = getHarmonics(fs, analysisBuffer, fs, false);
     activeChIDs = getActiveChannelIDs(chMode, channelCnt);
 
     % measuredPeaks are calculated for time at start of analysisBuffer
@@ -44,6 +45,23 @@ function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = ana
     for channelID = activeChIDs
       advanceTs{channelID} = (rows(analysisBuffer) - rows(buffer))/fs;
     endfor
+
+    if nonInteger
+      for channelID = activeChIDs
+        measuredPeaksCh = measuredPeaks{channelID};
+        peaksCnt = rows(measuredPeaksCh);
+        if peaksCnt == 1 || peaksCnt == 2
+          if (min(measuredPeaksCh(:, 1) > 50))
+            if peaksCnt == 1
+              measuredPeaksCh = findOneTonePeaks(measuredPeaksCh, analysisBuffer(:, channelID), fs);
+            else
+              measuredPeaksCh = findTwoTonePeaks(measuredPeaksCh, analysisBuffer(:, channelID), fs);
+            endif
+            measuredPeaks{channelID} = measuredPeaksCh;
+          endif
+        endif
+      endfor
+    endif
 
     hasAnyChannelPeaks = false;
     % each channel handled separately
@@ -90,6 +108,58 @@ function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = ana
   endif
 endfunction
 
+function measuredPeaksCh = findOneTonePeaks(measuredPeaksCh, analysisBufferCh, fs)
+  persistent PI2 = 2 * pi;
+
+  measFreq = measuredPeaksCh(1, 1);
+  measAmpl = measuredPeaksCh(1, 2);
+  measPhase = measuredPeaksCh(1, 3);
+
+  periods = 50;
+  t = 0 : 1/fs : periods * 1/measFreq;
+  f = @(p, t) p(2) * cos(PI2 * p(1) * t + p(3));
+
+  samplesY = analysisBufferCh(1:length(t));
+  init = [measFreq; measAmpl; measPhase];
+  [p, model_values, cvg, outp] = nonlin_curvefit(f, init, transpose(t), samplesY);
+  if p(1) ~= measFreq
+    % non-integer fundamental freq found
+    [ampl, phaseShift] = fixMeasuredAmplPhase(p(2), p(3));
+    measuredPeaksCh = [p(1), ampl, phaseShift];
+  endif
+endfunction
+
+function measuredPeaksCh = findTwoTonePeaks(measuredPeaksCh, analysisBufferCh, fs)
+  persistent PI2 = 2 * pi;
+
+  measFreq1 = measuredPeaksCh(1, 1);
+  measAmpl1 = measuredPeaksCh(1, 2);
+  measPhase1 = measuredPeaksCh(1, 3);
+
+  measFreq2 = measuredPeaksCh(2, 1);
+  measAmpl2 = measuredPeaksCh(2, 2);
+  measPhase2 = measuredPeaksCh(2, 3);
+
+  periods = 50;
+  t = 0 : 1/fs : periods * 1/min(measFreq1, measFreq2);
+  f = @(p, t) p(2) * cos(PI2 * p(1) * t + p(3)) + p(5) * cos(PI2 * p(4) * t + p(6));
+
+  init = [measFreq1; measAmpl1; measPhase1; measFreq2; measAmpl2; measPhase2];
+
+  samplesY = analysisBufferCh(1:length(t));
+
+  [p, model_values, cvg, outp] = nonlin_curvefit(f, init, transpose(t), samplesY);
+  if p(1) ~= measFreq1 || p(4) ~= measFreq2
+    % non-integer fundamental freq found
+    % first fundamental
+    [ampl, phaseShift] = fixMeasuredAmplPhase(p(2), p(3));
+    measuredPeaksCh = [p(1), ampl, phaseShift];
+    % second fundamental
+    [ampl, phaseShift] = fixMeasuredAmplPhase(p(5), p(6));
+    measuredPeaksCh = [measuredPeaksCh; p(4), ampl, phaseShift];
+  endif
+endfunction
+
 
 function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, compRequest, channelID, chMode, channelCnt, reloadCalFiles);
   
@@ -97,7 +167,7 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
   persistent complAllPeaks = cell(channelCnt, 1);
   persistent calFiles = cell(channelCnt, 1);
   
-  persistent prevFreqs = cell(channelCnt, 1);  
+  persistent prevPeaks = cell(channelCnt, 1);
   persistent sameFreqsCounter = zeros(channelCnt, 1);
   % how many cycles freqs must be same until declared stable - avoid artefacts caused by freqs change within the cycle
   persistent SAME_FREQS_ROUNDS = 2;
@@ -107,12 +177,10 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
   distortPeaksCh = [];
   calFile = '';
 
-  freqsCh = getFreqs(measuredPeaksCh);
-        
   % check if new and stable
-  areSame = isequal(freqsCh, prevFreqs{channelID});
+  areSame = areSameFreqs(measuredPeaksCh, prevPeaks{channelID});
   % remember for next round
-  prevFreqs{channelID} = freqsCh;
+  prevPeaks{channelID} = measuredPeaksCh;
   if ~areSame
     % are different
     % reset the counter
@@ -126,7 +194,7 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
     if sameFreqsCounter(channelID) >= SAME_FREQS_ROUNDS
       if sameFreqsCounter(channelID) == SAME_FREQS_ROUNDS || reloadCalFiles
         % changed incoming frequency, has been stable for SAME_FREQS_ROUNDS, load from calfile (if exists)
-        [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqsCh, fs, channelID, chMode, compRequest);
+        [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(getFreqs(measuredPeaksCh), fs, channelID, chMode, compRequest);
         % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
         if find(isna(complAllPeaksCh))
           complAllPeaksCh = fillMissingCalPeaks(complAllPeaksCh);
@@ -185,7 +253,12 @@ function [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqs, fs, chann
   if (exist(calFile, 'file'))
     % loading calRec, initialising persistent vars
     load(calFile);
-    distortFreqsCh = calRec.distortFreqs;
+    % distortFreqs are calculated for calRec.fundFreqs. However, in nonInteger mode the current fundFreqs can slightly differ.
+    % Experiments show the harmonics levels and phases do not change much when fund freq changes a bit (tens of Hz).
+    % Therefore the distortFreqs can be scaled safely to correspond to measured fund freqs
+    % scaling by first fundFreq
+    freqScale = freqs(1) / calRec.fundFreqs(1);
+    distortFreqsCh = calRec.distortFreqs * freqScale;
     complAllPeaksCh = calRec.peaks;
     writeLog('INFO', 'Distortion peaks for channel ID %d read from calibration file %s', channelID, calFile);
   else

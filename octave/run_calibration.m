@@ -2,18 +2,18 @@
 calBuffer = [calBuffer; buffer];
 currentSize = rows(calBuffer);
 
-if (currentSize < calibrationSize)
+if (currentSize < calBufferSize)
   % not enough data, cannot run calibration
   if (statusContains(CALIBRATING))
     setStatusResult(CALIBRATING, NOT_FINISHED_RESULT);
   endif
 else
-  % purging old samples from analysis buffer to cut calBuffer to calibrationSize     
-  calBuffer = calBuffer(currentSize - calibrationSize + 1: end, :);
+  % purging old samples from analysis buffer to cut calBuffer to calBufferSize
+  calBuffer = calBuffer(currentSize - calBufferSize + 1: end, :);
   
   if (statusContains(CALIBRATING))
     % running the actual calibration with calBuffer
-    [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, prevFundPeaks, fs, calRequest, chMode, restartCal);
+    [result, runID, correctRunsCounter, msg] = calibrate(calBuffer, measuredPeaks, fs, calRequest, chMode, restartCal, nonInteger);
     setStatusResult(CALIBRATING, result);
 
     % building complete status infomessage
@@ -41,6 +41,3 @@ else
     endif
   endif
 endif
-
-% remember for next round - using peaks calculated by analysis which uses the same procedure
-prevFundPeaks = measuredPeaks;

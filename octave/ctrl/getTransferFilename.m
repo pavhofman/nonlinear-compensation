@@ -9,6 +9,7 @@ function filename = getTransferFilename(freq, extCircuit)
     mkdir(filedir);
   endif
 
-  filename = ['transfer_' num2str(freq) '_' extCircuit '.dat'];
+  % floating point freq is supported - rounding for now
+  filename = ['transfer_' num2str(round(freq)) '_' extCircuit '.dat'];
   filename = genDataPath(filename, filedir);
 endfunction

@@ -1,4 +1,4 @@
-function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdName, lpName)
+function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdName, lpName, nonInteger)
   global COMP_TYPE_JOINT;
   global AMPL_IDX;  % = index of fundAmpl1 in cal peaks row
   global PLAY_AMPL_IDX;  % = index of playAmpl1 in cal peaks row
@@ -33,11 +33,11 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
   distortPeaksACh = [];
   distortPeaksDCh = [];
   
-  % starting with second harmonic
-  distortFreq = 2 * fundFreq;
-   
-  while distortFreq < fs/2
-    N = distortFreq/ fundFreq;
+  % starting with second harmonic, to transferFreqs size
+  maxN = length(getTransferFreqs(fundFreq, fs, nonInteger));
+
+  for N = 2 : maxN
+    distortFreq = N * fundFreq;
     % only freqs available for LP and VD can be calculated
     % TODO - skipping missing distortFreqs in LP/VD rows!
     distortPeakVD = getDistortPeakForFreq(distortFreq, peaksVDRow, distortVDFreqs);
@@ -45,7 +45,6 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
     
     if isempty(distortPeakVD) || isempty(distortPeakLP)
       % some distortPeaks at curFreq unknown, skipping this curFreq
-      distortFreq += fundFreq;
       continue;
     end
     
@@ -82,9 +81,7 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
     f = @(p, x) vdlpEqs2(t, distortFreq, p(1), p(2), p(3), p(4), fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP);
     % ampls half, phases zero
     init = [distortAmplVD/2; 0; distortAmplVD/2; 0];
-tic();
     [p, model_values, cvg, outp] = nonlin_curvefit(f, init, t, y);
-toc();
 
     [amplA, phaseA] = fixMeasuredAmplPhase(p(1), p(2));
     [amplD, phaseD] = fixMeasuredAmplPhase(p(3), p(4));
@@ -92,9 +89,7 @@ toc();
 
     distortPeaksACh = [distortPeaksACh; [distortFreq, amplA, phaseA]];
     distortPeaksDCh = [distortPeaksDCh; [distortFreq, amplD, phaseD]];
-    
-    distortFreq += fundFreq;
-  endwhile
+  endfor
 
   % building calfile peaks
   fundPeaksACh = [fundFreq, fundAmplVD, 0];
@@ -128,7 +123,8 @@ endfunction
 function distortPeak = getDistortPeakForFreq(freq, peaksRow, distortFreqs)
   global PEAKS_START_IDX;
   % index of freq in distortFreqs
-  freqID = find(distortFreqs == freq);
+  % support for nonInteger freqs
+  freqID = find(round(distortFreqs) == round(freq));
   if ~isempty(freqID)
     distortPeak = peaksRow(PEAKS_START_IDX + freqID - 1);
   else

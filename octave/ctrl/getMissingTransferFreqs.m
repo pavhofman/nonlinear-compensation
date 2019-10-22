@@ -1,11 +1,15 @@
-% returns array of freqs for which no transfer file is found (or is too old - see MAX_TRANSFER_AGE)
-function freqs = getMissingTransferFreqs(fundFreqs, fs, extCircuit)
+% returns freqs for which no transfer file is found (or is too old - see MAX_TRANSFER_AGE)
+% since playFundFreq and recFundFreq can slightly differ (nonInteger mode), missing transfer freqs are returned for both
+function [playFreqs, recFreqs] = getMissingTransferFreqs(playFundFreq, recFundFreq, fs, extCircuit, nonInteger)
   global MAX_TRANSFER_AGE;
+
   minTime = time() - MAX_TRANSFER_AGE;
-  allFreqs = getTransferFreqs(fundFreqs, fs);
-  freqs = [];
-  for freq = allFreqs
-    transferFile = getTransferFilename(freq, extCircuit);
+  allPlayFreqs = getTransferFreqs(playFundFreq, fs, nonInteger);
+  allRecFreqs = getTransferFreqs(recFundFreq, fs, nonInteger);
+  idsToKeep = [];
+
+  for freqID = 1:min(length(allPlayFreqs), length(allRecFreqs))
+    transferFile = getTransferFilename(allRecFreqs(freqID), extCircuit);
     if exist(transferFile, 'file')
       % loading transfRec variable
       load(transferFile);
@@ -20,6 +24,9 @@ function freqs = getMissingTransferFreqs(fundFreqs, fs, extCircuit)
       writeLog('DEBUG', 'Transfer file %s not found', transferFile);
     endif
     % missing or too old, missing freq
-    freqs = [freqs, freq];    
+    idsToKeep = [idsToKeep, freqID];
   endfor
+
+  playFreqs = allPlayFreqs(idsToKeep);
+  recFreqs = allRecFreqs(idsToKeep);
 endfunction

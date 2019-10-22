@@ -37,8 +37,6 @@ endfunction
 % Both peaks have two rows
 % Assuming firstFundPeaksCh and secondFundPeaksCh have same frequencies
 % Typically first = calibration time, second = measure time
-% Time offset can be determined precisely only for this specific case: both frequencies must be integer-divisable by their difference
-% E.g. 13k + 14k OK, 10k + 12k OK, 9960 + 9980 OK, but 9k + 11k FAIL
 function timeOffset = determineDualToneTimeOffset(firstFundPeaksCh, secondFundPeaksCh)
   zeroT1 = determineZeroTime(firstFundPeaksCh);
   zeroT2 = determineZeroTime(secondFundPeaksCh);

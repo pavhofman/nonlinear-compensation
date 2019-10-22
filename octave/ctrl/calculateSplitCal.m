@@ -1,4 +1,4 @@
-function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdName, lpName)
+function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdName, lpName, nonInteger)
   global COMP_TYPE_JOINT;
   global AMPL_IDX;  % = index of fundAmpl1 in cal peaks row
   global PLAY_AMPL_IDX;  % = index of playAmpl1 in cal peaks row
@@ -31,9 +31,6 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   distortPeaksACh = [];
   distortPeaksDCh = [];
   
-  % starting with second harmonic
-  distortFreq = 2 * fundFreq;
-  
   % VD and LP equations solve for the same DA/AD distortions. Same means they must be at the same time.
   % VD: time on AD side = time on DA side (no phaseShift considered). 
   % LP: LP is calculated for time = 0 (fundPhase = 0 - peaksLPRow has time moved to zero phase by calibration).
@@ -44,17 +41,20 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   
   fundLPvsVDPhaseShift = fundLPPhaseShift - fundVDPhaseShift;
   fundLPvsVDTimeOffset = (fundLPvsVDPhaseShift)/(2*pi*fundFreq);
-  
-  while distortFreq < fs/2
-    N = distortFreq/ fundFreq;
+
+  % starting with second harmonic, to transferFreqs size
+  maxN = size(getTransferFreqs(fundFreq, fs, nonInteger));
+
+  for N = 2 : maxN
+    distortFreq = N * fundFreq;
+
     % only freqs available for LP and VD can be calculated
     % TODO - skipping missing distortFreqs in LP/VD rows!
     distortPeakVD = getDistortPeakForFreq(distortFreq, peaksVDRow, distortVDFreqs);
     distortPeakLP = getDistortPeakForFreq(distortFreq, peaksLPRow, distortLPFreqs);
     
     if isempty(distortPeakVD) || isempty(distortPeakLP)
-      % some distortPeaks at curFreq unknown, skipping this curFreq
-      distortFreq += fundFreq;
+      % some distortPeaks at distortFreq unknown, skipping this distortFreq
       continue;
     end
     
@@ -104,9 +104,7 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
 
     distortPeaksACh = [distortPeaksACh; [distortFreq, amplA, phaseA]];
     distortPeaksDCh = [distortPeaksDCh; [distortFreq, amplD, phaseD]];
-    
-    distortFreq += fundFreq;
-  endwhile
+  endfor
 
   % building calfile peaks
   fundPeaksACh = [fundFreq, fundAmplVD, 0];
@@ -135,11 +133,12 @@ function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, ch
   writeLog('INFO', 'Saved calculated split calibration into %s', calFile);
 endfunction
 
-% of not found, returns empty
+% if not found, returns empty
 function distortPeak = getDistortPeakForFreq(freq, peaksRow, distortFreqs)
   global PEAKS_START_IDX;
   % index of freq in distortFreqs
-  freqID = find(distortFreqs == freq);
+  % support for nonInteger freqs
+  freqID = find(round(distortFreqs) == round(freq));
   if ~isempty(freqID)
     distortPeak = peaksRow(PEAKS_START_IDX + freqID - 1);
   else

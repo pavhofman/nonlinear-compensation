@@ -10,7 +10,7 @@ function result = splitCalibPlaySched(label = 1)
   
   persistent NAME = 'Split-Calibrating PLAY Side';
 
-  persistent AUTO_TIMEOUT = 10;
+  persistent AUTO_TIMEOUT = 20;
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
 
@@ -44,7 +44,8 @@ function result = splitCalibPlaySched(label = 1)
   % all set in first P1 branch
   persistent curFreq = NA;
   persistent fs = NA;
-  persistent origFreq = NA;
+  persistent origPlayFreq = NA;
+  persistent origRecFreq = NA;
   persistent origPlayLevels = NA;
   persistent playEqualizer = NA;
   
@@ -66,7 +67,15 @@ function result = splitCalibPlaySched(label = 1)
         % loading current values from analysis
         fs = recInfo.fs;
         % TODO - checks - only one fundament freq!!
-        origFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+        % if playback freq is known, use it (playback will be generating). If no (playback has no signal, rec fed by an external generator, use recInfo)
+        if length(playInfo.measuredPeaks) >= ANALYSED_CH_ID && ~ isempty(playInfo.measuredPeaks{ANALYSED_CH_ID})
+          origPlayFreq = playInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+        else
+          origPlayFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+        endif
+        
+        origRecFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+
         % two channels, only first fundament freqs (the only freq!)
         origPlayLevels = cell();
         for channelID = 1:length(playInfo.measuredPeaks)
@@ -85,7 +94,9 @@ function result = splitCalibPlaySched(label = 1)
         playEqualizer = playInfo.equalizer(1:2);
         
         % checking if all transfer files are available
-        if ~isempty(getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_LP1)) || ~isempty(getMissingTransferFreqs(origFreq, fs, EXTRA_CIRCUIT_VD))
+        [freqs1, freqs1] = getMissingTransferFreqs(origPlayFreq, origRecFreq, fs, EXTRA_CIRCUIT_LP1, recInfo.nonInteger);
+        [freqs2, freqs2] = getMissingTransferFreqs(origPlayFreq, origRecFreq, fs, EXTRA_CIRCUIT_VD, recInfo.nonInteger);
+        if ~isempty(freqs1) || ~isempty(freqs2)
           % some are missing, ask for measuring transfer. failed label = ABORT
           waitForTaskFinish('measureTransferSched', START_LABEL, ABORT, mfilename());
           return;
@@ -105,7 +116,7 @@ function result = splitCalibPlaySched(label = 1)
         endif
 
         clearOutBox();
-        printStr(sprintf("Joint-device calibrating LP at current frequency %dHz:", origFreq));
+        printStr(sprintf("Joint-device calibrating LP at current frequency %dHz:", origRecFreq));
         cmdIDPlay = writeCmd(PASS, cmdFilePlay);
         cmdIDRec = writeCmd(PASS, cmdFileRec);
         % we have to wait for command acceptance before issuing new commands (the cmd files could be deleted by new commands before they are consumed
@@ -133,20 +144,20 @@ function result = splitCalibPlaySched(label = 1)
         
 
       case CAL_LP_LABEL
-        % calibrating LPF at origFreq
+        % calibrating LPF at origRecFreq
         % generator is not strictly required since it generates same signal as currently incoming. But for safety of calibration it is safer to generate our own stable signal
-        printStr(sprintf("Generating %dHz", origFreq));
-        cmdIDPlay = sendPlayGeneratorCmd(origFreq, origPlayLevels, playEqualizer);
+        printStr(sprintf("Generating %dHz", origPlayFreq));
+        cmdIDPlay = sendPlayGeneratorCmd(origPlayFreq, origPlayLevels, playEqualizer);
         
-        printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", origFreq));
+        printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", origRecFreq));
         % deleting the calib file should it exist - always clean calibration
-        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);
-        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_LP1);
+        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);
         
         % safety measure - requesting calibration only at curFreq
-        calFreqReqStr = getCalFreqReqStr({[origFreq, NA, NA]});
+        calFreqReqStr = getCalFreqReqStr({[origRecFreq, NA, NA]});
         calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
         cmdIDRec = writeCmd(calCmd, cmdFileRec);
         % next frequency
@@ -168,25 +179,25 @@ function result = splitCalibPlaySched(label = 1)
       case CAL_VD_LABEL
         % VD calibration        
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
-        lpFundAmpl = loadCalFundAmpl(origFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
+        lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
 
         clearOutBox();
         
-        printStr(sprintf("Joint-device calibrating VD at frequency %dHz:", origFreq));
-        % VD at fundament (origFreq) must be calibrated at exactly the same level as LP so that the distortion characteristics of ADC are same
+        printStr(sprintf("Joint-device calibrating VD at frequency %dHz:", origRecFreq));
+        % VD at fundament (origRecFreq) must be calibrated at exactly the same level as LP so that the distortion characteristics of ADC are same
         % amplitude-constrained calibration
         % we need same ADC distortion profile for LP and VD => the level must be VERY similar
         calTolerance = db2mag(0.03);
-        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origFreq, ANALYSED_CH_ID, calTolerance, true);
+        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origRecFreq, ANALYSED_CH_ID, calTolerance, true);
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
         % much more time for manual level adjustment
         timeout = MANUAL_TIMEOUT;
         % zooming calibration levels + plotting the range so that user can adjust precisely                
         zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(lpFundAmpl, ANALYSED_CH_ID));
         % deleting the calib file should it exist - always clean calibration
-        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD);
+        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD);
         deleteFile(calFile);
-        calFile = genCalFilename(origFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_VD);
+        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_VD);
         deleteFile(calFile);
 
         calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
@@ -202,7 +213,9 @@ function result = splitCalibPlaySched(label = 1)
 
         clearOutBox();
         printStr(sprintf('Calculating split calibration'));
-        calculateSplitCal2(origFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1);
+
+        global recInfo;
+        calculateSplitCal2(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1, recInfo.nonInteger);
 
         % going to the next label. This could be processed in one label, but separating split calibration from play-side compensation makes the code cleaner
         label = COMP_PLAY_LABEL;
