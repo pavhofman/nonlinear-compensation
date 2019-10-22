@@ -15,7 +15,17 @@ for channelID = getActiveChannelIDs(chMode, channelCnt)
     endif
   else
     % even one channel on non-compensation means status failure
-    writeLog('DEBUG',  'No peaks available, compensation being skipped');
+    cause = cell();
+    if ~hasAnyPeak(measuredPeaksCh)
+      cause{end + 1} = 'measured fundPeaks';
+    endif
+    if ~hasAnyPeak(fundLevelsCh)
+      cause{end + 1} = 'fund levels';
+    endif
+    if ~hasAnyPeak(distortPeaksCh)
+      cause{end + 1} = 'distortPeaks';
+    endif
+    writeLog('DEBUG',  'No %s available for CH%d, compensation being skipped', strjoin(cause, ' + '), channelID);
     result = FAILING_RESULT;
     % resetting calfile
     compenCalFiles{channelID} = '';
