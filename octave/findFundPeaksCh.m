@@ -9,18 +9,24 @@
 %   fundPeaks [ frequency , amplitude_in_absolute_values, angle_in_radians ]
 %
 function [fundPeaksCh, errorMsg] = findFundPeaksCh(x, yc, y)
+  % ratio of minimum fundamental amplitude picked to the max. fundamental present
+  persistent MIN_FUND_RATIO = 1/15;
+
+  % minimum amplitude to consider for fundamental
+  persistent MIN_FUND_AMPL = 1e-5;
+
   fundPeaksCh = [];
   errorMsg = '';
 
   nffto2 = rows(y);
 
   [ymax, iymax] = max(y);
-  if ymax < 1e-5
+  if ymax < MIN_FUND_AMPL
       errorMsg = 'no peaks stronger than -100dBFS';
       return
   end
 
-  for idx = transpose(find(y >= ymax/10))
+  for idx = transpose(find(y >= ymax * MIN_FUND_RATIO))
     % local maximum?
       if ...
         % first bin
