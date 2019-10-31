@@ -2,7 +2,7 @@
 function info = rcvInfo(sock)
   % const
   % waiting for ms
-  persistent WAIT_MS = 150;
+  persistent WAIT_MS = 50;
   info = [];
 
   hasData = zmq_poll(sock, WAIT_MS);
