@@ -37,15 +37,22 @@ else
   nonInteger = (playRecConfig.recDeviceID ~= playRecConfig.otherDeviceID);
 endif
 
+global fs;
+fs = playRecConfig.sampleRate;
+
 global maxAmplDiff;
+
 if nonInteger
   cycleLength = CYCLE_LENGTH_NONINTEGER;
   periodSize = PERIOD_SIZE_NONINTEGER;
   maxAmplDiff = MAX_AMPL_DIFF_NONINTEGER;
+  calBufferSize = NONINTEGER_CAL_BUF_FS_MULTIPLE * fs;
 else
   cycleLength = CYCLE_LENGTH_INTEGER;
   periodSize = PERIOD_SIZE_INTEGER;
   maxAmplDiff = MAX_AMPL_DIFF_INTEGER;
+  % integer Hz, i.e. FFT at fs-length
+  calBufferSize = 1 * fs;
 endif
 
 % default initial command - PASS
@@ -82,15 +89,11 @@ genFunds = NA;
 global distortHarmAmpls;
 distortHarmAmpls = [];
 
-global fs;
-fs = NA;
-
 channelCnt = NA;
 global compenCalFiles;
 compenCalFiles = NA;
 
 calBuffer = [];
-calBufferSize = NA;
 
 global calRequest;
 calRequest = NA;
@@ -164,13 +167,6 @@ while(true)
     compenCalFiles = cell(channelCnt, 1);
     prevMeasuredPeaks = cell(channelCnt, 1);
     firstCycle = false;
-
-    if nonInteger
-      calBufferSize = NONINTEGER_CAL_BUF_FS_MULTIPLE * fs;
-    else
-      % integer Hz, i.e. FFT at fs-length
-      calBufferSize = 1 * fs;
-    endif
 
     % ones
     equalizer = ones(1, channelCnt);

@@ -5,7 +5,7 @@ endif
 
 if sourceStruct.src == PLAYREC_SRC || structContains(sinkStruct, PLAYREC_SINK)
   % reading and/or writing to soundcards
-  [buffer, fs] = readWritePlayrec(buffer, cycleLength, periodSize, restartReading);
+  buffer = readWritePlayrec(buffer, cycleLength, periodSize, fs, restartReading);
   % already waited
   hasWaited = true;
 else

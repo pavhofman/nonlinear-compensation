@@ -1,4 +1,4 @@
-function [buffer, fs] = readWritePlayrec(playBuffer, cycleLength, periodSize, restart)
+function buffer = readWritePlayrec(playBuffer, cycleLength, periodSize, fs, restart)
     global playRecConfig;
     persistent pageNumList;
     
@@ -18,11 +18,6 @@ function [buffer, fs] = readWritePlayrec(playBuffer, cycleLength, periodSize, re
         playDeviceID = -1;
     end
 
-    if isstruct(playRecConfig) && isfield(playRecConfig, 'sampleRate')
-        fs = playRecConfig.sampleRate;
-    else
-        fs = 48000;
-    end
     if isstruct(playRecConfig) && isfield(playRecConfig, 'recChanList')
         recChanList = playRecConfig.recChanList;
     else
@@ -66,7 +61,7 @@ function [buffer, fs] = readWritePlayrec(playBuffer, cycleLength, periodSize, re
           playrec('reset');
         endif
         fprintf('Initialising playrec to use sample rate: %d, recDeviceID: %d , playDeviceID: %d\n', fs, recDeviceID, playDeviceID);
-          playrec('init', fs, playDeviceID, recDeviceID, 2, 2, periodSize)
+        playrec('init', fs, playDeviceID, recDeviceID, 2, 2, periodSize)
         if(~playrec('isInitialised'))
             error ('Unable to initialise playrec correctly');
         elseif(playrec('getRecMaxChannel')<max(recChanList))
