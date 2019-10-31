@@ -174,16 +174,16 @@ ZEROMQ_PORT_PLAY = 5556;
 % length of one loop cycle in secs.
 % Intentionally chosen time which is not integer multiple of standard measuring frequencies/harmonics. Integer multiple (e.g. 200ms) hides errors in calculations.
 % integer mode determines fundamental freq by FFT, no slow nonlinear regression for measuring frequency
-INTEGER_CYCLE_LENGTH = 0.211;
+CYCLE_LENGTH_INTEGER = 0.211;
 % non-integer mode measures the fundamentals with very slow nonlinear regression - needs more time to avoid xruns
-NONINTEGER_CYCLE_LENGTH = 0.511;
+CYCLE_LENGTH_NONINTEGER = 0.511;
 
 % length of calibration buffer in multiples of FS for noninteger mode
 NONINTEGER_CAL_BUF_FS_MULTIPLE = 4;
 
 % period size (soundcard fragment size)
-INTEGER_PERIOD_SIZE = 40000;
-NONINTEGER_PERIOD_SIZE = 40000;
+PERIOD_SIZE_INTEGER = 40000;
+PERIOD_SIZE_NONINTEGER = 40000;
 
 % minimum level of distortion peaks to be included into calibration profile
 % depends largely on soundcard performance
@@ -219,7 +219,9 @@ global AMPL_TO_REPLACE_TOLERANCE = db2mag(0.01);
 
 % maximum fund ampl. difference between subsequent runs to consider stable fundPeaks
 % use the lowest value your soundcard stability allows
-global MAX_AMPL_DIFF = db2mag(-80);
+% integer mode is more stable, tighter requirement can be used
+global MAX_AMPL_DIFF_INTEGER = db2mag(-100);
+global MAX_AMPL_DIFF_NONINTEGER = db2mag(-80);
 
 % number of decimal points at which frequencies must be stable for calibration to start
 global MAX_FREQ_DIFF_DECIMALS = 2;

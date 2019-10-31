@@ -37,12 +37,15 @@ else
   nonInteger = (playRecConfig.recDeviceID ~= playRecConfig.otherDeviceID);
 endif
 
+global maxAmplDiff;
 if nonInteger
-  cycleLength = NONINTEGER_CYCLE_LENGTH;
-  periodSize = NONINTEGER_PERIOD_SIZE;
+  cycleLength = CYCLE_LENGTH_NONINTEGER;
+  periodSize = PERIOD_SIZE_NONINTEGER;
+  maxAmplDiff = MAX_AMPL_DIFF_NONINTEGER;
 else
-  cycleLength = INTEGER_CYCLE_LENGTH;
-  periodSize = INTEGER_PERIOD_SIZE;
+  cycleLength = CYCLE_LENGTH_INTEGER;
+  periodSize = PERIOD_SIZE_INTEGER;
+  maxAmplDiff = MAX_AMPL_DIFF_INTEGER;
 endif
 
 % default initial command - PASS

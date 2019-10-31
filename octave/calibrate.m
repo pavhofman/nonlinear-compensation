@@ -8,7 +8,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
   persistent MAX_RUNS = 100;
   
   % maximum fund ampl. difference between subsequent runs to consider stable fundPeaks
-  global MAX_AMPL_DIFF;
+  global maxAmplDiff;
   
   % memory of previous peaks, subjected to averaging  
   persistent allFundPeaks = cell(channelCnt, MAX_RUNS);
@@ -82,7 +82,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
       writeLog('WARN', 'Different/zero fund freqs in run %d from previous run, resetting counter', runID);
       msg = 'Unstable freqs';
     % stable levels check
-    elseif ~areSameLevels(fundPeaksCh, prevFundPeaksCh, MAX_AMPL_DIFF)
+    elseif ~areSameLevels(fundPeaksCh, prevFundPeaksCh, maxAmplDiff)
       writeLog('WARN', 'Different levels in run %d from previous run, resetting counter', runID);
       msg = 'Unstable levels';
     % req freqs check
