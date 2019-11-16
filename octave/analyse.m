@@ -110,18 +110,24 @@ endfunction
 
 function measuredPeaksCh = findOneTonePeaks(measuredPeaksCh, analysisBufferCh, fs)
   persistent PI2 = 2 * pi;
+  % fitting function
+  persistent f = @(p, t) p(2) * cos(PI2 * p(1) * t + p(3));
+  % partial derivatives
+  persistent fDfdp = @(p, t) [- PI2 * p(2) * t .* sin(PI2 * p(1) * t + p(3)) , cos(PI2 * p(1) * t + p(3)),  - p(2) * sin(PI2 * p(1) * t + p(3))];  
+  persistent settings = optimset ('dfdp', fDfdp);
 
   measFreq = measuredPeaksCh(1, 1);
   measAmpl = measuredPeaksCh(1, 2);
   measPhase = measuredPeaksCh(1, 3);
 
   periods = 50;
-  t = 0 : 1/fs : periods * 1/measFreq;
-  f = @(p, t) p(2) * cos(PI2 * p(1) * t + p(3));
-
+  % indep must be row vector
+  t = transpose(0 : 1/fs : periods * 1/measFreq);
+  
   samplesY = analysisBufferCh(1:length(t));
   init = [measFreq; measAmpl; measPhase];
-  [p, model_values, cvg, outp] = nonlin_curvefit(f, init, transpose(t), samplesY);
+    
+  [p, model_values, cvg, outp] = nonlin_curvefit(f, init, t, samplesY, settings);
   if p(1) ~= measFreq
     % non-integer fundamental freq found
     [ampl, phaseShift] = fixMeasuredAmplPhase(p(2), p(3));
@@ -131,6 +137,11 @@ endfunction
 
 function measuredPeaksCh = findTwoTonePeaks(measuredPeaksCh, analysisBufferCh, fs)
   persistent PI2 = 2 * pi;
+  persistent f = @(p, t) p(2) * cos(PI2 * p(1) * t + p(3)) + p(5) * cos(PI2 * p(4) * t + p(6));
+  % partial derivatives
+  persistent fDfdp = @(p, t) [- PI2 * p(2) * t .* sin(PI2 * p(1) * t + p(3)) , cos(PI2 * p(1) * t + p(3)),  - p(2) * sin(PI2 * p(1) * t + p(3)),...
+            -PI2 * p(5) * t .* sin(PI2 * p(4) * t + p(6)),  cos(PI2 * p(4) * t + p(6)), -p(5) * sin(PI2 * p(4) * t + p(6))];
+  persistent settings = optimset ('dfdp', fDfdp);
 
   measFreq1 = measuredPeaksCh(1, 1);
   measAmpl1 = measuredPeaksCh(1, 2);
@@ -141,14 +152,13 @@ function measuredPeaksCh = findTwoTonePeaks(measuredPeaksCh, analysisBufferCh, f
   measPhase2 = measuredPeaksCh(2, 3);
 
   periods = 50;
-  t = 0 : 1/fs : periods * 1/min(measFreq1, measFreq2);
-  f = @(p, t) p(2) * cos(PI2 * p(1) * t + p(3)) + p(5) * cos(PI2 * p(4) * t + p(6));
+  t = transpose(0 : 1/fs : periods * 1/min(measFreq1, measFreq2));  
 
   init = [measFreq1; measAmpl1; measPhase1; measFreq2; measAmpl2; measPhase2];
 
   samplesY = analysisBufferCh(1:length(t));
 
-  [p, model_values, cvg, outp] = nonlin_curvefit(f, init, transpose(t), samplesY);
+  [p, model_values, cvg, outp] = nonlin_curvefit(f, init, t, samplesY, settings);
   if p(1) ~= measFreq1 || p(4) ~= measFreq2
     % non-integer fundamental freq found
     % first fundamental
