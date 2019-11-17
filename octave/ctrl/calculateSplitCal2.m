@@ -78,7 +78,7 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
     phaseShiftByFundVD = N * fundPhaseShiftVD;
     phaseShiftByFundLP = N * fundPhaseShiftLP;
     
-    f = @(p, x) vdlpEqs2(t, distortFreq, p(1), p(2), p(3), p(4), fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP);
+    f = @(p, x) vdlpEqs2(x, distortFreq, p(1), p(2), p(3), p(4), fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP);
     % ampls half, phases zero
     init = [distortAmplVD/2; 0; distortAmplVD/2; 0];
     [p, model_values, cvg, outp] = nonlin_curvefit(f, init, t, y);
