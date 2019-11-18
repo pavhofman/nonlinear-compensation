@@ -17,5 +17,6 @@ function [output] = vdlpEqs2(t, distortF, amplA, phaseA, amplD, phaseD, fundGain
   sineA_LP = amplA * (fundGainLP/fundGainVD) * cos(PI2 * distortF * t + phaseA);
   
   sineLP = sineD_LP + sineA_LP;
+  % column vector
   output = [sineVD; sineLP];
 endfunction

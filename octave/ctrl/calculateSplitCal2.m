@@ -28,7 +28,7 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
   % 5 fundamental periods, approx 200 numbers per period, times not at boundary of each period (1001/5=200.2)
   periods = 5;
   totalCnt = 1001;
-  t = linspace(0, periods/fundFreq, totalCnt);
+  t = transpose(linspace(0, periods/fundFreq, totalCnt));
 
   distortPeaksACh = [];
   distortPeaksDCh = [];
@@ -67,6 +67,7 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
     refLP = distortAmplLP * cos(PI2 * distortFreq * t + distortPhaseLP);
 
     % "known" values for fitting
+    % column vector
     y = [refVD; refLP];
 
     [distortGainVD, distortPhaseShiftVD] = detTransferFromTransferFile(distortFreq, vdName);
