@@ -1,5 +1,5 @@
 % fitted function for nonlinear regression of calculating the DAC/ADC split distortions
-function [output] = vdlpEqs2(t, distortF, amplA, phaseA, amplD, phaseD, fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP)
+function [output] = vdlpEqs(t, distortF, amplA, phaseA, amplD, phaseD, fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP)
   persistent PI2 = 2*pi;
   % eq 1 - fitting VD distortion at distortF
   % amplitude D was attenuated and shifted by VD, preceeding amplitude A by fundamental phase shift scaled to distortF

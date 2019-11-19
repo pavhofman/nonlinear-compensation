@@ -1,4 +1,4 @@
-function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdName, lpName, nonInteger)
+function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdName, lpName, nonInteger)
   global COMP_TYPE_JOINT;
   global AMPL_IDX;  % = index of fundAmpl1 in cal peaks row
   global PLAY_AMPL_IDX;  % = index of playAmpl1 in cal peaks row
@@ -79,7 +79,7 @@ function calculateSplitCal2(fundFreq, fs, playChID, analysedRecChID, chMode, vdN
     phaseShiftByFundVD = N * fundPhaseShiftVD;
     phaseShiftByFundLP = N * fundPhaseShiftLP;
     
-    f = @(p, x) vdlpEqs2(x, distortFreq, p(1), p(2), p(3), p(4), fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP);
+    f = @(p, x) vdlpEqs(x, distortFreq, p(1), p(2), p(3), p(4), fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP);
     % jacobian function
     fDfdp = @(p, x) vdlpDfdp(x, distortFreq, p(1), p(2), p(3), p(4), fundGainVD, fundGainLP, distortGainVD, distortGainLP, distortPhaseShiftVD, distortPhaseShiftLP, phaseShiftByFundVD, phaseShiftByFundLP);
     
