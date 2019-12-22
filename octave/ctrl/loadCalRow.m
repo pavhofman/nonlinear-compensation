@@ -3,7 +3,7 @@ function [peaksRow, distortFreqs] = loadCalRow(calFile)
   load(calFile);
   
   peaks = calRec.peaks;
-  if rows(peaks) != 3
+  if rows(peaks) ~= 3
     msg = sprintf('Calfile %s does not have 3 peaks rows, unsupported operation, exiting.', calFile);
     writeLog('ERROR', msg);
     error(msg);

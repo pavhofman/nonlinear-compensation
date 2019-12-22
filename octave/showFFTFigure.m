@@ -35,7 +35,7 @@ function showFFTFigure(samples, fs, direction)
     sampleBuffer = [];
   end
   
-  if (showFFTCfg.fftSize != fftSize) || (fs != fftFs)
+  if (showFFTCfg.fftSize ~= fftSize) || (fs ~= fftFs)
     fftFs = fs;
     fftSize = showFFTCfg.fftSize;
     fftXAxisData = (0 : (fftSize / 2)) * fs / fftSize;
@@ -84,7 +84,7 @@ function showFFTFigure(samples, fs, direction)
     end
     if (showFFTCfg.restartAvg == 1) ...
         || (showFFTCfg.numAvg < 2) ...
-        || (size(yavg) != size(y))
+        || (size(yavg) ~= size(y))
         showFFTCfg.restartAvg = 0;
         yavg = y;
         yavgn = 1;

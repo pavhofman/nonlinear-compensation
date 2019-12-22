@@ -7,7 +7,7 @@ function timeOffset = determineTimeOffset(firstFundPeaksCh, secondFundPeaksCh)
     % both have at least two tones
     timeOffset = determineDualToneTimeOffset(firstFundPeaksCh(1:2, :), secondFundPeaksCh(1:2, :));
   else
-    error('determineTimeOffset called with rows(fundPeaks) != 1 or 2!');
+    error('determineTimeOffset called with rows(fundPeaks) ~= 1 or 2!');
   endif
 endfunction
 

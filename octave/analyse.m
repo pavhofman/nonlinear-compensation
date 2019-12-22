@@ -216,7 +216,7 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
       endif
     
       % interpolating
-      if !isempty(complAllPeaks{channelID})
+      if ~isempty(complAllPeaks{channelID})
         % interpolate to current measured level
         complAllPeaksCh = complAllPeaks{channelID};
         % if JOINT compensation on playback side - peaks must be scaled to playAmpl levels

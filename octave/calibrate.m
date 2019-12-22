@@ -165,7 +165,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
       endif
     endfor
     
-    if chMode != MODE_SINGLE && channelCnt >= 2
+    if chMode ~= MODE_SINGLE && channelCnt >= 2
       % at least two channels, we can measure/store avg. fund phase chan2 vs. chan1
       avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS);
     else
