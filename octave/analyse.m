@@ -51,6 +51,7 @@ function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = ana
         measuredPeaksCh = measuredPeaks{channelID};
         peaksCnt = rows(measuredPeaksCh);
         if peaksCnt == 1 || peaksCnt == 2
+          % TODO - really lower limit of 50Hz min?
           if (min(measuredPeaksCh(:, 1) > 50))
             if peaksCnt == 1
               measuredPeaksCh = findOneTonePeaks(measuredPeaksCh, analysisBuffer(:, channelID), fs);
