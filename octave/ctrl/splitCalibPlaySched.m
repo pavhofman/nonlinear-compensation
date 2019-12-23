@@ -5,8 +5,8 @@
 function result = splitCalibPlaySched(label = 1)
   result = NA;
   % init section
-  [CHECKING_LABEL, START_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
-      ALL_OFF_LABEL, DONE_LABEL, ERROR] = enum();
+  [CHECKING_LABEL, START_LABEL, PASS_LABEL, ADAPTER_LPF, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, SWITCH_TO_VD_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
+      ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
   
   persistent NAME = 'Split-Calibrating PLAY Side';
 
@@ -49,7 +49,7 @@ function result = splitCalibPlaySched(label = 1)
   persistent origPlayLevels = NA;
   persistent playEqualizer = NA;
   
-  persistent swStruct = initSwitchStruct();
+  persistent adapterStruct = initAdapterStruct();
   persistent wasAborted = false;
 
   while true
@@ -106,15 +106,13 @@ function result = splitCalibPlaySched(label = 1)
         endif
         
       case START_LABEL
-        swStruct.calibrate = true;
+        adapterStruct.calibrate = true;
         % for now calibrating right output channel only
-        swStruct.vd = false;
-        figResult = showSwitchWindow(sprintf('Set switches for LP calibration', ANALYSED_CH_ID), swStruct);
-        if ~figResult
-          label = ABORT;
-          continue;
-        endif
+        adapterStruct.vd = false;
+        waitForAdapterAdjust(sprintf('Set switches for LP calibration', ANALYSED_CH_ID), adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
+        return;
 
+      case PASS_LABEL
         clearOutBox();
         printStr(sprintf("Joint-device calibrating LP at current frequency %dHz:", origRecFreq));
         cmdIDPlay = writeCmd(PASS, cmdFilePlay);
@@ -160,18 +158,17 @@ function result = splitCalibPlaySched(label = 1)
         calFreqReqStr = getCalFreqReqStr({[origRecFreq, NA, NA]});
         calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
         cmdIDRec = writeCmd(calCmd, cmdFileRec);
-        % next frequency
-        waitForCmdDone([cmdIDPlay, cmdIDRec], WAIT_FOR_VD_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        % calibrating VD
+        waitForCmdDone([cmdIDPlay, cmdIDRec], SWITCH_TO_VD_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
-      case WAIT_FOR_VD_LABEL
-        swStruct.vd = true;
-        figResult = showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', ANALYSED_CH_ID)}, swStruct);
-        if ~figResult
-          label = ABORT;
-          continue;
-        endif
+      case SWITCH_TO_VD_LABEL
+        adapterStruct.vd = true;
+        waitForAdapterAdjust({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', ANALYSED_CH_ID)},
+          adapterStruct, WAIT_FOR_VD_LABEL, ABORT, ERROR, mfilename());
+        return;
 
+      case WAIT_FOR_VD_LABEL
         % after switching LPF -> VD we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
         schedPause(1, CAL_VD_LABEL, mfilename());
         return;
@@ -244,8 +241,11 @@ function result = splitCalibPlaySched(label = 1)
         endif
 
       case DONE_LABEL
-        swStruct.calibrate = false;
-        showSwitchWindow('Set switches for measuring DUT', swStruct');
+        adapterStruct.calibrate = false;
+        waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
+        return;
+
+      case FINISH_DONE_LABEL
         if wasAborted
           result = false;
         else

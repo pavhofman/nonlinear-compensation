@@ -5,7 +5,7 @@ function result = rangeCalibRecSched(label = 1)
   result = NA;
   % init section
   [CHECKING_LABEL, START_LABEL, MODE_LABEL, COMP_PLAY_LABEL, ...
-      CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL, COMP_REC_LABEL, ALL_OFF_LABEL, DONE_LABEL, ERROR] = enum();
+      CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL, COMP_REC_LABEL, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
   
   persistent NAME = 'Range-Calibrating REC Side';
   persistent AUTO_TIMEOUT = 10;
@@ -44,7 +44,7 @@ function result = rangeCalibRecSched(label = 1)
   persistent origPlayLevels = NA;
   persistent playEqualizer = NA;
   
-  persistent swStruct = initSwitchStruct();
+  persistent adapterStruct = initAdapterStruct();
   persistent wasAborted = false;
 
   while true
@@ -73,16 +73,12 @@ function result = rangeCalibRecSched(label = 1)
         continue;
         
       case START_LABEL
-        swStruct.calibrate = true;
-        swStruct.vd = true;
-        figResult = showSwitchWindow(sprintf('Set switches for calibration through VD', ANALYSED_CH_ID), swStruct);
-        if ~figResult
-          label = ABORT;
-          continue;
-        endif
-        label = MODE_LABEL;
-        continue;
-        
+        adapterStruct.calibrate = true;
+        adapterStruct.vd = true;
+        waitForAdapterAdjust(sprintf('Set switches for calibration through VD', ANALYSED_CH_ID),
+          adapterStruct, MODE_LABEL, ABORT, ERROR, mfilename());
+        return;
+
       case MODE_LABEL
         
         global SET_MODE;
@@ -168,8 +164,11 @@ function result = rangeCalibRecSched(label = 1)
         endif
 
       case DONE_LABEL
-        swStruct.calibrate = false;
-        showSwitchWindow('Set switches for measuring DUT', swStruct');
+        adapterStruct.calibrate = false;
+        waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
+        return;
+
+      case FINISH_DONE_LABEL
         if wasAborted
           result = false;
         else

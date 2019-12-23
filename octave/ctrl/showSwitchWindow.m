@@ -1,23 +1,24 @@
-function result = showSwitchWindow(label, swStruct)
-  persistent prevSwStruct = initSwitchStruct();
+function showSwitchWindow(label, adapterStruct)
+  persistent prevSwStruct = initAdapterStruct();
   % default - result OK
   result = true;
-  
-  if isequaln(swStruct, prevSwStruct)
+
+  global functionAborted;
+  if isequaln(adapterStruct, prevSwStruct)
     % no reason to display/do anything
+    functionAborted = false;
     return;
   else
-    prevSwStruct = swStruct;
+    prevSwStruct = adapterStruct;
   endif
-  
-  
+
+
   persistent WIDTH = 800;
   persistent HEIGHT = 400;
-  
+
   global POS_X;
   global POS_Y;
-  
-  global functionAborted;
+
   functionAborted = NA;
   
   fig = figure('position', [POS_X + 10, POS_Y + 10, WIDTH, HEIGHT]);
@@ -35,29 +36,23 @@ function result = showSwitchWindow(label, swStruct)
     'backgroundcolor', 'white',
     'position', [0, 0.1, 1, 0.7]);
     
-  % swStruct.calibrate = false;
-  % swStruct.inputR = true;
-  % swStruct.vd = true;
-  %swStruct.directL = true;
+  % adapterStruct.calibrate = false;
+  % adapterStruct.inputR = true;
+  % adapterStruct.vd = true;
+  %adapterStruct.directL = true;
 
   % addSwitch(panel, x, title, offLabel, onLabel, value)
-  addSwitch(panel, 0.0, 'Out Switch', 'DUT', 'Calibration', swStruct.calibrate);
-  addSwitch(panel, 0.20, 'Calib Out Ch', 'LEFT', 'RIGHT', swStruct.inputR);
-  addSwitch(panel, 0.40, 'VD/LPF', 'LPF', 'Voltage Divider', swStruct.vd);
-  addSwitch(panel, 0.60, 'Direct In Ch', 'RIGHT', 'LEFT', swStruct.directL);
-  addSwitch(panel, 0.80, 'Input Switch', 'DUT', 'Calibration', swStruct.calibrate);
+  addSwitch(panel, 0.0, 'Out Switch', 'DUT', 'Calibration', adapterStruct.calibrate);
+  addSwitch(panel, 0.20, 'Calib Out Ch', 'LEFT', 'RIGHT', adapterStruct.inputR);
+  addSwitch(panel, 0.40, 'VD/LPF', 'LPF', 'Voltage Divider', adapterStruct.vd);
+  addSwitch(panel, 0.60, 'Direct In Ch', 'RIGHT', 'LEFT', adapterStruct.directL);
+  addSwitch(panel, 0.80, 'Input Switch', 'DUT', 'Calibration', adapterStruct.calibrate);
   
   uicontrol(fig, 'style', 'pushbutton',
     'string', 'Switches set, continue',
     'units', 'normalized',
     'position', [0.3 0.01 0.4 0.06],
     'callback', @(h, e) closeSwWindow(fig, false));
-  
-  waitfor(fig);
-  if functionAborted
-    % figure closed, abort
-    result = false;
-  endif
 endfunction
 
 function closeSwWindow(fig, aborted)

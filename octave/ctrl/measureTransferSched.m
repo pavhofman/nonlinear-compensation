@@ -6,7 +6,8 @@ function result = measureTransferSched(label= 1, schedItem = [])
   persistent NAME = 'Measuring LP & VD Transfer';
   
   % init section
-  [START_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, PREPARE_VD_LABEL, CAL_VD_LABEL, CAL_VD_FINISHED_LABEL, ALL_OFF_LABEL, DONE_LABEL, ERROR] = enum();
+  [START_LABEL, PASS_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, SWITCH_TO_VD_LABEL,...
+    GEN_LABEL, CAL_VD_LABEL, CAL_VD_FINISHED_LABEL, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
   
   persistent AUTO_TIMEOUT = 20;
   % manual calibration timeout - enough time to adjust the level into the range limits
@@ -54,7 +55,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
   % measured at fixed levels
   persistent PLAY_LEVELS = {0.9, 0.9};
   
-  persistent swStruct = initSwitchStruct();
+  persistent adapterStruct = initAdapterStruct();
   persistent lpFundAmpl = NA;
   
   persistent didMeasureLPF = false;
@@ -93,22 +94,20 @@ function result = measureTransferSched(label= 1, schedItem = [])
         
         if isempty(recFreqs)
           % no need to measure LP, going to VD
-          label = PREPARE_VD_LABEL;
+          label = SWITCH_TO_VD_LABEL;
           didMeasureLPF = false;
           continue;
         else
           didMeasureLPF = true;
         endif
         
-        swStruct.calibrate = true;
-        swStruct.vd = false;
+        adapterStruct.calibrate = true;
+        adapterStruct.vd = false;
+        waitForAdapterAdjust(sprintf('Set switches for LPF measurement with output channel %d and input channel %d', PLAY_CH_ID, ANALYSED_CH_ID),
+          adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
+        return;
 
-        figResult = showSwitchWindow(sprintf('Set switches for LPF measurement with output channel %d and input channel %d', PLAY_CH_ID, ANALYSED_CH_ID), swStruct);
-        if ~figResult
-          label = ABORT;
-          continue;
-        endif
-
+      case PASS_LABEL
         clearOutBox();
         printStr(sprintf("Joint-device calibrating LP at harmonic frequencies of %dHz:", recFreqs(freqID)));
         
@@ -185,10 +184,10 @@ function result = measureTransferSched(label= 1, schedItem = [])
         % returning back to orig freq
         sendPlayGeneratorCmd(origPlayFreq, PLAY_LEVELS);
         % wait a bit for the change to propagate (to see the origPlayFreq in capture analysis UI)
-        schedPause(1, PREPARE_VD_LABEL, mfilename());
+        schedPause(1, SWITCH_TO_VD_LABEL, mfilename());
         return;
 
-      case PREPARE_VD_LABEL      
+      case SWITCH_TO_VD_LABEL
         % VD calibration
         % loading recFreqs for VD
         global recInfo;
@@ -210,14 +209,13 @@ function result = measureTransferSched(label= 1, schedItem = [])
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         lpFundAmpl = loadRecAmplFromTransfer(origRecFreq, EXTRA_CIRCUIT_LP1);
 
-        swStruct.vd = true;
-        figResult = showSwitchWindow({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', ANALYSED_CH_ID)}, swStruct);
-        if ~figResult
-          label = ABORT;
-          continue;
-        endif
-        
+        adapterStruct.calibrate = true;
+        adapterStruct.vd = true;
+        waitForAdapterAdjust({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', ANALYSED_CH_ID)},
+          adapterStruct, GEN_LABEL, ABORT, ERROR, mfilename());
+        return;
 
+      case GEN_LABEL
         clearOutBox();
         printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", recFreqs(freqID)));
 
@@ -237,7 +235,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
         while freqID <= length(playFreqs)
           switch label
             case CAL_VD_LABEL
-              % we can resend the first freq generator command even if it was already sent at PREPARE_VD_LABEL section. It's better to have the sections as independent as possible
+              % we can resend the first freq generator command even if it was already sent at SWITCH_TO_VD_LABEL section. It's better to have the sections as independent as possible
               printStr(sprintf("Generating %dHz", playFreqs(freqID)));
               cmdIDPlay = sendPlayGeneratorCmd(playFreqs(freqID), PLAY_LEVELS);
 
@@ -312,9 +310,12 @@ function result = measureTransferSched(label= 1, schedItem = [])
         if ~isempty(getRunTaskItemIDFor(mfilename()))
           % called from waitForFunction scheduler - not showing the final switchWindow
         else
-          swStruct.calibrate = false;
-          showSwitchWindow('Set switches for measuring DUT', swStruct);
+          adapterStruct.calibrate = false;
+          waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
+          return;
         endif
+
+      case FINISH_DONE_LABEL
         if wasAborted
           msg = 'Measuring transfer was aborted';
           result = false;

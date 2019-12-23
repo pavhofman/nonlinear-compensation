@@ -251,3 +251,5 @@ global playRecConfig = struct();
 playRecConfig.pageBufCount = 5;
 playRecConfig.recChanList = [1 2];
 playRecConfig.playChanList = [1 2];
+
+global ADAPTER_TYPE_SWITCHWIN = 1;
