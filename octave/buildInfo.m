@@ -1,26 +1,12 @@
 % building info struct from global variables
-function info = buildInfo()
+function info = buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks, fs, direction, cmdDoneID, compenCalFiles, reloadCalFiles,
+    sourceStruct, sinkStruct, showFFTCfg, chMode, equalizer, nonInteger)
   info = struct();
-  global statusStruct;
-  global measuredPeaks;
-  global distortPeaks;
-
-  global fs;
-  global direction;
-  global cmdDoneID;
-  global compenCalFiles;
-  global reloadCalFiles;
-  global sourceStruct;
-  global sinkStruct;
-  global showFFTCfg;
-  global chMode;
-  global equalizer;
-  global nonInteger;
-  
 
   info.id = NA;
   info.time = time();
-  
+
+  info.channelCnt = channelCnt;
   info.status = statusStruct;
   for [val, statusItem ] = statusStruct
     info = addStatusDetails(statusItem, info);

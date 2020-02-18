@@ -217,6 +217,7 @@ while(true)
   endif
 
   if useZeroMQ
-    sendInfo(buildInfo(), zeromqPort);
+    sendInfo(buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks, fs, direction, cmdDoneID, compenCalFiles, reloadCalFiles,
+      sourceStruct, sinkStruct, showFFTCfg, chMode, equalizer, nonInteger), zeromqPort);
   endif
 endwhile
