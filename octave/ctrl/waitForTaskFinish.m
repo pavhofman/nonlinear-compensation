@@ -1,4 +1,4 @@
-% scheduler-eanbled wait starting another function fNameToRun, with labels if fNameToRun returns OK (true) of FAil (false)
+% scheduler-enabled wait starting another function fNameToRun, with labels if fNameToRun returns OK (true) of Fail (false)
 % 
 function waitForTaskFinish(fNameToRun, okLabel, failLabel, callingFName);
   global schedQueue;
