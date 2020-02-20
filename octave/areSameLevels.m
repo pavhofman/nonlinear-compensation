@@ -1,11 +1,11 @@
-function result  = areSameLevels(fundPeaksCh, prevFundPeaksCh, maxAmplDiff)
-  % both must exist
-  if isempty(fundPeaksCh) || isempty(prevFundPeaksCh)
+function result  = areSameLevels(peaksCh1, peaksCh2, maxAmplDiff)
+  % both must exist and same frequencies
+  if isempty(peaksCh1) || isempty(peaksCh2) || ~isequal(peaksCh1(:, 1), peaksCh2(:, 1))
     result = false;
     return;
   endif
-  ampls = fundPeaksCh(:, 2);
-  prevAmpls = prevFundPeaksCh(:, 2);
+  ampls = peaksCh1(:, 2);
+  prevAmpls = peaksCh2(:, 2);
   differentAmplIDs = find(abs(1 - ampls ./ prevAmpls) > maxAmplDiff);
   result =  isempty(differentAmplIDs);
 endfunction

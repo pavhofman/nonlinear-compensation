@@ -1,14 +1,14 @@
-function result  = areSameFreqs(fundPeaksCh, prevFundPeaksCh)
+function result  = areSameFreqs(peaksCh1, peaksCh2)
   global MAX_FREQ_DIFF_DECIMALS;
   persistent MAX_DIFF_MULTIPLIER = 10^MAX_FREQ_DIFF_DECIMALS;
 
   % both must exist
-  if isempty(fundPeaksCh) || isempty(prevFundPeaksCh)
+  if isempty(peaksCh1) || isempty(peaksCh2)
     result = false;
     return;
   endif
   % same freqs
-  if ~isequal(round(fundPeaksCh(:, 1) * MAX_DIFF_MULTIPLIER), round(prevFundPeaksCh(:, 1) * MAX_DIFF_MULTIPLIER))
+  if ~isequal(round(peaksCh1(:, 1) * MAX_DIFF_MULTIPLIER), round(peaksCh2(:, 1) * MAX_DIFF_MULTIPLIER))
     % different freqs
     result = false;
   else
