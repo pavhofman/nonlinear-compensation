@@ -6,7 +6,8 @@ function result  = areSameLevels(peaksCh1, peaksCh2, maxAmplDiff)
   endif
   ampls = peaksCh1(:, 2);
   prevAmpls = peaksCh2(:, 2);
-  differentAmplIDs = find(abs(1 - ampls ./ prevAmpls) > maxAmplDiff);
+  % simple difference check, no ratios
+  differentAmplIDs = find(abs(ampls - prevAmpls) > maxAmplDiff);
   result =  isempty(differentAmplIDs);
 endfunction
 
