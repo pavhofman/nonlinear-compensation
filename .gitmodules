@@ -1,0 +1,3 @@
+[submodule "octave/ctrl/arduino"]
+	path = octave/ctrl/arduino
+	url = https://github.com/pavhofman/Arduino-Octave.git
