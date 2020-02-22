@@ -7,9 +7,7 @@ function adapterStruct = initAdapterStruct()
   adapterStruct = struct();
   
   adapterStruct.calibrate = false;
-  adapterStruct.inputR = (PLAY_CH_ID == 2);
   adapterStruct.vd = true;
-  adapterStruct.directL = true;
   adapterStruct.analysedR = (ANALYSED_CH_ID == 2);
 
   if adapterType == ADAPTER_TYPE_SWITCHWIN

@@ -37,15 +37,11 @@ function showSwitchWindow(label, adapterStruct)
     'position', [0, 0.1, 1, 0.7]);
     
   % adapterStruct.calibrate = false;
-  % adapterStruct.inputR = true;
   % adapterStruct.vd = true;
-  %adapterStruct.directL = true;
 
   % addSwitch(panel, x, title, offLabel, onLabel, value)
   addSwitch(panel, 0.0, 'Out Switch', 'DUT', 'Calibration', adapterStruct.calibrate);
-  addSwitch(panel, 0.20, 'Calib Out Ch', 'LEFT', 'RIGHT', adapterStruct.inputR);
   addSwitch(panel, 0.40, 'VD/LPF', 'LPF', 'Voltage Divider', adapterStruct.vd);
-  addSwitch(panel, 0.60, 'Direct In Ch', 'RIGHT', 'LEFT', adapterStruct.directL);
   addSwitch(panel, 0.80, 'Input Switch', 'DUT', 'Calibration', adapterStruct.calibrate);
   
   uicontrol(fig, 'style', 'pushbutton',
