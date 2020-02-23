@@ -39,55 +39,10 @@ function dirStruct = drawDirPanel(fig, x, width, title, dirStruct, cmdFile)
             );
   dirStruct.sinkTxt = sinkTxt;
 
-  modesHeight = TXT_FIELD_HEIGHT + 0.02;
-  modesY = devPanelY - modesHeight;
-  % mode radios
-  global MODE_DUAL;
-  global MODE_BAL;
-  global MODE_SINGLE;
-  
-  % create a button group
-  bGroup = uibuttongroup (panel, 
-            'units', 'normalized',
-            'selectionchangedfcn', {@clbkSetChMode, cmdFile}, 
-            'Position', [0, modesY, 1, modesHeight]);
-  dirStruct.chModeGroup = bGroup;
-
-  dirStruct.modeRadios{MODE_DUAL} = uicontrol (bGroup, 'style', 'radiobutton',
-            'string', 'DUAL [L] [R]',
-            'units', 'normalized',
-            'userdata', MODE_DUAL,
-            'Position', [ 0 0 0.3 1]);
-  
-  if dirStruct.dir == DIR_PLAY
-    radioTitle = 'BAL [-R] [R]';
-  else
-    radioTitle = 'BAL [R-L]/2 [R-L]/2';
-  endif
-  
-  dirStruct.modeRadios{MODE_BAL} = uicontrol (bGroup, 'style', 'radiobutton',
-            'string', radioTitle,
-            'units', 'normalized',
-            'userdata', MODE_BAL,
-            'Position', [ 0.35 0 0.3 1]);
-            
-  if dirStruct.dir == DIR_PLAY
-    radioTitle = 'SINGLE [0] [R]';
-  else
-    radioTitle = 'SUBTR [R-L] [R-L]';
-  endif
-
-  dirStruct.modeRadios{MODE_SINGLE} = uicontrol (bGroup, 'style', 'radiobutton',
-            'string', radioTitle,
-            'units', 'normalized',
-            'userdata', MODE_SINGLE,
-            'Position', [ 0.7 0 0.3 1]);
-  
-  
   % initializing status txt fields
   statusTxts = cell(STATUS_TXT_CNT, 1);  
   for i = 1:STATUS_TXT_CNT
-    [statusTxts{i}, statusTxtY] = drawStatusTxt(i, panel, modesY - 0.03); 
+    [statusTxts{i}, statusTxtY] = drawStatusTxt(i, panel, devPanelY - 0.04, TXT_FIELD_HEIGHT);
   endfor
   dirStruct.statusTxts = statusTxts;
 

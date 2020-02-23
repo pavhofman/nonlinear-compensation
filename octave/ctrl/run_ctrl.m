@@ -34,9 +34,6 @@ function dirStruct = createDirStruct(dir)
   dirStruct.sourceTxt = NA;
   dirStruct.sinkTxt = NA;
   
-  dirStruct.chModeGroup = NA;
-  dirStruct.modeRadios = cell(3);
-  
   dirStruct.dir = dir;
   
 endfunction
