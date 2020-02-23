@@ -97,7 +97,7 @@ recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "C
 
 
 
-% buttom panel with outBox
+% bottom panel with outBox
 outBoxPanel = uipanel(fig,
             "title", 'Messages',
             "position", [0, 0, 0.7, 0.1]);

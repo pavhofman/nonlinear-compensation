@@ -1,15 +1,16 @@
 function showSwitchWindow(label, adapterStruct)
-  persistent prevSwStruct = initAdapterStruct();
+tady se to musi predelat na panel nad outboxpanel
+  persistent prevAdapterStruct = initAdapterStruct();
   % default - result OK
   result = true;
 
   global functionAborted;
-  if isequaln(adapterStruct, prevSwStruct)
+  if isequaln(adapterStruct, prevAdapterStruct)
     % no reason to display/do anything
     functionAborted = false;
     return;
   else
-    prevSwStruct = adapterStruct;
+    prevAdapterStruct = adapterStruct;
   endif
 
 
