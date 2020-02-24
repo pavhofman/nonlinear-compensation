@@ -3,11 +3,7 @@ function setEnabled(items, enable)
     item = items(id);
     isEnabled = strcmp(get(item, 'enable'), 'on');
     if enable ~= isEnabled
-      if enable
-        set(item, 'enable', 'on');
-      else
-        set(item, 'enable', 'off');
-      endif
+      set(item, 'enable', merge(enable, 'on', 'off'));
     endif
   endfor
 endfunction
