@@ -1,12 +1,12 @@
-function dirStruct = drawDirPanel(fig, x, width, title, dirStruct, cmdFile)
-  global CHANNEL_REL_HEIGHT;
+function dirStruct = drawDirPanel(fig, x, y, width, height, title, dirStruct, cmdFile)
   persistent STATUS_TXT_CNT = 5;
-  global TXT_FIELD_HEIGHT;
+  persistent TXT_FIELD_HEIGHT = 0.035;
+
   global DIR_PLAY;
   
   panel = uipanel(fig, 
             "title", title,
-            "position", [x, 0.1, width, 0.9]);
+            "position", [x, y, width, height]);
   % from the top
   devPanelHeight = 2 * TXT_FIELD_HEIGHT + 0.05;
   maxFigY = 0.99;
@@ -74,17 +74,15 @@ function detailTxt = drawDetailTxt(channelID, x, width, height, panel, dirStruct
 endfunction
 
 
-function [statusTxt, y] = drawStatusTxt(id, panel, topY)
-  global TXT_FIELD_HEIGHT;
-  
-  y = topY - (TXT_FIELD_HEIGHT * (id - 1));
+function [statusTxt, y] = drawStatusTxt(id, panel, topY, fieldHeight)
+  y = topY - (fieldHeight * (id - 1));
   statusTxt = uicontrol (panel,
             "style", "text",
             "units", "normalized",
             "fontweight", "bold",
             "horizontalalignment", "left",
             "verticalalignment", "top",
-            "position", [0.01, y, 1, TXT_FIELD_HEIGHT]
+            "position", [0.01, y, 1, fieldHeight]
             );
 endfunction
 

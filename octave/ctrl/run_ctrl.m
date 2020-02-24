@@ -53,7 +53,6 @@ global HEIGHT = 600;
 global DIR_PANEL_REL_WIDTH = 0.5;
 
 global CH_DISTANCE_X = 0.3
-global TXT_FIELD_HEIGHT = 0.026
 
 global doQuit;
 doQuit = false;
@@ -89,8 +88,12 @@ recStruct = createDirStruct(DIR_REC);
 
 [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
-playStruct = drawDirPanel(fig, 0, DIR_PANEL_REL_WIDTH, "Playback", playStruct, cmdFilePlay);
-recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_REL_WIDTH, "Capture", recStruct, cmdFileRec);
+% dir panels
+DIR_PANEL_HEIGHT = 0.8;
+DIR_PANEL_Y = 1 - DIR_PANEL_HEIGHT;
+% from the top - i.e. from 1
+playStruct = drawDirPanel(fig, 0, DIR_PANEL_Y, DIR_PANEL_REL_WIDTH, DIR_PANEL_HEIGHT, "Playback", playStruct, cmdFilePlay);
+recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_Y, DIR_PANEL_REL_WIDTH, DIR_PANEL_HEIGHT, "Capture", recStruct, cmdFileRec);
 
 
 
