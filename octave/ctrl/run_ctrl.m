@@ -57,6 +57,9 @@ global CH_DISTANCE_X = 0.3
 global doQuit;
 doQuit = false;
 
+global adapterContinue;
+adapterContinue = false;
+
 global ABORT = -1;
 % list of currently running task functions
 global taskFNames;
@@ -95,12 +98,21 @@ DIR_PANEL_Y = 1 - DIR_PANEL_HEIGHT;
 playStruct = drawDirPanel(fig, 0, DIR_PANEL_Y, DIR_PANEL_REL_WIDTH, DIR_PANEL_HEIGHT, "Playback", playStruct, cmdFilePlay);
 recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_Y, DIR_PANEL_REL_WIDTH, DIR_PANEL_HEIGHT, "Capture", recStruct, cmdFileRec);
 
+% panel with adapter settings
+ADAPTER_PANEL_HEIGHT = 0.1;
+ADAPTER_PANEL_Y = DIR_PANEL_Y - ADAPTER_PANEL_HEIGHT;
+
+global adapterStruct;
+adapterStruct = drawAdapterPanel(fig, ADAPTER_PANEL_Y, ADAPTER_PANEL_HEIGHT);
 
 
 % bottom panel with outBox
+% all the way to adapter panel
+BOTTOM_PANEL_HEIGHT = ADAPTER_PANEL_Y - 0;
+OUTBOX_WIDTH = 0.7;
 outBoxPanel = uipanel(fig,
             "title", 'Messages',
-            "position", [0, 0, 0.7, 0.1]);
+            "position", [0, 0, OUTBOX_WIDTH, BOTTOM_PANEL_HEIGHT]);
 global outBox;
 outBox = uicontrol(outBoxPanel,
             "style", "edit",
@@ -110,25 +122,25 @@ set(outBox, 'horizontalalignment', 'left');
 set(outBox, 'verticalalignment', 'top');
 set(outBox, 'max', 1000);
 
-
+TASKS_WIDTH = 1 - OUTBOX_WIDTH;
 tasksPanel = uipanel(fig,
             "title", 'Running Tasks',
-            "position", [0.7, 0, 0.3, 0.1]);
+            "position", [OUTBOX_WIDTH, 0, TASKS_WIDTH, BOTTOM_PANEL_HEIGHT]);
 
 global taskLabelsBox;
 taskLabelsBox = uicontrol(tasksPanel, "style", "text",
             "units", "normalized",
+            'foregroundcolor', [0, 0.5, 0],
+            'horizontalalignment', 'left',
+            'verticalalignment', 'middle',
             'position', [0, 0, 0.6, 0.95]);
 
-setFieldColor(taskLabelsBox,  [0, 0.5, 0]);
-set(taskLabelsBox, 'horizontalalignment', 'left');
-set(taskLabelsBox, 'verticalalignment', 'middle');
 
-global abortTasksButton;
-abortTasksButton = uicontrol(tasksPanel, 'style', 'pushbutton',
+global abortTasksBtn;
+abortTasksBtn = uicontrol(tasksPanel, 'style', 'pushbutton',
             'string', 'Abort',
             "units", "normalized",
-            'enable', 'off',
+            'visible', 'off',
             "units", "normalized",
             'callback',  @(h, e) abortLastTask(),
              "position",[0.65 0.2 0.3 0.6]);

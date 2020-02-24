@@ -49,7 +49,7 @@ function result = splitCalibPlaySched(label = 1)
   persistent origPlayLevels = NA;
   persistent playEqualizer = NA;
   
-  persistent adapterStruct = initAdapterStruct();
+  global adapterStruct;
   persistent wasAborted = false;
 
   while true

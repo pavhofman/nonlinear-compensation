@@ -1,18 +1,23 @@
 function adapterStruct = initAdapterStruct()
-  global PLAY_CH_ID;
-  global ANALYSED_CH_ID;
   global adapterType;
   global ADAPTER_TYPE_SWITCHWIN;
 
   adapterStruct = struct();
-  
-  adapterStruct.calibrate = false;
-  adapterStruct.vd = true;
-  adapterStruct.analysedR = (ANALYSED_CH_ID == 2);
+
+  adapterStruct.calibrate = false; % that means cal/in switch is switched to IN
+  adapterStruct.out = true; % OUT switch
+  adapterStruct.vd = false;
+  % same format as peaksCh, phase column not required
+  adapterStruct.reqLevels = [];
+  adapterStruct.maxAmplDiff = [];
 
   if adapterType == ADAPTER_TYPE_SWITCHWIN
-    % simple info window with switch positions
-    adapterStruct.execFunc = @(title, thisStruct) showSwitchWindow(title, thisStruct);
-    adapterStruct.checkFunc = @(thisStruct, nextLabel, abortLabel, errorLabel, schedItem) checkSwitchWindow(thisStruct, nextLabel, abortLabel, errorLabel, schedItem);
+    % mechanical switches, no stepper
+    adapterStruct.hasRelays = false;
+    adapterStruct.hasStepper = false;
+
+    adapterStruct.execFunc = @(title, thisStruct) updateAdapterPanel(title, thisStruct, true);
+    adapterStruct.checkFunc = @(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedItem)...
+      checkAdapterPanel(thisStruct, nextLabel, abortLabel, errorLabel, schedItem);
   endif
 endfunction

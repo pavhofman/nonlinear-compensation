@@ -55,7 +55,8 @@ function result = measureTransferSched(label= 1, schedItem = [])
   % measured at fixed levels
   persistent PLAY_LEVELS = {0.9, 0.9};
   
-  persistent adapterStruct = initAdapterStruct();
+  global adapterStruct;
+
   persistent lpFundAmpl = NA;
   
   persistent didMeasureLPF = false;
@@ -121,7 +122,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
         return;
 
       case MODE_LABEL
-        
+
         global SET_MODE;
         global CMD_MODE_PREFIX;
         
@@ -200,7 +201,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
           if ~didMeasureLPF
             % informing user that all recFreqs are already measured
             global MAX_TRANSFER_AGE_DAYS;
-            msgbox(['All LPF and VD frequencies already measured and still valid (< ' num2str(MAX_TRANSFER_AGE_DAYS) ' days)']);
+            msgbox(sprintf('All LPF and VD frequencies already measured and still valid (< %d days)', MAX_TRANSFER_AGE_DAYS));
           endif
           label = ALL_OFF_LABEL;
           continue;
@@ -211,7 +212,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
 
         adapterStruct.calibrate = true;
         adapterStruct.vd = true;
-        waitForAdapterAdjust({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', ANALYSED_CH_ID)},
+        waitForAdapterAdjust(sprintf('Change switch to VD calibration. Adjust level within range for channel %d', ANALYSED_CH_ID),
           adapterStruct, GEN_LABEL, ABORT, ERROR, mfilename());
         return;
 
