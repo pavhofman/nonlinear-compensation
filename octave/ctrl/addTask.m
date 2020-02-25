@@ -3,6 +3,11 @@ function addTask(fName, label)
   global taskLabels;
   global taskLabelsBox;
   global abortTasksBtn;
+
+  if isempty(taskFNames)
+    % new task series
+    clearOutBox();
+  endif
   
   taskFNames(end + 1) = fName;
   taskLabels(end + 1) = label;
