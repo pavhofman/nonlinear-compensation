@@ -5,10 +5,10 @@ function updateAdapterPanel(title, adapterStruct, showContBtn)
 
   setChecked(adapterStruct.outCheckbox, adapterStruct.out)
 
-  radio = merge(adapterStruct.calibrate, adapterStruct.calInRadio, adapterStruct.dutInRadio);
+  radio = ifelse(adapterStruct.calibrate, adapterStruct.calInRadio, adapterStruct.dutInRadio);
   setRadio(adapterStruct.inRGroup, radio)
 
-  radio = merge(adapterStruct.vd, adapterStruct.vdRadio, adapterStruct.lpfRadio);
+  radio = ifelse(adapterStruct.vd, adapterStruct.vdRadio, adapterStruct.lpfRadio);
   setRadio(adapterStruct.vdlpRGroup, radio)
 
   if ~isempty(adapterStruct.reqLevels)

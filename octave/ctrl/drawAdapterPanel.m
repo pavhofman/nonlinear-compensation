@@ -27,7 +27,7 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
                              'string', 'OUT DUT',
                              'value', 0,
                              'verticalalignment', 'middle',
-                             'enable', merge(adapterStruct.hasRelays, 'on', 'off'),
+                             'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
                              'callback', @clbkSetOut,
                              'position', [0, 0, 0.3, 1]);
 
@@ -40,7 +40,7 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
             'style', 'radiobutton',
             'string', 'IN DUT',
             'units', 'normalized',
-            'enable', merge(adapterStruct.hasRelays, 'on', 'off'),
+            'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
             'Position', [0, 0, 0.5, 1]);
 
 
@@ -48,7 +48,7 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
             'style', 'radiobutton',
             'string', 'IN Calib',
             'units', 'normalized',
-            'enable', merge(adapterStruct.hasRelays, 'on', 'off'),
+            'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
             'Position', [0.5, 0, 0.5, 1]);
 
 
@@ -61,14 +61,14 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
             'style', 'radiobutton',
             'string', 'LPF',
             'units', 'normalized',
-            'enable', merge(adapterStruct.hasRelays, 'on', 'off'),
+            'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
             'Position', [0, 0, 0.5, 1]);
 
   adapterStruct.vdRadio = uicontrol (adapterStruct.vdlpRGroup,
             'style', 'radiobutton',
             'string', 'VD',
             'units', 'normalized',
-            'enable', merge(adapterStruct.hasRelays, 'on', 'off'),
+            'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
             'Position', [0.4, 0, 0.5, 1]);
 
 
@@ -76,8 +76,8 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
       'style', 'edit',
       'backgroundcolor', 'white',
       'units', 'normalized',
-      'tooltipstring', 'Enter required VD level (<0, 1>)',
-      'visible', merge(adapterStruct.hasStepper, 'on', 'off'),
+      'tooltipstring', 'Enter required VD level in dB < 0',
+      'visible', ifelse(adapterStruct.hasStepper, 'on', 'off'),
       'callback', @clbkSetVDLevel,
       'position', [0.65, 0, 0.07, 0.95]);
 
