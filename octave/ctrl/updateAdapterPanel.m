@@ -1,5 +1,5 @@
-function updateAdapterPanel(title, adapterStruct, showContBtn)
-  persistent LEVEL_FORMAT = '%6.4f';
+function updateAdapterPanel(title, showContBtn)
+  global adapterStruct;
   % updating panel items
   setFieldString(adapterStruct.msgBox, title);
 
@@ -11,10 +11,9 @@ function updateAdapterPanel(title, adapterStruct, showContBtn)
   radio = ifelse(adapterStruct.vd, adapterStruct.vdRadio, adapterStruct.lpfRadio);
   setRadio(adapterStruct.vdlpRGroup, radio)
 
-  if ~isempty(adapterStruct.reqLevels)
-    % just the first item
-    setFieldString(adapterStruct.vdLevel, num2str(adapterStruct.reqLevels(1), LEVEL_FORMAT));
-  endif
+  %   reqLevel enabled only when no task running
+  global taskFNames;
+  setEnabled(adapterStruct.vdLevel, isempty(taskFNames));
 
   % CONTINUE button enabled if not using relays
   setVisible(adapterStruct.contBtn, showContBtn && ~adapterStruct.hasRelays);

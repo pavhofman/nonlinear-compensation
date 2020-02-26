@@ -1,6 +1,7 @@
 pkg load zeromq;
 pkg load database;
 pkg load optim;
+pkg load instrument-control;
 
 more off;
   
@@ -71,6 +72,11 @@ taskLabels = {};
 global fNameToAbort;
 fNameToAbort = '';
 
+if adapterType == ADAPTER_TYPE_SWITCHWIN_VD_STEPPER
+  global ardStruct;
+  ardStruct = initArdStruct();
+endif
+
 function doExit(fig)
   global doQuit;
   doQuit = true;
@@ -104,6 +110,8 @@ ADAPTER_PANEL_Y = DIR_PANEL_Y - ADAPTER_PANEL_HEIGHT;
 
 global adapterStruct;
 adapterStruct = drawAdapterPanel(fig, ADAPTER_PANEL_Y, ADAPTER_PANEL_HEIGHT);
+% setting initial values, not enabling CONTINUE button
+updateAdapterPanel('', false);
 
 
 % bottom panel with outBox
@@ -116,7 +124,8 @@ outBoxPanel = uipanel(fig,
 global outBox;
 outBox = uicontrol(outBoxPanel,
             "style", "edit",
-             "units", "normalized", 'position', [0, 0, 1, 0.95]);
+             "units", "normalized",
+             'position', [0, 0, 1, 0.95]);
 % outbox requires configuration
 set(outBox, 'horizontalalignment', 'left');
 set(outBox, 'verticalalignment', 'top');

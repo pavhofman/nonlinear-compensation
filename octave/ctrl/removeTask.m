@@ -8,12 +8,7 @@ function removeTask(fName, label)
   set(taskLabelsBox, 'string', taskLabels);
 
   if isempty(taskLabels)
-    % hiding CONTINUE btn
-    global adapterStruct;
-    setVisible(adapterStruct.contBtn, false);
-    % clearing msgBox
-    setFieldString(adapterStruct.msgBox, {});
-
+    updateAdapterPanel('', false);
     % hiding ABORT btn
     global abortTasksBtn;
     setVisible(abortTasksBtn, false);

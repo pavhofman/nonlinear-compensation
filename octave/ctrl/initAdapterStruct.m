@@ -1,6 +1,7 @@
 function adapterStruct = initAdapterStruct()
   global adapterType;
   global ADAPTER_TYPE_SWITCHWIN;
+  global ADAPTER_TYPE_SWITCHWIN_VD_STEPPER;
 
   adapterStruct = struct();
 
@@ -16,8 +17,17 @@ function adapterStruct = initAdapterStruct()
     adapterStruct.hasRelays = false;
     adapterStruct.hasStepper = false;
 
-    adapterStruct.execFunc = @(title, thisStruct) updateAdapterPanel(title, thisStruct, true);
+    adapterStruct.execFunc = @(title, thisStruct) updateAdapterPanel(title, true);
     adapterStruct.checkFunc = @(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedItem)...
       checkAdapterPanel(thisStruct, nextLabel, abortLabel, errorLabel, schedItem);
+
+  elseif adapterType == ADAPTER_TYPE_SWITCHWIN_VD_STEPPER
+    % simple info window with switch positions
+    adapterStruct.hasRelays = false;
+    adapterStruct.hasStepper = true;
+
+    adapterStruct.execFunc = @(title, thisStruct) execAdapterPanelWithStepper(title, thisStruct);
+    adapterStruct.checkFunc = @(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedItem)...
+      checkAdapterPanelWithStepper(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedItem);
   endif
 endfunction

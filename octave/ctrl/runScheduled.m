@@ -47,8 +47,6 @@ function runScheduled(recInfo, playInfo);
     % updating in queue
     schedQueue{id} = item;
 
-
-    
     if ~isna(newLabel) && ~isempty(fName)
       % some label returned, executing fName
       writeLog('DEBUG', 'Calling function %s, label %d', fName, newLabel);

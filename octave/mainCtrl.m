@@ -9,10 +9,10 @@ statusDir = [currDir filesep() 'status'];
 addpath(statusDir);
 internalDir = [currDir filesep() 'internal'];
 addpath(internalDir);
+ardDir = [currDir filesep() 'ctrl/arduino/inst'];
+addpath(ardDir);
 
 source 'consts.m';
-
-global adapterType = ADAPTER_TYPE_SWITCHWIN;
 
 % we need some global settings - assuming recording direction (corresponding to configRec.m)
 direction = DIR_REC;

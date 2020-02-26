@@ -12,7 +12,8 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
                              'units', 'normalized',
                              'verticalalignment', 'bottom',
                              'horizontalalignment', 'left',
-                             'foregroundcolor', 'red',
+                             % no relays = manual switches => instructions => red
+                             'foregroundcolor', ifelse(adapterStruct.hasRelays, 'black', 'red'),
                              'position', [0, MSG_Y, 0.95, MSG_HEIGHT - 0.1]);
 
   % panel for control elements
@@ -91,8 +92,6 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
                                 'callback', @clbkAdapterContinue,
                                 'position', [0.8,  0.1, 0.1, 0.9]);
 
-  % setting initial values, not enabling CONTINUE button
-  updateAdapterPanel('', adapterStruct, false);
 endfunction
 
 function clbkSetOut(src, data)
@@ -129,14 +128,15 @@ function clbkSetVDLevel(src, data)
   value = str2double(str);
   if isnan(value)
       set(src, 'String',' 0.');
-      warndlg('VD level must be numerical');
-  elseif value < 0 || value >= 1
-    warndlg('VD level must be between 0 and 1');
+      warndlg('VD level must be numerical in dB');
+  elseif value > 0
+    warndlg('VD level must be < 0dB');
   endif
 
   global adapterStruct;
-  adapterStruct.reqLevels = value;
-  % TODO - starting the stepper
+  adapterStruct.reqLevels = db2mag(value);
+  % adjusting the stepper
+  setVDLevelSched();
 endfunction
 
 
