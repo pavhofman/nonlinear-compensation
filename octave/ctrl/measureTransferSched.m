@@ -1,7 +1,7 @@
 % scheduler-enabled function for measuring VD and LPF transfer via regular joint-sides calibration
 % Only one-sine (one fundamental) is supported!!
 % result: NA = not finished yet, false = error/failed, true = finished OK
-function result = measureTransferSched(label= 1, schedItem = [])
+function result = measureTransferSched(label= 1, schedTask = [])
   result = NA;
   persistent NAME = 'Measuring LP & VD Transfer';
   
@@ -308,7 +308,7 @@ function result = measureTransferSched(label= 1, schedItem = [])
         endif
 
       case DONE_LABEL
-        if ~isempty(getRunTaskItemIDFor(mfilename()))
+        if ~isempty(getRunTaskIDFor(mfilename()))
           % called from waitForFunction scheduler - not showing the final switchWindow
         else
           adapterStruct.calibrate = false;

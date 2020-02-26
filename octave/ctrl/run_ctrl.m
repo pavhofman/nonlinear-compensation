@@ -157,9 +157,9 @@ abortTasksBtn = uicontrol(tasksPanel, 'style', 'pushbutton',
 % resizing figure to fix painting problems
 set(fig, 'position', [POS_X, POS_Y, WIDTH, HEIGHT + 1]);
 set(fig, 'position', [POS_X, POS_Y, WIDTH, HEIGHT]);
-% queue for schedItems
-global schedQueue;
-schedQueue = cell();
+% queue for schedTasks
+global schedTasksQueue;
+schedTasksQueue = cell();
 
 
 % create  PAIR sockets

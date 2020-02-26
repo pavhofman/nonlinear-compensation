@@ -1,25 +1,25 @@
 % scheduler-eanbled wait for incoming cmdDoneID message with timeout
 % if recInfo or playInfo has cmdDoneID, return nextLabel. If timout reached, return timeoutLabel
 function waitForCmdDone(cmdDoneIDs, nextLabel, timeout, timeoutLabel, callingFName);
-  global schedQueue;
+  global schedTasksQueue;
   reqTime = time() + timeout;
-  fGetLabel = @(curTime, recInfo, playInfo, schedItem) decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedItem);
-  schedItem = createSchedItem(callingFName, fGetLabel);
-  schedItem.remainingCmdIDs = cmdDoneIDs;
-  schedQueue{end + 1} = schedItem;
+  fGetLabel = @(curTime, recInfo, playInfo, schedTask) decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedTask);
+  schedTask = createSchedTask(callingFName, fGetLabel);
+  schedTask.remainingCmdIDs = cmdDoneIDs;
+  schedTasksQueue{end + 1} = schedTask;
 endfunction
 
 % determine label: if recInfo or playInfo has cmdDoneID, return nextLabel. If timout reached, return timeoutLabel
-function schedItem = decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedItem)
+function schedTask = decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedTask)
   % removing this cmdDoneID from the remaining ids
-  schedItem.remainingCmdIDs(schedItem.remainingCmdIDs == getCmdDoneID(recInfo)) = [];
-  schedItem.remainingCmdIDs(schedItem.remainingCmdIDs == getCmdDoneID(playInfo)) = [];
-  if isempty(schedItem.remainingCmdIDs)
+  schedTask.remainingCmdIDs(schedTask.remainingCmdIDs == getCmdDoneID(recInfo)) = [];
+  schedTask.remainingCmdIDs(schedTask.remainingCmdIDs == getCmdDoneID(playInfo)) = [];
+  if isempty(schedTask.remainingCmdIDs)
     % all commands done, go to nextLabel
-    schedItem.newLabel = nextLabel;
+    schedTask.newLabel = nextLabel;
   elseif curTime > reqTime
     % timeout occured
-    schedItem.newLabel = timeoutLabel;
+    schedTask.newLabel = timeoutLabel;
   endif
   % else keep waiting
 endfunction

@@ -1,17 +1,17 @@
 function runScheduled(recInfo, playInfo);
-  global schedQueue;
+  global schedTasksQueue;
   global fNameToAbort;
 
   idsToRemove = [];
-  cnt = length(schedQueue);
+  cnt = length(schedTasksQueue);
   curTime = time();
   
   
   if ~isempty(fNameToAbort)
     % requested task abortion
-    % finding all schedItems related to this task. Keep only runtask item, or one of other items
+    % finding all schedTasks related to this task. Keep only runtask item, or one of other items
     % first the runTask items
-    runTaskID = getRunTaskItemIDFor(fNameToAbort);
+    runTaskID = getRunTaskIDFor(fNameToAbort);
     % add any other task for fNameToAbort, skip the taskIDs
     nonRunTaskIDs = getTaskItemIDs(fNameToAbort, runTaskID);
     taskIDs = [runTaskID, nonRunTaskIDs];
@@ -19,22 +19,22 @@ function runScheduled(recInfo, playInfo);
     % keep the first one, drop the rest
     if ~isempty(taskIDs)
       toKeepID = taskIDs(1);
-      itemToKeep = schedQueue{toKeepID};
+      itemToKeep = schedTasksQueue{toKeepID};
       global ABORT;
       % instructing the task fName to abort
       itemToKeep.newLabel = ABORT;
       % pushing back to the queue
-      schedQueue{toKeepID} = itemToKeep;
+      schedTasksQueue{toKeepID} = itemToKeep;
       % removing all the remaning items for fNameToAbort
-      schedQueue(taskIDs(2:end)) = [];
+      schedTasksQueue(taskIDs(2:end)) = [];
     endif
-    % resetting fNameToAbort
+    % resetting flag fNameToAbort
     fNameToAbort = '';
   endif
 
   % loop all scheduled items
   for id = 1:cnt
-    item = schedQueue{id};
+    item = schedTasksQueue{id};
     if isempty(item.newLabel)
       % determine new label for current time and received infos, passing scheduledItem
       item = item.getNextPointer(curTime, recInfo, playInfo, item);
@@ -45,7 +45,7 @@ function runScheduled(recInfo, playInfo);
     item.newLabel = [];
 
     % updating in queue
-    schedQueue{id} = item;
+    schedTasksQueue{id} = item;
 
     if ~isna(newLabel) && ~isempty(fName)
       % some label returned, executing fName
@@ -53,9 +53,9 @@ function runScheduled(recInfo, playInfo);
       result = feval(fName, newLabel, item);
       if ~isna(result) 
         % result belongs to item calling the item.fName which has the result field
-        resultItemID = getRunTaskItemIDFor(fName);
+        resultItemID = getRunTaskIDFor(fName);
         if ~isempty(resultItemID)
-          schedQueue{resultItemID}.result = result;
+          schedTasksQueue{resultItemID}.result = result;
         endif
       endif
 
@@ -66,15 +66,15 @@ function runScheduled(recInfo, playInfo);
     endif
   endfor
   % removing already executed items
-  schedQueue(idsToRemove) = [];
+  schedTasksQueue(idsToRemove) = [];
 endfunction
 
 function foundIDs = getTaskItemIDs(fName, idsToSkip)
-  global schedQueue;  
+  global schedTasksQueue;
   foundIDs = [];
-  for id = 1:length(schedQueue)
+  for id = 1:length(schedTasksQueue)
     if ~any(idsToSkip == id)
-      item = schedQueue{id};
+      item = schedTasksQueue{id};
       if strcmp(item.fName, fName)
         foundIDs = [foundIDs, id];
       endif

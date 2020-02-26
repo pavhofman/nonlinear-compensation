@@ -1,39 +1,39 @@
 % scheduler-enabled wait starting another function fNameToRun, with labels if fNameToRun returns OK (true) of Fail (false)
 % 
 function waitForTaskFinish(fNameToRun, okLabel, failLabel, callingFName);
-  global schedQueue;
-  fGetLabel = @(curTime, recInfo, playInfo, schedItem) decideLabel(fNameToRun, callingFName, okLabel, failLabel, schedItem);
-  schedItem = createSchedItem(fNameToRun, fGetLabel);
-  schedItem.runFunc = true;
-  schedItem.result = NA;
-  schedQueue{end + 1} = schedItem;
+  global schedTasksQueue;
+  fGetLabel = @(curTime, recInfo, playInfo, schedTask) decideLabel(fNameToRun, callingFName, okLabel, failLabel, schedTask);
+  schedTask = createSchedTask(fNameToRun, fGetLabel);
+  schedTask.runFunc = true;
+  schedTask.result = NA;
+  schedTasksQueue{end + 1} = schedTask;
 endfunction
 
 % determine label
-function schedItem = decideLabel(fNameToRun, callingFName, okLabel, failLabel, schedItem)
-  if schedItem.runFunc
+function schedTask = decideLabel(fNameToRun, callingFName, okLabel, failLabel, schedTask)
+  if schedTask.runFunc
     % start fNameToRun
-    schedItem.runFunc = false;
+    schedTask.runFunc = false;
     % start at 1
-    schedItem.newLabel = 1;
-    schedItem.fName = fNameToRun;
-    % keep this item in schedQueue - is used for returning to callingFName
-    schedItem.keepInQueue = true;
-  elseif ~isna(schedItem.result)
+    schedTask.newLabel = 1;
+    schedTask.fName = fNameToRun;
+    % keep this item in schedTasksQueue - is used for returning to callingFName
+    schedTask.keepInQueue = true;
+  elseif ~isna(schedTask.result)
     % fNameToRun function has finished, returning back to the calling function
-    schedItem.fName = callingFName;
-    % can drop the item from schedQueue
-    schedItem.keepInQueue = false;
+    schedTask.fName = callingFName;
+    % can drop the item from schedTasksQueue
+    schedTask.keepInQueue = false;
     % with result:
-    if schedItem.result
-      schedItem.newLabel = okLabel;
+    if schedTask.result
+      schedTask.newLabel = okLabel;
     else
-      schedItem.newLabel = failLabel;
+      schedTask.newLabel = failLabel;
     endif
   else
     % keep waiting, no label
-    schedItem.newLabel = NA;
-    % keeping fNameToRun so that result can be passed to this item in runScheduled()
-    schedItem.fName = fNameToRun;
+    schedTask.newLabel = NA;
+    % keeping fNameToRun so that result can be passed to this task in runScheduled()
+    schedTask.fName = fNameToRun;
   endif
 endfunction

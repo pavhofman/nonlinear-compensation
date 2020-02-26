@@ -1,4 +1,4 @@
-function schedItem = checkAdapterPanelWithStepper(adapterStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedItem)
+function schedTask = checkAdapterPanelWithStepper(adapterStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)
   % last processed recinfo time
   persistent lastRecTime = 0;
   global adapterContinue;
@@ -22,7 +22,7 @@ function schedItem = checkAdapterPanelWithStepper(adapterStruct, recInfo, playIn
               writeLog('DEBUG', "Stepper at required position, task is done");
               % resetting flag
               adapterContinue = false;
-              schedItem.newLabel = nextLabel;
+              schedTask.newLabel = nextLabel;
               return;
             else
               % new stepper run to get closer to reqLevel
@@ -31,7 +31,7 @@ function schedItem = checkAdapterPanelWithStepper(adapterStruct, recInfo, playIn
                 writeLog('DEBUG', "Stepper calculated 0 steps, yet no exactly at position, cannot do better, task is done");
                 % resetting flag
                 adapterContinue = false;
-                schedItem.newLabel = nextLabel;
+                schedTask.newLabel = nextLabel;
                 return;
               endif % 0 steps
             endif % req levels

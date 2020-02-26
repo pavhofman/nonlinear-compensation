@@ -1,9 +1,9 @@
-function schedItem = checkAdapterPanel(adapterStruct, nextLabel, abortLabel, errorLabel, schedItem)
+function schedTask = checkAdapterPanel(adapterStruct, nextLabel, abortLabel, errorLabel, schedTask)
   global adapterContinue;
   if adapterContinue
     % resetting flag
     adapterContinue = false;
     % and continuing
-    schedItem.newLabel = nextLabel;
+    schedTask.newLabel = nextLabel;
   endif
 endfunction
