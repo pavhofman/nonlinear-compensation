@@ -73,8 +73,7 @@ global taskFNameToAbort;
 taskFNameToAbort = '';
 
 if adapterType == ADAPTER_TYPE_SWITCHWIN_VD_STEPPER
-  global ardStruct;
-  ardStruct = initArdStruct();
+  initArdStruct();
 endif
 
 function doExit(fig)

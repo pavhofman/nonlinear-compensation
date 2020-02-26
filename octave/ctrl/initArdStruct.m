@@ -1,18 +1,10 @@
-function ardStruct = initArdStruct()
+function initArdStruct()
+  global ardStruct;
   ardStruct = struct();
   ardStruct.stepperID = 1;
   ardStruct.ard = initArduino(ardStruct.stepperID);
 
-  % format: rows [lastSteps, ratio ADC/DAC measured ampl, lastBacklashCoeff (0, 1)]
-  ardStruct.moves = [];
-  ardStruct.lastSteps = NA;
-  ardStruct.lastPos0 = NA;
-  ardStruct.backlashCleared = false;
-  ardStruct.calibrated = false;
-  % flag for isStepperRunning
-  ardStruct.stepperStarted = false;
-  % flag for areLevelsStable
-  ardStruct.stepperMoved = false;
+  initStepperParams();
 endfunction
 
 
