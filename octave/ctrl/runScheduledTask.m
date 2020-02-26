@@ -1,4 +1,4 @@
-function runScheduled(recInfo, playInfo);
+function runScheduledTask(recInfo, playInfo);
   global schedTasksQueue;
   global fNameToAbort;
 

@@ -68,7 +68,7 @@ taskFNames = {};
 % list of task strings to show
 global taskLabels;
 taskLabels = {};
-% fname of task to abort in next runScheduled call
+% fname of task to abort in next runScheduledTask call
 global fNameToAbort;
 fNameToAbort = '';
 
@@ -183,7 +183,7 @@ MAX_INFO_AGE = 0.5;
 while (~doQuit)
   % process scheduled callbacks, if any applicable at this time
   % callbacks can use received info structures
-  runScheduled(recInfo, playInfo);
+  runScheduledTask(recInfo, playInfo);
   
   do
     localRecInfo = rcvInfo(recSock);

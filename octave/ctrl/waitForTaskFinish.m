@@ -33,7 +33,7 @@ function schedTask = decideLabel(fNameToRun, callingFName, okLabel, failLabel, s
   else
     % keep waiting, no label
     schedTask.newLabel = NA;
-    % keeping fNameToRun so that result can be passed to this task in runScheduled()
+    % keeping fNameToRun so that result can be passed to this task in runScheduledTask()
     schedTask.fName = fNameToRun;
   endif
 endfunction
