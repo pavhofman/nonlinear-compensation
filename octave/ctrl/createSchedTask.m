@@ -4,5 +4,5 @@ function s = createSchedTask(fname, getNextPointerFunc)
   s.getNextPointer = getNextPointerFunc;  
   s.keepInQueue = false;
   s.newLabel = NA;
-  s.fName = fname;
+  s.taskFName = fname;
 endfunction

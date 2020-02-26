@@ -1,5 +1,5 @@
 % scheduled pause for timeout. 
-% Upon expiration, fName is called with nextLabel param - feval(fname, nextlabel)
+% Upon expiration, taskFName is called with nextLabel param - feval(fname, nextlabel)
 function schedPause(timeout, nextLabel, callingFName)
   global schedTasksQueue;
   reqTime = time() + timeout;

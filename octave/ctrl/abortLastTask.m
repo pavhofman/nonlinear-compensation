@@ -1,9 +1,9 @@
 function abortLastTask()
-  global fNameToAbort;
+  global taskFNameToAbort;
   global taskFNames;
   
   if ~isempty(taskFNames)
-    fNameToAbort = taskFNames{end};
+    taskFNameToAbort = taskFNames{end};
   endif
 endfunction
 

@@ -69,8 +69,8 @@ taskFNames = {};
 global taskLabels;
 taskLabels = {};
 % fname of task to abort in next runScheduledTask call
-global fNameToAbort;
-fNameToAbort = '';
+global taskFNameToAbort;
+taskFNameToAbort = '';
 
 if adapterType == ADAPTER_TYPE_SWITCHWIN_VD_STEPPER
   global ardStruct;

@@ -1,4 +1,4 @@
-function addTask(fName, label)
+function addTask(taskFName, label)
   global taskFNames;
   global taskLabels;
   global taskLabelsBox;
@@ -9,7 +9,7 @@ function addTask(fName, label)
     clearOutBox();
   endif
   
-  taskFNames(end + 1) = fName;
+  taskFNames(end + 1) = taskFName;
   taskLabels(end + 1) = label;
   set(taskLabelsBox, 'string', taskLabels);
 
