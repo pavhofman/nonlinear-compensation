@@ -7,7 +7,7 @@ function initStepperParams()
   ardStruct.backlashCleared = false;
   ardStruct.calibrated = false;
   % flag for isStepperRunning
-  ardStruct.stepperStarted = false;
+  ardStruct.stepperRunning = false;
   % flag for areLevelsStable
   ardStruct.stepperMoved = false;
 endfunction

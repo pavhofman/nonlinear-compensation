@@ -5,6 +5,6 @@ function moveStepperTo(steps)
   ardStruct.ard.relMoveTo(ardStruct.stepperID, steps);
   % remembering
   ardStruct.lastSteps = steps;
-  ardStruct.stepperStarted = true;
+  ardStruct.stepperRunning = true;
   ardStruct.stepperMoved = true;
 endfunction
