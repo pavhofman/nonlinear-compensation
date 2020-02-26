@@ -1,4 +1,6 @@
 function schedTask = checkAdapterPanelWithStepper(adapterStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)
+  % TODO - for now fixed
+  persistent STEPPER_ID = 1;
   % last processed recinfo time
   persistent lastRecTime = 0;
   global adapterContinue;
@@ -7,7 +9,7 @@ function schedTask = checkAdapterPanelWithStepper(adapterStruct, recInfo, playIn
   if adapterContinue
     % CONTINUE button pressed, checking stepper
     if ~isempty(adapterStruct.reqLevels) % requested specific levels
-      if ~isStepperRunning() % stepper is not moving (not yet or no more), it makes sense to measure level
+      if ~isStepperRunning(STEPPER_ID) % stepper is not moving (not yet or no more), it makes sense to measure level
         recTime = recInfo.time;
         if recTime ~= lastRecTime
           %remembering for next time
@@ -17,7 +19,7 @@ function schedTask = checkAdapterPanelWithStepper(adapterStruct, recInfo, playIn
           global ANALYSED_CH_ID;
           measPeaksCh = recInfo.measuredPeaks{ANALYSED_CH_ID};
 
-          if areLevelsStable(measPeaksCh)
+          if areLevelsStable(measPeaksCh, STEPPER_ID)
             if areReqLevels(adapterStruct.reqLevels, adapterStruct.maxAmplDiff, measPeaksCh)
               writeLog('DEBUG', "Stepper at required position, task is done");
               % resetting flag
@@ -26,7 +28,7 @@ function schedTask = checkAdapterPanelWithStepper(adapterStruct, recInfo, playIn
               return;
             else
               % new stepper run to get closer to reqLevel
-              steps = adjustStepper(adapterStruct.reqLevels, recInfo, playInfo);
+              steps = adjustStepper(STEPPER_ID, adapterStruct.reqLevels, recInfo, playInfo);
               if steps == 0
                 writeLog('DEBUG', "Stepper calculated 0 steps, yet no exactly at position, cannot do better, task is done");
                 % resetting flag
@@ -48,18 +50,18 @@ function schedTask = checkAdapterPanelWithStepper(adapterStruct, recInfo, playIn
   endif % window closed
 endfunction
 
-function result = areLevelsStable(measPeaksCh)
+function result = areLevelsStable(measPeaksCh, stepperID)
   % const
   persistent PREV_SAME_LEVELS_CNT = 2;
   persistent prevMeasPeaks = cell();
 
   result = false;
 
-  global ardStruct;
-  if ardStruct.stepperMoved
-    writeLog('DEBUG', 'Stepper has moved, resetting history');
+  global steppers;
+  if steppers{stepperID}.stepperMoved
+    writeLog('DEBUG', 'Stepper [%d] has moved, resetting history', stepperID);
     prevMeasPeaks = cell();
-    ardStruct.stepperMoved = false;
+    steppers{stepperID}.stepperMoved = false;
     return;
   endif
 

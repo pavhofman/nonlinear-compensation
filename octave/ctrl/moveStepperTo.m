@@ -1,10 +1,11 @@
-function moveStepperTo(steps)
+function moveStepperTo(stepperID, steps)
   global ardStruct;
   
-  writeLog('DEBUG', 'Moving stepper %d steps', steps);
-  ardStruct.ard.relMoveTo(ardStruct.stepperID, steps);
+  writeLog('DEBUG', 'Moving stepper [%d] steps: %d', stepperID, steps);
+  ardStruct.ard.relMoveTo(stepperID, steps);
   % remembering
-  ardStruct.lastSteps = steps;
-  ardStruct.stepperRunning = true;
-  ardStruct.stepperMoved = true;
+  global steppers;
+  steppers{stepperID}.lastSteps = steps;
+  steppers{stepperID}.stepperRunning = true;
+  steppers{stepperID}.stepperMoved = true;
 endfunction
