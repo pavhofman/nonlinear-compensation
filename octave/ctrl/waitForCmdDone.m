@@ -3,8 +3,8 @@
 function waitForCmdDone(cmdDoneIDs, nextLabel, timeout, timeoutLabel, callingFName);
   global schedQueue;
   reqTime = time() + timeout;
-  getLabel = @(curTime, recInfo, playInfo, schedItem) decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedItem);
-  schedItem = createSchedItem(callingFName, getLabel);
+  fGetLabel = @(curTime, recInfo, playInfo, schedItem) decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedItem);
+  schedItem = createSchedItem(callingFName, fGetLabel);
   schedItem.remainingCmdIDs = cmdDoneIDs;
   schedQueue{end + 1} = schedItem;
 endfunction

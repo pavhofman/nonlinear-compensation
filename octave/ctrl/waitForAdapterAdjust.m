@@ -3,6 +3,6 @@ function waitForAdapterAdjust(title, adapterStruct, nextLabel, abortLabel, error
   adapterStruct.execFunc(title, adapterStruct);
 
   global schedQueue;
-  getLabel = @(curTime, recInfo, playInfo, schedItem) adapterStruct.checkFunc(adapterStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedItem);
-  schedQueue{end + 1} =  createSchedItem(callingFName, getLabel);
+  fGetLabel = @(curTime, recInfo, playInfo, schedItem) adapterStruct.checkFunc(adapterStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedItem);
+  schedQueue{end + 1} =  createSchedItem(callingFName, fGetLabel);
 endfunction;

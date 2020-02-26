@@ -2,8 +2,8 @@
 % 
 function waitForTaskFinish(fNameToRun, okLabel, failLabel, callingFName);
   global schedQueue;
-  getLabel = @(curTime, recInfo, playInfo, schedItem) decideLabel(fNameToRun, callingFName, okLabel, failLabel, schedItem);
-  schedItem = createSchedItem(fNameToRun, getLabel);
+  fGetLabel = @(curTime, recInfo, playInfo, schedItem) decideLabel(fNameToRun, callingFName, okLabel, failLabel, schedItem);
+  schedItem = createSchedItem(fNameToRun, fGetLabel);
   schedItem.runFunc = true;
   schedItem.result = NA;
   schedQueue{end + 1} = schedItem;

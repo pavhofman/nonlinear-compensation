@@ -3,8 +3,8 @@
 function schedPause(timeout, nextLabel, callingFName)
   global schedQueue;
   reqTime = time() + timeout;
-  getLabel = @(curTime, recInfo, playInfo, schedItem) nextLabelWhen(curTime,  reqTime, nextLabel, schedItem);
-  schedQueue{end + 1} =  createSchedItem(callingFName, getLabel);
+  fGetLabel = @(curTime, recInfo, playInfo, schedItem) nextLabelWhen(curTime,  reqTime, nextLabel, schedItem);
+  schedQueue{end + 1} =  createSchedItem(callingFName, fGetLabel);
 endfunction
 
 % determine label with respect to current time vs. required time
