@@ -7,6 +7,7 @@ function runScheduledTask(recInfo, playInfo);
   curTime = time();
   
   
+  % handling task abort
   if ~isempty(taskFNameToAbort)
     % requested task abortion
     % finding all schedTasks related to this task. Keep only runtask task, or one of other tasks
@@ -16,21 +17,28 @@ function runScheduledTask(recInfo, playInfo);
     nonRunTaskIDs = getTaskIDs(taskFNameToAbort, runTaskID);
     taskIDs = [runTaskID, nonRunTaskIDs];
     
-    % keep the first one, drop the rest
+    % keeping the first one, dropping (aborting) the rest
     if ~isempty(taskIDs)
       toKeepID = taskIDs(1);
       taskToKeep = schedTasksQueue{toKeepID};
       global ABORT;
-      % instructing the task taskFName to abort
+      % instructing the task taskFName to abort when it gets executed
       taskToKeep.newLabel = ABORT;
       % pushing back to the queue
       schedTasksQueue{toKeepID} = taskToKeep;
-      % removing all the remaning tasks for taskFNameToAbort
+      % calling abortFunc on all tasks for taskFNameToAbort
+      % tasks are row vector
+      for taskID = taskIDs
+        task = schedTasksQueue{taskID};
+        task.abortFunc();
+      endfor
+
+      % removing the aborted tasks from the queue
       schedTasksQueue(taskIDs(2:end)) = [];
     endif
     % resetting flag taskFNameToAbort
     taskFNameToAbort = '';
-  endif
+  endif % task abort
 
   % loop all scheduled tasks
   for id = 1:cnt
@@ -69,6 +77,7 @@ function runScheduledTask(recInfo, playInfo);
   schedTasksQueue(idsToRemove) = [];
 endfunction
 
+% returns row of task ids
 function foundIDs = getTaskIDs(taskFName, idsToSkip)
   global schedTasksQueue;
   foundIDs = [];
