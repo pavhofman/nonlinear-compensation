@@ -11,6 +11,12 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
   global PLAY_CH_ID;
 
 
+  % checking status from previous adjustments
+  if steppers{stepperID}.backlashCleared && steppers{stepperID}.calibrated
+    steppers{stepperID}.initialized = true;
+  endif
+
+
   if ~steppers{stepperID}.backlashCleared
     % clearing backlash
     writeLog('DEBUG', "Moving %d steps to clear stepper [%d] backlash", BACKLASH_STEPS, stepperID);
@@ -79,13 +85,13 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
       steppers{stepperID}.calibrated = true;
     endif
   else
+    % already initialized, adjusting for the required level
     % for now only one req level
     reqTransfer = reqLevels(1)/playAmpl;
     newSteps  = calculateNewStep(stepperID, reqTransfer);
   endif
   % moving new steps
   if newSteps ~= 0
-    printStr("Moving stepper [%d] steps: %d", stepperID, newSteps);
     moveStepperTo(stepperID, newSteps);
   endif
 endfunction
