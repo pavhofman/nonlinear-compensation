@@ -25,7 +25,11 @@ function result = setVDLevelSched(label = 1)
         adapterStruct.vd = true;
 
         % adapterStruct.reqLevels already set from the txt input
-        adapterStruct.maxAmplDiff = db2mag(-80);
+
+        if isempty(adapterStruct.maxAmplDiff)
+          % default value
+          adapterStruct.maxAmplDiff = db2mag(-85);
+        endif
 
         waitForAdapterAdjust('Set switches for calibration through VD', 
           adapterStruct, DONE_LABEL, ABORT, ERROR, mfilename());
