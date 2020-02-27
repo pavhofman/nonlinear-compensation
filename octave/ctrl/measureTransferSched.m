@@ -70,6 +70,8 @@ function result = measureTransferSched(label= 1, schedTask = [])
         global playInfo;
         global recInfo;
 
+        clearOutBox();
+
         addTask(mfilename(), NAME);
         % init value
         wasAborted = false;
@@ -109,7 +111,6 @@ function result = measureTransferSched(label= 1, schedTask = [])
         return;
 
       case PASS_LABEL
-        clearOutBox();
         printStr(sprintf("Joint-device calibrating LP at harmonic frequencies of %dHz:", recFreqs(freqID)));
         
         % setting pass status on both sides
@@ -217,7 +218,6 @@ function result = measureTransferSched(label= 1, schedTask = [])
         return;
 
       case GEN_LABEL
-        clearOutBox();
         printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", recFreqs(freqID)));
 
         % Now switched to VD + mode. We start the generator at first freq and wait for all the changes topropagate through the chain. 1 sec should be enough
