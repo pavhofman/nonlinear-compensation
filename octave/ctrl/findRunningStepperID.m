@@ -3,7 +3,7 @@ function stepperID = findRunningStepperID()
 
   for idx = 1:length(steppers)
     stepper = steppers{idx};
-    if stepper.stepperRunning
+    if stepper.running
       stepperID = stepper.ID;
       return;
     endif

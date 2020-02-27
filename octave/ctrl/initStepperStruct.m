@@ -11,7 +11,7 @@ function stepper = initStepperStruct(stepperID)
   % backlash clearing and calibration really finished
   stepper.initialized = false;
   % flag for isStepperRunning
-  stepper.stepperRunning = false;
+  stepper.running = false;
   % flag for areLevelsStable
-  stepper.stepperMoved = false;
+  stepper.hasMoved = false;
 endfunction

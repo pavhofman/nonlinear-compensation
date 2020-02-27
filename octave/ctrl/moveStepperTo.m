@@ -7,6 +7,6 @@ function moveStepperTo(stepperID, steps)
   % remembering
   global steppers;
   steppers{stepperID}.lastSteps = steps;
-  steppers{stepperID}.stepperRunning = true;
-  steppers{stepperID}.stepperMoved = true;
+  steppers{stepperID}.running = true;
+  steppers{stepperID}.hasMoved = true;
 endfunction

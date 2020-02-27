@@ -58,10 +58,10 @@ function result = areLevelsStable(measPeaksCh, stepperID)
   result = false;
 
   global steppers;
-  if steppers{stepperID}.stepperMoved
+  if steppers{stepperID}.hasMoved
     writeLog('DEBUG', 'Stepper [%d] has moved, resetting history', stepperID);
     prevMeasPeaks = cell();
-    steppers{stepperID}.stepperMoved = false;
+    steppers{stepperID}.hasMoved = false;
     return;
   endif
 
