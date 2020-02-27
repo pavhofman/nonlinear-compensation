@@ -1,8 +1,8 @@
 function schedTask = checkAdapterPanelWithStepper(adapterStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)
   % TODO - for now fixed
   persistent STEPPER_ID = 1;
-  % last processed recinfo time
-  persistent lastRecTime = 0;
+  % last processed recinfo time - to avoid comparing levels of the same recInfo
+  persistent lastRecInfoTime = 0;
   global adapterContinue;
 
   % first checking continue status
@@ -10,10 +10,10 @@ function schedTask = checkAdapterPanelWithStepper(adapterStruct, recInfo, playIn
     % CONTINUE button pressed, checking stepper
     if ~isempty(adapterStruct.reqLevels) % requested specific levels
       if ~isStepperRunning(STEPPER_ID) % stepper is not moving (not yet or no more), it makes sense to measure level
-        recTime = recInfo.time;
-        if recTime ~= lastRecTime
+        recInfoTime = recInfo.time;
+        if recInfoTime ~= lastRecInfoTime
           %remembering for next time
-          lastRecTime = recTime;
+          lastRecInfoTime = recInfoTime;
 
           % new recInfo, can check level stability
           global ANALYSED_CH_ID;
