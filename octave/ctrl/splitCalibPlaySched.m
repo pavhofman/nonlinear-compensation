@@ -48,7 +48,12 @@ function result = splitCalibPlaySched(label = 1)
   persistent origRecFreq = NA;
   persistent origPlayLevels = NA;
   persistent playEqualizer = NA;
-  
+
+  % VD at fundament (origRecFreq) must be calibrated at exactly the same level as LP so that the distortion characteristics of ADC are same
+  % amplitude-constrained calibration
+  % we need same ADC distortion profile for LP and VD => the level must be as close as possible for best results
+  persistent MAX_AMPL_DIFF = db2mag(-85);
+
   global adapterStruct;
   persistent wasAborted = false;
 
@@ -106,14 +111,16 @@ function result = splitCalibPlaySched(label = 1)
         endif
         
       case START_LABEL
-        adapterStruct.calibrate = true;
-        % for now calibrating right output channel only
-        adapterStruct.vd = false;
+        clearOutBox();
+        adapterStruct.out = false; % OUT off
+        adapterStruct.calibrate = true; % IN calib
+        adapterStruct.vd = false; % LPF
+        adapterStruct.reqLevels = []; % no stepper adjustment
+        adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for LP calibration', ANALYSED_CH_ID), adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
         return;
 
       case PASS_LABEL
-        clearOutBox();
         printStr(sprintf("Joint-device calibrating LP at current frequency %dHz:", origRecFreq));
         cmdIDPlay = writeCmd(PASS, cmdFilePlay);
         cmdIDRec = writeCmd(PASS, cmdFileRec);
@@ -163,8 +170,16 @@ function result = splitCalibPlaySched(label = 1)
         return;
         
       case SWITCH_TO_VD_LABEL
+        % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
+        lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
+
+        adapterStruct.out = false;
+        adapterStruct.calibrate = true;
         adapterStruct.vd = true;
-        waitForAdapterAdjust({'Change switch to VD calibration', sprintf('For first freq. adjust level into the shown range for channel ', ANALYSED_CH_ID)},
+        adapterStruct.reqLevels = lpFundAmpl;
+        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF;
+        waitForAdapterAdjust(
+          sprintf('Change switch to VD calibration. For first freq adjust captured level to %s for channel %d', getAdapterLevelRangeStr(adapterStruct), ANALYSED_CH_ID),
           adapterStruct, WAIT_FOR_VD_LABEL, ABORT, ERROR, mfilename());
         return;
 
@@ -178,14 +193,8 @@ function result = splitCalibPlaySched(label = 1)
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
 
-        clearOutBox();
-        
-        printStr(sprintf("Joint-device calibrating VD at frequency %dHz:", origRecFreq));
-        % VD at fundament (origRecFreq) must be calibrated at exactly the same level as LP so that the distortion characteristics of ADC are same
-        % amplitude-constrained calibration
-        % we need same ADC distortion profile for LP and VD => the level must be VERY similar
-        calTolerance = db2mag(0.03);
-        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origRecFreq, ANALYSED_CH_ID, calTolerance, true);
+        printStr("Joint-device calibrating VD at %dHz:", origRecFreq);
+        calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origRecFreq, ANALYSED_CH_ID, MAX_AMPL_DIFF, true);
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
         % much more time for manual level adjustment
         timeout = MANUAL_TIMEOUT;
@@ -207,8 +216,6 @@ function result = splitCalibPlaySched(label = 1)
       case SPLIT_CAL_LABEL
         % range calibrations finished, closing the zoomed calib plot
         closeCalibPlot();
-
-        clearOutBox();
         printStr(sprintf('Calculating split calibration'));
 
         global recInfo;
@@ -241,7 +248,11 @@ function result = splitCalibPlaySched(label = 1)
         endif
 
       case DONE_LABEL
-        adapterStruct.calibrate = false;
+        adapterStruct.out = true; % OUT on
+        adapterStruct.calibrate = false; % IN DUT
+        adapterStruct.vd = false; % LPF
+        adapterStruct.reqLevels = []; % no stepper
+        adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
         return;
 

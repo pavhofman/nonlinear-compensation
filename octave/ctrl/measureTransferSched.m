@@ -6,13 +6,13 @@ function result = measureTransferSched(label= 1, schedTask = [])
   persistent NAME = 'Measuring LP & VD Transfer';
   
   % init section
-  [START_LABEL, PASS_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, SWITCH_TO_VD_LABEL,...
+  [START_LABEL, PASS_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, GEN_ORIG_F, SWITCH_TO_VD_LABEL,...
     GEN_LABEL, CAL_VD_LABEL, CAL_VD_FINISHED_LABEL, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
   
   persistent AUTO_TIMEOUT = 20;
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
-  
+
   % analysed input ch goes through LP or VD, the other input channel is direct
   global ANALYSED_CH_ID;
 
@@ -54,7 +54,11 @@ function result = measureTransferSched(label= 1, schedTask = [])
   
   % measured at fixed levels
   persistent PLAY_LEVELS = {0.9, 0.9};
-  
+
+  % max. allowed deviation in each direction from midAmpl
+  % similar level of VD to LPF provides similar phaseshift of VD to when measured in splitCalibPlaySched. Here it is not so critical
+  persistent MAX_AMPL_DIFF = db2mag(-70);
+
   global adapterStruct;
 
   persistent lpFundAmpl = NA;
@@ -96,16 +100,19 @@ function result = measureTransferSched(label= 1, schedTask = [])
         writeLog('DEBUG', 'Missing transfer recFreqs for %s: %s', EXTRA_CIRCUIT_LP1, disp(recFreqs));
         
         if isempty(recFreqs)
-          % no need to measure LP, going to VD
-          label = SWITCH_TO_VD_LABEL;
+          % no need to measure LP, going to VD, but starting generating orig freq (f0) first to let stepper adjust to correct level
+          label = GEN_ORIG_F;
           didMeasureLPF = false;
           continue;
         else
           didMeasureLPF = true;
         endif
         
-        adapterStruct.calibrate = true;
-        adapterStruct.vd = false;
+        adapterStruct.out = false; % OUT off
+        adapterStruct.calibrate = true; % IN calib
+        adapterStruct.vd = false; % LPF
+        adapterStruct.reqLevels = []; % no stepper adjustment
+        adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for LPF measurement with output channel %d and input channel %d', PLAY_CH_ID, ANALYSED_CH_ID),
           adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
         return;
@@ -180,9 +187,12 @@ function result = measureTransferSched(label= 1, schedTask = [])
               
               label = CAL_LP_LABEL;
               continue;
-            endswitch
-              
-        endwhile
+            endswitch              
+        endwhile % LP freqs
+        label = GEN_ORIG_F;
+        continue;
+                
+      case GEN_ORIG_F
         % returning back to orig freq
         sendPlayGeneratorCmd(origPlayFreq, PLAY_LEVELS);
         % wait a bit for the change to propagate (to see the origPlayFreq in capture analysis UI)
@@ -211,9 +221,13 @@ function result = measureTransferSched(label= 1, schedTask = [])
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         lpFundAmpl = loadRecAmplFromTransfer(origRecFreq, EXTRA_CIRCUIT_LP1);
 
+        adapterStruct.out = false;
         adapterStruct.calibrate = true;
         adapterStruct.vd = true;
-        waitForAdapterAdjust(sprintf('Change switch to VD calibration. Adjust level within range for channel %d', ANALYSED_CH_ID),
+        adapterStruct.reqLevels = lpFundAmpl;
+        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF;
+        waitForAdapterAdjust(
+          sprintf('Change switch to VD calibration. Adjust captured level to %s for channel %d', getAdapterLevelRangeStr(adapterStruct), ANALYSED_CH_ID),
           adapterStruct, GEN_LABEL, ABORT, ERROR, mfilename());
         return;
 
@@ -242,15 +256,9 @@ function result = measureTransferSched(label= 1, schedTask = [])
 
               printStr(sprintf("Joint-device calibrating VD at %dHz", recFreqs(freqID)));
               if recFreqs(freqID) == origRecFreq
-                % VD at fundament (origFreq) must be calibrated at exactly the same level as LP so that the distortion characteristics of ADC are same
-                
+                % VD at fundament (origFreq) should be calibrated close to the LP level
                 % amplitude-constrained calibration
-
-                % max. allowed deviation in each direction from midAmpl
-                % similar level of VD to LPF provides similar phaseshift of VD to when measured in splitCalibPlaySched. Here it is not so critical
-                calTolerance = db2mag(0.08);
-
-                calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origRecFreq, ANALYSED_CH_ID, calTolerance, true);
+                calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origRecFreq, ANALYSED_CH_ID, MAX_AMPL_DIFF, true);
                 calFreqReqStr = getCalFreqReqStr(calFreqReq);
                 % much more time for manual level adjustment
                 timeout = MANUAL_TIMEOUT;
@@ -309,9 +317,13 @@ function result = measureTransferSched(label= 1, schedTask = [])
 
       case DONE_LABEL
         if ~isempty(getRunTaskIDFor(mfilename()))
-          % called from waitForFunction scheduler - not showing the final switchWindow
+          % called from waitForFunction scheduler (i.e. from split-calibration task) - not showing the final switchWindow
         else
-          adapterStruct.calibrate = false;
+          adapterStruct.out = true; % OUT on
+          adapterStruct.calibrate = false; % IN DUT
+          adapterStruct.vd = false; % LPF
+          adapterStruct.reqLevels = []; % no stepper
+          adapterStruct.maxAmplDiff = [];
           waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
           return;
         endif
