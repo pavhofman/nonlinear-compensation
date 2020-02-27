@@ -1,20 +1,32 @@
 function updateAdapterPanel(title, showContBtn)
   global adapterStruct;
   % updating panel items
+  % not checking changed status
   setFieldString(adapterStruct.msgBox, title);
 
-  setChecked(adapterStruct.outCheckbox, adapterStruct.out)
+  changed = setChecked(adapterStruct.outCheckbox, adapterStruct.out);
 
   radio = ifelse(adapterStruct.calibrate, adapterStruct.calInRadio, adapterStruct.dutInRadio);
-  setRadio(adapterStruct.inRGroup, radio)
+  changed |= setRadio(adapterStruct.inRGroup, radio);
 
   radio = ifelse(adapterStruct.vd, adapterStruct.vdRadio, adapterStruct.lpfRadio);
-  setRadio(adapterStruct.vdlpRGroup, radio)
+  changed |= setRadio(adapterStruct.vdlpRGroup, radio);
 
   %   reqLevel enabled only when no task running
   global taskFNames;
+  % not checking changed status
   setEnabled(adapterStruct.vdLevel, isempty(taskFNames));
 
-  % CONTINUE button enabled if not using relays
-  setVisible(adapterStruct.contBtn, showContBtn && ~adapterStruct.hasRelays);
+  % CONTINUE button
+  if showContBtn
+    if changed
+      % some change detected, i.e. manual action required - showing confirmation/continue button
+      % enabled if not using relays
+      setVisible(adapterStruct.contBtn, ~adapterStruct.hasRelays);
+    else
+      % no change detected, not showing the CONTINUE button, but sending its click
+      global adapterContinue;
+      adapterContinue = true;
+    endif
+  endif
 endfunction
