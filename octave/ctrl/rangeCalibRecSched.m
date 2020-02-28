@@ -5,18 +5,29 @@
 function result = rangeCalibRecSched(label = 1)
   result = NA;
   % init section
-  [CHECKING_LABEL, START_LABEL, MODE_LABEL, COMP_PLAY_LABEL, ...
-      ADJ_REC_UP_LABEL, ADJ_REC_DOWN_LABEL, ADJ_REC_EX_LABEL,...
-      CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL,...
-      COMP_REC_LABEL, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
-  
+  [CHECKING_LABEL, START_LABEL, MODE_LABEL, COMP_PLAY_LABEL, ADJ_LABEL, CAL_LABEL,...
+      COMP_REC_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
+
   persistent NAME = 'Range-Calibrating REC Side';
   persistent AUTO_TIMEOUT = 10;
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
   
   % step above and below exact calibration level to also calibrate for interpolation
-  persistent CAL_LEVEL_STEP = db2mag(0.05);
+  persistent CAL_LEVEL_STEP = db2mag(-58);
+
+  % format [adjustment1, maxAmplDiff1; adjustment2, maxAmplDiff2;...]
+  persistent STEPS = [...
+    % up
+    % 2 * CAL_LEVEL_STEP,   db2mag(-75);...
+    CAL_LEVEL_STEP,   db2mag(-75);...
+    % very exact value
+    0,                db2mag(-85);...
+    % down
+    -CAL_LEVEL_STEP, db2mag(-75);...
+    % -2 * CAL_LEVEL_STEP, db2mag(-75);...
+  ];
+
   
   % analysed input ch goes through LP or VD, the other input channel is direct
   global ANALYSED_CH_ID;
@@ -41,6 +52,8 @@ function result = rangeCalibRecSched(label = 1)
   persistent origPlayLevels = NA;
   persistent maxAmplDiff = NA;
   persistent adjustment = NA;
+  persistent calFreqReq = NA;
+  persistent stepID = 1;
 
   global adapterStruct;
   persistent wasAborted = false;
@@ -54,8 +67,10 @@ function result = rangeCalibRecSched(label = 1)
         global recInfo;
         
         addTask(mfilename(), NAME);
-        % init value
+
+        % init values
         wasAborted = false;
+        stepID = 1;
         
         % loading current values from analysis
         fs = recInfo.fs;
@@ -93,70 +108,47 @@ function result = rangeCalibRecSched(label = 1)
       case COMP_PLAY_LABEL
         printStr('Compensating PLAY side first');
         cmdIDPlay = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_PLAY_SIDE)], cmdFilePlay);
-        waitForCmdDone(cmdIDPlay, ADJ_REC_UP_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdIDPlay, ADJ_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
-      case {ADJ_REC_UP_LABEL, ADJ_REC_DOWN_LABEL, ADJ_REC_EX_LABEL}
-        switch label
-          case ADJ_REC_UP_LABEL           
-            expl = 'upper limit';
-            adjustment = CAL_LEVEL_STEP;
-            % approximate value
-            maxAmplDiff = db2mag(-75);
-            nextLabel = CAL_REC_UP_LABEL;
-            
-          case ADJ_REC_DOWN_LABEL
-            expl = 'lower limit';
-            adjustment = 1/CAL_LEVEL_STEP;
-            % approximate value
-            maxAmplDiff = db2mag(-75);
-            nextLabel = CAL_REC_DOWN_LABEL;
+      case ADJ_LABEL
+        % params for this step
+        adjustment = STEPS(stepID, 1);
+        maxAmplDiff = STEPS(stepID, 2);
 
-          case ADJ_REC_EX_LABEL
-            % last run at exact value - for now
-            expl = 'exact value';
-            adjustment = 1;
-            % better fit for exact value
-            maxAmplDiff = db2mag(-85);
-            nextLabel = CAL_REC_EX_LABEL;
-        endswitch
-        
-        printStr('Calibrating REC side at original recLevel of channel %d - %s', ANALYSED_CH_ID, expl);
+        printStr('Calibrating REC side at CH%d level - adj %f, maxAmplDiff %f', ANALYSED_CH_ID, adjustment, maxAmplDiff);
         
         adapterStruct.calibrate = true;
         adapterStruct.vd = true;
-        adapterStruct.reqLevels = origRecLevel * adjustment;
+        adapterStruct.reqLevels = (1 + adjustment) * origRecLevel;
         adapterStruct.maxAmplDiff = maxAmplDiff;
-        % adjusting level
-        waitForTaskFinish('setVDLevelSched', nextLabel, ABORT, mfilename());
-        return;
-        
-      case {CAL_REC_UP_LABEL, CAL_REC_DOWN_LABEL, CAL_REC_EX_LABEL}
-        switch label
-          case CAL_REC_UP_LABEL
-            nextLabel = ADJ_REC_DOWN_LABEL;
-          
-          case CAL_REC_DOWN_LABEL
-            nextLabel = ADJ_REC_EX_LABEL;
-
-          case CAL_REC_EX_LABEL
-            nextLabel = COMP_REC_LABEL;
-        endswitch
-        
-        % amplitude-constrained calibration
-        % TODO - for now using lpFundAmpl instead of origRecLevel to allow easy switching between LP and VD for result checking
-
-        % max. allowed deviation in each direction from midAmpl
-        % the tolerance really does not matter much here
 
         % including mid ampl only for exact value
-        calFreqReq = getConstrainedLevelCalFreqReq(adapterStruct.reqLevels, origFreq, ANALYSED_CH_ID, adapterStruct.maxAmplDiff, adjustment == 1);
-        calFreqReqStr = getCalFreqReqStr(calFreqReq);
+        calFreqReq = getConstrainedLevelCalFreqReq(adapterStruct.reqLevels, origFreq, ANALYSED_CH_ID, adapterStruct.maxAmplDiff, adjustment == 0);
+
         % zooming calibration levels + plotting the range so that user can adjust precisely
         % target level = orig Rec level (not the increased range)
-        % zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, ANALYSED_CH_ID));
         zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(origRecLevel, ANALYSED_CH_ID));
+
+
+        % scheduled adjusting level
+        waitForTaskFinish('setVDLevelSched', CAL_LABEL, ABORT, mfilename());
+        return;
         
+      case CAL_LABEL
+        % amplitude-constrained calibration
+
+        % loop for all STEPS
+        if stepID < rows(STEPS)
+          % looping for next calibration step
+          nextLabel = ADJ_LABEL;
+          ++stepID;
+        else
+          % will continue after calibration
+          nextLabel = COMP_REC_LABEL;
+        endif
+
+        calFreqReqStr = getCalFreqReqStr(calFreqReq);
         cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
         waitForCmdDone(cmdID, nextLabel, MANUAL_TIMEOUT, ERROR, mfilename());
         return;
@@ -167,23 +159,13 @@ function result = rangeCalibRecSched(label = 1)
         
         printStr('Compensating SPLIT REC side');
         cmdID = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
-        waitForCmdDone(cmdID, ALL_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdID, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
       case ABORT
         wasAborted= true;
-        label = ALL_OFF_LABEL;
+        label = DONE_LABEL;
         continue;
-
-      case ALL_OFF_LABEL
-        cmdIDs = sendAllOffCmds();
-        if ~isempty(cmdIDs)
-          waitForCmdDone(cmdIDs, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
-          return;
-        else
-          label = DONE_LABEL;
-          continue;
-        endif
 
       case DONE_LABEL
         adapterStruct.out = true; % OUT on
