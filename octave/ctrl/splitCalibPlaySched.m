@@ -149,10 +149,6 @@ function result = splitCalibPlaySched(label = 1)
 
       case CAL_LP_LABEL
         % calibrating LPF at origRecFreq
-        % generator is not strictly required since it generates same signal as currently incoming. But for safety of calibration it is safer to generate our own stable signal
-        printStr(sprintf("Generating %dHz", origPlayFreq));
-        cmdIDPlay = sendPlayGeneratorCmd(origPlayFreq, origPlayLevels, playEqualizer);
-        
         printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", origRecFreq));
         % deleting the calib file should it exist - always clean calibration
         calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
@@ -165,7 +161,7 @@ function result = splitCalibPlaySched(label = 1)
         calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
         cmdIDRec = writeCmd(calCmd, cmdFileRec);
         % calibrating VD
-        waitForCmdDone([cmdIDPlay, cmdIDRec], SWITCH_TO_VD_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone([cmdIDRec], SWITCH_TO_VD_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
       case SWITCH_TO_VD_LABEL
