@@ -107,8 +107,34 @@ recStruct = drawDirPanel(fig, (1 - DIR_PANEL_REL_WIDTH), DIR_PANEL_Y, DIR_PANEL_
 ADAPTER_PANEL_HEIGHT = 0.1;
 ADAPTER_PANEL_Y = DIR_PANEL_Y - ADAPTER_PANEL_HEIGHT;
 
+btnPanel = uipanel(fig,
+            "position", [0, ADAPTER_PANEL_Y, 0.2, ADAPTER_PANEL_HEIGHT]);
+
+global splitCalibBtn;
+splitCalibBtn = uicontrol (btnPanel,
+                                'style', 'pushbutton',
+                                'units', 'normalized',
+                                'string', "Split-Calib\nPlayback",
+                                'verticalalignment', 'middle',
+                                'horizontalalignment', 'center',
+                                %'backgroundcolor', 'yellow',
+                                'callback', @clbkSplitCalibPlay,
+                                'position', [0.03,  0.1, 0.45, 0.8]);
+
+global rangeCalibRecBtn;
+rangeCalibRecBtn = uicontrol (btnPanel,
+                                'style', 'pushbutton',
+                                'units', 'normalized',
+                                'string', "Range-Calib\nCapture",
+                                'verticalalignment', 'middle',
+                                'horizontalalignment', 'center',
+                                %'backgroundcolor', 'yellow',
+                                'callback', @clbkRangeCalibRec,
+                                'position', [0.52,  0.1, 0.45, 0.8]);
+
+
 global adapterStruct;
-adapterStruct = drawAdapterPanel(fig, ADAPTER_PANEL_Y, ADAPTER_PANEL_HEIGHT);
+adapterStruct = drawAdapterPanel(fig, 0.2, ADAPTER_PANEL_Y, ADAPTER_PANEL_HEIGHT);
 % setting initial values, not enabling CONTINUE button
 updateAdapterPanel('', false);
 

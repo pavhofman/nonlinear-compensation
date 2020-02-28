@@ -27,16 +27,6 @@ function clbkMeasureTransfers(src, data)
   measureTransferSched();
 endfunction
 
-function clbkSplitCalibPlay(src, data)
-  % calling scheduler-enabled calibration
-  splitCalibPlaySched();
-endfunction
-
-function clbkRangeCalibRec(src, data)
-  % calling scheduler-enabled calibration
-  rangeCalibRecSched();
-endfunction
-
 function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
   global COMPENSATE;
   global PASS;

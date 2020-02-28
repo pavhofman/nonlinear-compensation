@@ -1,10 +1,10 @@
-function adapterStruct = drawAdapterPanel(fig, y, height)
+function adapterStruct = drawAdapterPanel(fig, x, y, height)
   persistent MSG_HEIGHT = 0.5;
   adapterStruct = initAdapterStruct();
 
   panel = uipanel(fig,
               'title', 'Adapter',
-              'position', [0, y, 1, height]);
+              'position', [x, y, 1, height]);
 
   MSG_Y = 1- MSG_HEIGHT;
   adapterStruct.msgBox =   uicontrol(panel,
@@ -30,12 +30,12 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
                              'verticalalignment', 'middle',
                              'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
                              'callback', @clbkSetOut,
-                             'position', [0, 0, 0.3, 1]);
+                             'position', [0, 0, 0.2, 1]);
 
   adapterStruct.inRGroup = uibuttongroup (ctrlPanel ,
                                'units', 'normalized',
                                'selectionchangedfcn', @clbkSetIn,
-                               'position', [0.2, 0, 0.2, 1]);
+                               'position', [0.2, 0, 0.15, 1]);
 
   adapterStruct.dutInRadio = uicontrol (adapterStruct.inRGroup,
             'style', 'radiobutton',
@@ -56,7 +56,7 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
   adapterStruct.vdlpRGroup = uibuttongroup (ctrlPanel ,
                                'units', 'normalized',
                                'selectionchangedfcn', @clbkSetVdlp,
-                               'position', [0.5, 0, 0.15, 1]);
+                               'position', [0.4, 0, 0.15, 1]);
 
   adapterStruct.lpfRadio = uicontrol (adapterStruct.vdlpRGroup,
             'style', 'radiobutton',
@@ -80,7 +80,7 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
       'tooltipstring', 'Enter required VD level in dB < 0',
       'visible', ifelse(adapterStruct.hasStepper, 'on', 'off'),
       'callback', @clbkSetVDLevel,
-      'position', [0.65, 0, 0.07, 0.95]);
+      'position', [0.55, 0, 0.07, 0.95]);
 
 
   adapterStruct.contBtn = uicontrol (ctrlPanel ,
@@ -90,7 +90,7 @@ function adapterStruct = drawAdapterPanel(fig, y, height)
                                 'verticalalignment', 'middle',
                                 'visible', 'off',
                                 'callback', @clbkAdapterContinue,
-                                'position', [0.8,  0.1, 0.1, 0.9]);
+                                'position', [0.68,  0.1, 0.1, 0.9]);
 
 endfunction
 
