@@ -23,14 +23,9 @@ function result = rangeCalibRecSched(label = 1)
 
   global cmdFileRec;
   global cmdFilePlay;
-  global GENERATE;
-  global PASS;
   global CALIBRATE;
   global COMPENSATE;
-  global CMD_CHANNEL_FUND_PREFIX;
   global CMD_COMP_TYPE_PREFIX;
-  global CMD_PLAY_AMPLS_PREFIX;
-  global COMP_TYPE_JOINT;
   global COMP_TYPE_PLAY_SIDE;
   global COMP_TYPE_REC_SIDE;
   
@@ -40,7 +35,6 @@ function result = rangeCalibRecSched(label = 1)
  
   % current frequency of calibration
   % all set in first P1 branch
-  persistent curFreq = NA;
   persistent fs = NA;
   persistent origFreq = NA;
   persistent origRecLevel = NA;

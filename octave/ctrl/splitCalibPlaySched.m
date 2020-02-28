@@ -24,7 +24,6 @@ function result = splitCalibPlaySched(label = 1)
   
   global cmdFileRec;
   global cmdFilePlay;
-  global GENERATE;
   global PASS;
   global CALIBRATE;
   global COMPENSATE;
