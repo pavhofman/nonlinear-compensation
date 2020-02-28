@@ -9,6 +9,7 @@ function printStr(msg, varargin)
     msg = sprintf(msg, varargin{:});
   end
 
-  contents(end + 1) = msg;
+  % prepending at the beginning to avoid having to scroll to end manually
+  contents = [msg; contents];
   set(outBox, 'string', contents);
 endfunction
