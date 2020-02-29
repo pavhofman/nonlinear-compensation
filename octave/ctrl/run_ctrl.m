@@ -133,8 +133,8 @@ rangeCalibRecBtn = uicontrol (btnPanel,
                                 'position', [0.52,  0.1, 0.45, 0.8]);
 
 
-global adapterStruct;
-adapterStruct = drawAdapterPanel(fig, 0.2, ADAPTER_PANEL_Y, ADAPTER_PANEL_HEIGHT);
+initAdapterStruct();
+drawAdapterPanel(fig, 0.2, ADAPTER_PANEL_Y, ADAPTER_PANEL_HEIGHT);
 % setting initial values, not enabling CONTINUE button
 updateAdapterPanel('', false);
 

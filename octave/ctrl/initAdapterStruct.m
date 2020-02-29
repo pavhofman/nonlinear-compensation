@@ -1,16 +1,11 @@
-function adapterStruct = initAdapterStruct()
+function initAdapterStruct()
   global adapterType;
   global ADAPTER_TYPE_SWITCHWIN;
   global ADAPTER_TYPE_SWITCHWIN_VD_STEPPER;
 
+  global adapterStruct;
   adapterStruct = struct();
-
-  adapterStruct.calibrate = false; % that means cal/in switch is switched to IN
-  adapterStruct.out = true; % OUT switch
-  adapterStruct.vd = false;
-  % same format as peaksCh, phase column not required
-  adapterStruct.reqLevels = [];
-  adapterStruct.maxAmplDiff = [];
+  resetAdapterStruct();
 
   if adapterType == ADAPTER_TYPE_SWITCHWIN
     % mechanical switches, no stepper

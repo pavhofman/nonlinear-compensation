@@ -1,6 +1,6 @@
-function adapterStruct = drawAdapterPanel(fig, x, y, height)
+function drawAdapterPanel(fig, x, y, height)
   persistent MSG_HEIGHT = 0.5;
-  adapterStruct = initAdapterStruct();
+  global adapterStruct;
 
   panel = uipanel(fig,
               'title', 'Adapter',

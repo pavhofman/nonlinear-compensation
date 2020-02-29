@@ -319,11 +319,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         if ~isempty(getRunTaskIDFor(mfilename()))
           % called from waitForFunction scheduler (i.e. from split-calibration task) - not showing the final switchWindow
         else
-          adapterStruct.out = true; % OUT on
-          adapterStruct.calibrate = false; % IN DUT
-          adapterStruct.vd = false; % LPF
-          adapterStruct.reqLevels = []; % no stepper
-          adapterStruct.maxAmplDiff = [];
+          resetAdapterStruct();
           waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
           return;
         endif
