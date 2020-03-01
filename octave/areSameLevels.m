@@ -1,4 +1,4 @@
-function result  = areSameLevels(peaksCh1, peaksCh2, maxAmplDiff)
+function result  = areSameLevels(peaksCh1, peaksCh2, maxAmplRatioDiff)
   % both must exist and same frequencies
   if isempty(peaksCh1) || isempty(peaksCh2) || ~isequal(peaksCh1(:, 1), peaksCh2(:, 1))
     result = false;
@@ -6,8 +6,7 @@ function result  = areSameLevels(peaksCh1, peaksCh2, maxAmplDiff)
   endif
   ampls = peaksCh1(:, 2);
   prevAmpls = peaksCh2(:, 2);
-  % simple difference check, no ratios
-  differentAmplIDs = find(abs(ampls - prevAmpls) > maxAmplDiff);
+  differentAmplIDs = find(abs(1 - ampls ./ prevAmpls) > maxAmplRatioDiff);
   result =  isempty(differentAmplIDs);
 endfunction
 
