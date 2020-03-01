@@ -6,6 +6,7 @@ function result = isStepperRunning(stepperID)
     [position, reportedStepperID] = ardStruct.ard.checkMoveComplete();
     finished = ~isempty(position) && reportedStepperID == stepperID;
     if finished
+      ardStruct.ard.disableStepper(stepperID);
       writeLog('DEBUG', "Stepper [%d] finished at internal position %d", stepperID, position);
       % resetting flag
       steppers{stepperID}.running = false;
