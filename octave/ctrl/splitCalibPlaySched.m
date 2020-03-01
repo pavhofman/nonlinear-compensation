@@ -172,7 +172,8 @@ function result = splitCalibPlaySched(label = 1)
         adapterStruct.in = false; % CALIB
         adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = lpFundAmpl;
-        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF;
+        % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
+        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF * 0.9;
         waitForAdapterAdjust(
           sprintf('Change switch to VD calibration. For first freq adjust captured level to %s for channel %d', getAdapterLevelRangeStr(adapterStruct), ANALYSED_CH_ID),
           adapterStruct, WAIT_FOR_VD_LABEL, ABORT, ERROR, mfilename());

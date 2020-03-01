@@ -121,7 +121,8 @@ function result = rangeCalibRecSched(label = 1)
         adapterStruct.in = false; % CALIB
         adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = (1 + adjustment) * origRecLevel;
-        adapterStruct.maxAmplDiff = maxAmplDiff;
+        % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
+        adapterStruct.maxAmplDiff = maxAmplDiff * 0.9;
 
         % including mid ampl only for exact value
         calFreqReq = getConstrainedLevelCalFreqReq(adapterStruct.reqLevels, origFreq, ANALYSED_CH_ID, adapterStruct.maxAmplDiff, adjustment == 0);

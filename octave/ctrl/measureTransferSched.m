@@ -225,7 +225,8 @@ function result = measureTransferSched(label= 1, schedTask = [])
         adapterStruct.in = false; % CALIB
         adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = lpFundAmpl;
-        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF;
+        % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
+        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF * 0.9;
         waitForAdapterAdjust(
           sprintf('Change switch to VD calibration. Adjust captured level to %s for channel %d', getAdapterLevelRangeStr(adapterStruct), ANALYSED_CH_ID),
           adapterStruct, GEN_LABEL, ABORT, ERROR, mfilename());
@@ -318,6 +319,8 @@ function result = measureTransferSched(label= 1, schedTask = [])
       case DONE_LABEL
         if ~isempty(getRunTaskIDFor(mfilename()))
           % called from waitForFunction scheduler (i.e. from split-calibration task) - not showing the final switchWindow
+          label = FINISH_DONE_LABEL;
+          continue;
         else
           resetAdapterStruct();
           waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
