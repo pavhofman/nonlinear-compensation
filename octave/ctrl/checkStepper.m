@@ -1,0 +1,94 @@
+function result = checkStepper(adapterStruct, recInfo, playInfo)
+  % TODO - for now fixed
+  persistent STEPPER_ID = 1;
+  % last processed recinfo time - to avoid comparing levels of the same recInfo
+  persistent lastRecInfoTime = 0;
+
+  result = false;
+
+  % CONTINUE button pressed, checking stepper
+  if ~isempty(adapterStruct.reqLevels) % requested specific levels
+    if ~isStepperRunning(STEPPER_ID) % stepper is not moving (not yet or no more), it makes sense to measure level
+      recInfoTime = recInfo.time;
+      if recInfoTime ~= lastRecInfoTime
+        %remembering for next time
+        lastRecInfoTime = recInfoTime;
+
+        % new recInfo, can check level stability
+        global ANALYSED_CH_ID;
+        measPeaksCh = recInfo.measuredPeaks{ANALYSED_CH_ID};
+
+        if areLevelsStable(measPeaksCh, STEPPER_ID)
+          if areReqLevels(adapterStruct.reqLevels, measPeaksCh(:, 2), adapterStruct.maxAmplDiff)
+            writeLog('DEBUG', "Stepper at required position");
+            result = true;
+            return;
+          else
+            % new stepper run to get closer to reqLevel
+            steps = adjustStepper(STEPPER_ID, adapterStruct.reqLevels, recInfo, playInfo);
+            if steps == 0
+              writeLog('DEBUG', "Stepper calculated 0 steps, yet no exactly at position, cannot do better");
+              result = true;
+              return;
+            endif % 0 steps
+          endif % req levels
+        endif % levels stable
+      endif % new recTime
+    endif % stepper not running
+  else % requested levels
+    writeLog('DEBUG', "No stepper level adjustment requested");
+    result = true;
+    return;
+  endif % requested levels
+endfunction
+
+function result = areLevelsStable(measPeaksCh, stepperID)
+  % const
+  persistent PREV_SAME_LEVELS_CNT = 2;
+  persistent prevMeasPeaks = cell();
+
+  result = false;
+
+  global steppers;
+  if steppers{stepperID}.hasMoved
+    writeLog('DEBUG', 'Stepper [%d] has moved, resetting history', stepperID);
+    prevMeasPeaks = cell();
+    steppers{stepperID}.hasMoved = false;
+    return;
+  endif
+
+  if isempty(measPeaksCh)
+    % no measured peaks, restarting history
+    prevMeasPeaks = cell();
+  else
+    if numel(prevMeasPeaks) >= PREV_SAME_LEVELS_CNT
+      % already collected correct count of prev. levels
+      % checking levels
+      global MAX_AMPL_DIFF_INTEGER;
+
+      result = true;
+      % checking all previous peaks
+      for idx = 1:numel(prevMeasPeaks)
+        prevPeaksCh = prevMeasPeaks{idx};
+        result &= areSameLevels(measPeaksCh, prevPeaksCh, MAX_AMPL_DIFF_INTEGER);
+        writeLog('DEBUG', 'areLevelsStable: IDX %d: meas: %f prev: %f, result %d', idx, measPeaksCh(1, 2), prevPeaksCh(1, 2), result);
+        if ~result
+          % no reason to continue
+          break;
+        endif
+      endfor
+
+      % removing oldest item
+      prevMeasPeaks(1) = [];
+    endif
+    % adding new peaks for next round
+    prevMeasPeaks{end + 1} = measPeaksCh;
+  endif
+endfunction
+
+function result = areReqLevels(reqLevels, measLevels, maxAmplDiff)
+  % simple difference check, no ratios
+  differentAmplIDs = find(abs(reqLevels - measLevels) > maxAmplDiff);
+  result =  isempty(differentAmplIDs);
+  writeLog('DEBUG', 'areReqLevels: req: %f meas: %f, , maxAmplDiff %f => result %d', reqLevels(1), measLevels(1), maxAmplDiff, result);
+endfunction

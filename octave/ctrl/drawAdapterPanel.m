@@ -112,8 +112,8 @@ function clbkSetIn(src, data)
 endfunction
 
 function clbkAdapterContinue(src, data)
-  global adapterContinue;
-  adapterContinue = true;
+  global switchesSet;
+  switchesSet = true;
   global adapterStruct;
   % again hiding
   setVisible(adapterStruct.contBtn, false);

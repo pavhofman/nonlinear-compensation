@@ -1,8 +1,9 @@
 function schedTask = checkAdapterPanel(adapterStruct, nextLabel, abortLabel, errorLabel, schedTask)
-  global adapterContinue;
-  if adapterContinue
+  global switchesSet;
+  if switchesSet
+    % switches set, user confirned with CONTINUE button
     % resetting flag
-    adapterContinue = false;
+    switchesSet = false;
     % and continuing
     schedTask.newLabel = nextLabel;
   endif

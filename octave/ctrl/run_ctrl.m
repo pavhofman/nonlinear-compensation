@@ -58,8 +58,8 @@ global CH_DISTANCE_X = 0.3
 global doQuit;
 doQuit = false;
 
-global adapterContinue;
-adapterContinue = false;
+global switchesSet;
+switchesSet = false;
 
 global ABORT = -1;
 % list of currently running task functions
@@ -71,10 +71,6 @@ taskLabels = {};
 % fname of task to abort in next runScheduledTask call
 global taskFNameToAbort;
 taskFNameToAbort = '';
-
-if adapterType == ADAPTER_TYPE_SWITCHWIN_VD_STEPPER
-  initArdStruct();
-endif
 
 function doExit(fig)
   global doQuit;
