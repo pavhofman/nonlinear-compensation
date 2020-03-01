@@ -84,8 +84,8 @@ function result = rangeCalibRecSched(label = 1)
         
       case START_LABEL
         clearOutBox();
-        adapterStruct.calibrate = true; % IN calib
-        adapterStruct.vd = true; % VD
+        adapterStruct.in = false; % CALIB IN
+        adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for calibration through VD', ANALYSED_CH_ID),
@@ -118,8 +118,8 @@ function result = rangeCalibRecSched(label = 1)
 
         printStr('Calibrating REC side at CH%d level - adj %f, maxAmplDiff %f', ANALYSED_CH_ID, adjustment, maxAmplDiff);
         
-        adapterStruct.calibrate = true;
-        adapterStruct.vd = true;
+        adapterStruct.in = false; % CALIB
+        adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = (1 + adjustment) * origRecLevel;
         adapterStruct.maxAmplDiff = maxAmplDiff;
 

@@ -102,13 +102,13 @@ endfunction
 function clbkSetVdlp(src, data)
   global adapterStruct;
   radio = get(src, 'selectedobject');
-  adapterStruct.vd = radio == adapterStruct.vdRadio;
+  adapterStruct.lpf = radio == adapterStruct.lpfRadio;
 endfunction
 
 function clbkSetIn(src, data)
   global adapterStruct;
   radio = get(src, 'selectedobject');
-  adapterStruct.calibrate = radio == adapterStruct.calInRadio;
+  adapterStruct.in = radio == adapterStruct.dutInRadio;
 endfunction
 
 function clbkAdapterContinue(src, data)

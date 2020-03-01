@@ -112,8 +112,8 @@ function result = splitCalibPlaySched(label = 1)
       case START_LABEL
         clearOutBox();
         adapterStruct.out = false; % OUT off
-        adapterStruct.calibrate = true; % IN calib
-        adapterStruct.vd = false; % LPF
+        adapterStruct.in = false; % CALIB IN
+        adapterStruct.lpf = true; % LPF
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for LP calibration', ANALYSED_CH_ID), adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
@@ -169,8 +169,8 @@ function result = splitCalibPlaySched(label = 1)
         lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
 
         adapterStruct.out = false;
-        adapterStruct.calibrate = true;
-        adapterStruct.vd = true;
+        adapterStruct.in = false; % CALIB
+        adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = lpFundAmpl;
         adapterStruct.maxAmplDiff = MAX_AMPL_DIFF;
         waitForAdapterAdjust(

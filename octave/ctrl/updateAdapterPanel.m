@@ -6,10 +6,10 @@ function updateAdapterPanel(title, showContBtn)
 
   changed = setChecked(adapterStruct.outCheckbox, adapterStruct.out);
 
-  radio = ifelse(adapterStruct.calibrate, adapterStruct.calInRadio, adapterStruct.dutInRadio);
+  radio = ifelse(adapterStruct.in, adapterStruct.dutInRadio, adapterStruct.calInRadio);
   changed |= setRadio(adapterStruct.inRGroup, radio);
 
-  radio = ifelse(adapterStruct.vd, adapterStruct.vdRadio, adapterStruct.lpfRadio);
+  radio = ifelse(adapterStruct.lpf, adapterStruct.lpfRadio, adapterStruct.vdRadio);
   changed |= setRadio(adapterStruct.vdlpRGroup, radio);
 
   %   reqLevel enabled only when no task running

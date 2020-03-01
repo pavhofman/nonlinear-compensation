@@ -109,8 +109,8 @@ function result = measureTransferSched(label= 1, schedTask = [])
         endif
         
         adapterStruct.out = false; % OUT off
-        adapterStruct.calibrate = true; % IN calib
-        adapterStruct.vd = false; % LPF
+        adapterStruct.in = false; % CALIB IN
+        adapterStruct.lpf = true; % LPF
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for LPF measurement with output channel %d and input channel %d', PLAY_CH_ID, ANALYSED_CH_ID),
@@ -222,8 +222,8 @@ function result = measureTransferSched(label= 1, schedTask = [])
         lpFundAmpl = loadRecAmplFromTransfer(origRecFreq, EXTRA_CIRCUIT_LP1);
 
         adapterStruct.out = false;
-        adapterStruct.calibrate = true;
-        adapterStruct.vd = true;
+        adapterStruct.in = false; % CALIB
+        adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = lpFundAmpl;
         adapterStruct.maxAmplDiff = MAX_AMPL_DIFF;
         waitForAdapterAdjust(
