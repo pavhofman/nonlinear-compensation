@@ -9,7 +9,7 @@ function [output] = vdlpEqs(t, distortF, amplA, phaseA, amplD, phaseD, fundGainV
   sineA_VD = amplA * cos(PI2 * distortF * t + phaseA);
   sineVD =  sineD_VD + sineA_VD;
   
-  % eq 2 - fitting LP distortion at distortF
+  % eq 2 - fitting LPF distortion at distortF
   % amplitude D was attenuated and shifted by LPF, preceeding amplitude A by fundamental phase shift scaled to distortF
   sineD_LP = amplD * distortGainLP * cos(PI2 * distortF * t + phaseD - phaseShiftByFundLP + distortPhaseShiftLP);
   % amplitude A was at full scale for the incoming level of fundamental freq.

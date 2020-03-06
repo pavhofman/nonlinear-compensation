@@ -9,13 +9,13 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   % voltage divider
   calFile = genCalFilename(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, vdName);
   [peaksVDRow, distortVDFreqs] = loadCalRow(calFile);
-  % LP filter (input - resistor 10k -RIGHT- capacitor 10nF - ground)
+  % LPF filter (input - resistor 10k -RIGHT- capacitor 10nF - ground)
   calFile = genCalFilename(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, lpName);
   [peaksLPRow, distortLPFreqs] = loadCalRow(calFile);
 
 
   fundAmplVD = peaksVDRow(1, AMPL_IDX);
-  % both VD and LP peaks must have been measured with the same play amplitude!
+  % both VD and LPF peaks must have been measured with the same play amplitude!
   playAmpl = peaksVDRow(1, PLAY_AMPL_IDX);
 
   % fundGainXX - attenuation of voltage divider (measured amplitude on A side / generated amplitude on D side)
@@ -38,8 +38,8 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
 
   for N = 2 : maxN
     distortFreq = N * fundFreq;
-    % only freqs available for LP and VD can be calculated
-    % TODO - skipping missing distortFreqs in LP/VD rows!
+    % only freqs available for LPF and VD can be calculated
+    % TODO - skipping missing distortFreqs in LPF/VD rows!
     distortPeakVD = getDistortPeakForFreq(distortFreq, peaksVDRow, distortVDFreqs);
     distortPeakLP = getDistortPeakForFreq(distortFreq, peaksLPRow, distortLPFreqs);
     
@@ -52,7 +52,7 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
     distortAmplVD = abs(distortPeakVD);
     distortPhaseVD = angle(distortPeakVD);
 
-    % LP params
+    % LPF params
     distortAmplLP = abs(distortPeakLP);
     distortPhaseLP = angle(distortPeakLP);
   
@@ -63,7 +63,7 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
 
 
     % eq 2
-    % Dlp + Alp = LP where D, A, G are amplitude and phase (complex amplitude) for filter signal (measured at filter levels)
+    % Dlp + Alp = LPF where D, A, G are amplitude and phase (complex amplitude) for filter signal (measured at filter levels)
     refLP = distortAmplLP * cos(PI2 * distortFreq * t + distortPhaseLP);
 
     % "known" values for fitting
@@ -73,7 +73,7 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
     [distortGainVD, distortPhaseShiftVD] = detTransferFromTransferFile(distortFreq, vdName);
     [distortGainLP, distortPhaseShiftLP] = detTransferFromTransferFile(distortFreq, lpName);
     
-    % VD and LP equations solve for the same DA/AD distortions. Same means they must be at the same time.
+    % VD and LPF equations solve for the same DA/AD distortions. Same means they must be at the same time.
     % The measured values loaded from cal files are on AD side and zero-time based (time-shifted to zero fundamental phase)
     % At time = 0 on ADC side => the DAC side phase shift of every n-th harmonic (incl. the fundamental) is preceeding by the n-th multiple of the filter phase shift at fundamental
     phaseShiftByFundVD = N * fundPhaseShiftVD;

@@ -10,7 +10,7 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
   tasksMenu = uimenu (fig, "label", "&Tasks");
   
-  uimenu(tasksMenu, "label", "Measure LP/VD Transfer", 'separator', 'on', 'callback', @clbkMeasureTransfers);
+  uimenu(tasksMenu, "label", "Measure LPF/VD Transfer", 'separator', 'on', 'callback', @clbkMeasureTransfers);
   
   calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Single Run", 'separator', 'on', "callback", {@clbkJointCalib, false});
   calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});

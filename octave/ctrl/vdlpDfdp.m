@@ -15,7 +15,7 @@ function output = vdlpDfdp(t, distortF, amplA, phaseA, amplD, phaseD, fundGainVD
     -1 * amplD * distortGainVD * sin(PI2 * distortF * t + phaseD - phaseShiftByFundVD + distortPhaseShiftVD)];
 
   
-  % eq 2 - fitting LP distortion at distortF
+  % eq 2 - fitting LPF distortion at distortF
   % sineD_LP = amplD * distortGainLP * cos(PI2 * distortF * t + phaseD - phaseShiftByFundLP + distortPhaseShiftLP);
   % sineA_LP = amplA * (fundGainLP/fundGainVD) * cos(PI2 * distortF * t + phaseA);  
   % sineLP = sineD_LP + sineA_LP;

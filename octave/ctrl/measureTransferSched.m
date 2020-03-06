@@ -3,7 +3,7 @@
 % result: NA = not finished yet, false = error/failed, true = finished OK
 function result = measureTransferSched(label= 1, schedTask = [])
   result = NA;
-  persistent NAME = 'Measuring LP & VD Transfer';
+  persistent NAME = 'Measuring LPF & VD Transfer';
   
   % init section
   [START_LABEL, PASS_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, GEN_ORIG_F, SWITCH_TO_VD_LABEL,...
@@ -13,7 +13,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
 
-  % analysed input ch goes through LP or VD, the other input channel is direct
+  % analysed input ch goes through LPF or VD, the other input channel is direct
   global ANALYSED_CH_ID;
 
   % ID of output channel used for split calibration
@@ -100,7 +100,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         writeLog('DEBUG', 'Missing transfer recFreqs for %s: %s', EXTRA_CIRCUIT_LP1, disp(recFreqs));
         
         if isempty(recFreqs)
-          % no need to measure LP, going to VD, but starting generating orig freq (f0) first to let stepper adjust to correct level
+          % no need to measure LPF, going to VD, but starting generating orig freq (f0) first to let stepper adjust to correct level
           label = GEN_ORIG_F;
           didMeasureLPF = false;
           continue;
@@ -159,7 +159,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               printStr(sprintf("Generating %dHz", playFreqs(freqID)));
               cmdIDPlay = sendPlayGeneratorCmd(playFreqs(freqID), PLAY_LEVELS);
 
-              printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", recFreqs(freqID)));
+              printStr(sprintf("Joint-device calibrating/measuring LPF at %dHz", recFreqs(freqID)));
               % deleting the calib file should it exist - always clean calibration
               calFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
               deleteFile(calFile);
@@ -186,7 +186,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               label = CAL_LP_LABEL;
               continue;
             endswitch              
-        endwhile % LP freqs
+        endwhile % LPF freqs
         label = GEN_ORIG_F;
         continue;
                 
@@ -245,7 +245,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         return;
 
       case {CAL_VD_LABEL, CAL_VD_FINISHED_LABEL}
-        % calibrating LP connection at freq harmonics
+        % calibrating LPF connection at freq harmonics
         while freqID <= length(playFreqs)
           switch label
             case CAL_VD_LABEL
@@ -255,7 +255,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
 
               printStr(sprintf("Joint-device calibrating VD at %dHz", recFreqs(freqID)));
               if recFreqs(freqID) == origRecFreq
-                % VD at fundament (origFreq) should be calibrated close to the LP level
+                % VD at fundament (origFreq) should be calibrated close to the LPF level
                 % amplitude-constrained calibration
                 calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origRecFreq, ANALYSED_CH_ID, MAX_AMPL_DIFF, true);
                 calFreqReqStr = getCalFreqReqStr(calFreqReq);

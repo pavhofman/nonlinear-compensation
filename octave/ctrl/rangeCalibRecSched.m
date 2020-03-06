@@ -29,7 +29,7 @@ function result = rangeCalibRecSched(label = 1)
   ];
 
   
-  % analysed input ch goes through LP or VD, the other input channel is direct
+  % analysed input ch goes through LPF or VD, the other input channel is direct
   global ANALYSED_CH_ID;
 
   global cmdFileRec;

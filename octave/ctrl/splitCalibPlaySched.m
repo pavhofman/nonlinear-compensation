@@ -14,7 +14,7 @@ function result = splitCalibPlaySched(label = 1)
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
 
-  % analysed input ch goes through LP or VD, the other input channel is direct
+  % analysed input ch goes through LPF or VD, the other input channel is direct
   global ANALYSED_CH_ID;
   % ID of output channel used for split calibration
   global PLAY_CH_ID;
@@ -48,9 +48,9 @@ function result = splitCalibPlaySched(label = 1)
   persistent origPlayLevels = NA;
   persistent playEqualizer = NA;
 
-  % VD at fundament (origRecFreq) must be calibrated at exactly the same level as LP so that the distortion characteristics of ADC are same
+  % VD at fundament (origRecFreq) must be calibrated at exactly the same level as LPF so that the distortion characteristics of ADC are same
   % amplitude-constrained calibration
-  % we need same ADC distortion profile for LP and VD => the level must be as close as possible for best results
+  % we need same ADC distortion profile for LPF and VD => the level must be as close as possible for best results
   persistent MAX_AMPL_DIFF = db2mag(-85);
 
   global adapterStruct;
@@ -116,7 +116,7 @@ function result = splitCalibPlaySched(label = 1)
         adapterStruct.lpf = true; % LPF
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
-        waitForAdapterAdjust(sprintf('Set switches for LP calibration', ANALYSED_CH_ID), adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
+        waitForAdapterAdjust(sprintf('Set switches for LPF calibration', ANALYSED_CH_ID), adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
         return;
 
       case PASS_LABEL
@@ -148,7 +148,7 @@ function result = splitCalibPlaySched(label = 1)
 
       case CAL_LP_LABEL
         % calibrating LPF at origRecFreq
-        printStr(sprintf("Joint-device calibrating/measuring LP at %dHz", origRecFreq));
+        printStr(sprintf("Joint-device calibrating/measuring LPF at %dHz", origRecFreq));
         % deleting the calib file should it exist - always clean calibration
         calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);

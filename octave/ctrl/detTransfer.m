@@ -1,4 +1,4 @@
-% Determine filter transfer at freq from calrows for LP and VD of same level (to keep characteristics same)
+% Determine filter transfer at freq from calrows for LPF and VD of same level (to keep characteristics same)
 % Gain is against playAmpl, phaseshift against the other channel, corrected for interchannel difference
 % output format: [gain, phaseShift]
 function [gain, phaseShift] = detTransfer(peaksRow)
