@@ -72,8 +72,8 @@ function result = splitCalibPlaySched(label = 1)
         fs = recInfo.fs;
         % TODO - checks - only one fundament freq!!
         % if playback freq is known, use it (playback will be generating). If no (playback has no signal, rec fed by an external generator, use recInfo)
-        if length(playInfo.measuredPeaks) >= ANALYSED_CH_ID && ~ isempty(playInfo.measuredPeaks{ANALYSED_CH_ID})
-          origPlayFreq = playInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+        if length(playInfo.measuredPeaks) >= PLAY_CH_ID && ~ isempty(playInfo.measuredPeaks{PLAY_CH_ID})
+          origPlayFreq = playInfo.measuredPeaks{PLAY_CH_ID}(1, 1);
         else
           origPlayFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
         endif
