@@ -165,6 +165,7 @@ function result = splitCalibPlaySched(label = 1)
         
       case SWITCH_TO_VD_LABEL
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
+        % persistent variable, also used in next step CAL_VD_LABEL
         lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
 
         adapterStruct.out = false;
@@ -185,10 +186,8 @@ function result = splitCalibPlaySched(label = 1)
         
       case CAL_VD_LABEL
         % VD calibration        
-        % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
-        lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
-
         printStr("Joint-device calibrating VD at %dHz:", origRecFreq);
+        % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origRecFreq, ANALYSED_CH_ID, MAX_AMPL_DIFF, true);
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
         % much more time for manual level adjustment
