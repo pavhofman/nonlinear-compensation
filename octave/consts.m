@@ -231,7 +231,7 @@ global MAX_FREQ_DIFF_DECIMALS = 2;
 % the most logical setting is using the same channel as in MODE_SINGLE and MODE_BALANCED
 global PLAY_CH_ID = KEEP_CHANNEL_ID;
 
-% analysed input ch goes through LP or VD, the other input channel is direct
+% analysed input ch goes through LPF or VD, the other input channel is direct
 global ANALYSED_CH_ID = 2;
 
 global EXTRA_CIRCUIT_VD = 'vd';
@@ -263,4 +263,4 @@ global ADAPTER_TYPE_SWITCHWIN_VD_STEPPER = 2;
 global ADAPTER_TYPE_RELAYS_1STEPPER = 3;
 
 % current adapter type
-global adapterType = ADAPTER_TYPE_SWITCHWIN_VD_STEPPER;
+global adapterType = ADAPTER_TYPE_RELAYS_1STEPPER;
