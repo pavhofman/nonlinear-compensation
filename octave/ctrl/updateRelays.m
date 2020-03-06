@@ -2,9 +2,9 @@ function updateRelays()
   global adapterStruct;
   global ardStruct;
 
-  setRelay(ardStruct.ard, ardStruct.outPin, adapterStruct.out, 'OUT/OFF');
-  setRelay(ardStruct.ard, ardStruct.lpfPin, adapterStruct.lpf, 'LPF/VD');
-  setRelay(ardStruct.ard, ardStruct.inPin, adapterStruct.in, 'IN/CALIB');
+  setRelay(ardStruct.ard, ardStruct.outPin, adapterStruct.out, 'OFF/OUT');
+  setRelay(ardStruct.ard, ardStruct.lpfPin, adapterStruct.lpf, 'VD/LPF');
+  setRelay(ardStruct.ard, ardStruct.inPin, adapterStruct.in, 'CALIB/IN');
 
   % switches are set now
   global switchesSet;
