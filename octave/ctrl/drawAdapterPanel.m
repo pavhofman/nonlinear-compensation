@@ -97,18 +97,24 @@ endfunction
 function clbkSetOut(src, data)
   global adapterStruct;
   adapterStruct.out = get(src, 'value');
+  % this control is enabled only when having relays
+  updateRelays();
 endfunction
 
 function clbkSetVdlp(src, data)
   global adapterStruct;
   radio = get(src, 'selectedobject');
   adapterStruct.lpf = radio == adapterStruct.lpfRadio;
+  % this control is enabled only when having relays
+  updateRelays();
 endfunction
 
 function clbkSetIn(src, data)
   global adapterStruct;
   radio = get(src, 'selectedobject');
   adapterStruct.in = radio == adapterStruct.dutInRadio;
+  % this control is enabled only when having relays
+  updateRelays();
 endfunction
 
 function clbkAdapterContinue(src, data)
@@ -140,5 +146,3 @@ function clbkSetVDLevel(src, data)
   % adjusting the stepper
   setVDLevelSched();
 endfunction
-
-
