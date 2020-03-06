@@ -1,7 +1,6 @@
 % generates frequencies to measure transfer for fundFreq. For now only single tone is supported
 function freqs = getTransferFreqs(fundFreq, fs, nonInteger)
-  % const
-  persistent MAX_FREQS = 10;
+  global MAX_TRANSFER_FREQS;
   % for nonInteger mode
   persistent LIMIT_TO_NYQUIST = 0.95;
 
@@ -14,7 +13,7 @@ function freqs = getTransferFreqs(fundFreq, fs, nonInteger)
   endif
 
   % only single frequency supported for now
-  cnt = min(MAX_FREQS, floor((limit * fs/2 - 1) / fundFreq));
+  cnt = min(MAX_TRANSFER_FREQS, floor((limit * fs/2 - 1) / fundFreq));
   writeLog('DEBUG', 'Generating %d transfer freqs for fundFreq %f and fs %d', cnt, fundFreq, fs);
   freqs = linspace(fundFreq, fundFreq * cnt, cnt);
 endfunction
