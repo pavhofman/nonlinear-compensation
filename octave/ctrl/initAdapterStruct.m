@@ -2,6 +2,7 @@ function initAdapterStruct()
   global adapterType;
   global ADAPTER_TYPE_SWITCHWIN;
   global ADAPTER_TYPE_SWITCHWIN_VD_STEPPER;
+  global ADAPTER_TYPE_RELAYS_1STEPPER;
 
   global adapterStruct;
   adapterStruct = struct();
@@ -42,9 +43,9 @@ function initAdapterStruct()
     global steppers;
     steppers{1} = initStepper(ardStruct.ard, 1, 6, 7, 8, 9);
     % relays pins
-    ardStruct.outPin = 1;
-    ardStruct.vdPin = 2;
-    ardStruct.calibratePin = 3;
+    ardStruct.outPin = 15;
+    ardStruct.lpfPin = 10;
+    ardStruct.inPin = 16;
 
 
     adapterStruct.execFunc = @(title, thisStruct) execRelaysAdapter(title, thisStruct);
