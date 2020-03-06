@@ -116,7 +116,7 @@ function result = splitCalibPlaySched(label = 1)
         adapterStruct.lpf = true; % LPF
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
-        waitForAdapterAdjust(sprintf('Set switches for LPF calibration', ANALYSED_CH_ID), adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
+        waitForAdapterAdjust(sprintf('Set switches for CH%d LPF calibration', ANALYSED_CH_ID), adapterStruct, CAL_LP_LABEL, ABORT, ERROR, mfilename());
         return;
 
       case PASS_LABEL

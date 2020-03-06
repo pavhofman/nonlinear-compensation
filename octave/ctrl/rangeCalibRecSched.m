@@ -88,7 +88,7 @@ function result = rangeCalibRecSched(label = 1)
         adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
-        waitForAdapterAdjust(sprintf('Set switches for calibration through VD', ANALYSED_CH_ID),
+        waitForAdapterAdjust(sprintf('Set switches for CH%d calibration through VD', ANALYSED_CH_ID),
           adapterStruct, MODE_LABEL, ABORT, ERROR, mfilename());
         return;
 
