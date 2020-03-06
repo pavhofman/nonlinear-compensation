@@ -12,6 +12,7 @@ function updateRelays()
 endfunction
 
 function setRelay(ard, pin, status, relayName)
-  writeLog('DEBUG', "Setting %s relay (pin %d) to %d", relayName, pin, status);
-  writeDigitalPin(ard, pin, status);
+  pinName = sprintf("D%d", pin);
+  writeLog('DEBUG', "Setting %s relay (pin %s) to %d", relayName, pinName, status);
+  ard._writeDigitalPin(pinName, status)
 endfunction
