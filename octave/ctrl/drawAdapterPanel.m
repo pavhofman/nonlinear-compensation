@@ -129,8 +129,10 @@ function clbkSetVDLevel(src, data)
   if isnan(value)
       set(src, 'String',' 0.');
       warndlg('VD level must be numerical in dB');
+      return;
   elseif value > 0
     warndlg('VD level must be < 0dB');
+    return;
   endif
 
   global adapterStruct;
