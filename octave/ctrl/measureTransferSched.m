@@ -118,8 +118,6 @@ function result = measureTransferSched(label= 1, schedTask = [])
         return;
 
       case PASS_LABEL
-        printStr(sprintf("Joint-device calibrating LP at harmonic frequencies of %dHz:", recFreqs(freqID)));
-        
         % setting pass status on both sides
         cmdIDPlay = writeCmd(PASS, cmdFilePlay);
         cmdIDRec = writeCmd(PASS, cmdFileRec);

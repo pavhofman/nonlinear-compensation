@@ -120,7 +120,6 @@ function result = splitCalibPlaySched(label = 1)
         return;
 
       case PASS_LABEL
-        printStr(sprintf("Joint-device calibrating LP at current frequency %dHz:", origRecFreq));
         cmdIDPlay = writeCmd(PASS, cmdFilePlay);
         cmdIDRec = writeCmd(PASS, cmdFileRec);
         % we have to wait for command acceptance before issuing new commands (the cmd files could be deleted by new commands before they are consumed
