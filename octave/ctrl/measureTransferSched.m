@@ -62,8 +62,6 @@ function result = measureTransferSched(label= 1, schedTask = [])
   global adapterStruct;
 
   persistent lpFundAmpl = NA;
-  
-  persistent didMeasureLPF = false;
   persistent wasAborted = false;
   
   while true
@@ -100,13 +98,23 @@ function result = measureTransferSched(label= 1, schedTask = [])
         writeLog('DEBUG', 'Missing transfer recFreqs for %s: %s', EXTRA_CIRCUIT_LP1, disp(recFreqs));
         
         if isempty(recFreqs)
-          % no need to measure LPF, going to VD, but starting generating orig freq (f0) first to let stepper adjust to correct level
+          % no need to measure LPF
+          % checking VD freqs
+          [playVDFreqs, recVDFreqs] = getMissingTransferFreqs(origPlayFreq, origRecFreq, fs, EXTRA_CIRCUIT_VD, recInfo.nonInteger);
+          if  isempty(recVDFreqs)
+            % all transfers available for VD too, ending
+            % informing user that all recFreqs are already measured
+            global MAX_TRANSFER_AGE_DAYS;
+            msg = sprintf('All LPF and VD frequencies already measured and still valid (< %d days)', MAX_TRANSFER_AGE_DAYS);
+            writeLog('INFO', msg);
+            printStr(msg);
+            break;
+          endif
+
+          % going to VD, but starting generating orig freq (f0) first to let stepper adjust to correct level
           label = GEN_ORIG_F;
-          didMeasureLPF = false;
           continue;
-        else
-          didMeasureLPF = true;
-        endif
+        endif % empty LPF recFreqs
         
         % for restoration at the end
         keepInOutSwitches();
@@ -209,12 +217,6 @@ function result = measureTransferSched(label= 1, schedTask = [])
         freqID = 1;
         
         if isempty(playFreqs)
-          % all transfers available for VD, ending
-          if ~didMeasureLPF
-            % informing user that all recFreqs are already measured
-            global MAX_TRANSFER_AGE_DAYS;
-            msgbox(sprintf('All LPF and VD frequencies already measured and still valid (< %d days)', MAX_TRANSFER_AGE_DAYS));
-          endif
           label = ALL_OFF_LABEL;
           continue;
         endif
