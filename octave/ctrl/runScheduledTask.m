@@ -3,7 +3,6 @@ function runScheduledTask(recInfo, playInfo);
   global taskFNameToAbort;
 
   idsToRemove = [];
-  cnt = length(schedTasksQueue);
   curTime = time();
   
   
@@ -41,7 +40,7 @@ function runScheduledTask(recInfo, playInfo);
   endif % task abort
 
   % loop all scheduled tasks
-  for id = 1:cnt
+  for id = 1:length(schedTasksQueue)
     task = schedTasksQueue{id};
     if isempty(task.newLabel)
       % determine new label for current time and received infos, passing scheduledItem
