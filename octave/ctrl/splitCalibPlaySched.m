@@ -5,7 +5,7 @@
 function result = splitCalibPlaySched(label = 1)
   result = NA;
   % init section
-  [CHECKING_LABEL, START_LABEL, SWITCH_TO_LPF_LABEL, PASS_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, SWITCH_TO_VD_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
+  [CHECKING_LABEL, START_LABEL, SWITCH_TO_LPF_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, SWITCH_TO_VD_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
       CHECK_LOOPING, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
   
   persistent NAME = 'Split-Calibrating PLAY Side';
@@ -125,30 +125,9 @@ function result = splitCalibPlaySched(label = 1)
         adapterStruct.lpf = true; % LPF
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
-        waitForAdapterAdjust(sprintf('Set switches for CH%d LPF calibration', ANALYSED_CH_ID), adapterStruct, CAL_LP_LABEL, ABORT, ERROR, mfilename());
+        waitForAdapterAdjust(sprintf('Set switches for CH%d LPF calibration', ANALYSED_CH_ID), adapterStruct, WAIT_FOR_LP_LABEL, ABORT, ERROR, mfilename());
         return;
 
-      case PASS_LABEL
-        cmdIDPlay = writeCmd(PASS, cmdFilePlay);
-        cmdIDRec = writeCmd(PASS, cmdFileRec);
-        % we have to wait for command acceptance before issuing new commands (the cmd files could be deleted by new commands before they are consumed
-        % waiting only for one of the pass commands, both sides run at same speed
-        % after AUTO_TIMEOUT secs timeout call ERROR
-        waitForCmdDone([cmdIDPlay, cmdIDRec], MODE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
-        return;
-        
-      case MODE_LABEL
-        
-        global SET_MODE;
-        global CMD_MODE_PREFIX;
-        
-        % setting MODE_DUAL on both sides
-        cmdStr = [SET_MODE ' ' CMD_MODE_PREFIX num2str(MODE_DUAL)];
-        cmdIDPlay = writeCmd(cmdStr, cmdFilePlay);
-        cmdIDRec = writeCmd(cmdStr, cmdFileRec);
-        waitForCmdDone([cmdIDPlay, cmdIDRec], WAIT_FOR_LP_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
-        return;
-        
       case WAIT_FOR_LP_LABEL
         % after switching to LPF + mode we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
         schedPause(1, CAL_LP_LABEL, mfilename());
