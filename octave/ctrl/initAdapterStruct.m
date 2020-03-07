@@ -6,6 +6,8 @@ function initAdapterStruct()
 
   global adapterStruct;
   adapterStruct = struct();
+  % flag for indicating that phase of setting switches is finished
+  adapterStruct.switchesSet = false;
   resetAdapterStruct();
 
   if adapterType == ADAPTER_TYPE_SWITCHWIN
@@ -73,9 +75,9 @@ endfunction
 
 
 function abortAdapterPanel()
-  global switchesSet;
+  global adapterStruct;
   % resetting flag
-  switchesSet = false;
+  adapterStruct.switchesSet = false;
   % setting switches to default values
   resetAdapterStruct();
 endfunction

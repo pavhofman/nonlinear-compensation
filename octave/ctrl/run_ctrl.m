@@ -58,9 +58,6 @@ global CH_DISTANCE_X = 0.3
 global doQuit;
 doQuit = false;
 
-global switchesSet;
-switchesSet = false;
-
 global ABORT = -1;
 % list of currently running task functions
 global taskFNames;

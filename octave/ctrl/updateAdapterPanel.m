@@ -25,8 +25,7 @@ function updateAdapterPanel(title, showContBtn)
       setVisible(adapterStruct.contBtn, ~adapterStruct.hasRelays);
     else
       % no change detected, not showing the CONTINUE button, but sending its click
-      global switchesSet;
-      switchesSet = true;
+      adapterStruct.switchesSet = true;
     endif
   endif
 endfunction

@@ -1,14 +1,13 @@
 % checkFunc for tasks
 function schedTask = checkSwitchesAndStepper(adapterStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)
-  global switchesSet;
   persistent checkingStepper = false;
 
   % first checking continue status
-  if switchesSet
+  if adapterStruct.switchesSet
     % CONTINUE button pressed, can continue with checking stepper
     checkingStepper = true;
     % setting flags
-    switchesSet = false;
+    adapterStruct.switchesSet = false;
     adapterStruct.resetPrevMeasPeaks = true;
   endif
 

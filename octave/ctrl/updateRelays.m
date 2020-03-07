@@ -7,8 +7,7 @@ function updateRelays()
   setRelay(ardStruct.ard, ardStruct.inPin, adapterStruct.in, 'CALIB/IN');
 
   % switches are set now
-  global switchesSet;
-  switchesSet = true;
+  adapterStruct.switchesSet = true;
 endfunction
 
 function setRelay(ard, pin, status, relayName)
