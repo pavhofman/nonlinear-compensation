@@ -65,7 +65,7 @@ endfunction
 
 function stepperStruct = initStepper(ard, stepperID, p1, p2, p3, p4)
   ard.initStepperType4(stepperID, p1, p2, p3, p4);
-  ard.setSpeed(stepperID, 400);
+  ard.setSpeed(stepperID, 500);
   % 0 accel = acceleration off
   ard.setAccel(stepperID, 0);
   stepperStruct = initStepperStruct(stepperID);
