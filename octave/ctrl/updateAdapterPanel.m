@@ -17,6 +17,7 @@ function updateAdapterPanel(title, showContBtn)
   % not checking changed status
   setEnabled(adapterStruct.vdLevel, isempty(taskFNames));
 
+  adapterStruct.switchesChanged |= changed;
   % CONTINUE button
   if showContBtn
     if changed

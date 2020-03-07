@@ -142,6 +142,7 @@ function clbkSetVDLevel(src, data)
 
   global adapterStruct;
   adapterStruct.reqLevels = db2mag(value);
+  adapterStruct.switchesSet = true;
   % adjusting the stepper
   setVDLevelSched();
 endfunction
