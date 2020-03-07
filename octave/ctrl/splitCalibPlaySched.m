@@ -5,14 +5,17 @@
 function result = splitCalibPlaySched(label = 1)
   result = NA;
   % init section
-  [CHECKING_LABEL, START_LABEL, PASS_LABEL, ADAPTER_LPF, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, SWITCH_TO_VD_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
-      ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
+  [CHECKING_LABEL, START_LABEL, SWITCH_TO_LPF_LABEL, PASS_LABEL, MODE_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, SWITCH_TO_VD_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
+      CHECK_LOOPING, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
   
   persistent NAME = 'Split-Calibrating PLAY Side';
 
   persistent AUTO_TIMEOUT = 20;
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
+
+  % delay between split-calib runs in looping mode
+  persistent LOOPING_DELAY = 3;
 
   % analysed input ch goes through LPF or VD, the other input channel is direct
   global ANALYSED_CH_ID;
@@ -113,7 +116,10 @@ function result = splitCalibPlaySched(label = 1)
         clearOutBox();
         % for restoration at the end
         keepInOutSwitches();
+        label = SWITCH_TO_LPF_LABEL;
+        continue;
 
+      case SWITCH_TO_LPF_LABEL
         % OUT unchanged
         adapterStruct.in = false; % CALIB IN
         adapterStruct.lpf = true; % LPF
@@ -229,8 +235,21 @@ function result = splitCalibPlaySched(label = 1)
       case COMP_PLAY_LABEL
         printStr(sprintf('Compensating PLAY side'));
         cmdIDPlay = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_PLAY_SIDE)], cmdFilePlay);
-        waitForCmdDone(cmdIDPlay, ALL_OFF_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone(cmdIDPlay, CHECK_LOOPING, AUTO_TIMEOUT, ERROR, mfilename());
         return;
+
+      case CHECK_LOOPING
+        global loopSplitCalib;
+        if loopSplitCalib
+          % waiting and repeating
+          schedPause(LOOPING_DELAY, SWITCH_TO_LPF_LABEL, mfilename());
+          return;
+        else
+          % done
+          label = DONE_LABEL;
+          continue;
+        endif
+
 
       case ABORT
         wasAborted= true;

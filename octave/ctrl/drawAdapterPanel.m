@@ -1,11 +1,11 @@
-function drawAdapterPanel(fig, x, y, height)
-  persistent MSG_HEIGHT = 0.5;
+function drawAdapterPanel(fig, x, y, width, height)
   global adapterStruct;
 
   panel = uipanel(fig,
               'title', 'Adapter',
-              'position', [x, y, 1, height]);
+              'position', [x, y, width, height]);
 
+  MSG_HEIGHT = 0.5;
   MSG_Y = 1- MSG_HEIGHT;
   adapterStruct.msgBox =   uicontrol(panel,
                              'style', 'text',
@@ -22,7 +22,9 @@ function drawAdapterPanel(fig, x, y, height)
               'position', [0, 0, 1, MSG_Y]);
 
 
-  adapterStruct.outCheckbox = uicontrol (ctrlPanel ,
+  CLEARANCE = 0.03;
+  OUT_CHCKBX_WIDTH = 0.14;
+  adapterStruct.outCheckbox = uicontrol (ctrlPanel,
                              'style', 'checkbox',
                              'units', 'normalized',
                              'string', 'OUT DUT',
@@ -30,12 +32,15 @@ function drawAdapterPanel(fig, x, y, height)
                              'verticalalignment', 'middle',
                              'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
                              'callback', @clbkSetOut,
-                             'position', [0, 0, 0.2, 1]);
+                             'position', [0, 0, OUT_CHCKBX_WIDTH, 1]);
 
+
+  IN_RGROUP_WIDTH = 0.25;
+  inRGroupX = OUT_CHCKBX_WIDTH + CLEARANCE;
   adapterStruct.inRGroup = uibuttongroup (ctrlPanel ,
                                'units', 'normalized',
                                'selectionchangedfcn', @clbkSetIn,
-                               'position', [0.2, 0, 0.15, 1]);
+                               'position', [inRGroupX, 0, IN_RGROUP_WIDTH, 1]);
 
   adapterStruct.dutInRadio = uicontrol (adapterStruct.inRGroup,
             'style', 'radiobutton',
@@ -53,10 +58,12 @@ function drawAdapterPanel(fig, x, y, height)
             'Position', [0.5, 0, 0.5, 1]);
 
 
+  VDLP_RGROUP_WIDTH = 0.18;
+  vdlpRGroupX = inRGroupX + IN_RGROUP_WIDTH + CLEARANCE;
   adapterStruct.vdlpRGroup = uibuttongroup (ctrlPanel ,
                                'units', 'normalized',
                                'selectionchangedfcn', @clbkSetVdlp,
-                               'position', [0.4, 0, 0.15, 1]);
+                               'position', [vdlpRGroupX, 0, VDLP_RGROUP_WIDTH, 1]);
 
   adapterStruct.lpfRadio = uicontrol (adapterStruct.vdlpRGroup,
             'style', 'radiobutton',
@@ -70,19 +77,24 @@ function drawAdapterPanel(fig, x, y, height)
             'string', 'VD',
             'units', 'normalized',
             'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
-            'Position', [0.4, 0, 0.5, 1]);
+            'Position', [0.5, 0, 0.5, 1]);
 
 
+  VD_LEVEL_WIDTH = 0.1;
+  vdLevelX = vdlpRGroupX + VDLP_RGROUP_WIDTH + CLEARANCE/5;
   adapterStruct.vdLevel = uicontrol(ctrlPanel,
       'style', 'edit',
       'backgroundcolor', 'white',
       'units', 'normalized',
+      'verticalalignment', 'middle',
       'tooltipstring', 'Enter required VD level in dB < 0',
       'visible', ifelse(adapterStruct.hasStepper, 'on', 'off'),
       'callback', @clbkSetVDLevel,
-      'position', [0.55, 0, 0.07, 0.95]);
+      'position', [vdLevelX, 0, VD_LEVEL_WIDTH, 0.95]);
 
 
+  BTN_WIDTH = 0.2;
+  btnX = vdLevelX + VD_LEVEL_WIDTH + CLEARANCE;
   adapterStruct.contBtn = uicontrol (ctrlPanel ,
                                 'style', 'pushbutton',
                                 'units', 'normalized',
@@ -90,7 +102,7 @@ function drawAdapterPanel(fig, x, y, height)
                                 'verticalalignment', 'middle',
                                 'visible', 'off',
                                 'callback', @clbkAdapterContinue,
-                                'position', [0.68,  0.1, 0.1, 0.9]);
+                                'position', [btnX,  0.1, BTN_WIDTH, 0.9]);
 
 endfunction
 
