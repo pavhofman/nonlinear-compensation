@@ -175,6 +175,11 @@ playInfo = [];
 % older infos are skipped - flushing the incoming queue
 MAX_INFO_AGE = 0.5;
 
+% display interval of received infos (not processing in scheduled tasks!) has lower limit to avoid useless refreshes
+lastDisplayedRecInfoTime = 0;
+lastDisplayedPlayInfoTime = 0;
+MIN_INFO_DISPLAY_INTERVAL = 0.1;
+
 % loop until doQuit, waiting for client infos
 while (~doQuit)
   % process scheduled callbacks, if any applicable at this time
@@ -189,7 +194,12 @@ while (~doQuit)
   else
     writeLog('TRACE', 'Processing rec info with ID %d', localRecInfo.id);
     recInfo = localRecInfo;
-    processInfo(recInfo, recStruct);
+    if lastDisplayedRecInfoTime + MIN_INFO_DISPLAY_INTERVAL < recInfo.time
+      processInfo(recInfo, recStruct);
+      lastDisplayedRecInfoTime = recInfo.time;
+    else
+      writeLog('TRACE', 'Skipped displaying recInfo');
+    endif
   endif
 
 
@@ -201,7 +211,12 @@ while (~doQuit)
   else
     writeLog('TRACE', 'Processing play info');
     playInfo = localPlayInfo;
-    processInfo(playInfo, playStruct);
+    if lastDisplayedPlayInfoTime + MIN_INFO_DISPLAY_INTERVAL < playInfo.time
+      processInfo(playInfo, playStruct);
+      lastDisplayedPlayInfoTime = playInfo.time;
+    else
+      writeLog('TRACE', 'Skipped displaying playInfo');
+    endif
   endif
 
   drawnow();
