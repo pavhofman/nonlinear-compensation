@@ -1,18 +1,19 @@
 function result = checkStepper(adapterStruct, recInfo, playInfo)
   % TODO - for now fixed
   persistent STEPPER_ID = 1;
-  % last processed recinfo time - to avoid comparing levels of the same recInfo
-  persistent lastRecInfoTime = 0;
+  % last processed recinfo ID - to avoid comparing levels of the same recInfo
+  persistent lastRecInfoID = 0;
 
   result = false;
 
   % CONTINUE button pressed, checking stepper
   if ~isempty(adapterStruct.reqLevels) % requested specific levels
     if ~isStepperRunning(STEPPER_ID) % stepper is not moving (not yet or no more), it makes sense to measure level
-      recInfoTime = recInfo.time;
-      if recInfoTime ~= lastRecInfoTime
+      recInfoID = recInfo.id;
+      if recInfoID ~= lastRecInfoID
         %remembering for next time
-        lastRecInfoTime = recInfoTime;
+        lastRecInfoID = recInfoID;
+        writeLog('DEBUG', "New recInfo ID %d", recInfoID);
 
         % new recInfo, can check level stability
         global ANALYSED_CH_ID;
@@ -90,5 +91,5 @@ function result = areReqLevels(reqLevels, measLevels, maxAmplDiff)
   % simple difference check, no ratios
   differentAmplIDs = find(abs(reqLevels - measLevels) > maxAmplDiff);
   result =  isempty(differentAmplIDs);
-  writeLog('DEBUG', 'areReqLevels: req: %f meas: %f, , maxAmplDiff %f => result %d', reqLevels(1), measLevels(1), maxAmplDiff, result);
+  writeLog('DEBUG', 'req: %f meas: %f, , maxAmplDiff %f => result %d', reqLevels(1), measLevels(1), maxAmplDiff, result);
 endfunction

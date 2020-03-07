@@ -212,7 +212,7 @@ while (~doQuit)
   if isempty(localRecInfo)
     writeLog('TRACE', 'Empty rec info');
   else
-    writeLog('TRACE', 'Processing rec info');
+    writeLog('TRACE', 'Processing rec info with ID %d', localRecInfo.id);
     recInfo = localRecInfo;
     processInfo(recInfo, recStruct);
   endif

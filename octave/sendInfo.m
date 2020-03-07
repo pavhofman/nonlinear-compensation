@@ -5,10 +5,9 @@ function sendInfo(info, zeromqPort)
   persistent result = zmq_connect(sock, ['tcp://localhost:' num2str(zeromqPort)]);
   
  
-  info.time = time();
   info.id = id;
   ser = var2bytea(info);
-  writeLog('TRACE', "Sending info: %d bytes", length(ser));
+  writeLog('TRACE', "Sending info: %d bytes, ID %d", length(ser), info.id);
   zmq_send (sock, ser, ZMQ_DONTWAIT);  
   id += 1;
 endfunction
