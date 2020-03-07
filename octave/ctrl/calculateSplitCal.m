@@ -1,4 +1,4 @@
-function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdName, lpName, nonInteger)
+function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdName, lpName, nonInteger, playDistortPeaksCh)
   global COMP_TYPE_JOINT;
   global AMPL_IDX;  % = index of fundAmpl1 in cal peaks row
   global PLAY_AMPL_IDX;  % = index of playAmpl1 in cal peaks row
@@ -43,10 +43,23 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
     distortPeakVD = getDistortPeakForFreq(distortFreq, peaksVDRow, distortVDFreqs);
     distortPeakLP = getDistortPeakForFreq(distortFreq, peaksLPRow, distortLPFreqs);
     
+    % for incremental update
+    if ~isempty(playDistortPeaksCh)
+      % currently compensated distortPeak for distortFreq
+      curDistortPeak =  playDistortPeaksCh(playDistortPeaksCh(:, 1) == distortFreq, :);
+    else
+      curDistortPeak = [];
+    endif
+
     if isempty(distortPeakVD) || isempty(distortPeakLP)
-      % some distortPeaks at curFreq unknown, skipping this curFreq
+      % some distortPeaks at distortFreq unknown, skipping calculation for this distortFreq
+      % if incremental mode, using the peak being currently compensated instead
+      if ~isempty(curDistortPeak)
+        distortPeaksDCh = [distortPeaksDCh; curDistortPeak];
+      endif
+      % go to next frequency
       continue;
-    end
+    endif
     
     % VD params
     distortAmplVD = abs(distortPeakVD);
@@ -92,6 +105,18 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
 
 
     distortPeaksACh = [distortPeaksACh; [distortFreq, amplA, phaseA]];
+
+    if ~isempty(curDistortPeak)
+      % incremental mode - the calculated peak is just complex-added to curDistortPeak
+      % addition in complex form
+      curPeakC = curDistortPeak(1, 2) * exp(i * curDistortPeak(1, 3));
+      calcPeakC = amplD * exp(i * phaseD);
+      sumC = curPeakC + calcPeakC;
+      % converting back to polar coordinates
+      amplD = abs(sumC);
+      phaseD = angle(sumC);
+    endif
+
     distortPeaksDCh = [distortPeaksDCh; [distortFreq, amplD, phaseD]];
   endfor
 
