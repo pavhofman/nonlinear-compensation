@@ -1,4 +1,5 @@
-function schedTask = checkAdapterPanel(adapterStruct, nextLabel, abortLabel, errorLabel, schedTask)
+function schedTask = checkAdapterPanel(nextLabel, abortLabel, errorLabel, schedTask)
+  global adapterStruct;
   if adapterStruct.switchesSet
     % switches set, user confirned with CONTINUE button
     % resetting flag

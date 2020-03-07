@@ -15,9 +15,9 @@ function initAdapterStruct()
     adapterStruct.hasRelays = false;
     adapterStruct.hasStepper = false;
 
-    adapterStruct.execFunc = @(title, thisStruct) updateAdapterPanel(title, true);
-    adapterStruct.checkFunc = @(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
-      checkAdapterPanel(thisStruct, nextLabel, abortLabel, errorLabel, schedTask);
+    adapterStruct.execFunc = @(title) updateAdapterPanel(title, true);
+    adapterStruct.checkFunc = @(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
+      checkAdapterPanel(nextLabel, abortLabel, errorLabel, schedTask);
     % empty function
     adapterStruct.abortFunc = @() abortAdapterPanel();
   else
@@ -32,14 +32,14 @@ function initAdapterStruct()
     steppers{1} = initStepper(ardStruct.ard, 1, 6, 7, 8, 9);
 
     % same for all stepper adapters
-    adapterStruct.checkFunc = @(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
-      checkSwitchesAndStepper(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask);
+    adapterStruct.checkFunc = @(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
+      checkSwitchesAndStepper(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask);
     adapterStruct.abortFunc = @() abortAdapterPanelWithStepper();
 
     if adapterType == ADAPTER_TYPE_SWITCHWIN_VD_STEPPER
       % simple info window with switch positions
       adapterStruct.hasRelays = false;
-      adapterStruct.execFunc = @(title, thisStruct) execAdapterPanelWithStepper(title, thisStruct);
+      adapterStruct.execFunc = @(title) execAdapterPanelWithStepper(title);
   
     elseif adapterType == ADAPTER_TYPE_RELAYS_1STEPPER
       adapterStruct.hasRelays = true;
@@ -47,7 +47,7 @@ function initAdapterStruct()
       ardStruct.outPin = 15;
       ardStruct.lpfPin = 10;
       ardStruct.inPin = 16;
-      adapterStruct.execFunc = @(title, thisStruct) execRelaysAdapter(title, thisStruct);
+      adapterStruct.execFunc = @(title) execRelaysAdapter(title);
     endif % stepper adapter type
   endif % adapter type
 endfunction

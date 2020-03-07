@@ -1,5 +1,6 @@
 % checkFunc for tasks
-function schedTask = checkSwitchesAndStepper(adapterStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)
+function schedTask = checkSwitchesAndStepper(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)
+  global adapterStruct;
   persistent checkingStepper = false;
 
   % first checking continue status
