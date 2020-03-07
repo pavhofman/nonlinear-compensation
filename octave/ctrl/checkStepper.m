@@ -44,18 +44,18 @@ function result = checkStepper(adapterStruct, recInfo, playInfo)
 endfunction
 
 function result = areLevelsStable(measPeaksCh, stepperID)
+  global adapterStruct;
   % const
   persistent PREV_SAME_LEVELS_CNT = 2;
   persistent prevMeasPeaks = cell();
 
   result = false;
 
-  global steppers;
-  if steppers{stepperID}.hasMoved
-    writeLog('DEBUG', 'Stepper [%d] has moved, resetting history', stepperID);
+  if adapterStruct.resetPrevMeasPeaks
+    writeLog('DEBUG', 'Resetting peaks history was requested');
     prevMeasPeaks = cell();
-    steppers{stepperID}.hasMoved = false;
-    return;
+    % clearing the flag
+    adapterStruct.resetPrevMeasPeaks = false;
   endif
 
   if isempty(measPeaksCh)
@@ -72,7 +72,7 @@ function result = areLevelsStable(measPeaksCh, stepperID)
       for idx = 1:numel(prevMeasPeaks)
         prevPeaksCh = prevMeasPeaks{idx};
         result &= areSameLevels(measPeaksCh, prevPeaksCh, MAX_AMPL_DIFF_INTEGER);
-        writeLog('DEBUG', 'areLevelsStable: IDX %d: meas: %f prev: %f, result %d', idx, measPeaksCh(1, 2), prevPeaksCh(1, 2), result);
+        writeLog('DEBUG', 'IDX %d: meas: %f prev: %f, result %d', idx, measPeaksCh(1, 2), prevPeaksCh(1, 2), result);
         if ~result
           % no reason to continue
           break;

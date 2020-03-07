@@ -12,6 +12,4 @@ function stepper = initStepperStruct(stepperID)
   stepper.initialized = false;
   % flag for isStepperRunning
   stepper.running = false;
-  % flag for areLevelsStable
-  stepper.hasMoved = false;
 endfunction

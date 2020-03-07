@@ -7,8 +7,9 @@ function schedTask = checkSwitchesAndStepper(adapterStruct, recInfo, playInfo, n
   if switchesSet
     % CONTINUE button pressed, can continue with checking stepper
     checkingStepper = true;
-    % resetting flag
+    % setting flags
     switchesSet = false;
+    adapterStruct.resetPrevMeasPeaks = true;
   endif
 
   if checkingStepper

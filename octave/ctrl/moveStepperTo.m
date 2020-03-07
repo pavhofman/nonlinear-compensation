@@ -11,5 +11,8 @@ function moveStepperTo(stepperID, steps)
   global steppers;
   steppers{stepperID}.lastSteps = steps;
   steppers{stepperID}.running = true;
-  steppers{stepperID}.hasMoved = true;
+
+  % stepper move will cause level change - peaks history must be reset
+  global adapterStruct;
+  adapterStruct.resetPrevMeasPeaks = true;
 endfunction

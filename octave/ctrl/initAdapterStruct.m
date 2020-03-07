@@ -21,6 +21,8 @@ function initAdapterStruct()
   else
     % all other adapter types have some steppers
     adapterStruct.hasStepper = true;
+    % flag for checkStepper() - set after every switch change and stepper move
+    adapterStruct.resetPrevMeasPeaks = true;
 
     initArduino();
     global ardStruct;
