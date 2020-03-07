@@ -18,10 +18,8 @@ function initAdapterStruct()
       checkAdapterPanel(thisStruct, nextLabel, abortLabel, errorLabel, schedTask);
     % empty function
     adapterStruct.abortFunc = @() abortAdapterPanel();
-
-  elseif adapterType == ADAPTER_TYPE_SWITCHWIN_VD_STEPPER
-    % simple info window with switch positions
-    adapterStruct.hasRelays = false;
+  else
+    % all other adapter types have some steppers
     adapterStruct.hasStepper = true;
 
     initArduino();
@@ -29,30 +27,25 @@ function initAdapterStruct()
     global steppers;
     steppers{1} = initStepper(ardStruct.ard, 1, 6, 7, 8, 9);
 
-    adapterStruct.execFunc = @(title, thisStruct) execAdapterPanelWithStepper(title, thisStruct);
+    % same for all stepper adapters
     adapterStruct.checkFunc = @(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
       checkSwitchesAndStepper(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask);
     adapterStruct.abortFunc = @() abortAdapterPanelWithStepper();
 
-  elseif adapterType == ADAPTER_TYPE_RELAYS_1STEPPER
-    adapterStruct.hasRelays = true;
-    adapterStruct.hasStepper = true;
-
-    initArduino();
-    global ardStruct;
-    global steppers;
-    steppers{1} = initStepper(ardStruct.ard, 1, 6, 7, 8, 9);
-    % relays pins
-    ardStruct.outPin = 15;
-    ardStruct.lpfPin = 10;
-    ardStruct.inPin = 16;
-
-
-    adapterStruct.execFunc = @(title, thisStruct) execRelaysAdapter(title, thisStruct);
-    adapterStruct.checkFunc = @(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
-      checkSwitchesAndStepper(thisStruct, recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask);
-    adapterStruct.abortFunc = @() abortAdapterPanelWithStepper();
-  endif
+    if adapterType == ADAPTER_TYPE_SWITCHWIN_VD_STEPPER
+      % simple info window with switch positions
+      adapterStruct.hasRelays = false;
+      adapterStruct.execFunc = @(title, thisStruct) execAdapterPanelWithStepper(title, thisStruct);
+  
+    elseif adapterType == ADAPTER_TYPE_RELAYS_1STEPPER
+      adapterStruct.hasRelays = true;
+      % relays pins
+      ardStruct.outPin = 15;
+      ardStruct.lpfPin = 10;
+      ardStruct.inPin = 16;
+      adapterStruct.execFunc = @(title, thisStruct) execRelaysAdapter(title, thisStruct);
+    endif % stepper adapter type
+  endif % adapter type
 endfunction
 
 
