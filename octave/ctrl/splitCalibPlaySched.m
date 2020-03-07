@@ -111,7 +111,10 @@ function result = splitCalibPlaySched(label = 1)
         
       case START_LABEL
         clearOutBox();
-        adapterStruct.out = false; % OUT off
+        % for restoration at the end
+        keepInOutSwitches();
+
+        % OUT unchanged
         adapterStruct.in = false; % CALIB IN
         adapterStruct.lpf = true; % LPF
         adapterStruct.reqLevels = []; % no stepper adjustment
@@ -168,7 +171,7 @@ function result = splitCalibPlaySched(label = 1)
         % persistent variable, also used in next step CAL_VD_LABEL
         lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
 
-        adapterStruct.out = false;
+        % OUT unchanged
         adapterStruct.in = false; % CALIB
         adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = lpFundAmpl;
@@ -245,6 +248,7 @@ function result = splitCalibPlaySched(label = 1)
         endif
 
       case DONE_LABEL
+        % plus restoring IN/OUT switches
         resetAdapterStruct();
         waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
         return;

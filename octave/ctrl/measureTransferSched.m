@@ -108,6 +108,9 @@ function result = measureTransferSched(label= 1, schedTask = [])
           didMeasureLPF = true;
         endif
         
+        % for restoration at the end
+        keepInOutSwitches();
+        % OUT must be off because the task will generate auxiliary signals
         adapterStruct.out = false; % OUT off
         adapterStruct.in = false; % CALIB IN
         adapterStruct.lpf = true; % LPF
@@ -320,6 +323,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
           label = FINISH_DONE_LABEL;
           continue;
         else
+          % plus restoring IN/OUT switches
           resetAdapterStruct();
           waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
           return;

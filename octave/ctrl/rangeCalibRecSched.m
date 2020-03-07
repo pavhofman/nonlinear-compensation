@@ -84,6 +84,10 @@ function result = rangeCalibRecSched(label = 1)
         
       case START_LABEL
         clearOutBox();
+        % for restoration at the end
+        keepInOutSwitches();
+
+        % OUT unchanged
         adapterStruct.in = false; % CALIB IN
         adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = []; % no stepper adjustment
@@ -118,7 +122,6 @@ function result = rangeCalibRecSched(label = 1)
 
         printStr('Calibrating REC side at CH%d level - adj %f, maxAmplDiff %f', ANALYSED_CH_ID, adjustment, maxAmplDiff);
         
-        adapterStruct.in = false; % CALIB
         adapterStruct.lpf = false; % VD
         adapterStruct.reqLevels = (1 + adjustment) * origRecLevel;
         % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
@@ -169,6 +172,7 @@ function result = rangeCalibRecSched(label = 1)
         continue;
 
       case DONE_LABEL
+        % plus restoring IN/OUT switches
         resetAdapterStruct();
         waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
         return;
