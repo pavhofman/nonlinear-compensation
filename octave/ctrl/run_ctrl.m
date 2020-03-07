@@ -194,8 +194,10 @@ while (~doQuit)
   else
     writeLog('TRACE', 'Processing rec info with ID %d', localRecInfo.id);
     recInfo = localRecInfo;
+
+    % displaying
     if lastDisplayedRecInfoTime + MIN_INFO_DISPLAY_INTERVAL < recInfo.time
-      processInfo(recInfo, recStruct);
+      displayInfo(recInfo, recStruct);
       lastDisplayedRecInfoTime = recInfo.time;
     else
       writeLog('TRACE', 'Skipped displaying recInfo');
@@ -211,8 +213,10 @@ while (~doQuit)
   else
     writeLog('TRACE', 'Processing play info');
     playInfo = localPlayInfo;
+
+    % displaying
     if lastDisplayedPlayInfoTime + MIN_INFO_DISPLAY_INTERVAL < playInfo.time
-      processInfo(playInfo, playStruct);
+      displayInfo(playInfo, playStruct);
       lastDisplayedPlayInfoTime = playInfo.time;
     else
       writeLog('TRACE', 'Skipped displaying playInfo');

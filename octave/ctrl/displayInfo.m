@@ -1,4 +1,4 @@
-function processInfo(info, dirStruct)
+function displayInfo(info, dirStruct)
   %info.id = NA;
   %info.time = time();
   %info.status = statusStruct;
