@@ -192,8 +192,8 @@ while (~doQuit)
   if isempty(localRecInfo)
     writeLog('TRACE', 'Empty rec info');
   else
-    writeLog('TRACE', 'Processing rec info with ID %d', localRecInfo.id);
     recInfo = localRecInfo;
+    writeLog('TRACE', 'Processing rec info with ID %d', recInfo.id);
 
     % displaying
     if lastDisplayedRecInfoTime + MIN_INFO_DISPLAY_INTERVAL < recInfo.time
@@ -211,8 +211,8 @@ while (~doQuit)
   if isempty(localPlayInfo)
     writeLog('TRACE', 'Empty play info');
   else
-    writeLog('TRACE', 'Processing play info');
     playInfo = localPlayInfo;
+    writeLog('TRACE', 'Processing play info with ID %d', playInfo.id);
 
     % displaying
     if lastDisplayedPlayInfoTime + MIN_INFO_DISPLAY_INTERVAL < playInfo.time
