@@ -49,7 +49,6 @@ function result = rangeCalibRecSched(label = 1)
   persistent fs = NA;
   persistent origFreq = NA;
   persistent origRecLevel = NA;
-  persistent origPlayLevels = NA;
   persistent maxAmplDiff = NA;
   persistent adjustment = NA;
   persistent calFreqReq = NA;
@@ -62,8 +61,6 @@ function result = rangeCalibRecSched(label = 1)
     switch(label)
     
       case CHECKING_LABEL
-        
-        global playInfo;
         global recInfo;
         
         addTask(mfilename(), NAME);
@@ -76,9 +73,7 @@ function result = rangeCalibRecSched(label = 1)
         fs = recInfo.fs;
         origFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
         origRecLevel = recInfo.measuredPeaks{ANALYSED_CH_ID}(:, 2);
-        % two channels, any freqs
-        origPlayLevels = {playInfo.measuredPeaks{1}(:, 2), playInfo.measuredPeaks{2}(:, 2)};
-        
+
         label = START_LABEL;
         continue;
         
