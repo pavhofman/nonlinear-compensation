@@ -13,7 +13,6 @@ function result = checkStepper(adapterStruct, recInfo, playInfo)
       if recInfoID ~= lastRecInfoID
         %remembering for next time
         lastRecInfoID = recInfoID;
-        writeLog('DEBUG', "New recInfo ID %d", recInfoID);
 
         % new recInfo, can check level stability
         global ANALYSED_CH_ID;
