@@ -27,7 +27,7 @@ function initAdapterStruct()
     initArduino();
     global ardStruct;
     global steppers;
-    steppers{1} = initStepper(ardStruct.ard, 1, 6, 7, 8, 9);
+    steppers{1} = initStepper(ardStruct.ard, 1, 6, 9, 8, 7);
 
     % same for all stepper adapters
     adapterStruct.checkFunc = @(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
@@ -65,7 +65,7 @@ endfunction
 
 function stepperStruct = initStepper(ard, stepperID, p1, p2, p3, p4)
   ard.initStepperType4(stepperID, p1, p2, p3, p4);
-  ard.setSpeed(stepperID, 500);
+  ard.setSpeed(stepperID, 450);
   % 0 accel = acceleration off
   ard.setAccel(stepperID, 0);
   stepperStruct = initStepperStruct(stepperID);
