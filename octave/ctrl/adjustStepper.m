@@ -6,6 +6,9 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
   persistent MIN_MOVES = 15;
   persistent MAX_MOVES = 20;
 
+  % estimate of total stepper steps (9.9 revolutions x 2038 steps/revolution)
+  persistent EST_TOTAL_STEPS = 9.9 * 2038;
+
   global steppers;
   global ANALYSED_CH_ID;
   global PLAY_CH_ID;
@@ -88,7 +91,21 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
     % already initialized, adjusting for the required level
     % for now only one req level
     reqTransfer = reqLevels(1)/playAmpl;
-    newSteps  = calculateNewStep(stepperID, reqTransfer);
+
+    % estimating pos0 for setting regression bound <-10%, +10%>
+    % using current amplitude in direct channel as max. amplitude of analyzed channel
+    % precise value is not important
+    recDirectAmpl = recInfo.measuredPeaks{getTheOtherChannelID(ANALYSED_CH_ID)}(1, 2);
+    % estimated current position of analysed CH
+    estCurPos = EST_TOTAL_STEPS * recAmpl/recDirectAmpl;
+    % getting back to zero position
+    moves = steppers{stepperID}.moves;
+    steps = moves(:, 1);
+    offsets = cumsum(steps);
+    % backlash is negligible here - value used only for the bound range
+    estPos0 = estCurPos - offsets(end);
+
+    newSteps  = calculateNewStep(stepperID, reqTransfer, estPos0);
   endif
   % moving new steps
   if newSteps ~= 0
@@ -96,8 +113,11 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
   endif
 endfunction
 
-function newSteps = calculateNewStep(stepperID, reqTransfer)
+function newSteps = calculateNewStep(stepperID, reqTransfer, estPos0)
   persistent INIT_BACKLASH = 20;
+  persistent MIN_BACKLASH = 5;
+  persistent MAX_BACKLASH = 50;
+
   % corresponds to steps required to reach next VD wire
   persistent MIN_STEPS = 2;
   global steppers;
@@ -119,16 +139,13 @@ function newSteps = calculateNewStep(stepperID, reqTransfer)
 
   f = @(p, x) fitEqs(x, p(1), p(2));
 
-  if isna(steppers{stepperID}.lastPos0)
-    % pos0 must not be 0, otherwise division by zero!
-    minPos0 = 1;
-    maxPos0 = 30000;
-  else
-    % using pos0 from last calculation to avoid abrupt jumps in curvefit results
-    minPos0 = 0.9 * steppers{stepperID}.lastPos0;
-    maxPos0 = 1.1 * steppers{stepperID}.lastPos0;
-  endif
-  settings = optimset('lbound', [minPos0 ; 5], 'ubound', [maxPos0; 100]);
+  % bounding pos0 with estimated pos0 from current analyzed vs. direct channel amplitudes
+  minPos0 = round(0.9 * estPos0);
+  maxPos0 = round (1.1 * estPos0);
+
+  settings = optimset('lbound', [minPos0 ; MIN_BACKLASH], 'ubound', [maxPos0; MAX_BACKLASH]);
+  writeLog('DEBUG', 'Stepper [%d] bounds: pos0 <%d, %d>, backlash <%d, %d>', stepperID, minPos0, maxPos0, MIN_BACKLASH, MAX_BACKLASH);
+
   init = [minPos0; INIT_BACKLASH];
   
   [p, model_values, cvg, outp] = nonlin_curvefit(f, init, x, obs, settings);
@@ -148,7 +165,7 @@ function newSteps = calculateNewStep(stepperID, reqTransfer)
   lastDir = steps(end) == abs(steps(end))
   if xor(lastDir, newSteps > 0)
     % direction changed, increasing by safe (partial) backlash
-    safeBacklash = round(backlash * 0.6);
+    safeBacklash = round(backlash * 0.3);
     newSteps = ifelse(newSteps > 0, newSteps + safeBacklash, newSteps - safeBacklash);
     writeLog('DEBUG', 'Stepper [%d] direction will change, adding safe backlash %d steps', stepperID, safeBacklash);
   endif
