@@ -5,9 +5,9 @@ function drawBtnPanel(fig, x, y, width, height)
 
   global loopSplitCalib = false;
 
-  CLEARANCE = 0.02;
+  CLEARANCE = 0.01;
   LOOP_CHCKBX_X = 0.03;
-  LOOP_CHCKBX_WIDTH = 0.2;
+  LOOP_CHCKBX_WIDTH = 0.24;
 
   BTN_Y = 0.1;
   BTN_WIDTH = 0.35;
@@ -43,7 +43,7 @@ function drawBtnPanel(fig, x, y, width, height)
                                   'horizontalalignment', 'center',
                                   %'backgroundcolor', 'yellow',
                                   'callback', @clbkRangeCalibRec,
-                                  'position', [splitBtnX + BTN_WIDTH + 2 * CLEARANCE,  BTN_Y, BTN_WIDTH, BTN_HEIGHT]);
+                                  'position', [splitBtnX + BTN_WIDTH + CLEARANCE,  BTN_Y, BTN_WIDTH, BTN_HEIGHT]);
 endfunction
 
 function clbkLoopSplitCalib(src, data)

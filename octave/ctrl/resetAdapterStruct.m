@@ -31,7 +31,7 @@ function resetAdapterStruct(recoverInOut = true)
   endif
 
   % other switches defaults
-  adapterStruct.lpf = false; % VD
+  adapterStruct.calibLPF = false; % VD
   % same format as peaksCh, phase column not required
   adapterStruct.reqLevels = [];
   adapterStruct.maxAmplDiff = [];

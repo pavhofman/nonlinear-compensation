@@ -9,8 +9,8 @@ function updateAdapterPanel(title, showContBtn)
   radio = ifelse(adapterStruct.in, adapterStruct.dutInRadio, adapterStruct.calInRadio);
   changed |= setRadio(adapterStruct.inRGroup, radio);
 
-  radio = ifelse(adapterStruct.lpf, adapterStruct.lpfRadio, adapterStruct.vdRadio);
-  changed |= setRadio(adapterStruct.vdlpRGroup, radio);
+  radio = ifelse(adapterStruct.calibLPF, adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio);
+  changed |= setRadio(adapterStruct.calibVdlpRGroup, radio);
 
   %   reqLevel enabled only when no task running
   global taskFNames;

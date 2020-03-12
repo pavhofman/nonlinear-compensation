@@ -43,7 +43,7 @@ function initAdapterStruct()
       adapterStruct.hasRelays = true;
       % relays pins
       ardStruct.outPin = 15;
-      ardStruct.lpfPin = 10;
+      ardStruct.calibLPFPin = 10;
       ardStruct.inPin = 16;
       adapterStruct.execFunc = @(title) execRelaysAdapter(title);
     endif % stepper adapter type

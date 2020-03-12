@@ -22,8 +22,8 @@ function drawAdapterPanel(fig, x, y, width, height)
               'position', [0, 0, 1, MSG_Y]);
 
 
-  CLEARANCE = 0.03;
-  OUT_CHCKBX_WIDTH = 0.14;
+  CLEARANCE = 0.01;
+  OUT_CHCKBX_WIDTH = 0.12;
   adapterStruct.outCheckbox = uicontrol (ctrlPanel,
                              'style', 'checkbox',
                              'units', 'normalized',
@@ -35,7 +35,7 @@ function drawAdapterPanel(fig, x, y, width, height)
                              'position', [0, 0, OUT_CHCKBX_WIDTH, 1]);
 
 
-  IN_RGROUP_WIDTH = 0.25;
+  IN_RGROUP_WIDTH = 0.21;
   inRGroupX = OUT_CHCKBX_WIDTH + CLEARANCE;
   adapterStruct.inRGroup = uibuttongroup (ctrlPanel ,
                                'units', 'normalized',
@@ -58,21 +58,21 @@ function drawAdapterPanel(fig, x, y, width, height)
             'Position', [0.5, 0, 0.5, 1]);
 
 
-  VDLP_RGROUP_WIDTH = 0.18;
-  vdlpRGroupX = inRGroupX + IN_RGROUP_WIDTH + CLEARANCE;
-  adapterStruct.vdlpRGroup = uibuttongroup (ctrlPanel ,
+  CALIB_VDLP_RGROUP_WIDTH = 0.15;
+  calibVdlpRGroupX = inRGroupX + IN_RGROUP_WIDTH + CLEARANCE;
+  adapterStruct.calibVdlpRGroup = uibuttongroup (ctrlPanel ,
                                'units', 'normalized',
                                'selectionchangedfcn', @clbkSetVdlp,
-                               'position', [vdlpRGroupX, 0, VDLP_RGROUP_WIDTH, 1]);
+                               'position', [calibVdlpRGroupX, 0, CALIB_VDLP_RGROUP_WIDTH, 1]);
 
-  adapterStruct.lpfRadio = uicontrol (adapterStruct.vdlpRGroup,
+  adapterStruct.calibLpfRadio = uicontrol (adapterStruct.calibVdlpRGroup,
             'style', 'radiobutton',
             'string', 'LPF',
             'units', 'normalized',
             'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
             'Position', [0, 0, 0.5, 1]);
 
-  adapterStruct.vdRadio = uicontrol (adapterStruct.vdlpRGroup,
+  adapterStruct.calibVdRadio = uicontrol (adapterStruct.calibVdlpRGroup,
             'style', 'radiobutton',
             'string', 'VD',
             'units', 'normalized',
@@ -80,8 +80,8 @@ function drawAdapterPanel(fig, x, y, width, height)
             'Position', [0.5, 0, 0.5, 1]);
 
 
-  VD_LEVEL_WIDTH = 0.1;
-  vdLevelX = vdlpRGroupX + VDLP_RGROUP_WIDTH + CLEARANCE/5;
+  VD_LEVEL_WIDTH = 0.09;
+  vdLevelX = calibVdlpRGroupX + CALIB_VDLP_RGROUP_WIDTH + CLEARANCE/5;
   adapterStruct.vdLevel = uicontrol(ctrlPanel,
       'style', 'edit',
       'backgroundcolor', 'white',
@@ -116,7 +116,7 @@ endfunction
 function clbkSetVdlp(src, data)
   global adapterStruct;
   radio = get(src, 'selectedobject');
-  adapterStruct.lpf = radio == adapterStruct.lpfRadio;
+  adapterStruct.calibLPF = radio == adapterStruct.calibLpfRadio;
   % this control is enabled only when having relays
   updateRelays();
 endfunction

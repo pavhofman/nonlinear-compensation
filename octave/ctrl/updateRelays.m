@@ -3,7 +3,7 @@ function updateRelays()
   global ardStruct;
 
   changed = setRelay(ardStruct.ard, ardStruct.outPin, adapterStruct.out, 'OFF/OUT');
-  changed |= setRelay(ardStruct.ard, ardStruct.lpfPin, adapterStruct.lpf, 'VD/LPF');
+  changed |= setRelay(ardStruct.ard, ardStruct.calibLPFPin, adapterStruct.calibLPF, 'VD/LPF');
   changed |= setRelay(ardStruct.ard, ardStruct.inPin, adapterStruct.in, 'CALIB/IN');
 
   % switches are set now

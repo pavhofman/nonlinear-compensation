@@ -22,7 +22,7 @@ function result = setVDLevelSched(label = 1)
         wasAborted = false;
 
         adapterStruct.in = false; % CALIB IN
-        adapterStruct.lpf = false; % VD
+        adapterStruct.calibLPF = false; % VD
 
         % adapterStruct.reqLevels already set from the txt input
 

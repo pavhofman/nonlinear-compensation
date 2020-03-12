@@ -101,7 +101,7 @@ ADAPTER_PANEL_HEIGHT = 0.1;
 ADAPTER_PANEL_Y = DIR_PANEL_Y - ADAPTER_PANEL_HEIGHT;
 
 % button panel with fast-access buttons
-BTN_PANEL_WIDTH = 0.35;
+BTN_PANEL_WIDTH = 0.25;
 drawBtnPanel(fig, 0, ADAPTER_PANEL_Y, BTN_PANEL_WIDTH, ADAPTER_PANEL_HEIGHT);
 
 initAdapterStruct();
