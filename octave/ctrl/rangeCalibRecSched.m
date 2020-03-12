@@ -169,10 +169,14 @@ function result = rangeCalibRecSched(label = 1)
       case DONE_LABEL
         % plus restoring IN/OUT switches
         resetAdapterStruct();
-        waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
+        waitForAdapterAdjust('Restore switches', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
         return;
 
       case FINISH_DONE_LABEL
+        % clearing the label
+        adapterStruct.label = '';
+        updateAdapterPanel();
+
         if wasAborted
           result = false;
         else

@@ -327,11 +327,14 @@ function result = measureTransferSched(label= 1, schedTask = [])
         else
           % plus restoring IN/OUT switches
           resetAdapterStruct();
-          waitForAdapterAdjust('Set switches for measuring DUT', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
+          waitForAdapterAdjust('Restore switches', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
           return;
         endif
 
       case FINISH_DONE_LABEL
+        % clearing the label
+        adapterStruct.label = '';
+        updateAdapterPanel();
         if wasAborted
           msg = 'Measuring transfer was aborted';
           result = false;
