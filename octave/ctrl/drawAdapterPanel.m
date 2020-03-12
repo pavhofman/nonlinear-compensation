@@ -93,6 +93,28 @@ function drawAdapterPanel(fig, x, y, width, height)
       'position', [vdLevelX, 0, VD_LEVEL_WIDTH, 0.95]);
 
 
+
+  LPF_RGROUP_WIDTH = 0.15;
+  lpfRGroupX = vdLevelX + VD_LEVEL_WIDTH + CLEARANCE;
+  adapterStruct.lpfRGroup = uibuttongroup (ctrlPanel ,
+                               'units', 'normalized',
+                               'selectionchangedfcn', @clbkSetLpf,
+                               'position', [lpfRGroupX, 0, CALIB_VDLP_RGROUP_WIDTH, 1]);
+
+  adapterStruct.lpf1Radio = uicontrol (adapterStruct.lpfRGroup,
+            'style', 'radiobutton',
+            'string', 'LPF1',
+            'units', 'normalized',
+            'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
+            'Position', [0, 0, 0.5, 1]);
+
+  adapterStruct.lpf2Radio = uicontrol (adapterStruct.lpfRGroup,
+            'style', 'radiobutton',
+            'string', 'LPF2',
+            'units', 'normalized',
+            'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
+            'Position', [0.5, 0, 0.5, 1]);
+
   BTN_WIDTH = 0.2;
   btnX = vdLevelX + VD_LEVEL_WIDTH + CLEARANCE;
   adapterStruct.contBtn = uicontrol (ctrlPanel ,
@@ -117,6 +139,14 @@ function clbkSetVdlp(src, data)
   global adapterStruct;
   radio = get(src, 'selectedobject');
   adapterStruct.calibLPF = radio == adapterStruct.calibLpfRadio;
+  % this control is enabled only when having relays
+  updateRelays();
+endfunction
+
+function clbkSetLpf(src, data)
+  global adapterStruct;
+  radio = get(src, 'selectedobject');
+  adapterStruct.lpf = ifelse(radio == adapterStruct.lpf1Radio, 1, 2);
   % this control is enabled only when having relays
   updateRelays();
 endfunction

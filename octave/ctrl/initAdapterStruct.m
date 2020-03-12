@@ -7,6 +7,8 @@ function initAdapterStruct()
   global adapterStruct;
   adapterStruct = struct();
   resetAdapterStruct();
+  % lpf1/2 is not modified by resetAdapterStruct, defining init value here
+  adapterStruct.lpf = 1; % 1 = LPF1, 2 = LPF2
 
   if adapterType == ADAPTER_TYPE_SWITCHWIN
     % mechanical switches, no stepper
@@ -45,6 +47,7 @@ function initAdapterStruct()
       ardStruct.outPin = 15;
       ardStruct.calibLPFPin = 10;
       ardStruct.inPin = 16;
+      ardStruct.lpfPin = 14; % LPF 1/2
       adapterStruct.execFunc = @(title) execRelaysAdapter(title);
     endif % stepper adapter type
   endif % adapter type

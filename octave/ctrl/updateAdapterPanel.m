@@ -12,6 +12,9 @@ function updateAdapterPanel(title, showContBtn)
   radio = ifelse(adapterStruct.calibLPF, adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio);
   changed |= setRadio(adapterStruct.calibVdlpRGroup, radio);
 
+  radio = ifelse(adapterStruct.lpf == 1, adapterStruct.lpf1Radio, adapterStruct.lpf2Radio);
+  changed |= setRadio(adapterStruct.lpfRGroup, radio);
+
   %   reqLevel enabled only when no task running
   global taskFNames;
   % not checking changed status
