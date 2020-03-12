@@ -133,6 +133,7 @@ function clbkSetOut(src, data)
   adapterStruct.out = get(src, 'value');
   % this control is enabled only when having relays
   updateRelays();
+  updateAdapterPanel();
 endfunction
 
 function clbkSetVdlp(src, data)
@@ -141,6 +142,7 @@ function clbkSetVdlp(src, data)
   adapterStruct.calibLPF = radio == adapterStruct.calibLpfRadio;
   % this control is enabled only when having relays
   updateRelays();
+  updateAdapterPanel();
 endfunction
 
 function clbkSetLpf(src, data)
@@ -149,6 +151,7 @@ function clbkSetLpf(src, data)
   adapterStruct.lpf = ifelse(radio == adapterStruct.lpf1Radio, 1, 2);
   % this control is enabled only when having relays
   updateRelays();
+  updateAdapterPanel();
 endfunction
 
 function clbkSetIn(src, data)
@@ -157,16 +160,17 @@ function clbkSetIn(src, data)
   adapterStruct.in = radio == adapterStruct.dutInRadio;
   % this control is enabled only when having relays
   updateRelays();
+  updateAdapterPanel();
 endfunction
 
 function clbkAdapterContinue(src, data)
   global adapterStruct;
   adapterStruct.switchesSet = true;
   % again hiding
-  setVisible(adapterStruct.contBtn, false);
-
+  adapterStruct.label = '';
   % clearing msgBox
-  setFieldString(adapterStruct.msgBox, {});
+  adapterStruct.showContinueBtn = false;
+  updateAdapterPanel();
 endfunction
 
 function clbkSetVDLevel(src, data)
@@ -185,6 +189,8 @@ function clbkSetVDLevel(src, data)
   global adapterStruct;
   adapterStruct.reqLevels = db2mag(value);
   adapterStruct.switchesSet = true;
+  % just in case
+  updateAdapterPanel();
   % adjusting the stepper
   setVDLevelSched();
 endfunction

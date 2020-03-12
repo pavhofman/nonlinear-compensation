@@ -1,5 +1,9 @@
 function execRelaysAdapter(label)
   % updating adapter panel only, rest is in checkSwitchesAndStepper
-  updateAdapterPanel(label, true);
+  global adapterStruct;
+  adapterStruct.label = label;
+  adapterStruct.showContinueBtn = true;
+  updateAdapterPanel();
+
   updateRelays();
 endfunction

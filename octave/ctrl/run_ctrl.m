@@ -107,7 +107,7 @@ drawBtnPanel(fig, 0, ADAPTER_PANEL_Y, BTN_PANEL_WIDTH, ADAPTER_PANEL_HEIGHT);
 initAdapterStruct();
 drawAdapterPanel(fig, BTN_PANEL_WIDTH, ADAPTER_PANEL_Y, 1 - BTN_PANEL_WIDTH, ADAPTER_PANEL_HEIGHT);
 % setting initial values, not enabling CONTINUE button
-updateAdapterPanel('', false);
+updateAdapterPanel();
 
 
 % bottom panel with outBox

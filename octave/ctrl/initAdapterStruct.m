@@ -15,7 +15,7 @@ function initAdapterStruct()
     adapterStruct.hasRelays = false;
     adapterStruct.hasStepper = false;
 
-    adapterStruct.execFunc = @(title) updateAdapterPanel(title, true);
+    adapterStruct.execFunc = @(title) updateSwitchWinPanel(title);
     adapterStruct.checkFunc = @(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
       checkAdapterPanel(nextLabel, abortLabel, errorLabel, schedTask);
     % empty function
@@ -53,6 +53,12 @@ function initAdapterStruct()
   endif % adapter type
 endfunction
 
+function updateSwitchWinPanel(title)
+  global adapterStruct;
+  adapterStruct.label = title;
+  adapterStruct.showContinueBtn = true;
+  updateAdapterPanel();
+endfunction
 
 function initArduino()
   global ardStruct;

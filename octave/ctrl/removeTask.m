@@ -8,7 +8,7 @@ function removeTask(taskFName, label)
   set(taskLabelsBox, 'string', taskLabels);
 
   if isempty(taskLabels)
-    updateAdapterPanel('', false);
+    updateAdapterPanel();
     % hiding ABORT btn
     global abortTasksBtn;
     setVisible(abortTasksBtn, false);
