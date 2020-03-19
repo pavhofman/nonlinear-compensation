@@ -1,5 +1,5 @@
 function clbkDistort(src, data, title, cmdFile)
-  persistent HARMS = 3;
+  persistent HARMS = 9;
   global DISTORT;
   
   try
