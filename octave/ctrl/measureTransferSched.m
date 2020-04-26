@@ -35,9 +35,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
   global CMD_CALRUNS_PREFIX;
   global CMD_PLAY_AMPLS_PREFIX;
   global COMP_TYPE_JOINT;
-  global COMP_TYPE_PLAY_SIDE;
-  global COMP_TYPE_REC_SIDE;
-  
+
   global MODE_DUAL;
   global ABORT;
   
