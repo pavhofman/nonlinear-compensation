@@ -23,6 +23,7 @@ function result = setVDLevelSched(label = 1)
 
         adapterStruct.in = false; % CALIB IN
         adapterStruct.calibLPF = false; % VD
+        % VD as currently selected
 
         % adapterStruct.reqLevels already set from the txt input
 

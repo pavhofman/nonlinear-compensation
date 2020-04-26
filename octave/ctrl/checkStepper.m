@@ -1,14 +1,15 @@
 function result = checkStepper(adapterStruct, recInfo, playInfo)
-  % TODO - for now fixed
-  persistent STEPPER_ID = 1;
   % last processed recinfo ID - to avoid comparing levels of the same recInfo
   persistent lastRecInfoID = 0;
+
+  % using stepper for the currently selected voltage divider
+  stepperID = adapterStruct.vd;
 
   result = false;
 
   % CONTINUE button pressed, checking stepper
   if ~isempty(adapterStruct.reqLevels) % requested specific levels
-    if ~isStepperRunning(STEPPER_ID) % stepper is not moving (not yet or no more), it makes sense to measure level
+    if ~isStepperRunning(stepperID) % stepper is not moving (not yet or no more), it makes sense to measure level
       recInfoID = recInfo.id;
       if recInfoID ~= lastRecInfoID
         %remembering for next time
@@ -18,14 +19,14 @@ function result = checkStepper(adapterStruct, recInfo, playInfo)
         global ANALYSED_CH_ID;
         measPeaksCh = recInfo.measuredPeaks{ANALYSED_CH_ID};
 
-        if areLevelsStable(measPeaksCh, STEPPER_ID)
+        if areLevelsStable(measPeaksCh, stepperID)
           if areReqLevels(adapterStruct.reqLevels, measPeaksCh(:, 2), adapterStruct.maxAmplDiff)
             writeLog('DEBUG', "Stepper at required position");
             result = true;
             return;
           else
             % new stepper run to get closer to reqLevel
-            steps = adjustStepper(STEPPER_ID, adapterStruct.reqLevels, recInfo, playInfo);
+            steps = adjustStepper(stepperID, adapterStruct.reqLevels, recInfo, playInfo);
             if steps == 0
               writeLog('DEBUG', "Stepper calculated 0 steps, yet no exactly at position, cannot do better");
               result = true;

@@ -227,6 +227,8 @@ function result = measureTransferSched(label= 1, schedTask = [])
         adapterStruct.out = false;
         adapterStruct.in = false; % CALIB
         adapterStruct.calibLPF = false; % VD
+        % LPF + transfer measurement - VD for splitting
+        adapterStruct.vd = adapterStruct.vdForSplitting;
         adapterStruct.reqLevels = lpFundAmpl;
         % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
         adapterStruct.maxAmplDiff = MAX_AMPL_DIFF * 0.9;

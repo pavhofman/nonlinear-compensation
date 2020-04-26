@@ -85,6 +85,9 @@ function result = rangeCalibRecSched(label = 1)
         % OUT unchanged
         adapterStruct.in = false; % CALIB IN
         adapterStruct.calibLPF = false; % VD
+        % VD for input level
+        adapterStruct.vd = adapterStruct.vdForInput;
+
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for CH%d calibration through VD', ANALYSED_CH_ID),
