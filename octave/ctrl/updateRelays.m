@@ -5,8 +5,16 @@ function updateRelays()
   changed = setRelay(ardStruct.ard, ardStruct.outPin, adapterStruct.out, 'OFF/OUT');
   changed |= setRelay(ardStruct.ard, ardStruct.calibLPFPin, adapterStruct.calibLPF, 'VD/LPF');
   changed |= setRelay(ardStruct.ard, ardStruct.inPin, adapterStruct.in, 'CALIB/IN');
-  % LPF1 = relay off = false, LPF2 = on = true
-  changed |= setRelay(ardStruct.ard, ardStruct.lpfPin,  adapterStruct.lpf == 2, 'LPF1/LPF2');
+
+  if adapterStruct.has2LPFs
+    % LPF1 = relay off = false, LPF2 = on = true
+    changed |= setRelay(ardStruct.ard, ardStruct.lpfPin,  adapterStruct.lpf == 2, 'LPF1/LPF2');
+  endif
+
+  if adapterStruct.has2VDs
+    % VD1 = relay off = false, VD2 = on = true
+    changed |= setRelay(ardStruct.ard, ardStruct.vdPin,  adapterStruct.vd == 2, 'VD1/VD2');
+  endif
 
   % switches are set now
   adapterStruct.switchesSet = true;

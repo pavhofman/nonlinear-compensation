@@ -255,12 +255,5 @@ playRecConfig.pageBufCount = 5;
 playRecConfig.recChanList = [1 2];
 playRecConfig.playChanList = [1 2];
 
-% switches as well as VD are manually operated - displaying only info window
-global ADAPTER_TYPE_SWITCHWIN = 1;
-% switches are manually operated - displaying only info window. VD operated by a stepper
-global ADAPTER_TYPE_SWITCHWIN_VD_STEPPER = 2;
-% relays + one stepper
-global ADAPTER_TYPE_RELAYS_1STEPPER = 3;
-
 % current adapter type
-global adapterType = ADAPTER_TYPE_RELAYS_1STEPPER;
+global adapterHasArduino = true;

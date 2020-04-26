@@ -21,14 +21,24 @@ function updateAdapterPanel()
   % calibration VD/LPF - enabled when no tasks and switched to calibration
   setEnabled([adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio], noTasksRunning && ~adapterStruct.in);
 
-  radio = ifelse(adapterStruct.lpf == 1, adapterStruct.lpf1Radio, adapterStruct.lpf2Radio);
-  changed |= setRadio(adapterStruct.lpfRGroup, radio);
-  % LPF1/2 - enabled when no tasks, switched to calibration and LPF
-  setEnabled([adapterStruct.lpf1Radio, adapterStruct.lpf2Radio], noTasksRunning && ~adapterStruct.in && adapterStruct.calibLPF);
+  if adapterStruct.has2LPFs
+    radio = ifelse(adapterStruct.lpf == 1, adapterStruct.lpf1Radio, adapterStruct.lpf2Radio);
+    changed |= setRadio(adapterStruct.lpfRGroup, radio);
+    % LPF1/2 - enabled when no tasks
+    setEnabled([adapterStruct.lpf1Radio, adapterStruct.lpf2Radio], adapterStruct.hasRelays && noTasksRunning);
+  endif
 
   %   reqLevel enabled only when no task running
   % not checking changed status
   setEnabled(adapterStruct.vdLevel, noTasksRunning);
+
+
+  if adapterStruct.has2VDs
+    radio = ifelse(adapterStruct.vd == 1, adapterStruct.vd1Radio, adapterStruct.vd2Radio);
+    changed |= setRadio(adapterStruct.vdRGroup, radio);
+    % VD1/2 - enabled when no tasks
+    setEnabled([adapterStruct.vd1Radio, adapterStruct.vd2Radio], adapterStruct.hasRelays && noTasksRunning);
+  endif
 
   adapterStruct.switchesChanged |= changed;
   % CONTINUE button

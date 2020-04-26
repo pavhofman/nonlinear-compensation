@@ -99,12 +99,14 @@ function drawAdapterPanel(fig, x, y, width, height)
   adapterStruct.lpfRGroup = uibuttongroup (ctrlPanel ,
                                'units', 'normalized',
                                'selectionchangedfcn', @clbkSetLpf,
-                               'position', [lpfRGroupX, 0, CALIB_VDLP_RGROUP_WIDTH, 1]);
+                               'visible', ifelse(adapterStruct.has2LPFs, 'on', 'off'),
+                               'position', [lpfRGroupX, 0, LPF_RGROUP_WIDTH, 1]);
 
   adapterStruct.lpf1Radio = uicontrol (adapterStruct.lpfRGroup,
             'style', 'radiobutton',
             'string', 'LPF1',
             'units', 'normalized',
+            'visible', ifelse(adapterStruct.has2LPFs, 'on', 'off'),
             'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
             'Position', [0, 0, 0.5, 1]);
 
@@ -112,15 +114,40 @@ function drawAdapterPanel(fig, x, y, width, height)
             'style', 'radiobutton',
             'string', 'LPF2',
             'units', 'normalized',
+            'visible', ifelse(adapterStruct.has2LPFs, 'on', 'off'),
             'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
             'Position', [0.5, 0, 0.5, 1]);
 
-  BTN_WIDTH = 0.2;
-  btnX = vdLevelX + VD_LEVEL_WIDTH + CLEARANCE;
+  VD_RGROUP_WIDTH = 0.15;
+  vdRGroupX = lpfRGroupX + LPF_RGROUP_WIDTH + CLEARANCE;
+  adapterStruct.vdRGroup = uibuttongroup (ctrlPanel ,
+                               'units', 'normalized',
+                               'selectionchangedfcn', @clbkSetVd,
+                               'visible', ifelse(adapterStruct.has2VDs, 'on', 'off'),
+                               'position', [vdRGroupX, 0, VD_RGROUP_WIDTH, 1]);
+
+  adapterStruct.vd1Radio = uicontrol (adapterStruct.vdRGroup,
+            'style', 'radiobutton',
+            'string', 'VD1',
+            'units', 'normalized',
+            'visible', ifelse(adapterStruct.has2VDs, 'on', 'off'),
+            'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
+            'Position', [0, 0, 0.5, 1]);
+
+  adapterStruct.vd2Radio = uicontrol (adapterStruct.vdRGroup,
+            'style', 'radiobutton',
+            'string', 'VD2',
+            'units', 'normalized',
+            'visible', ifelse(adapterStruct.has2VDs, 'on', 'off'),
+            'enable', ifelse(adapterStruct.hasRelays, 'on', 'off'),
+            'Position', [0.5, 0, 0.5, 1]);
+
+  BTN_WIDTH = 0.05;
+  btnX = vdRGroupX + VD_RGROUP_WIDTH + CLEARANCE;
   adapterStruct.contBtn = uicontrol (ctrlPanel ,
                                 'style', 'pushbutton',
                                 'units', 'normalized',
-                                'string', 'Set, continue',
+                                'string', 'Set',
                                 'verticalalignment', 'middle',
                                 'visible', 'off',
                                 'callback', @clbkAdapterContinue,
@@ -149,6 +176,15 @@ function clbkSetLpf(src, data)
   global adapterStruct;
   radio = get(src, 'selectedobject');
   adapterStruct.lpf = ifelse(radio == adapterStruct.lpf1Radio, 1, 2);
+  % this control is enabled only when having relays
+  updateRelays();
+  updateAdapterPanel();
+endfunction
+
+function clbkSetVd(src, data)
+  global adapterStruct;
+  radio = get(src, 'selectedobject');
+  adapterStruct.vd = ifelse(radio == adapterStruct.vd1Radio, 1, 2);
   % this control is enabled only when having relays
   updateRelays();
   updateAdapterPanel();
