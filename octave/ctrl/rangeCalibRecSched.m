@@ -2,10 +2,11 @@
 % Range calibration calibrates at higher, lower, and exact level of the original signal to provide lines in calFile for interpolation
 % Not using generator
 % result: NA = not finished yet, false = error/failed, true = finished OK
+% If PLAY-side not compensating, running joint-sides calibration, otherwise REC-side calibration
 function result = rangeCalibRecSched(label = 1)
   result = NA;
   % init section
-  [CHECKING_LABEL, START_LABEL, MODE_LABEL, COMP_PLAY_LABEL, ADJ_LABEL, CAL_LABEL,...
+  [CHECKING_LABEL, START_LABEL, MODE_LABEL, ADJ_LABEL, CAL_LABEL,...
       COMP_REC_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
 
   persistent NAME = 'Range-Calibrating REC Side';
@@ -40,9 +41,7 @@ function result = rangeCalibRecSched(label = 1)
   global CALIBRATE;
   global COMPENSATE;
   global CMD_COMP_TYPE_PREFIX;
-  global COMP_TYPE_PLAY_SIDE;
-  global COMP_TYPE_REC_SIDE;
-  
+
   global MODE_DUAL;
   global ABORT;
   
@@ -56,6 +55,8 @@ function result = rangeCalibRecSched(label = 1)
   persistent adjustment = NA;
   persistent calFreqReq = NA;
   persistent stepID = 1;
+
+  persistent compenType = NA;
 
   global adapterStruct;
   persistent wasAborted = false;
@@ -106,16 +107,10 @@ function result = rangeCalibRecSched(label = 1)
         cmdStr = [SET_MODE ' ' CMD_MODE_PREFIX num2str(MODE_DUAL)];
         cmdIDPlay = writeCmd(cmdStr, cmdFilePlay);
         cmdIDRec = writeCmd(cmdStr, cmdFileRec);
-        waitForCmdDone([cmdIDPlay, cmdIDRec], COMP_PLAY_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone([cmdIDPlay, cmdIDRec], ADJ_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
 
-      case COMP_PLAY_LABEL
-        printStr('Compensating PLAY side first');
-        cmdIDPlay = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_PLAY_SIDE)], cmdFilePlay);
-        waitForCmdDone(cmdIDPlay, ADJ_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
-        return;
-        
       case ADJ_LABEL
         % params for this step
         adjustment = STEPS(stepID, 1);
@@ -152,17 +147,25 @@ function result = rangeCalibRecSched(label = 1)
           nextLabel = COMP_REC_LABEL;
         endif
 
+
+        % determining compensation type - rec-side if compensation running on PLAY side, otherwise joint-sides
+        global playInfo;
+        global COMP_TYPE_JOINT;
+        global COMP_TYPE_REC_SIDE;
+        compenType = ifelse(structContains(playInfo.status, COMPENSATE), COMP_TYPE_REC_SIDE, COMP_TYPE_JOINT);
+
+
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
-        cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
+        cmdID = writeCmd([CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(compenType)], cmdFileRec);
         waitForCmdDone(cmdID, nextLabel, MANUAL_TIMEOUT, ERROR, mfilename());
         return;
         
       case COMP_REC_LABEL
         % all calibrations finished, closing the zoomed calib plot
         closeCalibPlot();
-        
-        printStr('Compensating SPLIT REC side');
-        cmdID = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_REC_SIDE)], cmdFileRec);
+
+        printStr('Compensating REC side');
+        cmdID = writeCmd([COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(compenType)], cmdFileRec);
         waitForCmdDone(cmdID, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
         return;
         
