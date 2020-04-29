@@ -43,6 +43,8 @@ function initAdapterStruct()
       checkSwitchesAndStepper(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask);
     adapterStruct.abortFunc = @() abortAdapterPanelWithStepper();
 
+    adapterStruct.updateIOFunc = @(recInfo, playInfo) emptyFunc();
+
     firmware = ardStruct.ard.getFirmware();
     if strcmp(firmware, 'CleanSine-0.1')
       % switches are manually operated - displaying only info window. VD operated by a stepper
@@ -57,10 +59,10 @@ function initAdapterStruct()
       adapterStruct.has2LPFs = true;
       steppers{1} = initStepper(ardStruct.ard, 1, 6, 9, 8, 7);
       % relays pins
-      ardStruct.outPin = 15;
-      ardStruct.calibLPFPin = 10;
-      ardStruct.inPin = 16;
-      ardStruct.lpfPin = 14; % LPF 1/2
+      ardStruct.outPin = 'D15';
+      ardStruct.calibLPFPin = 'D10';
+      ardStruct.inPin = 'D16';
+      ardStruct.lpfPin = 'D14'; % LPF 1/2
       adapterStruct.execFunc = @(title) execRelaysAdapter(title);
 
     elseif strcmp(firmware, 'CleanSine-2.0')
@@ -69,17 +71,49 @@ function initAdapterStruct()
       adapterStruct.has2LPFs = true;
       adapterStruct.has2VDs = true;
       % second VD used for calibration at input level
+      adapterStruct.vdForSplitting = 1;
       adapterStruct.vdForInput = 2;
       steppers{1} = initStepper(ardStruct.ard, 1, 2, 5, 4, 3);
       steppers{2} = initStepper(ardStruct.ard, 2, 6, 19, 8, 7);
 
       % relays pins
-      ardStruct.outPin = 10;
-      ardStruct.calibLPFPin = 14;
-      ardStruct.inPin = 15;
-      ardStruct.lpfPin = 16; % LPF 1/2
-      ardStruct.vdPin = 18; % VD1/2
+      ardStruct.outPin = 'D10';
+      ardStruct.calibLPFPin = 'D14';
+      ardStruct.inPin = 'D15';
+      ardStruct.lpfPin = 'D16'; % LPF 1/2
+      ardStruct.vdPin = 'D18'; % VD1/2
+
+
+      % LEDs
+      global gpios;
+      gpios = struct();
+      gpios.out = struct();
+      gpios.out.pin = 'D21';
+      gpios.out.status = 0;
+
+      gpios.in = struct();
+      gpios.in.pin = 'D20';
+      gpios.in.status = 0;
+
+      % green
+      gpios.ctrl1 = struct();
+      gpios.ctrl1.pin = 'D9';
+      gpios.ctrl1.status = 1;
+
+      % orange
+      gpios.ctrl2 = struct();
+      gpios.ctrl2.pin = 'D0';
+      gpios.ctrl2.status = 0;
+
+      % switch
+      gpios.sw = struct();
+      gpios.sw.pin = 'D1';
+      gpios.sw.pushedSince = NA;
+      ardStruct.ard._configurePin(gpios.sw.pin,'Pullup');
+
       adapterStruct.execFunc = @(title) execRelaysAdapter(title);
+
+      adapterStruct.updateIOFunc = @(recInfo, playInfo) updateLedsAndSwitch(recInfo, playInfo);
 
     endif % stepper adapter type
   endif % adapter has arduino
@@ -106,7 +140,7 @@ endfunction
 
 function stepperStruct = initStepper(ard, stepperID, p1, p2, p3, p4)
   ard.initStepperType4(stepperID, p1, p2, p3, p4);
-  ard.setSpeed(stepperID, 450);
+  ard.setSpeed(stepperID, 500);
   % 0 accel = acceleration off
   ard.setAccel(stepperID, 0);
   stepperStruct = initStepperStruct(stepperID);
@@ -121,4 +155,7 @@ endfunction
 function abortAdapterPanelWithStepper()
   abortAdapterPanel();
   abortStepper();
+endfunction
+
+function emptyFunc()
 endfunction

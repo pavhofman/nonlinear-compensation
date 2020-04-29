@@ -104,7 +104,9 @@ ADAPTER_PANEL_Y = DIR_PANEL_Y - ADAPTER_PANEL_HEIGHT;
 BTN_PANEL_WIDTH = 0.25;
 drawBtnPanel(fig, 0, ADAPTER_PANEL_Y, BTN_PANEL_WIDTH, ADAPTER_PANEL_HEIGHT);
 
+global adapterStruct;
 initAdapterStruct();
+
 drawAdapterPanel(fig, BTN_PANEL_WIDTH, ADAPTER_PANEL_Y, 1 - BTN_PANEL_WIDTH, ADAPTER_PANEL_HEIGHT);
 % setting initial values, not enabling CONTINUE button
 updateAdapterPanel();
@@ -185,6 +187,8 @@ while (~doQuit)
   % process scheduled callbacks, if any applicable at this time
   % callbacks can use received info structures
   runScheduledTask(recInfo, playInfo);
+  % Leds, switches, etc.
+  adapterStruct.updateIOFunc(recInfo, playInfo);
   
   do
     localRecInfo = rcvInfo(recSock);

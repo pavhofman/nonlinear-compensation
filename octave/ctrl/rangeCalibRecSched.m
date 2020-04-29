@@ -152,7 +152,9 @@ function result = rangeCalibRecSched(label = 1)
         global playInfo;
         global COMP_TYPE_JOINT;
         global COMP_TYPE_REC_SIDE;
-        compenType = ifelse(structContains(playInfo.status, COMPENSATE), COMP_TYPE_REC_SIDE, COMP_TYPE_JOINT);
+        global COMPENSATING;
+        compenType = ifelse(structContains(playInfo.status, COMPENSATING), COMP_TYPE_REC_SIDE, COMP_TYPE_JOINT);
+        writeLog('DEBUG', 'Calibrating compensation type: %d', compenType);
 
 
         calFreqReqStr = getCalFreqReqStr(calFreqReq);
