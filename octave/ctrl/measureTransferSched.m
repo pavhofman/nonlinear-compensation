@@ -55,7 +55,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
 
   % max. allowed deviation in each direction from midAmpl
   % similar level of VD to LPF provides similar phaseshift of VD to when measured in splitCalibPlaySched. Here it is not so critical
-  persistent MAX_AMPL_DIFF = db2mag(-70);
+  persistent MAX_AMPL_DIFF = db2mag(-80);
 
   global adapterStruct;
 
