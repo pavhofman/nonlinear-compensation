@@ -1,5 +1,7 @@
 % we cannot call 'clear all' since it clears all functions => also all breakpoints in functions
 clear;
+% clearing cached classes in Octave IDE
+clear classes;
 
 currDir = fileparts(mfilename('fullpath'));
 addpath(currDir);
