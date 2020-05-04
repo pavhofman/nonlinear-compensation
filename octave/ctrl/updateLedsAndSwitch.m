@@ -30,9 +30,19 @@ function updateLedsAndSwitch(recInfo, playInfo)
 
   % task running or calibration - slow blinking
   if ~isempty(taskFNames) || (~isempty(recInfo) && structContains(recInfo.status, CALIBRATING))
-    gpios.ctrl1.status = SLOW_BLINK;
+    ctrlActiveStatus = SLOW_BLINK;
   else
-    gpios.ctrl1.status = ON;
+    ctrlActiveStatus = ON;
+  endif
+
+  if isAnalysisOK(playInfo) && isAnalysisOK(recInfo)
+    % ctrl1 green OK
+    gpios.ctrl1.status = ctrlActiveStatus;
+    % ctrl red OFF
+    gpios.ctrl2.status = OFF;
+  else
+    gpios.ctrl2.status = ctrlActiveStatus;
+    gpios.ctrl1.status = OFF;
   endif
 
 
@@ -102,4 +112,22 @@ function updateLedsAndSwitch(recInfo, playInfo)
     endif % just released
   endif % not pushed
 
+endfunction
+
+function result = isAnalysisOK(info)
+  global ANALYSING;
+  if ~isempty(info) && isfield(info.status, ANALYSING)
+    statusVal = info.status.(ANALYSING);
+    if isfield(statusVal, 'result')
+      result = statusVal.result;
+      if isResultOK(result)
+        result = true;
+        % ending
+        return;
+      endif
+    endif
+  endif
+
+  % not found or failed result
+  result = false;
 endfunction
