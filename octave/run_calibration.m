@@ -17,7 +17,8 @@ else
     setStatusResult(CALIBRATING, result);
 
     % building complete status infomessage
-    completeMsg = [num2str(correctRunsCounter(1)) '-' num2str(correctRunsCounter(2)) '/' num2str(runID) ' ' msg];
+    % correctRunsCounter - row = channel
+    completeMsg = sprintf('%d - %d/%d %s', correctRunsCounter(1), correctRunsCounter(2), runID, msg);
     setStatusMsg(CALIBRATING, completeMsg);
 
     restartCal = false;
