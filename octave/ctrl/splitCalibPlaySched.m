@@ -101,6 +101,12 @@ function result = splitCalibPlaySched(label = 1)
         playEqualizer = playInfo.equalizer(1:2);
         
         % checking if all transfer files are available
+
+        % setting maxTransferAge for getMissingTransferFreqs (UGLY!) - not zero, but const MAX_TRANSFER_AGE
+        global maxTransferAge;
+        global MAX_TRANSFER_AGE;
+        maxTransferAge = MAX_TRANSFER_AGE;
+
         [freqs1, freqs1] = getMissingTransferFreqs(origPlayFreq, origRecFreq, fs, EXTRA_CIRCUIT_LP1, recInfo.nonInteger);
         [freqs2, freqs2] = getMissingTransferFreqs(origPlayFreq, origRecFreq, fs, EXTRA_CIRCUIT_VD, recInfo.nonInteger);
         if ~isempty(freqs1) || ~isempty(freqs2)

@@ -10,7 +10,7 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
   tasksMenu = uimenu (fig, "label", "&Tasks");
   
-  uimenu(tasksMenu, "label", "Measure LPF/VD Transfer", 'separator', 'on', 'callback', @clbkMeasureTransfers);
+  uimenu(tasksMenu, "label", "Re-Measure LPF/VD Transfer", 'separator', 'on', 'callback', @clbkRemeasureTransfers);
   
   calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Single Run", 'separator', 'on', "callback", {@clbkJointCalib, false});
   calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});
@@ -22,7 +22,10 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 endfunction
 
 
-function clbkMeasureTransfers(src, data)
+function clbkRemeasureTransfers(src, data)
+  global maxTransferAge;
+  % deleting all transfers first (automatically in getMissingTransferFreqs()) - UGLY
+  maxTransferAge = 0;
   % calling scheduler-enabled calibration
   measureTransferSched();
 endfunction

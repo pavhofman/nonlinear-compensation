@@ -1,9 +1,10 @@
-% returns freqs for which no transfer file is found (or is too old - see MAX_TRANSFER_AGE)
+% returns freqs for which no transfer file is found (or is too old - global variable maxTransferAge)
 % since playFundFreq and recFundFreq can slightly differ (nonInteger mode), missing transfer freqs are returned for both
 function [playFreqs, recFreqs] = getMissingTransferFreqs(playFundFreq, recFundFreq, fs, extCircuit, nonInteger)
-  global MAX_TRANSFER_AGE;
+  % external variable, ugly hack but the easiest way to control without passing
+  global maxTransferAge;
 
-  minTime = time() - MAX_TRANSFER_AGE;
+  minTime = time() - maxTransferAge;
   allPlayFreqs = getTransferFreqs(playFundFreq, fs, nonInteger);
   allRecFreqs = getTransferFreqs(recFundFreq, fs, nonInteger);
   idsToKeep = [];
@@ -18,7 +19,8 @@ function [playFreqs, recFreqs] = getMissingTransferFreqs(playFundFreq, recFundFr
         % ok
         continue;
       else
-        writeLog('DEBUG', 'Transfer file %s too old, ignored', transferFile);
+        writeLog('DEBUG', 'Transfer file %s too old, deleting', transferFile);
+        deleteFile(transferFile);
       endif
     else
       writeLog('DEBUG', 'Transfer file %s not found', transferFile);

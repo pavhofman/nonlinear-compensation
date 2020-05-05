@@ -242,9 +242,8 @@ global EXTRA_CIRCUIT_VD = 'vd';
 global EXTRA_CIRCUIT_LP1 = 'lp1';  
 global EXTRA_TRANSFER_DIR = 'transfer';  
 
-% transfer file/record maximum age to be accepted - 3 days
-global MAX_TRANSFER_AGE_DAYS = 3;
-global MAX_TRANSFER_AGE = 60 * 60 * 24 * MAX_TRANSFER_AGE_DAYS;
+% transfer file/record maximum age to be accepted in splitCalibPlaySched -1 day
+global MAX_TRANSFER_AGE = 60 * 60 * 24 * 1;
 
 % maximum measured and split-calculated transfer freqs (harmonics of the fundamental)
 global MAX_TRANSFER_FREQS = 15;

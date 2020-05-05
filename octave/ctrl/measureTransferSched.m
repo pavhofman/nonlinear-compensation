@@ -102,8 +102,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
           if  isempty(recVDFreqs)
             % all transfers available for VD too, ending
             % informing user that all recFreqs are already measured
-            global MAX_TRANSFER_AGE_DAYS;
-            msg = sprintf('All LPF and VD frequencies already measured and still valid (< %d days)', MAX_TRANSFER_AGE_DAYS);
+            msg = sprintf('All LPF and VD frequencies already measured and still valid');
             writeLog('INFO', msg);
             printStr(msg);
             break;

@@ -69,6 +69,9 @@ taskLabels = {};
 global taskFNameToAbort;
 taskFNameToAbort = '';
 
+global maxTransferAge;
+maxTransferAge = 0;
+
 function doExit(fig)
   global doQuit;
   doQuit = true;
