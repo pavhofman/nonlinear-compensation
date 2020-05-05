@@ -7,27 +7,28 @@ function resetAdapterStruct(recoverInOut = true)
 
   % initialization
   if ~isfield(adapterStruct, 'prevOut')
-    adapterStruct.prevOut = [];
+    % stack of values
+    adapterStruct.prevOut = cell();
   endif
 
   if ~isfield(adapterStruct, 'prevIn')
-    adapterStruct.prevIn = [];
+    adapterStruct.prevIn = cell();
   endif
 
   % in/out recovery
   if recoverInOut &&  ~isempty(adapterStruct.prevOut)
-    adapterStruct.out = adapterStruct.prevOut;
+    adapterStruct.out = adapterStruct.prevOut{end};
     % reset
-    adapterStruct.prevOut = [];
+    adapterStruct.prevOut(end) = [];
   else
     % default
     adapterStruct.out = false; % OUT OFF
   endif
 
   if recoverInOut &&  ~isempty(adapterStruct.prevIn)
-    adapterStruct.in = adapterStruct.prevIn;
+    adapterStruct.in = adapterStruct.prevIn{end};
     % reset
-    adapterStruct.prevIn = [];
+    adapterStruct.prevIn(end) = [];
   else
     % default
     adapterStruct.in = false; % IN CALIB
