@@ -1,17 +1,12 @@
 % Updating corresponding calPlots based on info. Reads fundamental amplitudes from calFiles, updates only calLines in dirStruct.
 function updatePlots(dirStruct, info)
-  global COMPENSATING;
   global CH_DISTANCE_X;
   persistent calFiles = cell(2, 2);
   persistent allCalLevels = cell(2, 2);
   
-  isCompensating = isfield(info.status, COMPENSATING);
   direction = info.direction;
   for channelID = 1:2
     plotStruct = dirStruct.calPlots{channelID};
-    if isCompensating
-      presus = 1;
-    endif
     calFile = info.compenCalFiles{channelID};
     if ~strcmp(calFiles{direction, channelID}, calFile) || info.reloadCalFiles
       % change from last run or explicit request to reload calfiles
