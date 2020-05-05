@@ -28,8 +28,11 @@ function updateLedsAndSwitch(recInfo, playInfo)
     gpios.in.status = OFF;
   endif
 
-  % task running or calibration - slow blinking
-  if ~isempty(taskFNames) || (~isempty(recInfo) && structContains(recInfo.status, CALIBRATING))
+  if any(strcmp(taskFNames, 'splitCalibPlaySched'))
+    % splitCalibPlaySched running
+    ctrlActiveStatus = FAST_BLINK;
+  elseif ~isempty(taskFNames) || (~isempty(recInfo) && structContains(recInfo.status, CALIBRATING))
+    % any other task running or calibration - slow blinking
     ctrlActiveStatus = SLOW_BLINK;
   else
     ctrlActiveStatus = ON;
