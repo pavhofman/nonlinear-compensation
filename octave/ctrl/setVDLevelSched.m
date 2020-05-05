@@ -3,7 +3,7 @@
 function result = setVDLevelSched(label = 1)
   result = NA;
   % init section
-  [START_LABEL, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
+  [START_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
   
   persistent NAME = 'Setting VD level';
   persistent AUTO_TIMEOUT = 10;
@@ -20,6 +20,9 @@ function result = setVDLevelSched(label = 1)
         addTask(mfilename(), NAME);
         % init value
         wasAborted = false;
+
+        % for restoration at the end
+        keepInOutSwitches();
 
         adapterStruct.in = false; % CALIB IN
         adapterStruct.calibLPF = false; % VD
@@ -38,20 +41,19 @@ function result = setVDLevelSched(label = 1)
 
       case ABORT
         wasAborted= true;
-        label = ALL_OFF_LABEL;
+        label = DONE_LABEL;
         continue;
 
-      case ALL_OFF_LABEL
-        cmdIDs = sendAllOffCmds();
-        if ~isempty(cmdIDs)
-          waitForCmdDone(cmdIDs, DONE_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
-          return;
-        else
-          label = DONE_LABEL;
-          continue;
-        endif
-
       case DONE_LABEL
+        % plus restoring IN/OUT switches
+        resetAdapterStruct();
+        waitForAdapterAdjust('Restore switches', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
+        return;
+
+      case FINISH_DONE_LABEL
+        % clearing the label
+        adapterStruct.label = '';
+        updateAdapterPanel();
         if wasAborted
           result = false;
         else
