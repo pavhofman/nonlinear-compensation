@@ -32,7 +32,8 @@ function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, p
   calRec.fundFreqs = transpose(fundPeaksCh(:, 1));
   calRec.distortFreqs = distortFreqs;
   calRec.peaks = calPeaks;
-  writeLog('DEBUG', 'Updated calRec for calfile %s: %s', calFile, disp(calRec));
+  writeLog('DEBUG', 'Updated calRec for calfile %s', calFile);
+  writeLog('TRACE', '%s', disp(calRec));
   
   calFileStruct = struct();
   calFileStruct.fileName = calFile;
