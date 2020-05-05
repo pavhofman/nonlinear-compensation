@@ -98,7 +98,8 @@ function result = areReqLevels(reqLevels, measLevels, maxAmplDiff)
   % simple difference check, no ratios
   differentAmplIDs = find(abs(reqLevels - measLevels) > maxAmplDiff);
   result =  isempty(differentAmplIDs);
-  writeLog('DEBUG', 'req: %f meas: %f, , maxAmplDiff %f => result %d', reqLevels(1), measLevels(1), maxAmplDiff, result);
+  writeLog('DEBUG', 'req: %f meas: %f, diff: %f, maxDiff %f => result %d',
+    reqLevels(1), measLevels(1), abs(reqLevels(1) - measLevels(1)), maxAmplDiff, result);
 endfunction
 
 function resetStepperIfNotConverging(stepperID)
