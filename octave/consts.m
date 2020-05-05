@@ -257,5 +257,10 @@ playRecConfig.pageBufCount = 5;
 playRecConfig.recChanList = [1 2];
 playRecConfig.playChanList = [1 2];
 
+
+% maximum stepper attempts to reach one level before resetting stepper calibration/history to allow fresh calibration
+% including calibration for the first level
+global MAX_STEPPER_ATTEMPTS = 30;
+
 % current adapter type
 global adapterHasArduino = true;
