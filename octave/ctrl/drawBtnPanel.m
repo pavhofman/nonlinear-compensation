@@ -38,11 +38,11 @@ function drawBtnPanel(fig, x, y, width, height)
   rangeCalibRecBtn = uicontrol (btnPanel,
                                   'style', 'pushbutton',
                                   'units', 'normalized',
-                                  'string', "Range-Calib\nCapture",
+                                  'string', "Exact-Calib\nCapture",
                                   'verticalalignment', 'middle',
                                   'horizontalalignment', 'center',
                                   %'backgroundcolor', 'yellow',
-                                  'callback', @clbkRangeCalibRec,
+                                  'callback', @clbkExactCalibRec,
                                   'position', [splitBtnX + BTN_WIDTH + CLEARANCE,  BTN_Y, BTN_WIDTH, BTN_HEIGHT]);
 endfunction
 

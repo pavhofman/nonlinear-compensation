@@ -100,10 +100,10 @@ function updateLedsAndSwitch(recInfo, playInfo)
       if isempty(taskFNames)
         if longPush
           writeLog('DEBUG', 'Button pushed long - running splitCalibPlaySched');
-          % splitCalibPlaySched()
+          splitCalibPlaySched()
         else
-          writeLog('DEBUG', 'Button pushed short - running rangeCalibRecSched');
-          rangeCalibRecSched();
+          writeLog('DEBUG', 'Button pushed short - running exactCalibRecSched');
+          exactCalibRecSched();
         endif
       else
         writeLog('DEBUG', 'Button pushed while tasks running - aborting');

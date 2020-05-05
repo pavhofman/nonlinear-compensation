@@ -57,6 +57,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   uimenu(menu, "label", ['Compensate Only ' sideName], "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(compType)], cmdFile});
   
   if dirStruct.dir == DIR_REC
+    calOnMenus{end+1} = uimenu(menu, "label", ['Exact-Level Calibrate Capture Side'], 'separator', 'on', "callback", @clbkExactCalibRec);
     calOnMenus{end+1} = uimenu(menu, "label", ['Range-Calibrate Capture Side'], 'separator', 'on', "callback", @clbkRangeCalibRec);
   else
     calOnMenus{end+1} = uimenu(menu, "label", ['Split-Calibrate Playback Side'], 'separator', 'on', "callback", @clbkSplitCalibPlay);
