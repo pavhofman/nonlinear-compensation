@@ -148,8 +148,7 @@ endfunction
 
 
 function abortAdapterPanel()
-  % setting switches to default values + restoring IN/OUT switches
-  resetAdapterStruct();
+  % empty
 endfunction
 
 function abortAdapterPanelWithStepper()
