@@ -381,7 +381,7 @@ function moveCalToTransferFile(calFile, freq, fs, playChID, analysedChID, extraC
   save(transferFile, 'transfRec');
   
   % deleting the calFile - useless now
-  delete(calFile);
+  deleteFile(calFile);
 endfunction
 
 function ampl = loadRecAmplFromTransfer(freq, extraCircuit)

@@ -138,7 +138,7 @@ while(true)
     else
       cmd = lines(2:end);
     endif
-    delete(cmdFile);
+    deleteFile(cmdFile);
   endif;
 
   % process new command if any
