@@ -206,6 +206,10 @@ global MIN_LOG_LEVEL = 'DEBUG';
 % default mode
 global chMode = MODE_DUAL;
 
+% calibration runs for averaging
+global CAL_RUNS = 15;
+global DROP_CAL_RUNS = 3;
+
 % calPeaks constants
 % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, playFundAmpl1, playFundAmpl2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
 % index of fundAmpl1
@@ -237,7 +241,6 @@ global ANALYSED_CH_ID = 2;
 global EXTRA_CIRCUIT_VD = 'vd';
 global EXTRA_CIRCUIT_LP1 = 'lp1';  
 global EXTRA_TRANSFER_DIR = 'transfer';  
-
 
 % transfer file/record maximum age to be accepted - 3 days
 global MAX_TRANSFER_AGE_DAYS = 3;

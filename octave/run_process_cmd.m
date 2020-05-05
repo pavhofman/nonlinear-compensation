@@ -42,7 +42,7 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     compType = findNumInCmd(cmd, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT);
     
     % optional number of averating calibration runs, 10 = default
-    calRuns = findNumInCmd(cmd, CMD_CALRUNS_PREFIX, 10);
+    calRuns = findNumInCmd(cmd, CMD_CALRUNS_PREFIX, CAL_RUNS);
     
     % stored calFile can have a different chMode to current one, e.g. when split-calibrating playback side (runs always on rec side)
     % default = current chMode

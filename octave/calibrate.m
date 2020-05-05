@@ -288,17 +288,18 @@ function [avgFundPeaksCh, avgDistortPeaksCh] = detAveragePeaks(allFundPeaksCh, a
 endfunction
 
 % merging all rows of non-empty peaks matrices in allPeaksCh to single matrix. 
-% First and last non-empty peaks matrices are skipped - could contain dirty transitional values
+% first DROP_CAL_RUNS non-empty peaks matrices are skipped - could contain dirty transitional values
 % allPeaksCh - cell array(1, MAX_RUNS) of peaks matrices
 % mergedPeaksCh - regular peaks matrix(N, 3)
 function [mergedPeaksCh, runsCnt] = mergePeaks(allPeaksCh)
+  global DROP_CAL_RUNS;
   mergedPeaksCh = [];
   emptyIDs = find(cellfun('isempty', allPeaksCh));
   % remove empty cells
   allPeaksCh(:, emptyIDs) = [];
-  % remove first item - may contain transitional non-stable data
-  if size(allPeaksCh, 2) > 1
-    allPeaksCh(:, 1) = [];
+  % remove first DROP_CAL_RUNS items - may contain transitional non-stable data
+  if size(allPeaksCh, 2) > DROP_CAL_RUNS
+    allPeaksCh(:, 1:DROP_CAL_RUNS) = [];
   endif
   
   runsCnt = size(allPeaksCh, 2);
