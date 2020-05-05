@@ -253,28 +253,41 @@ function complAllPeaksCh = scalePeaksToPlayAmpls(complAllPeaksCh)
   complAllPeaksCh = sortrows(complAllPeaksCh, AMPL_IDX);
 endfunction
 
-function [distortFreqsCh, complAllPeaksCh, calFile] = loadPeaks(freqs, fs, channelID, chMode, compRequest)
-  
+function [distortFreqsCh, calPeaksCh, calFile] = loadPeaks(freqs, fs, channelID, chMode, compRequest)
   % values for no signal/no calfile
   distortFreqsCh = [];
-  complAllPeaksCh = [];
+  calPeaksCh = [];
   
   % re-reading cal file with one channel calib data
   calFile = genCalFilename(freqs, fs, compRequest.compType, compRequest.playChannelID, channelID, chMode, compRequest.extraCircuit);
-  if (exist(calFile, 'file'))
+  if exist(calFile, 'file')
     % loading calRec, initialising persistent vars
     load(calFile);
+
+    calPeaksCh = calRec.peaks;
+    % removing outdated rows
+    calPeaksCh = removeOutdatedCalPeaks(calPeaksCh, time());
+
+    if isempty(calPeaksCh)
+      writeLog('WARN', 'Calib file %s has only outdated cal peaks, channel ID %d PASSING', calFile, channelID);
+      calFile = '';
+      return;
+    endif
+
+    % adding edge rows for interpolation (not stored in the calfile)
+    calPeaksCh = addEdgeCalPeaks(calRec.peaks);
+
     % distortFreqs are calculated for calRec.fundFreqs. However, in nonInteger mode the current fundFreqs can slightly differ.
     % Experiments show the harmonics levels and phases do not change much when fund freq changes a bit (tens of Hz).
     % Therefore the distortFreqs can be scaled safely to correspond to measured fund freqs
     % scaling by first fundFreq
     freqScale = freqs(1) / calRec.fundFreqs(1);
     distortFreqsCh = calRec.distortFreqs * freqScale;
-    complAllPeaksCh = calRec.peaks;
     writeLog('INFO', 'Distortion peaks for channel ID %d read from calibration file %s', channelID, calFile);
   else
     writeLog('WARN', 'Did not find calib file %s, channel ID %d PASSING', calFile, channelID);
-    calFile = '';    
+    calFile = '';
+    return;
   endif
 endfunction
 

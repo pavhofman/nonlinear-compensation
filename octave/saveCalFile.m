@@ -25,10 +25,8 @@ function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, p
       dPeaksC = transpose(distortPeaksCh(:, 2) .* exp(i * distortPeaksCh(:, 3)));
     endif
     calPeaks = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC, playAmplsCh);
-    % adding edge rows for extrapolation
-    calPeaks = addEdgeCalPeaks(calPeaks);
-    % new calfile, always 3 rows
-    addedRowIDs = 1:3;
+    % new calfile, always 1 row
+    addedRowIDs = 1;
   endif
 
   calRec.fundFreqs = transpose(fundPeaksCh(:, 1));

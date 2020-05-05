@@ -30,8 +30,8 @@ for channelID = getActiveChannelIDs(chMode, channelCnt)
     % resetting calfile
     compenCalFiles{channelID} = '';
     if hasAnyPeak(measuredPeaksCh) && ~hasAnyPeak(fundLevelsCh)
-      % incoming signal, yet not fundLevels from calfile - no calfile found
-      msg = [msg ' ' 'No calib. file for CH' num2str(channelID) '.'];
+      % incoming signal, yet not fundLevels from calfile - no valid calibration available (either missing file or outdated calibration)
+      msg = sprintf("%s No valid calib. for CH%d.", msg, channelID);
     endif
   endif
 endfor

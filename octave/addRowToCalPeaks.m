@@ -7,13 +7,6 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
   % fund amplitude within +/- AMPL_TO_REPLACE_TOLERANCE considered same
   global AMPL_TO_REPLACE_TOLERANCE;
 
-  global MAX_CALIB_ROW_AGE;
-  
-  % edge rows can be changed if new row min or max. The easiest way is removing them first and adding newly calculated at the end
-  % remove edge extrapolation rows
-  calPeaks(1, :) = [];
-  calPeaks(end, :) = [];
-  
   % get distortion peaks only
   allDPeaksC = calPeaks(:, PEAKS_START_IDX:end);
   
@@ -72,12 +65,7 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
   complPeak = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC, playAmplsCh);
 
   % remove outdated rows
-  % calibration time is in the first column
-  outdatedRowIDs = find(calPeaks(:, 1) < (timestamp - MAX_CALIB_ROW_AGE));
-  if ~isempty(outdatedRowIDs)
-    writeLog('INFO', "Removing outdated rows IDs: %s", num2str(outdatedRowIDs));
-    calPeaks(outdatedRowIDs, :) = [];
-  endif
+  calPeaks = removeOutdatedCalPeaks(calPeaks, timestamp)
 
   % remove existing rows (if any) with amplitude within tolerance AMPL_TO_REPLACE_TOLERANCE apart from fundAmpl1 - we have newer values
   newFundAmpl = fundPeaksCh(1, 2);
@@ -111,10 +99,7 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
   % sort rows by fundAmpl1 (at position AMPL_IDX)
   calPeaks = sortrows(calPeaks, AMPL_IDX);
   
-  % add fresh edge rows for extrapolation
-  calPeaks = addEdgeCalPeaks(calPeaks);
-  
-  % HACK: addedRowIDs determined by its timestamp (incl. respective updated bordering edgeCalPeaks)
+  % HACK: addedRowIDs determined by its timestamp
   % row-vector needed - transposing
   addedRowIDs = transpose(find(calPeaks(:, 1) == timestamp));
 endfunction
