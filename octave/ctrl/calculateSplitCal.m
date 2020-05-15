@@ -133,9 +133,11 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   %global COMP_TYPE_REC_SIDE;
   %saveNewCalFile(fs, fundPeaksACh, distortPeaksACh, NA, analysedRecChID, chMode, COMP_TYPE_REC_SIDE, timestamp);
 
-  % DAC values
+  % DAC values stored to PLAY-side calibration file
   global COMP_TYPE_PLAY_SIDE;
-  saveNewCalFile(fs, fundPeaksDCh, distortPeaksDCh, NA, playChID, chMode, COMP_TYPE_PLAY_SIDE, timestamp);  
+  % the PLAY-side peaks are calculated for current play-side samplerate
+  global playInfo;
+  saveNewCalFile(playInfo.fs, fundPeaksDCh, distortPeaksDCh, NA, playChID, chMode, COMP_TYPE_PLAY_SIDE, timestamp);
 endfunction
 
 function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, chMode, compType, timestamp)
