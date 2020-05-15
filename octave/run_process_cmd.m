@@ -44,16 +44,12 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     % optional number of averating calibration runs, 10 = default
     calRuns = findNumInCmd(cmd, CMD_CALRUNS_PREFIX, CAL_RUNS);
     
-    % stored calFile can have a different chMode to current one, e.g. when split-calibrating playback side (runs always on rec side)
-    % default = current chMode
-    calChMode = findNumInCmd(cmd, CMD_MODE_PREFIX, chMode);
-    
     % joint compType should pass current playback amplitudes for storing into the calfile
     playAmpls = findMatricesInCmd(cmd, CMD_PLAY_AMPLS_PREFIX, cell(channelCnt));
 
         
     % building calibration request struct
-    calRequest = initCalRequest(calFreqReq, compType, playChannelID, playAmpls, calExtraCircuit, contCal, calRuns, calChMode);
+    calRequest = initCalRequest(calFreqReq, compType, playChannelID, playAmpls, calExtraCircuit, contCal, calRuns);
 
     % clearing calibration buffer
     restartCal = true;
