@@ -5,3 +5,4 @@ octave/playrec.mex
 octave-workspace
 .idea
 playrec.mex
+octave/log/*.log
