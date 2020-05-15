@@ -7,14 +7,14 @@ if sourceStruct.src == PLAYREC_SRC || structContains(sinkStruct, PLAYREC_SINK)
   % reading and/or writing to soundcards
   buffer = readWritePlayrec(buffer, cycleLength, periodSize, fs, restartReading);
   % already waited
-  hasWaited = true;
+  hasWaitedInPlayrec = true;
 else
-  % did not read from playrec, has no waited yet
-  hasWaited = false;
+  % did not read from playrec, has not waited yet
+  hasWaitedInPlayrec = false;
 endif
     
 if sourceStruct.src == FILE_SRC
-  [buffer, fs, sourceStruct] = readFileData(fs, sourceStruct, FILE_CHAN_LIST, cycleLength, ~hasWaited, restartReading);
+  [buffer, fs, sourceStruct] = readFileData(fs, sourceStruct, FILE_CHAN_LIST, cycleLength, ~hasWaitedInPlayrec, restartReading);
 endif
 
 restartReading = false;
