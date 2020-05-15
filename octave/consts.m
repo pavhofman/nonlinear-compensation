@@ -136,6 +136,12 @@ global PLAYREC_SRC = 2;
 global MEMORY_SINK = 'MEM';
 global PLAYREC_SINK = 'PR';
 
+% default INPUT: soundcard (= playrec)
+src = PLAYREC_SRC;
+
+% default OUTPUT: soundcard
+sink = PLAYREC_SINK;
+
 % compensation types
 global COMP_TYPE_JOINT = 0;
 global COMP_TYPE_PLAY_SIDE = 1;
