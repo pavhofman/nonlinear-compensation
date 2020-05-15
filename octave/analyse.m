@@ -7,9 +7,16 @@
 % fundLevels, distortPeaks - read from calibration file corresponding to current stream freqs
 %
 % fundLevels: since distortPeaks are ALWAYS zero-time based, i.e. phase = 0 for all fundamental frequencies, fundLevels only contains frequency and level, no phases
-function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = analyse(buffer, fs, compRequest, chMode, reloadCalFiles, nonInteger)
+function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = analyse(buffer, fs, compRequest, chMode, reloadCalFiles, restart, nonInteger)
   persistent analysisBuffer = [];
-  persistent channelCnt = columns(buffer);
+    if (restart)
+      % resetting all relevant persistent vars
+      analysisBuffer = [];
+      % TODO - persistent vars in genCompensationPeaks should be cleared too!
+    endif
+
+
+  channelCnt = columns(buffer);
   
   global NOT_FINISHED_RESULT;
   global FINISHED_RESULT;

@@ -109,6 +109,8 @@ recordedData = [];
 
 global reloadCalFiles;
 reloadCalFiles = false;
+restartAnalysis = false;
+
 % first run -> restart, reading all files
 source 'restart_chain.m';
 
