@@ -11,7 +11,8 @@ function displayInfo(info, dirStruct)
   %info.compenCalFiles = compenCalFiles;
   %info.calFreqs;
   %info.direction = direction;
-  
+
+  updatePanelTitle(dirStruct, info);
   updateStatusTxts(dirStruct, info);
   updateMenu(dirStruct, info);
 

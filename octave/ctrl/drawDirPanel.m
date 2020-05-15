@@ -4,9 +4,11 @@ function dirStruct = drawDirPanel(fig, x, y, width, height, title, dirStruct, cm
 
   global DIR_PLAY;
   
-  panel = uipanel(fig, 
-            "title", title,
+  panel = uipanel(fig,
             "position", [x, y, width, height]);
+  dirStruct.panel = panel;
+  updatePanelTitle(dirStruct, NA);
+
   % from the top
   devPanelHeight = 2 * TXT_FIELD_HEIGHT + 0.05;
   maxFigY = 0.99;
