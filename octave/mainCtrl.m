@@ -3,7 +3,8 @@ clear;
 % clearing cached classes in Octave IDE
 clear classes;
 
-currDir = fileparts(mfilename('fullpath'));
+source 'consts.m';
+
 addpath(currDir);
 ctrlDir = [currDir filesep() 'ctrl'];
 addpath(ctrlDir);
@@ -11,10 +12,9 @@ statusDir = [currDir filesep() 'status'];
 addpath(statusDir);
 internalDir = [currDir filesep() 'internal'];
 addpath(internalDir);
-ardDir = [currDir filesep() 'ctrl/arduino/inst'];
+ardDir = [ctrlDir filesep() 'arduino' filesep() 'inst'];
 addpath(ardDir);
 
-source 'consts.m';
 
 % we need some global settings - assuming recording direction (corresponding to configRec.m)
 direction = DIR_REC;

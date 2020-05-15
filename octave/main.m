@@ -10,10 +10,7 @@ pkg load optim;
 pkg load zeromq;
 pkg load database;
 
-currDir = fileparts(mfilename('fullpath'));
 addpath(currDir);
-statusDir = [currDir filesep() 'status'];
-addpath(statusDir);
 statusDir = [currDir filesep() 'status'];
 addpath(statusDir);
 internalDir = [currDir filesep() 'internal'];
