@@ -144,9 +144,12 @@ function result = splitCalibPlaySched(label = 1)
         % calibrating LPF at origRecFreq
         printStr(sprintf("Joint-device calibrating/measuring LPF at %dHz", origRecFreq));
         % deleting the calib file should it exist - always clean calibration
-        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+        global recInfo;
+        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID,
+          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);
-        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_LP1);
+        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID),
+          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);
         
         % safety measure - requesting calibration only at curFreq
@@ -160,7 +163,8 @@ function result = splitCalibPlaySched(label = 1)
       case SWITCH_TO_VD_LABEL
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         % persistent variable, also used in next step CAL_VD_LABEL
-        lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
+        global recInfo;
+        lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, recInfo.playCalDevName, recInfo.recCalDevName, EXTRA_CIRCUIT_LP1);
 
         % OUT unchanged
         adapterStruct.in = false; % CALIB
@@ -192,9 +196,12 @@ function result = splitCalibPlaySched(label = 1)
         % zooming calibration levels + plotting the range so that user can adjust precisely                
         zoomCalLevels(calFreqReq, getTargetLevelsForAnalysedCh(lpFundAmpl, ANALYSED_CH_ID));
         % deleting the calib file should it exist - always clean calibration
-        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD);
+        global recInfo;
+        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID,
+          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_VD);
         deleteFile(calFile);
-        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID), MODE_DUAL, EXTRA_CIRCUIT_VD);
+        calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID),
+          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_VD);
         deleteFile(calFile);
 
         calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];

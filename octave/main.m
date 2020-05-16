@@ -118,6 +118,7 @@ startingTs = NA;
 buffer = [0];
 
 source 'run_common.m';
+source 'set_caldev_names.m';
 
 firstCycle = true;
 
@@ -217,6 +218,6 @@ while(true)
 
   if useZeroMQ
     sendInfo(buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks, fs, direction, cmdDoneID, compenCalFiles, reloadCalFiles,
-      sourceStruct, sinkStruct, showFFTCfg, chMode, equalizer, nonInteger), zeromqPort);
+      sourceStruct, sinkStruct, showFFTCfg, chMode, equalizer, nonInteger, playCalDevName, recCalDevName), zeromqPort);
   endif
 endwhile

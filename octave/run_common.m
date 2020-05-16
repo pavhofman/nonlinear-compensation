@@ -11,5 +11,3 @@ endif
 if ~exist(logDir, 'dir')
   mkdir(logDir);
 endif
-
-source 'set_device_names.m';

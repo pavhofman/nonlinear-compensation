@@ -3,14 +3,15 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   global AMPL_IDX;  % = index of fundAmpl1 in cal peaks row
   global PLAY_AMPL_IDX;  % = index of playAmpl1 in cal peaks row
   global EXTRA_TRANSFER_DIR;
+  global recInfo;
   
   persistent PI2 = 2*pi;
 
   % voltage divider
-  calFile = genCalFilename(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, vdName);
+  calFile = genCalFilename(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, recInfo.playCalDevName, recInfo.recCalDevName, chMode, vdName);
   [peaksVDRow, distortVDFreqs] = loadCalRow(calFile);
   % LPF filter (input - resistor 10k -RIGHT- capacitor 10nF - ground)
-  calFile = genCalFilename(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, chMode, lpName);
+  calFile = genCalFilename(fundFreq, fs, COMP_TYPE_JOINT, playChID, analysedRecChID, recInfo.playCalDevName, recInfo.recCalDevName, chMode, lpName);
   [peaksLPRow, distortLPFreqs] = loadCalRow(calFile);
 
 
@@ -141,8 +142,9 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
 endfunction
 
 function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, chMode, compType, timestamp)
+  global recInfo;
   % no extraCircuit
-  calFile = genCalFilename(getFreqs(fundPeaksCh), fs, compType, playChID, channelID, chMode, '');
+  calFile = genCalFilename(getFreqs(fundPeaksCh), fs, compType, playChID, channelID, recInfo.playCalDevName, recInfo.recCalDevName, chMode, '');
   
   % always writing new file - delete first if exists
   deleteFile(calFile);  

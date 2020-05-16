@@ -1,6 +1,6 @@
 % building info struct from global variables
 function info = buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks, fs, direction, cmdDoneID, compenCalFiles, reloadCalFiles,
-    sourceStruct, sinkStruct, showFFTCfg, chMode, equalizer, nonInteger)
+    sourceStruct, sinkStruct, showFFTCfg, chMode, equalizer, nonInteger, playCalDevName, recCalDevName)
   info = struct();
 
   info.id = NA;
@@ -22,7 +22,10 @@ function info = buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks,
   
   info.sourceStruct = sourceStruct;
   info.sinkStruct = sinkStruct;
-  
+
+  info.playCalDevName = playCalDevName;
+  info.recCalDevName = recCalDevName;
+
   info.showingFFT = showFFTCfg.enabled;
 
   info.fs = fs;
