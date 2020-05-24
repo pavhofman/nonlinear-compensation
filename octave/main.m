@@ -186,16 +186,10 @@ while(true)
     %printf('Analysis took %f\n', toc(id));
   endif
 
-  if statusContains(DISTORTING)
-    source 'run_distortion.m';
-  endif
-  
-
   % calibration - updating calBuffer in every cycle
   source 'run_calibration.m';
 
-  
-  if (statusContains(COMPENSATING))
+    if (statusContains(COMPENSATING))
     %id = tic();
     source 'run_compensation.m';
     %printf('Compensation took %f\n', toc(id));
@@ -203,6 +197,11 @@ while(true)
     % for all other statuses - clear compenCalFiles
     compenCalFiles = cell(columns(buffer), 1);
   endif
+
+  if statusContains(DISTORTING)
+    source 'run_distortion.m';
+  endif
+  
   
   source 'post_process_stream.m';
 
