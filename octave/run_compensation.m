@@ -38,5 +38,3 @@ endfor
 
 setStatusResult(COMPENSATING, result);
 setStatusMsg(COMPENSATING, msg);
-% advancing startingsTs to next cycle
-startingTs = cellfun(@(x) x + rows(buffer) * 1/fs, startingTs,'un',0);
