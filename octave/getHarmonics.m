@@ -62,6 +62,6 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(fftLength, sam
   endfor
  
   if genDistortPeaks
-    writeLog('DEBUG', 'Determined distortion peaks: %s', disp(distortPeaks));
+    writeLog('TRACE', 'Determined distortion peaks: %s', disp(distortPeaks));
   endif
 endfunction
