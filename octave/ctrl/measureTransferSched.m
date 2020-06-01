@@ -57,6 +57,9 @@ function result = measureTransferSched(label= 1, schedTask = [])
   % similar level of VD to LPF provides similar phaseshift of VD to when measured in splitCalibPlaySched. Here it is not so critical
   persistent MAX_AMPL_DIFF = db2mag(-80);
 
+  % transfer measurement requires more averages to increase precision since it will not be performed often
+  persistent TRANSF_CAL_RUNS = 30;
+
   global adapterStruct;
 
   persistent lpFundAmpl = NA;
@@ -176,7 +179,8 @@ function result = measureTransferSched(label= 1, schedTask = [])
 
               % safety measure - requesting calibration only at current rec freq (no level known, unfortunately)
               calFreqReqStr = getCalFreqReqStr({[recFreqs(freqID), NA, NA]});
-              calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
+              calCmd = sprintf("%s %s %s%d %s %s%s %s%d", CALIBRATE, calFreqReqStr, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT,
+                getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX), CMD_EXTRA_CIRCUIT_PREFIX, EXTRA_CIRCUIT_LP1, CMD_CALRUNS_PREFIX, TRANSF_CAL_RUNS);
               cmdIDRec = writeCmd(calCmd, cmdFileRec);
 
               waitForCmdDone([cmdIDPlay, cmdIDRec], CAL_LP_FINISHED_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
@@ -284,7 +288,9 @@ function result = measureTransferSched(label= 1, schedTask = [])
                 recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_VD);
               deleteFile(calFile);
 
-              calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
+              calCmd = sprintf("%s %s %s%d %s %s%s %s%d", CALIBRATE, calFreqReqStr, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT,
+                getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX), CMD_EXTRA_CIRCUIT_PREFIX, EXTRA_CIRCUIT_VD, CMD_CALRUNS_PREFIX, TRANSF_CAL_RUNS);
+
               cmdIDRec = writeCmd(calCmd, cmdFileRec);
 
               waitForCmdDone([cmdIDPlay, cmdIDRec], CAL_VD_FINISHED_LABEL, timeout, ERROR, mfilename());
