@@ -1,16 +1,13 @@
 %% Config file for REC side and for mainCtrl process
 %% NOTE - configPlay.m overrides these settings in mainPlay process - both are loaded
 
-% samplerate - same for REC and PLAY. Different samplerates NOT supported!
+% samplerate - same for REC and PLAY. Different samplerates NOT supported (yet)!
 playRecConfig.sampleRate = 48000;
 
-% capture/recording playrec device ID - see output of mainListPlayrecDevs.m
+% capture/recording playrec device name (distinctive substring) - see output of mainListPlayrecDevs.m
 % typically the physical soundcard
-playRecConfig.recDeviceID = 23; % EMU
+playRecConfig.recDevice = 'emu2ch'; % EMU
 
-% playback playrec device ID - see output of mainListPlayrecDevs.m
+% playback playrec device name - see output of mainListPlayrecDevs.m
 % typically the looback device
-playRecConfig.playDeviceID = 21; % loop 0
-
-% "executive" sound device ID in the other direction
-playRecConfig.otherDeviceID = 8; % infrasonic
+playRecConfig.playDevice = 'octave_loop';

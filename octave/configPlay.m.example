@@ -1,12 +1,9 @@
 % config overrides for configRec.m on PLAY side
 
-% capture/recording playrec device ID on PLAY side - see output of mainListPlayrecDevs.m
+% capture/recording playrec device name (distinctive substring) on PLAY side - see output of mainListPlayrecDevs.m
 % typically the loopback device
-playRecConfig.recDeviceID = 21; % octave_loop
+playRecConfig.recDevice = 'octave_loop';
 
-% playback playrec device ID on PLAY side - see output of mainListPlayrecDevs.m
+% playback playrec device name on PLAY side - see output of mainListPlayrecDevs.m
 % typically the physical soundcard
-playRecConfig.playDeviceID = 8; % Infrasonic
-
-% "executive" sound device ID in the other direction
-playRecConfig.otherDeviceID = 23; % E-MU
+playRecConfig.playDevice = 'emu2ch'; % E-MU

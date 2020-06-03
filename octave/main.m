@@ -18,6 +18,7 @@ addpath(statusDir);
 internalDir = [currDir filesep() 'internal'];
 addpath(internalDir);
 
+% contains samplerate config, loaded for both sides
 source 'configRec.m';
 
 global nonInteger;
@@ -26,12 +27,17 @@ if direction == DIR_PLAY
   source 'configPlay.m';
   cmdFile = genDataPath(CMD_FILE_PLAY, dataDir);
   zeromqPort = ZEROMQ_PORT_PLAY;
-  % support for non-integer frequencies - by default off on playback side
-  nonInteger = false;
 else
   cmdFile = genDataPath(CMD_FILE_REC, dataDir);
   zeromqPort = ZEROMQ_PORT_REC;
+endif
 
+source 'init_dev_ids.m';
+
+if direction == DIR_PLAY
+  % support for non-integer frequencies - by default off on playback side
+  nonInteger = false;
+else
   % support for non-integer frequencies on rec side - depends if the same device is used on playback side
   nonInteger = (playRecConfig.recDeviceID ~= playRecConfig.otherDeviceID);
 endif
@@ -119,7 +125,6 @@ source 'restart_chain.m';
 startingTs = NA;
 buffer = [0];
 
-source 'run_common.m';
 source 'set_caldev_names.m';
 
 firstCycle = true;
