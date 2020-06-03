@@ -8,7 +8,7 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   calOnMenusTasks = cell();
   calOffMenusTasks = cell();
 
-  tasksMenu = uimenu (fig, "label", "&Tasks");
+  tasksMenu = uimenu (fig, "label", "&Control");
   
   uimenu(tasksMenu, "label", "Re-Measure LPF/VD Transfer", 'separator', 'on', 'callback', @clbkRemeasureTransfers);
   
@@ -16,8 +16,10 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});
   calOffMenusTasks{end+1} = uimenu(tasksMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
 
-  uimenu(tasksMenu, "label", ['View logs for Ctrl'], "callback", {@clbkViewLogfile, 'ctrl'});
-  
+  uimenu(tasksMenu, "label", 'View logs for Control', 'separator', 'on', "callback", {@clbkViewLogfile, 'ctrl'});
+  clbkRestartCtrl = @(src, data) exit();
+  uimenu(tasksMenu, "label", 'Restart Control', "callback", clbkRestartCtrl);
+
   % array of menu items related to calibration start/stop - used to enable/disable all at once
   recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
   recStruct.calOffMenus = [cell2mat(calOffMenusPlay), cell2mat(calOffMenusRec), cell2mat(calOffMenusTasks)];
@@ -89,5 +91,6 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   dirStruct.fftMenu = uimenu(menu, "label", "Show FFT Chart", 'separator', 'on', "callback", {fCmd, SHOW_FFT, cmdFile});
   dirStruct.fftOffMenu = uimenu(menu, "label", "Close FFT Chart", 'enable', 'off', "callback", {@clbkCmdOff, SHOW_FFT, cmdFile});
 
-  uimenu(menu, "label", ['View logs for ' sideName], "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
+  uimenu(menu, "label", ['View logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
+  uimenu(menu, "label", ['Restart ' sideName ' process'], "callback", {@clbkKillProcess, dirStruct.dir});
 endfunction

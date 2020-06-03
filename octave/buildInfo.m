@@ -32,6 +32,8 @@ function info = buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks,
   info.cmdDoneID = cmdDoneID;
   info.nonInteger = nonInteger;
   info.direction = direction;
+  % current process PID is needed for restarting/monitoring from CTRL
+  info.pid = getpid();
 endfunction
 
 
