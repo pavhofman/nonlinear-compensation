@@ -78,12 +78,13 @@ function doExit(fig)
 endfunction
 
 % create figure and panel on it
-fig = figure('position', [100, 100, WIDTH, HEIGHT]);
-% menubar must be removed with set, otherwise no menu bar is displayed
-set(fig, 'menubar', 'none');
-set(fig, "toolbar", "none");
-
-set(fig, 'DeleteFcn', @(h, e) doExit(fig));
+fig = figure(
+  'name','CleanSine',
+  'numbertitle', 'off',
+  'menubar', 'none',
+  'toolbar', 'none',
+  'position', [100, 100, WIDTH, HEIGHT],
+  'DeleteFcn', @(h, e) doExit(fig));
 
 global playStruct;
 playStruct = createDirStruct(DIR_PLAY);
