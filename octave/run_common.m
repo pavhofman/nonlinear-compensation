@@ -11,3 +11,7 @@ endif
 if ~exist(logDir, 'dir')
   mkdir(logDir);
 endif
+
+if ~exist(commDir, 'dir')
+  mkdir(commDir);
+endif

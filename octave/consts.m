@@ -267,6 +267,9 @@ global dataDir = sprintf("%s%s%s", currDir, filesep(), 'data');
 % directory for logs
 global logDir = sprintf("%s%s%s", currDir, filesep(), 'log');
 
+% directory for communication files between processes
+global commDir = sprintf("%s%s%s", currDir, filesep(), 'data_comm');
+
 % configuration of audio interface
 global playRecConfig = struct();
 playRecConfig.pageBufCount = 5;
