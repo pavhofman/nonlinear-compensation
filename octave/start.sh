@@ -60,6 +60,8 @@ while true; do
     startScript mainCtrl.m ctrl
     PID3=$!
   fi
+  # to avoid clogging CPU in case some of the processes does not start
+  sleep 0.5s
 done
 
 trap - TERM INT
