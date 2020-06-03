@@ -13,10 +13,10 @@ function devName = readOtherDevFromConfig(direction)
   playRecConfig = struct();
   if direction == DIR_PLAY
     % the other side
-    source 'configRec.m'
+    source 'configRec.conf'
     devName = playRecConfig.recDevice;
   else
-    source 'configPlay.m'
+    source 'configPlay.conf'
     devName = playRecConfig.playDevice;
   endif
 endfunction

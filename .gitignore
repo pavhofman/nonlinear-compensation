@@ -1,5 +1,5 @@
-octave/configRec.m
-octave/configPlay.m
+octave/configRec.conf
+octave/configPlay.conf
 octave/playrec.mex
 octave-workspace
 .idea
