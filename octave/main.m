@@ -10,6 +10,8 @@ pkg load optim;
 pkg load zeromq;
 pkg load database;
 
+source 'run_common.m';
+
 addpath(currDir);
 statusDir = [currDir filesep() 'status'];
 addpath(statusDir);
