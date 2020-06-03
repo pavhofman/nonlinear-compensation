@@ -25,10 +25,10 @@ global nonInteger;
 if direction == DIR_PLAY
   % overriden playback config values
   source 'configPlay.m';
-  cmdFile = getFilePath(CMD_FILE_PLAY, dataDir);
+  cmdFile = getFilePath(CMD_FILE_PLAY, commDir);
   zeromqPort = ZEROMQ_PORT_PLAY;
 else
-  cmdFile = getFilePath(CMD_FILE_REC, dataDir);
+  cmdFile = getFilePath(CMD_FILE_REC, commDir);
   zeromqPort = ZEROMQ_PORT_REC;
 endif
 
