@@ -16,16 +16,27 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});
   calOffMenusTasks{end+1} = uimenu(tasksMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
 
-  uimenu(tasksMenu, "label", 'View logs for Control', 'separator', 'on', "callback", {@clbkViewLogfile, 'ctrl'});
-  uimenu(tasksMenu, "label", 'Restart Control', "callback", @(src, data) exit());
+  uimenu(tasksMenu, "label", 'Delete all calibration files', 'separator', 'on', "callback", @clbkDeleteCalFiles);
+
+  uimenu(tasksMenu, "label", 'View logs for Control', "callback", {@clbkViewLogfile, 'ctrl'});
+  uimenu(tasksMenu, "label", 'Restart Control', "callback", @(src, data) killProcess(getpid(), 'Control'));
   % TERM signal
-  uimenu(tasksMenu, "label", 'Quit all CleanSine processes', 'separator', 'on', "callback", @(src, data) kill(getppid(), 15));
+  uimenu(tasksMenu, "label", 'Quit all CleanSine processes', "callback", @(src, data) kill(getppid(), 15));
 
   % array of menu items related to calibration start/stop - used to enable/disable all at once
   recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
   recStruct.calOffMenus = [cell2mat(calOffMenusPlay), cell2mat(calOffMenusRec), cell2mat(calOffMenusTasks)];
 endfunction
 
+function clbkDeleteCalFiles(src, data)
+  global dataDir;
+  files = glob([dataDir filesep() '*.dat']);
+  for idx = 1:length(files)
+    filename = files{idx};
+    writeLog('DEBUG', 'Deleting calibration file %s', filename);
+    delete(filename);
+  endfor
+endfunction
 
 function clbkRemeasureTransfers(src, data)
   global maxTransferAge;
@@ -93,5 +104,28 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   dirStruct.fftOffMenu = uimenu(menu, "label", "Close FFT Chart", 'enable', 'off', "callback", {@clbkCmdOff, SHOW_FFT, cmdFile});
 
   uimenu(menu, "label", ['View logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
-  uimenu(menu, "label", ['Restart ' sideName ' process'], "callback", {@clbkKillProcess, dirStruct.dir});
+  uimenu(menu, "label", ['Restart ' sideName ' process'], "callback", {@clbkKillSide, dirStruct.dir, sideName});
+endfunction
+
+% killing process PLAY or REC
+function clbkKillSide(src, data, direction, sideName)
+  global DIR_PLAY;
+
+  if direction == DIR_PLAY
+    global playInfo;
+    pid = playInfo.pid;
+  else
+    global recInfo;
+    pid = recInfo.pid;
+  endif
+  killProcess(pid, sideName);
+endfunction
+
+% killing process PLAY or REC
+function killProcess(pid, sideName)
+  % TERM
+  persistent SIGNAL = 15;
+
+  writeLog('DEBUG', 'Sending signal %d to process %s', SIGNAL, sideName);
+  kill(pid, SIGNAL);
 endfunction
