@@ -5,8 +5,8 @@ function filename = getDevIDFilepath(direction)
   global DIR_PLAY;
 
   if direction == DIR_PLAY
-    filename = genDataPath('play_main_dev_id.dat', commDir);
+    filename = getFilePath('play_main_dev_id.dat', commDir);
   else
-    filename = genDataPath('rec_main_dev_id.dat', commDir);
+    filename = getFilePath('rec_main_dev_id.dat', commDir);
   endif
 endfunction

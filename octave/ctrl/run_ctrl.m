@@ -40,9 +40,9 @@ function dirStruct = createDirStruct(dir)
 endfunction
 
 global cmdFileRec;
-cmdFileRec = genDataPath(CMD_FILE_REC, dataDir);
+cmdFileRec = getFilePath(CMD_FILE_REC, dataDir);
 global cmdFilePlay;
-cmdFilePlay = genDataPath(CMD_FILE_PLAY, dataDir);
+cmdFilePlay = getFilePath(CMD_FILE_PLAY, dataDir);
 
 global POS_X = 100;
 global POS_Y = 100;

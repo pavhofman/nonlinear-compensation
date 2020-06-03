@@ -1,3 +1,3 @@
-function path = genDataPath(filename, filedir)
+function path = getFilePath(filename, filedir)
   path = [filedir filesep() filename];
 endfunction

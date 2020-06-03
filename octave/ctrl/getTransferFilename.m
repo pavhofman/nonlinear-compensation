@@ -11,5 +11,5 @@ function filename = getTransferFilename(freq, extCircuit)
 
   % floating point freq is supported - rounding for now
   filename = ['transfer_' num2str(round(freq)) '_' extCircuit '.dat'];
-  filename = genDataPath(filename, filedir);
+  filename = getFilePath(filename, filedir);
 endfunction

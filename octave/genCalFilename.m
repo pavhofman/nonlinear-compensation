@@ -35,7 +35,7 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
   % suffix
   filename = [filename '.dat'];
 
-  filename = genDataPath(filename, dataDir);
+  filename = getFilePath(filename, dataDir);
 endfunction
 
 % devSpec: rows of cells {devName, chID}
