@@ -21,8 +21,6 @@ direction = DIR_REC;
 global logPath;
 logPath = stdout;
 
-source 'configRec.m';
-source 'init_sourcestruct.m';
 source 'run_common.m';
 
 unwind_protect
