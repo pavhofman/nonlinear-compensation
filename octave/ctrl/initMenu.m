@@ -104,6 +104,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   dirStruct.fftOffMenu = uimenu(menu, "label", "Close FFT Chart", 'enable', 'off', "callback", {@clbkCmdOff, SHOW_FFT, cmdFile});
 
   uimenu(menu, "label", ['View logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
+  uimenu(menu, "label", ['Edit config file for ' sideName], "callback", {@clbkEditConfig, ifelse(dirStruct.dir == DIR_REC, 'Rec', 'Play')});
   uimenu(menu, "label", ['Restart ' sideName ' process'], "callback", {@clbkKillSide, dirStruct.dir, sideName});
 endfunction
 
@@ -128,4 +129,16 @@ function killProcess(pid, sideName)
 
   writeLog('DEBUG', 'Sending signal %d to process %s', SIGNAL, sideName);
   kill(pid, SIGNAL);
+endfunction
+
+function clbkViewLogfile(src, data, logName)
+  global logDir;
+
+  open(sprintf("%s%s%s.log", logDir, filesep(), logName));
+endfunction
+
+function clbkEditConfig(src, data, dirSuffix)
+  global currDir;
+
+  open(sprintf("%s%sconfig%s.conf", currDir, filesep(), dirSuffix));
 endfunction
