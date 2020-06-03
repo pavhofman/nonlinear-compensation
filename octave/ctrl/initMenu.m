@@ -18,9 +18,10 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
   uimenu(tasksMenu, "label", 'Delete all calibration files', 'separator', 'on', "callback", @clbkDeleteCalFiles);
 
-  uimenu(tasksMenu, "label", 'View logs for Control', 'separator', 'on', "callback", {@clbkViewLogfile, 'ctrl'});
-  uimenu(tasksMenu, "label", 'View GIT version', "callback", @clbkViewVersion);
-  uimenu(tasksMenu, "label", 'Restart Control', "callback", @(src, data) killProcess(getpid(), 'Control'));
+  uimenu(tasksMenu, "label", 'View logs for Control', "callback", {@clbkViewLogfile, 'ctrl'});
+  uimenu(tasksMenu, "label", 'View GIT version', 'separator', 'on', "callback", @clbkViewVersion);
+  uimenu(tasksMenu, "label", 'Update to latest GIT version', "callback", @clbkUpdateGit);
+  uimenu(tasksMenu, "label", 'Restart Control', 'separator', 'on', "callback", @(src, data) killProcess(getpid(), 'Control'));
   % TERM signal
   uimenu(tasksMenu, "label", 'Quit all CleanSine processes', "callback", @(src, data) kill(getppid(), 15));
 
@@ -148,7 +149,16 @@ function clbkViewVersion(src, data)
   global currDir;
   persistent TMP_FILE = "/tmp/cleansine_version.txt";
 
-  gitCmd = sprintf("%s%sgit_version.sh > %s", currDir, filesep(), TMP_FILE);
+  gitCmd = sprintf("%s%sgit_version.sh > %s 2>&1", currDir, filesep(), TMP_FILE);
+  system (gitCmd);
+  open(TMP_FILE);
+endfunction
+
+function clbkUpdateGit(src, data)
+  global currDir;
+  persistent TMP_FILE = "/tmp/git_update_output.txt";
+
+  gitCmd = sprintf("%s%sgit_update.sh > %s  2>&1", currDir, filesep(), TMP_FILE);
   system (gitCmd);
   open(TMP_FILE);
 endfunction
