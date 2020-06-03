@@ -18,7 +18,8 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
   uimenu(tasksMenu, "label", 'Delete all calibration files', 'separator', 'on', "callback", @clbkDeleteCalFiles);
 
-  uimenu(tasksMenu, "label", 'View logs for Control', "callback", {@clbkViewLogfile, 'ctrl'});
+  uimenu(tasksMenu, "label", 'View logs for Control', 'separator', 'on', "callback", {@clbkViewLogfile, 'ctrl'});
+  uimenu(tasksMenu, "label", 'View GIT version', "callback", @clbkViewVersion);
   uimenu(tasksMenu, "label", 'Restart Control', "callback", @(src, data) killProcess(getpid(), 'Control'));
   % TERM signal
   uimenu(tasksMenu, "label", 'Quit all CleanSine processes', "callback", @(src, data) kill(getppid(), 15));
@@ -141,4 +142,13 @@ function clbkEditConfig(src, data, dirSuffix)
   global currDir;
 
   open(sprintf("%s%sconfig%s.conf", currDir, filesep(), dirSuffix));
+endfunction
+
+function clbkViewVersion(src, data)
+  global currDir;
+  persistent TMP_FILE = "/tmp/cleansine_version.txt";
+
+  gitCmd = sprintf("%s%sgit_version.sh > %s", currDir, filesep(), TMP_FILE);
+  system (gitCmd);
+  open(TMP_FILE);
 endfunction
