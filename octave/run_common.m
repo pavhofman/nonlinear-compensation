@@ -1,5 +1,4 @@
-% script runs common code for mainRec/Play and mainCtrl. Defines global device names, creates required dirs, etc.
-% Requires loaded configRec.m files
+% script runs common code for mainRec/Play and mainCtrl. Creates required dirs, etc.
 
 % no crash dumps
 crash_dumps_octave_core(false);
@@ -14,4 +13,8 @@ endif
 
 if ~exist(commDir, 'dir')
   mkdir(commDir);
+endif
+
+if ~exist(transfDir, 'dir')
+  mkdir(transfDir);
 endif

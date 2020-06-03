@@ -250,7 +250,6 @@ global ANALYSED_CH_ID = 2;
 
 global EXTRA_CIRCUIT_VD = 'vd';
 global EXTRA_CIRCUIT_LP1 = 'lp1';  
-global EXTRA_TRANSFER_DIR = 'transfer';  
 
 % transfer file/record maximum age to be accepted in splitCalibPlaySched -1 day
 global MAX_TRANSFER_AGE = 60 * 60 * 24 * 1;
@@ -269,6 +268,9 @@ global logDir = sprintf("%s%s%s", currDir, filesep(), 'log');
 
 % directory for communication files between processes
 global commDir = sprintf("%s%s%s", currDir, filesep(), 'data_comm');
+
+% directory for measured transfer files
+global transfDir = sprintf("%s%s%s", currDir, filesep(), 'data_transfer');
 
 % configuration of audio interface
 global playRecConfig = struct();

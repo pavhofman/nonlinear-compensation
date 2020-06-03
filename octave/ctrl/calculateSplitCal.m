@@ -2,7 +2,6 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   global COMP_TYPE_JOINT;
   global AMPL_IDX;  % = index of fundAmpl1 in cal peaks row
   global PLAY_AMPL_IDX;  % = index of playAmpl1 in cal peaks row
-  global EXTRA_TRANSFER_DIR;
   global recInfo;
   
   persistent PI2 = 2*pi;

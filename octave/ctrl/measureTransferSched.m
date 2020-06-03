@@ -21,8 +21,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
   
   global EXTRA_CIRCUIT_VD;
   global EXTRA_CIRCUIT_LP1;
-  global EXTRA_TRANSFER_DIR;
-  
+
   global cmdFileRec;
   global cmdFilePlay;
   global GENERATE;
@@ -193,7 +192,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               % removing the other channel calfile - useless
               global recInfo;
               otherCalFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID),
-                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_LP1, EXTRA_TRANSFER_DIR);
+                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_LP1);
               deleteFile(otherCalFile);
               
               % next frequency
