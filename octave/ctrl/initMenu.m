@@ -17,8 +17,9 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   calOffMenusTasks{end+1} = uimenu(tasksMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
 
   uimenu(tasksMenu, "label", 'View logs for Control', 'separator', 'on', "callback", {@clbkViewLogfile, 'ctrl'});
-  clbkRestartCtrl = @(src, data) exit();
-  uimenu(tasksMenu, "label", 'Restart Control', "callback", clbkRestartCtrl);
+  uimenu(tasksMenu, "label", 'Restart Control', "callback", @(src, data) exit());
+  % TERM signal
+  uimenu(tasksMenu, "label", 'Quit all CleanSine processes', 'separator', 'on', "callback", @(src, data) kill(getppid(), 15));
 
   % array of menu items related to calibration start/stop - used to enable/disable all at once
   recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
