@@ -1,9 +1,8 @@
-octave/configRec.conf
-octave/configPlay.conf
+conf/configRec.conf
+conf/configPlay.conf
 octave/playrec.mex
 octave-workspace
 .idea
-playrec.mex
 log/*
 data/*
 data_transfer/*

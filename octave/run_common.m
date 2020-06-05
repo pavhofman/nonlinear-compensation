@@ -18,3 +18,7 @@ endif
 if ~exist(transfDir, 'dir')
   mkdir(transfDir);
 endif
+
+if ~exist(confDir, 'dir')
+  mkdir(confDir);
+endif

@@ -275,6 +275,9 @@ global transfDir = sprintf("%s%s..%s%s", currDir, filesep(), filesep(), 'data_tr
 % directory for scripts
 global binDir = sprintf("%s%s..%s%s", currDir, filesep(), filesep(), 'bin');
 
+% directory for scripts
+global confDir = sprintf("%s%s..%s%s", currDir, filesep(), filesep(), 'conf');
+
 % configuration of audio interface
 global playRecConfig = struct();
 playRecConfig.pageBufCount = 5;

@@ -19,12 +19,12 @@ internalDir = [currDir filesep() 'internal'];
 addpath(internalDir);
 
 % contains samplerate config, loaded for both sides
-source 'configRec.conf';
+source(sprintf('%s%sconfigRec.conf', confDir, filesep()));
 
 global nonInteger;
 if direction == DIR_PLAY
   % overriden playback config values
-  source 'configPlay.conf';
+  source(sprintf('%s%sconfigPlay.conf', confDir, filesep()));
   cmdFile = getFilePath(CMD_FILE_PLAY, commDir);
   zeromqPort = ZEROMQ_PORT_PLAY;
 else

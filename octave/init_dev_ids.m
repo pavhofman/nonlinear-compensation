@@ -9,14 +9,15 @@ save(getDevIDFilepath(direction), 'mainDevID');
 % must be a function since playRecConfig is global
 function devName = readOtherDevFromConfig(direction)
   global DIR_PLAY;
+  global confDir;
   % must be LOCAL playRecConfig, used only for reading the conf file here
   playRecConfig = struct();
   if direction == DIR_PLAY
     % the other side
-    source 'configRec.conf'
+    source(sprintf('%s%sconfigRec.conf', confDir, filesep()));
     devName = playRecConfig.recDevice;
   else
-    source 'configPlay.conf'
+    source(sprintf('%s%sconfigPlay.conf', confDir, filesep()));
     devName = playRecConfig.playDevice;
   endif
 endfunction
