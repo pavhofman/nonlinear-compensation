@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 function terminate() {
   echo "Caught SIGTERM signal!"
   kill -TERM $PID1 2>/dev/null
@@ -21,7 +21,7 @@ trap terminate TERM INT
 DIRNAME=$(dirname "$0")
 
 cd $DIRNAME/../
-mkdir log
+mkdir -p log
 cd octave
 
 startScript mainCtrl.m ctrl
