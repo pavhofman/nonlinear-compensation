@@ -12,7 +12,7 @@ function terminate() {
 function startScript() {
   NAME=$1
   LOG_NAME=$2
-  octave $NAME > log/$LOG_NAME.log 2>&1 &
+  octave $NAME > ../log/$LOG_NAME.log 2>&1 &
   return $!
 }
 
@@ -20,7 +20,9 @@ trap terminate TERM INT
 
 DIRNAME=$(dirname "$0")
 
-cd $DIRNAME
+cd $DIRNAME/../
+mkdir log
+cd octave
 
 startScript mainCtrl.m ctrl
 PID3=$!

@@ -4,7 +4,7 @@ octave/playrec.mex
 octave-workspace
 .idea
 playrec.mex
-octave/log/*
-octave/data/*
-octave/data_transfer/*
-octave/data_comm/*
+log/*
+data/*
+data_transfer/*
+data_comm/*

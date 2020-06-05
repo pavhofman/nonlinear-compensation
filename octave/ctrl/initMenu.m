@@ -149,19 +149,19 @@ function clbkEditConfig(src, data, dirSuffix)
 endfunction
 
 function clbkViewVersion(src, data)
-  global currDir;
+  global binDir;
   persistent TMP_FILE = "/tmp/cleansine_version.txt";
 
-  gitCmd = sprintf("%s%sgit_version.sh > %s 2>&1", currDir, filesep(), TMP_FILE);
+  gitCmd = sprintf("%s%sgit_version.sh > %s 2>&1", binDir, filesep(), TMP_FILE);
   system (gitCmd);
   open(TMP_FILE);
 endfunction
 
 function clbkUpdateGit(src, data)
-  global currDir;
+  global binDir;
   persistent TMP_FILE = "/tmp/git_update_output.txt";
 
-  gitCmd = sprintf("%s%sgit_update.sh > %s  2>&1", currDir, filesep(), TMP_FILE);
+  gitCmd = sprintf("%s%sgit_update.sh > %s  2>&1", binDir, filesep(), TMP_FILE);
   system (gitCmd);
   open(TMP_FILE);
 endfunction
