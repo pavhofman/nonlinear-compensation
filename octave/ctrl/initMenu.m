@@ -8,23 +8,26 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   calOnMenusTasks = cell();
   calOffMenusTasks = cell();
 
-  tasksMenu = uimenu (fig, "label", "&Control");
+  jointSidesMenu = uimenu (fig, "label", "&Joint Sides");
   
-  uimenu(tasksMenu, "label", "Re-Measure LPF/VD Transfer", 'separator', 'on', 'callback', @clbkRemeasureTransfers);
-  
-  calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Single Run", 'separator', 'on', "callback", {@clbkJointCalib, false});
-  calOnMenusTasks{end+1} = uimenu(tasksMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});
-  calOffMenusTasks{end+1} = uimenu(tasksMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
+  calOnMenusTasks{end+1} = uimenu(jointSidesMenu, "label", "Calibrate Joint-Sides: Single Run", "callback", {@clbkJointCalib, false});
+  calOnMenusTasks{end+1} = uimenu(jointSidesMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});
+  calOffMenusTasks{end+1} = uimenu(jointSidesMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
 
-  uimenu(tasksMenu, "label", 'Delete all calibration files', 'separator', 'on', "callback", @clbkDeleteCalFiles);
+  uimenu(jointSidesMenu, "label", "Re-Measure LPF/VD Transfer", 'separator', 'on', 'callback', @clbkRemeasureTransfers);
 
-  uimenu(tasksMenu, "label", 'View logs for Control', "callback", {@clbkViewLogfile, 'ctrl'});
-  uimenu(tasksMenu, "label", 'View GIT version', 'separator', 'on', "callback", @clbkViewVersion);
-  uimenu(tasksMenu, "label", 'Update to latest GIT version', "callback", @clbkUpdateGit);
-  uimenu(tasksMenu, "label", 'Restart Control', 'separator', 'on', "callback", @(src, data) killProcess(getpid(), 'Control'));
+
+  controlMenu = uimenu (fig, "label", "C&ontrol");
+  uimenu(controlMenu, "label", 'Delete all calibration files', "callback", @clbkDeleteCalFiles);
+
+  uimenu(controlMenu, "label", 'View logs for Control', 'separator', 'on', "callback", {@clbkViewLogfile, 'ctrl'});
+  uimenu(controlMenu, "label", 'Restart Control', "callback", @(src, data) killProcess(getpid(), 'Control'));
   % TERM signal
-  uimenu(tasksMenu, "label", 'Quit all CleanSine processes', "callback", @(src, data) kill(getppid(), 15));
+  uimenu(controlMenu, "label", 'Quit all CleanSine processes', "callback", @(src, data) kill(getppid(), 15));
 
+  aboutMenu = uimenu (fig, "label", "&About");
+  uimenu(aboutMenu, "label", 'View GIT version', "callback", @clbkViewVersion);
+  uimenu(aboutMenu, "label", 'Update to latest GIT version', "callback", @clbkUpdateGit);
   % array of menu items related to calibration start/stop - used to enable/disable all at once
   recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
   recStruct.calOffMenus = [cell2mat(calOffMenusPlay), cell2mat(calOffMenusRec), cell2mat(calOffMenusTasks)];
