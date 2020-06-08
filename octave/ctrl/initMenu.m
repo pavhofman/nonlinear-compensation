@@ -18,16 +18,16 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
 
   controlMenu = uimenu (fig, "label", "C&ontrol");
-  uimenu(controlMenu, "label", 'Delete all calibration files', "callback", @clbkDeleteCalFiles);
+  uimenu(controlMenu, "label", 'Delete All Calibration Files', "callback", @clbkDeleteCalFiles);
 
-  uimenu(controlMenu, "label", 'View logs for Control', 'separator', 'on', "callback", {@clbkViewLogfile, 'ctrl'});
+  uimenu(controlMenu, "label", 'View Logs for Control', 'separator', 'on', "callback", {@clbkViewLogfile, 'ctrl'});
   uimenu(controlMenu, "label", 'Restart Control', "callback", @(src, data) killProcess(getpid(), 'Control'));
   % TERM signal
-  uimenu(controlMenu, "label", 'Quit all CleanSine processes', "callback", @(src, data) kill(getppid(), 15));
+  uimenu(controlMenu, "label", 'Quit All CleanSine Processes', "callback", @(src, data) kill(getppid(), 15));
 
   aboutMenu = uimenu (fig, "label", "&About");
-  uimenu(aboutMenu, "label", 'View GIT version', "callback", @clbkViewVersion);
-  uimenu(aboutMenu, "label", 'Update to latest GIT version', "callback", @clbkUpdateGit);
+  uimenu(aboutMenu, "label", 'View GIT Version', "callback", @clbkViewVersion);
+  uimenu(aboutMenu, "label", 'Update to Latest GIT Version', "callback", @clbkUpdateGit);
   % array of menu items related to calibration start/stop - used to enable/disable all at once
   recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
   recStruct.calOffMenus = [cell2mat(calOffMenusPlay), cell2mat(calOffMenusRec), cell2mat(calOffMenusTasks)];
@@ -108,10 +108,10 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   dirStruct.fftMenu = uimenu(menu, "label", "Show FFT Chart", 'separator', 'on', "callback", {fCmd, SHOW_FFT, cmdFile});
   dirStruct.fftOffMenu = uimenu(menu, "label", "Close FFT Chart", 'enable', 'off', "callback", {@clbkCmdOff, SHOW_FFT, cmdFile});
 
-  uimenu(menu, "label", ['View logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
-  uimenu(menu, "label", ['Edit config file for ' sideName], "callback", {@clbkEditConfig, ifelse(dirStruct.dir == DIR_REC, 'Rec', 'Play')});
-  uimenu(menu, "label", ['List available devices for ' sideName], "callback", {@clbkListDevs, dirStruct.dir ~= DIR_REC});
-  uimenu(menu, "label", ['Restart ' sideName ' process'], "callback", {@clbkKillSide, dirStruct.dir, sideName});
+  uimenu(menu, "label", ['View Logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
+  uimenu(menu, "label", ['Edit Config File for ' sideName], "callback", {@clbkEditConfig, ifelse(dirStruct.dir == DIR_REC, 'Rec', 'Play')});
+  uimenu(menu, "label", ['List Available Devices for ' sideName], "callback", {@clbkListDevs, dirStruct.dir ~= DIR_REC});
+  uimenu(menu, "label", ['Restart ' sideName ' Process'], "callback", {@clbkKillSide, dirStruct.dir, sideName});
 endfunction
 
 % killing process PLAY or REC
