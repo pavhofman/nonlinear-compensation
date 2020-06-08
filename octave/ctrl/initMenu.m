@@ -110,6 +110,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
 
   uimenu(menu, "label", ['View logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
   uimenu(menu, "label", ['Edit config file for ' sideName], "callback", {@clbkEditConfig, ifelse(dirStruct.dir == DIR_REC, 'Rec', 'Play')});
+  uimenu(menu, "label", ['List available devices for ' sideName], "callback", {@clbkListDevs, dirStruct.dir ~= DIR_REC});
   uimenu(menu, "label", ['Restart ' sideName ' process'], "callback", {@clbkKillSide, dirStruct.dir, sideName});
 endfunction
 
@@ -163,5 +164,19 @@ function clbkUpdateGit(src, data)
 
   gitCmd = sprintf("%s%sgit_update.sh > %s  2>&1", binDir, filesep(), TMP_FILE);
   system (gitCmd);
+  open(TMP_FILE);
+endfunction
+
+function clbkListDevs(src, data, isPlayback)
+  global currDir;
+  persistent TMP_FILE = "/tmp/devs.txt";
+
+  devs = getPlayrecDevs(isPlayback);
+  fid = fopen(TMP_FILE, 'w');
+  for k=1:length(devs)
+    fprintf(fid, devs{k}.desc);
+  end
+  fclose(fid);
+
   open(TMP_FILE);
 endfunction
