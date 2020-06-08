@@ -141,8 +141,10 @@ function ardStruct = initArdStruct()
     return;
   catch err
     writeLog('ERROR', 'No arduino adapter found, cannot continue');
-    h = errordlg('No arduino adapter found, cannot continue');
+    h = errordlg('No arduino adapter found, quitting all CleanSine processes');
     uiwait(h);
+
+    kill(getppid(), 15);
     % exiting
     error("No arduino found");
   end_try_catch
