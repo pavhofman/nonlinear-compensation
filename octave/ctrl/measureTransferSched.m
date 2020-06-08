@@ -118,7 +118,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         % for restoration at the end
         keepInOutSwitches();
         % OUT must be off because the task will generate auxiliary signals
-        adapterStruct.out = false; % OUT off
+        % adapterStruct.out = false; % OUT off
         adapterStruct.in = false; % CALIB IN
         adapterStruct.calibLPF = true; % LPF
         adapterStruct.reqLevels = []; % no stepper adjustment
@@ -228,7 +228,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         lpFundAmpl = loadRecAmplFromTransfer(origRecFreq, EXTRA_CIRCUIT_LP1);
 
-        adapterStruct.out = false;
+        % adapterStruct.out = false;
         adapterStruct.in = false; % CALIB
         adapterStruct.calibLPF = false; % VD
         % LPF + transfer measurement - VD for splitting
