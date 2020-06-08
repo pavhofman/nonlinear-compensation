@@ -135,7 +135,17 @@ endfunction
 
 function ardStruct = initArdStruct()
   ardStruct = struct();
-  ardStruct.ard = findArduino('ttyACM');
+  try
+    ardStruct.ard = findArduino('ttyACM');
+    % found, returning
+    return;
+  catch err
+    writeLog('ERROR', 'No arduino adapter found, cannot continue');
+    h = errordlg('No arduino adapter found, cannot continue');
+    uiwait(h);
+    % exiting
+    error("No arduino found");
+  end_try_catch
 endfunction
 
 function stepperStruct = initStepper(ard, stepperID, p1, p2, p3, p4)
