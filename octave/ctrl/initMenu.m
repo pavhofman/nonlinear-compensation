@@ -143,9 +143,9 @@ function clbkViewLogfile(src, data, logName)
 endfunction
 
 function clbkEditConfig(src, data, dirSuffix)
-  global currDir;
+  global confDir;
 
-  open(sprintf("%s%sconfig%s.conf", currDir, filesep(), dirSuffix));
+  open(sprintf("%s%sconfig%s.conf", confDir, filesep(), dirSuffix));
 endfunction
 
 function clbkViewVersion(src, data)
