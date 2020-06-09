@@ -20,16 +20,22 @@ trap terminate TERM INT
 
 DIRNAME=$(dirname "$0")
 
+
 cd $DIRNAME/../
 mkdir -p log
+
+# deleting outdated main_dev_id files
+rm -f data_comm/*
+
 cd octave
 
 startScript mainCtrl.m ctrl
 PID3=$!
-sleep 0.5s
+# mainCtrl does not use playrec, no need to delay next process startup
 
 startScript mainPlay.m play
 PID1=$!
+# delay to avoid possible deadlock in playrec if two processes (mainPlay, mainRec) open it concurrently
 sleep 0.5s
 
 startScript mainRec.m rec
