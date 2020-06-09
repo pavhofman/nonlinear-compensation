@@ -79,16 +79,15 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
     compType = COMP_TYPE_PLAY_SIDE;
   endif
   uimenu(menu, "label", ['Compensate Only ' sideName], "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(compType)], cmdFile});
-  
+  uimenu(menu, "label", 'Compensate Joint-Sides', "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFile});
+
   if dirStruct.dir == DIR_REC
-    calOnMenus{end+1} = uimenu(menu, "label", ['Exact-Level Calibrate Capture Side'], 'separator', 'on', "callback", @clbkExactCalibRec);
-    calOnMenus{end+1} = uimenu(menu, "label", ['Range-Calibrate Capture Side'], 'separator', 'on', "callback", @clbkRangeCalibRec);
+    calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate/Compensate Capture at Current Level'], 'separator', 'on', "callback", @clbkExactCalibRec);
+    calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate/Compensate Capture at Range around Current Level'], "callback", @clbkRangeCalibRec);
   else
-    calOnMenus{end+1} = uimenu(menu, "label", ['Split-Calibrate Playback Side'], 'separator', 'on', "callback", @clbkSplitCalibPlay);
+    calOnMenus{end+1} = uimenu(menu, "label", ['Split-Calibrate/Compensate Playback'], 'separator', 'on', "callback", @clbkSplitCalibPlay);
   endif
-  
-  uimenu(menu, "label", 'Compensate Joint-Sides', 'separator', 'on', "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFile});  
-  calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate Only ' sideName ': Single Run'], 'separator', 'on', "callback", {@clbkCalib, compType, false});
+  calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate Only ' sideName ': Single Run'], "callback", {@clbkCalib, compType, false});
   calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate Only ' sideName ': Continuously'], "callback", {@clbkCalib, compType, true});
   calOffMenus{end+1} = uimenu(menu, "label", "Stop Calibrating", 'enable', 'off', "callback", @clbkCalibOff);
   
@@ -100,17 +99,17 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
 
   dirStruct.readfileMenu = uimenu(menu, "label", "Read from Audiofile", 'separator', 'on', "callback", {@clbkReadFile, cmdFile});
   dirStruct.readfileOffMenu = uimenu(menu, "label", "Stop File Reading", 'enable', 'off', "callback", {@clbkCmdOff, READFILE, cmdFile});
-
-  dirStruct.recordMenu = uimenu(menu, "label", "Start Recording to Memory", 'separator', 'on', "callback", {fCmd, RECORD, cmdFile});
+  dirStruct.recordMenu = uimenu(menu, "label", "Start Recording to Memory", "callback", {fCmd, RECORD, cmdFile});
   dirStruct.recordOffMenu = uimenu(menu, "label", "Stop Recording", 'enable', 'off', "callback", {@clbkCmdOff, RECORD, cmdFile});
   dirStruct.storeRecordedMenu = uimenu(menu, "label", "Store Recording to File", 'enable', 'off', "callback", {@clbkStoreRec, cmdFile});
 
   dirStruct.fftMenu = uimenu(menu, "label", "Show FFT Chart", 'separator', 'on', "callback", {fCmd, SHOW_FFT, cmdFile});
   dirStruct.fftOffMenu = uimenu(menu, "label", "Close FFT Chart", 'enable', 'off', "callback", {@clbkCmdOff, SHOW_FFT, cmdFile});
 
-  uimenu(menu, "label", ['View Logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
-  uimenu(menu, "label", ['Edit Config File for ' sideName], "callback", {@clbkEditConfig, ifelse(dirStruct.dir == DIR_REC, 'Rec', 'Play')});
+  uimenu(menu, "label", ['Edit Config File for ' sideName], 'separator', 'on', "callback", {@clbkEditConfig, ifelse(dirStruct.dir == DIR_REC, 'Rec', 'Play')});
   uimenu(menu, "label", ['List Available Devices for ' sideName], "callback", {@clbkListDevs, dirStruct.dir ~= DIR_REC});
+
+  uimenu(menu, "label", ['View Logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
   uimenu(menu, "label", ['Restart ' sideName ' Process'], "callback", {@clbkKillSide, dirStruct.dir, sideName});
 endfunction
 
@@ -173,6 +172,7 @@ function clbkListDevs(src, data, isPlayback)
 
   devs = getPlayrecDevs(isPlayback);
   fid = fopen(TMP_FILE, 'w');
+  fprintf(fid, "Available (not used) devices for %s\n--------------------------------------\n", ifelse(isPlayback, 'Playback', 'Capture'));
   for k=1:length(devs)
     fprintf(fid, devs{k}.desc);
   end
