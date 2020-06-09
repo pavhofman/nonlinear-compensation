@@ -235,18 +235,21 @@ function result = checkCorrectLevels(calFreqReqCh, fundPeaksCh)
   result = true;
 endfunction
 
-% determines average phase diffs between second and first channels.
+% determines average phase diffs between analysed and the other channels.
 % avgPhaseDiffs = row vector, diff for each fundament
 function avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS)
-  writeLog('DEBUG', 'Determining avg fund phase diff between channel 2 and 1');
+  global ANALYSED_CH_ID;
+  persistent otherChannelID = getTheOtherChannelID(ANALYSED_CH_ID);
+
+  writeLog('DEBUG', 'Determining avg fund phase diff between channel %d and %d', ANALYSED_CH_ID, otherChannelID);
   phaseDiffsC = cell();
   for id = 1:MAX_RUNS
-    fundPeaksCh1 = allFundPeaks{1, id};
-    fundPeaksCh2 = allFundPeaks{2, id};
-    if hasAnyPeak(fundPeaksCh1) && isequal(fundPeaksCh1(:, 1), fundPeaksCh2(:, 1))
+    fundPeaksChOther = allFundPeaks{otherChannelID, id};
+    fundPeaksChAn = allFundPeaks{ANALYSED_CH_ID, id};
+    if hasAnyPeak(fundPeaksChOther) && isequal(fundPeaksChOther(:, 1), fundPeaksChAn(:, 1))
       % both have a peak, both same freqs, store the phase diff
       % NOTE - phases are not generally in <-pi, +pi> range which will produce nonsense when averaging. Averaging complex numbers instead      
-      phaseDiffsC{end + 1} = exp(i * fundPeaksCh2(:, 3)) ./ exp(i * fundPeaksCh1(:, 3));
+      phaseDiffsC{end + 1} = exp(i * fundPeaksChAn(:, 3)) ./ exp(i * fundPeaksChOther(:, 3));
     endif
   endfor
   % remove first row to avoid transitions - same as for averaging peaks
