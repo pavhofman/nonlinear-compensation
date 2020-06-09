@@ -1,12 +1,13 @@
 % updating phase columns of calPeaks with avgPhaseDiffs at addedRowIDs
 function calPeaks = updatePhaseDiffsInPeaks(calPeaks, avgPhaseDiffs, addedRowIDs)
+  global PHASEDIFF_IDX;
   if length(avgPhaseDiffs) == 1
     % aligning to two values
     avgPhaseDiffs = [avgPhaseDiffs, 0];
   end  
   
   for rowID = addedRowIDs
-    calPeaks(rowID, [2 3]) = avgPhaseDiffs;
+    calPeaks(rowID, [PHASEDIFF_IDX PHASEDIFF_IDX+1]) = avgPhaseDiffs;
   endfor
 endfunction
 
