@@ -188,8 +188,9 @@ CYCLE_LENGTH_NONINTEGER = 0.511;
 NONINTEGER_CAL_BUF_FS_MULTIPLE = 4;
 
 % period size (soundcard fragment size)
-PERIOD_SIZE_INTEGER = 20000;
-PERIOD_SIZE_NONINTEGER = 40000;
+% period size is handled by playrec in a separate thread - using powers of two
+PERIOD_SIZE_INTEGER = 2^12;
+PERIOD_SIZE_NONINTEGER = 2^12;
 
 % minimum level of distortion peaks to be included into calibration profile
 % depends largely on soundcard performance
