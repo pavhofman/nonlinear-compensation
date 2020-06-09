@@ -152,7 +152,7 @@ global COMP_TYPE_REC_SIDE = 2;
 % dual/unbalanced/separate L, R
 global MODE_DUAL = 1;
 % id of channel to keep in MODE_BAL and MODE_SINGLE
-% RIGHT
+% LEFT
 global KEEP_CHANNEL_ID = 1;
 
 % balanced - PLAY: L = -R(equalized), R = R
