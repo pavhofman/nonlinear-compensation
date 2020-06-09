@@ -56,7 +56,7 @@ function buffer = readWritePlayrec(playBuffer, cycleLength, periodSize, fs, rest
     end
 
     %Initialise if not initialised
-    if(restart || !playrec('isInitialised'))
+    if(restart || ~playrec('isInitialised'))
         if (playrec('isInitialised'))
           playrec('reset');
         endif
