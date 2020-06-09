@@ -1,5 +1,6 @@
 % Reading device ID for the given devName from playrec.
 % Note: checks only devices not currently open
+% If such devName is not found, error is thrown
 function devID = getPlayrecDevID(devName, playback)
   devs = playrec('getDevices');
   for id = 1:length(devs)
