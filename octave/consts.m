@@ -247,7 +247,8 @@ global MAX_FREQ_DIFF_DECIMALS = 2;
 global PLAY_CH_ID = KEEP_CHANNEL_ID;
 
 % analysed input ch goes through LPF or VD, the other input channel is direct
-global ANALYSED_CH_ID = 2;
+% LEFT
+global ANALYSED_CH_ID = 1;
 
 global EXTRA_CIRCUIT_VD = 'vd';
 global EXTRA_CIRCUIT_LP1 = 'lp1';  
