@@ -72,7 +72,7 @@ taskFNameToAbort = '';
 global maxTransferAge;
 maxTransferAge = 0;
 
-function doExit(fig)
+function doExit()
   global doQuit;
   doQuit = true;
 endfunction
@@ -84,7 +84,7 @@ fig = figure(
   'menubar', 'none',
   'toolbar', 'none',
   'position', [100, 100, WIDTH, HEIGHT],
-  'DeleteFcn', @(h, e) doExit(fig));
+  'DeleteFcn', @(h, e) doExit());
 
 global playStruct;
 playStruct = createDirStruct(DIR_PLAY);
