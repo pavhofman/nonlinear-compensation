@@ -27,7 +27,7 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
   aboutMenu = uimenu (fig, "label", "&About");
   uimenu(aboutMenu, "label", 'View GIT Version', "callback", @clbkViewVersion);
-  uimenu(aboutMenu, "label", 'Update to Latest GIT Version', "callback", @clbkUpdateGit);
+  uimenu(aboutMenu, "label", 'Update to the Latest GIT Version', "callback", @clbkUpdateGit);
   % array of menu items related to calibration start/stop - used to enable/disable all at once
   recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
   recStruct.calOffMenus = [cell2mat(calOffMenusPlay), cell2mat(calOffMenusRec), cell2mat(calOffMenusTasks)];
