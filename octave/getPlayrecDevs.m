@@ -7,7 +7,8 @@ function availDevs = getPlayrecDevs(isPlayback)
     if (isPlayback && allDevs(idx).outputChans) || (~isPlayback && allDevs(idx).inputChans)
       dev = struct();
       dev.id = allDevs(idx).deviceID;
-      dev.desc = sprintf(' %2d) %s (%s) %d channels\n', allDevs(idx).deviceID, allDevs(idx).name, allDevs(idx).hostAPI, allDevs(idx).outputChans);
+      dev.desc = sprintf('ID %2d: Name: %s; API: %s; %d channels\n', allDevs(idx).deviceID, allDevs(idx).name, allDevs(idx).hostAPI,
+        ifelse(isPlayback, allDevs(idx).outputChans, allDevs(idx).inputChans));
 
       availDevs(end + 1) = dev;
     end
