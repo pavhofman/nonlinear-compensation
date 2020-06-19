@@ -12,7 +12,8 @@ function terminate() {
 function startScript() {
   NAME=$1
   LOG_NAME=$2
-  octave $NAME > ../log/$LOG_NAME.log 2>&1 &
+  PARAM=$3
+  octave $NAME $PARAM> ../log/$LOG_NAME.log 2>&1 &
   return $!
 }
 
@@ -29,7 +30,7 @@ rm -f data_comm/*
 
 cd octave
 
-startScript mainCtrl.m ctrl
+startScript mainCtrl.m ctrl all
 PID3=$!
 # mainCtrl does not use playrec, no need to delay next process startup
 
@@ -65,7 +66,7 @@ while true; do
 
   if ! kill -0 $PID3 2> /dev/null ; then
     echo "mainCtrl quit, restarting"
-    startScript mainCtrl.m ctrl
+    startScript mainCtrl.m ctrl all
     PID3=$!
   fi
   # to avoid clogging CPU in case some of the processes does not start

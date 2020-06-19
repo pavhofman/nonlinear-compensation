@@ -23,7 +23,7 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   uimenu(controlMenu, "label", 'View Logs for Control', 'separator', 'on', "callback", {@clbkViewLogfile, 'ctrl'});
   uimenu(controlMenu, "label", 'Restart Control', "callback", @(src, data) killProcess(getpid(), 'Control'));
   % TERM signal
-  uimenu(controlMenu, "label", 'Quit All CleanSine Processes', "callback", @(src, data) kill(getppid(), 15));
+  uimenu(controlMenu, "label", 'Quit All CleanSine Processes', "callback", @(src, data) stopAll());
 
   aboutMenu = uimenu (fig, "label", "&About");
   uimenu(aboutMenu, "label", 'View GIT Version', "callback", @clbkViewVersion);
