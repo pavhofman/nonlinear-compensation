@@ -75,6 +75,8 @@ maxTransferAge = 0;
 function doExit()
   global doQuit;
   doQuit = true;
+  % the DeleteBtn stops all processes
+  stopAll();
 endfunction
 
 % create figure and panel on it
