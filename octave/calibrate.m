@@ -104,7 +104,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
     prevFundPeaks{channelID} = fundPeaksCh;
 
     if checksOK
-      % OK, actual calibration
+      % OK, doing the actual calibration
       writeLog('DEBUG', 'Same fund peaks as in previous run + correct freqs and levels in in run %d, using for averaging', runID);
 
       % same non-empty freqs from previous run, can continue
@@ -128,8 +128,8 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
       allDistortPeaks = cell(channelCnt, MAX_RUNS);
 
       % DEBUG printing values
-      writeLog('DEBUG', 'This round fundPeaksCh: %s', disp(fundPeaksCh));
-      writeLog('DEBUG', 'Prev. round prevFundPeaksCh: %s', disp(prevFundPeaksCh));
+      writeLog('DEBUG', 'Checks failed: This round fundPeaksCh: %s', disp(fundPeaksCh));
+      writeLog('DEBUG', 'Checks failed: Prev. round prevFundPeaksCh: %s', disp(prevFundPeaksCh));
       result = FAILING_RESULT;
     endif
   endfor
@@ -169,8 +169,8 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
     endfor
     
     if chMode ~= MODE_SINGLE && channelCnt >= 2
-      % at least two channels, we can measure/store avg. fund phase chan2 vs. chan1
-      avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS);
+      % at least two channels, we can measure/store avg. fund phase theOtherChID vs. ANALYSED_CH_ID
+      avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks);
     else
       avgPhaseDiffs = NA;
     endif
@@ -239,13 +239,13 @@ endfunction
 
 % determines average phase diffs between analysed and the other channels.
 % avgPhaseDiffs = row vector, diff for each fundament
-function avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS)
+function avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks)
   global ANALYSED_CH_ID;
   persistent otherChannelID = getTheOtherChannelID(ANALYSED_CH_ID);
 
   writeLog('DEBUG', 'Determining avg fund phase diff between channel %d and %d', ANALYSED_CH_ID, otherChannelID);
   phaseDiffsC = cell();
-  for id = 1:MAX_RUNS
+  for id = 1:columns(allFundPeaks)
     fundPeaksChOther = allFundPeaks{otherChannelID, id};
     fundPeaksChAn = allFundPeaks{ANALYSED_CH_ID, id};
     if hasAnyPeak(fundPeaksChOther)  && hasAnyPeak(fundPeaksChAn) && isequal(fundPeaksChOther(:, 1), fundPeaksChAn(:, 1))
