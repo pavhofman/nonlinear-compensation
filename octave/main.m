@@ -51,13 +51,13 @@ if nonInteger
   cycleLength = CYCLE_LENGTH_NONINTEGER;
   periodSize = PERIOD_SIZE_NONINTEGER;
   maxAmplDiff = MAX_AMPL_DIFF_NONINTEGER;
-  calBufferSize = NONINTEGER_CAL_BUF_FS_MULTIPLE * fs;
+  calBufferSize = NONINTEGER_MAX_FFT_FS_MULTIPLE * fs;
 else
   cycleLength = CYCLE_LENGTH_INTEGER;
   periodSize = PERIOD_SIZE_INTEGER;
   maxAmplDiff = MAX_AMPL_DIFF_INTEGER;
-  % integer Hz, i.e. FFT at fs-length
-  calBufferSize = 1 * fs;
+  % integer Hz, i.e. FFT at INTEGER_FS_FFT_MULTIPLE*fs length
+  calBufferSize = INTEGER_FS_FFT_MULTIPLE * fs;
 endif
 
 % default initial command - PASS

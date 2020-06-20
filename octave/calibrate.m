@@ -20,6 +20,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
   global RUNNING_OK_RESULT;
   
   global MODE_SINGLE;
+  global INTEGER_FS_FFT_MULTIPLE;
   
   persistent correctRunsCounter = zeros(channelCnt, 1);
   
@@ -43,8 +44,9 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
   % calculate FFT peaks
   if ~nonInteger
     % integer freq mode
-    % all channels at once with FFT, with length = fs
-    [fundPeaks, distortPeaks] = getHarmonics(fs, calBuffer(rows(calBuffer) - fs + 1:end, :), fs, 'rect');
+    % all channels at once with FFT, with length = INTEGER_FS_FFT_MULTIPLE * fs
+    fftLength = INTEGER_FS_FFT_MULTIPLE * fs;
+    [fundPeaks, distortPeaks] = getHarmonics(fftLength, calBuffer(rows(calBuffer) - fftLength + 1:end, :), fs, 'rect');
   else
     % empty, will calculate for each channel in loop
     fundPeaks = cell(channelCnt, 1);
