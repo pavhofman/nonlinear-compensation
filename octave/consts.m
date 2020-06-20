@@ -185,7 +185,7 @@ CYCLE_LENGTH_INTEGER = 0.211;
 CYCLE_LENGTH_NONINTEGER = 0.511;
 
 % length of calibration buffer = FFT length in multiples of FS for integer mode
-global INTEGER_FS_FFT_MULTIPLE = 1;
+global INTEGER_FS_FFT_MULTIPLE = 4;
 % length of calibration buffer in multiples of FS for noninteger mode
 NONINTEGER_MAX_FFT_FS_MULTIPLE = 4;
 
