@@ -248,7 +248,7 @@ function avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks, MAX_RUNS)
   for id = 1:MAX_RUNS
     fundPeaksChOther = allFundPeaks{otherChannelID, id};
     fundPeaksChAn = allFundPeaks{ANALYSED_CH_ID, id};
-    if hasAnyPeak(fundPeaksChOther) && isequal(fundPeaksChOther(:, 1), fundPeaksChAn(:, 1))
+    if hasAnyPeak(fundPeaksChOther)  && hasAnyPeak(fundPeaksChAn) && isequal(fundPeaksChOther(:, 1), fundPeaksChAn(:, 1))
       % both have a peak, both same freqs, store the phase diff
       % NOTE - phases are not generally in <-pi, +pi> range which will produce nonsense when averaging. Averaging complex numbers instead      
       phaseDiffsC{end + 1} = exp(i * fundPeaksChAn(:, 3)) ./ exp(i * fundPeaksChOther(:, 3));
