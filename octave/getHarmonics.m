@@ -12,7 +12,7 @@
 %   x - freqencies
 %   y - amplitudes_in_abs_value
 %
-function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(fftLength, samples, Fs, genDistortPeaks = true, window_name = 'rect')
+function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(fftLength, samples, fs, genDistortPeaks = true, window_name = 'rect')
   global MAX_DISTORT_ID;
 
   [x, yc, nfft] = computeFFT(samples, fftLength, window_name);
@@ -41,7 +41,7 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(fftLength, sam
       end
       if ~isempty(distortPeaksCh)
         % converting bin ID to Hz
-        distortPeaksCh(:, 1) = distortPeaksCh(:, 1) * Fs / fftLength;
+        distortPeaksCh(:, 1) = distortPeaksCh(:, 1) * fs / fftLength;
         % storing
         distortPeaks{channelID} = double(distortPeaksCh);
       endif
@@ -49,7 +49,7 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(fftLength, sam
 
     if ~isempty(fundPeaksCh)
       % converting bin ID to Hz
-      fundPeaksCh(:, 1) = fundPeaksCh(:, 1) * Fs / fftLength;
+      fundPeaksCh(:, 1) = fundPeaksCh(:, 1) * fs / fftLength;
       % storing. Must use double! Result of time() converted to single returns incorrect time.
       fundPeaks{channelID} = double(fundPeaksCh);
     endif
