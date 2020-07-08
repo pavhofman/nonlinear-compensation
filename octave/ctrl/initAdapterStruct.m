@@ -50,7 +50,7 @@ function initAdapterStruct()
       steppers{1} = initStepper(ardStruct.ard, 1, 6, 9, 8, 7);
       % simple info window with switch positions
       adapterStruct.hasRelays = false;
-      adapterStruct.execFunc = @(title) execAdapterPanelWithStepper(title);
+      adapterStruct.execFunc = @(title) execAdapterPanelWithOnlyStepper(title);
 
     elseif strcmp(firmware, 'CleanSine-1.0')
       % relays + 1 stepper, 2 LPFs
