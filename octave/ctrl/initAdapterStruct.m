@@ -17,6 +17,7 @@ function initAdapterStruct()
 
   adapterStruct.hasRelays = false;
   adapterStruct.hasStepper = false;
+  adapterStruct.updateIOFunc = @(recInfo, playInfo) emptyFunc();
 
   if ~adapterHasArduino
     % switches as well as VD are manually operated - displaying only info window
@@ -42,8 +43,6 @@ function initAdapterStruct()
     adapterStruct.checkFunc = @(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
       checkSwitchesAndStepper(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask);
     adapterStruct.abortFunc = @() abortAdapterPanelWithStepper();
-
-    adapterStruct.updateIOFunc = @(recInfo, playInfo) emptyFunc();
 
     firmware = ardStruct.ard.getFirmware();
     if strcmp(firmware, 'CleanSine-0.1')
