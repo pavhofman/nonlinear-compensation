@@ -23,7 +23,7 @@ function initAdapterStruct()
     % switches as well as VD are manually operated - displaying only info window
       % mechanical switches, no stepper
 
-    adapterStruct.execFunc = @(title) updateSwitchWinPanel(title);
+    adapterStruct.execFunc = @(title) updateNoArduinoAdapterPanel(title);
     adapterStruct.checkFunc = @(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
       checkAdapterPanel(nextLabel, abortLabel, errorLabel, schedTask);
     % empty function
@@ -118,7 +118,7 @@ function initAdapterStruct()
   endif % adapter has arduino
 endfunction
 
-function updateSwitchWinPanel(title)
+function updateNoArduinoAdapterPanel(title)
   global adapterStruct;
   adapterStruct.label = title;
   adapterStruct.showContinueBtn = true;
