@@ -13,13 +13,13 @@ function updateAdapterPanel()
 
   radio = ifelse(adapterStruct.in, adapterStruct.dutInRadio, adapterStruct.calInRadio);
   changed |= setRadio(adapterStruct.inRGroup, radio);
-  setEnabled([adapterStruct.dutInRadio, adapterStruct.calInRadio], noTasksRunning);
+  setEnabled([adapterStruct.dutInRadio, adapterStruct.calInRadio], noTasksRunning && adapterStruct.hasRelays);
 
 
   radio = ifelse(adapterStruct.calibLPF, adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio);
   changed |= setRadio(adapterStruct.calibVdlpRGroup, radio);
   % calibration VD/LPF - enabled when no tasks and switched to calibration
-  setEnabled([adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio], noTasksRunning && ~adapterStruct.in);
+  setEnabled([adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio], noTasksRunning && ~adapterStruct.in && adapterStruct.hasRelays);
 
   if adapterStruct.has2LPFs
     radio = ifelse(adapterStruct.lpf == 1, adapterStruct.lpf1Radio, adapterStruct.lpf2Radio);
