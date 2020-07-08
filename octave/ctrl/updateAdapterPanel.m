@@ -47,9 +47,6 @@ function updateAdapterPanel()
       % some change detected, i.e. manual action required - showing confirmation/continue button
       % enabled if not using relays
       setVisible(adapterStruct.contBtn, ~adapterStruct.hasRelays);
-    else
-      % no change detected, not showing the CONTINUE button, but sending its click
-      adapterStruct.switchesSet = true;
     endif
   endif
 endfunction
