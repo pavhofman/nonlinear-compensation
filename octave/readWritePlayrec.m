@@ -61,7 +61,7 @@ function buffer = readWritePlayrec(playBuffer, cycleLength, periodSize, fs, rest
           playrec('reset');
         endif
         writeLog('INFO', 'Initialising playrec to use sample rate: %d, recDeviceID: %d , playDeviceID: %d\n', fs, recDeviceID, playDeviceID);
-        playrec('init', fs, playDeviceID, recDeviceID, 2, 2, periodSize)
+        playrec('init', fs, playDeviceID, recDeviceID, 2, 2, periodSize, 0.3, 0.3);
         if(~playrec('isInitialised'))
             error ('Unable to initialise playrec correctly');
         elseif(playrec('getRecMaxChannel')<max(recChanList))
