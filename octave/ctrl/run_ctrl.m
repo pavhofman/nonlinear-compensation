@@ -114,9 +114,6 @@ global adapterStruct;
 initAdapterStruct();
 
 drawAdapterPanel(fig, BTN_PANEL_WIDTH, ADAPTER_PANEL_Y, 1 - BTN_PANEL_WIDTH, ADAPTER_PANEL_HEIGHT);
-% setting initial values, not enabling CONTINUE button
-updateAdapterPanel();
-
 
 % bottom panel with outBox
 % all the way to adapter panel

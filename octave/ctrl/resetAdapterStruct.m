@@ -3,7 +3,6 @@ function resetAdapterStruct(recoverInOut = true)
   global adapterStruct;
 
   adapterStruct.label = '';
-  adapterStruct.showContinueBtn = false;
 
   % initialization
   if ~isfield(adapterStruct, 'prevOut')

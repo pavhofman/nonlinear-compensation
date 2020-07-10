@@ -1,4 +1,4 @@
-function updateAdapterPanel()
+function updateAdapterPanel(init = false)
   global adapterStruct;
   global taskFNames;
 
@@ -6,24 +6,24 @@ function updateAdapterPanel()
 
   % updating panel items
   % not checking changed status
-  setFieldString(adapterStruct.msgBox, adapterStruct.label);
+  newLabelShown = setFieldString(adapterStruct.msgBox, adapterStruct.label) && ~isempty(adapterStruct.label);
 
-  changed = setChecked(adapterStruct.outCheckbox, adapterStruct.out);
+  switchesChanged = setChecked(adapterStruct.outCheckbox, adapterStruct.out);
   % OUT can be manually enabled at any time
 
   radio = ifelse(adapterStruct.in, adapterStruct.dutInRadio, adapterStruct.calInRadio);
-  changed |= setRadio(adapterStruct.inRGroup, radio);
+  switchesChanged |= setRadio(adapterStruct.inRGroup, radio);
   setEnabled([adapterStruct.dutInRadio, adapterStruct.calInRadio], noTasksRunning && adapterStruct.hasRelays);
 
 
   radio = ifelse(adapterStruct.calibLPF, adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio);
-  changed |= setRadio(adapterStruct.calibVdlpRGroup, radio);
+  switchesChanged |= setRadio(adapterStruct.calibVdlpRGroup, radio);
   % calibration VD/LPF - enabled when no tasks and switched to calibration
   setEnabled([adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio], noTasksRunning && ~adapterStruct.in && adapterStruct.hasRelays);
 
   if adapterStruct.has2LPFs
     radio = ifelse(adapterStruct.lpf == 1, adapterStruct.lpf1Radio, adapterStruct.lpf2Radio);
-    changed |= setRadio(adapterStruct.lpfRGroup, radio);
+    switchesChanged |= setRadio(adapterStruct.lpfRGroup, radio);
     % LPF1/2 - enabled when no tasks
     setEnabled([adapterStruct.lpf1Radio, adapterStruct.lpf2Radio], adapterStruct.hasRelays && noTasksRunning);
   endif
@@ -35,18 +35,15 @@ function updateAdapterPanel()
 
   if adapterStruct.has2VDs
     radio = ifelse(adapterStruct.vd == 1, adapterStruct.vd1Radio, adapterStruct.vd2Radio);
-    changed |= setRadio(adapterStruct.vdRGroup, radio);
+    switchesChanged |= setRadio(adapterStruct.vdRGroup, radio);
     % VD1/2 - enabled when no tasks
     setEnabled([adapterStruct.vd1Radio, adapterStruct.vd2Radio], adapterStruct.hasRelays && noTasksRunning);
   endif
 
-  adapterStruct.switchesChanged |= changed;
+  adapterStruct.switchesChanged |= ~init && switchesChanged;
   % CONTINUE button
-  if adapterStruct.showContinueBtn
-    if changed
-      % some change detected, i.e. manual action required - showing confirmation/continue button
-      % enabled if not using relays
-      setVisible(adapterStruct.contBtn, ~adapterStruct.hasRelays);
-    endif
+  if adapterStruct.hasContButton
+    % showing confirmation/continue button if some switch change detected (incl. changed nonempty label), i.e. manual action required
+    setVisible(adapterStruct.contBtn, ~init && (switchesChanged  || newLabelShown));
   endif
 endfunction

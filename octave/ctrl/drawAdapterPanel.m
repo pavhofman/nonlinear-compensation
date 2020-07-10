@@ -153,6 +153,9 @@ function drawAdapterPanel(fig, x, y, width, height)
                                 'callback', @clbkAdapterContinue,
                                 'position', [btnX,  0.1, BTN_WIDTH, 0.9]);
 
+  % setting initial values - in INIT mode
+  updateAdapterPanel(true);
+
 endfunction
 
 function clbkSetOut(src, data)
@@ -202,10 +205,9 @@ endfunction
 function clbkAdapterContinue(src, data)
   global adapterStruct;
   adapterStruct.switchesSet = true;
-  % again hiding
-  adapterStruct.label = '';
+  % hiding contButton
   % clearing msgBox
-  adapterStruct.showContinueBtn = false;
+  adapterStruct.label = '';
   updateAdapterPanel();
 endfunction
 
