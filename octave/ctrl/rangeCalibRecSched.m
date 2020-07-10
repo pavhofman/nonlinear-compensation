@@ -24,5 +24,5 @@ function result = rangeCalibRecSched(label = 1)
     0,                db2mag(-85);...
   ];
 
-  result = calibRec(label, MULTI_STEPS, mfilename(), 'Range-Calibrating REC Side');
+  result = calibRecSched(label, MULTI_STEPS, mfilename(), 'Range-Calibrating REC Side');
 endfunction

@@ -9,5 +9,5 @@ function result = exactCalibRecSched(label = 1)
     0,                db2mag(-85);...
   ];
 
-  result = calibRec(label, SINGLE_STEP, mfilename(), 'Exact-Level Calibrating REC Side');
+  result = calibRecSched(label, SINGLE_STEP, mfilename(), 'Exact-Level Calibrating REC Side');
 endfunction

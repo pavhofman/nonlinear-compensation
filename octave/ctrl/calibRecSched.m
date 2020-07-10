@@ -1,9 +1,9 @@
-% scheduler-enabled function for range-calibration of REC side
+% scheduler-enabled function for calibration of REC side
 % Range calibration calibrates at steps level of the original signal to provide lines in calFile for interpolation
 % Not using generator
 % result: NA = not finished yet, false = error/failed, true = finished OK
 % If PLAY-side not compensating, running joint-sides calibration, otherwise REC-side calibration
-function result = calibRec(label, steps, schedFilename, name)
+function result = calibRecSched(label, steps, schedFilename, name)
   result = NA;
   % init section
   [CHECKING_LABEL, START_LABEL, MODE_LABEL, ADJ_LABEL, CAL_LABEL,...
