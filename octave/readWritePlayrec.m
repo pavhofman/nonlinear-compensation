@@ -44,13 +44,13 @@ function buffer = readWritePlayrec(playBuffer, cycleLength, periodSize, fs, rest
     %Test if current initialisation is ok
     if(playrec('isInitialised'))
         if(playrec('getSampleRate')~=fs)
-            fprintf('Changing playrec sample rate from %d to %d\n', playrec('getSampleRate'), fs);
+            writeLog('INFO', 'Changing playrec sample rate from %d to %d\n', playrec('getSampleRate'), fs);
             playrec('reset');
         elseif(playrec('getRecDevice')~=recDeviceID)
-            fprintf('Changing playrec record device from %d to %d\n', playrec('getRecDevice'), recDeviceID);
+            writeLog('INFO', 'Changing playrec record device from %d to %d\n', playrec('getRecDevice'), recDeviceID);
             playrec('reset');
         elseif(playrec('getRecMaxChannel')<max(recChanList))
-            fprintf('Resetting playrec to configure device to use more input channels\n');
+            writeLog('INFO', 'Resetting playrec to configure device to use more input channels\n');
             playrec('reset');
         end
     end
@@ -60,7 +60,7 @@ function buffer = readWritePlayrec(playBuffer, cycleLength, periodSize, fs, rest
         if (playrec('isInitialised'))
           playrec('reset');
         endif
-        fprintf('Initialising playrec to use sample rate: %d, recDeviceID: %d , playDeviceID: %d\n', fs, recDeviceID, playDeviceID);
+        writeLog('INFO', 'Initialising playrec to use sample rate: %d, recDeviceID: %d , playDeviceID: %d\n', fs, recDeviceID, playDeviceID);
         playrec('init', fs, playDeviceID, recDeviceID, 2, 2, periodSize)
         if(~playrec('isInitialised'))
             error ('Unable to initialise playrec correctly');
@@ -77,7 +77,12 @@ function buffer = readWritePlayrec(playBuffer, cycleLength, periodSize, fs, rest
         tic();
     end
 
-    writeLog('TRACE', 'Sleeping for %f', cnt/fs - toc());
+    sleepTime = cnt/fs - toc();
+    if sleepTime > 0
+      writeLog('TRACE', 'Sleeping for %f', sleepTime);
+    else
+      writeLog('WARN', 'XRUN - Sleeping only for %f', sleepTime);
+    endif
     % blocking read on recording side
     playrec('block', pageNumList(1));
     buffer = playrec('getRec', pageNumList(1));
