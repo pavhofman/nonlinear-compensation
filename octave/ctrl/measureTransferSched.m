@@ -49,8 +49,10 @@ function result = measureTransferSched(label= 1, schedTask = [])
 
   persistent calFile = '';
   
-  % measured at fixed levels
-  persistent PLAY_LEVELS = {0.9, 0.9};
+  % fixed levels if no current PLAY level is known
+  persistent DEFAULT_PLAY_LEVELS = {0.9, 0.9};
+  % initialized in START_LABEL
+  persistent playLevels;
 
   % max. allowed deviation in each direction from midAmpl
   % similar level of VD to LPF provides similar phaseshift of VD to when measured in splitCalibPlaySched. Here it is not so critical
@@ -85,8 +87,12 @@ function result = measureTransferSched(label= 1, schedTask = [])
         % if playback freq is known, use it (playback will be generating). If no (playback has no signal, rec fed by an external generator, use recInfo)
         if length(playInfo.measuredPeaks) >= PLAY_CH_ID && ~ isempty(playInfo.measuredPeaks{PLAY_CH_ID})
           origPlayFreq = playInfo.measuredPeaks{PLAY_CH_ID}(1, 1);
+          % generated levels equal to current play level
+          origPlayLevel = playInfo.measuredPeaks{PLAY_CH_ID}(1, 2);
+          playLevels = {origPlayLevel, origPlayLevel};
         else
           origPlayFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
+          playLevels = DEFAULT_PLAY_LEVELS;
         endif
         
         origRecFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
@@ -151,10 +157,10 @@ function result = measureTransferSched(label= 1, schedTask = [])
         
       case WAIT_FOR_LP_LABEL
         % Now switched to LPF + mode. We start the generator at first freq and wait for all the changes topropagate through the chain. 1 sec should be enough
-        % The reason for waiting is if no freq change occured and it takes too long for the new PLAY_LEVELS amplitude to propagate, calibration will finish at the old levels of DUT, not of the measured transfer.
+        % The reason for waiting is if no freq change occured and it takes too long for the new playLevels amplitude to propagate, calibration will finish at the old levels of DUT, not of the measured transfer.
         if ~isempty(recFreqs)
           printStr(sprintf("Generating %dHz", recFreqs(1)));
-          sendPlayGeneratorCmd(recFreqs(1), PLAY_LEVELS);
+          sendPlayGeneratorCmd(recFreqs(1), playLevels);
         endif
 
         schedPause(1, CAL_LP_LABEL, mfilename());
@@ -167,7 +173,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
             case CAL_LP_LABEL
               % we can resend the first freq generator command even if it was already sent at WAIT_FOR_LP_LABEL section. It's better to have the sections as independent as possible
               printStr(sprintf("Generating %dHz", playFreqs(freqID)));
-              cmdIDPlay = sendPlayGeneratorCmd(playFreqs(freqID), PLAY_LEVELS);
+              cmdIDPlay = sendPlayGeneratorCmd(playFreqs(freqID), playLevels);
 
               printStr(sprintf("Joint-device calibrating/measuring LPF at %dHz", recFreqs(freqID)));
               % deleting the calib file should it exist - always clean calibration
@@ -179,7 +185,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               % safety measure - requesting calibration only at current rec freq (no level known, unfortunately)
               calFreqReqStr = getCalFreqReqStr({[recFreqs(freqID), NA, NA]});
               calCmd = sprintf("%s %s %s%d %s %s%s %s%d", CALIBRATE, calFreqReqStr, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT,
-                getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX), CMD_EXTRA_CIRCUIT_PREFIX, EXTRA_CIRCUIT_LP1, CMD_CALRUNS_PREFIX, TRANSF_CAL_RUNS);
+                getMatrixCellsToCmdStr(playLevels, CMD_PLAY_AMPLS_PREFIX), CMD_EXTRA_CIRCUIT_PREFIX, EXTRA_CIRCUIT_LP1, CMD_CALRUNS_PREFIX, TRANSF_CAL_RUNS);
               cmdIDRec = writeCmd(calCmd, cmdFileRec);
 
               waitForCmdDone([cmdIDPlay, cmdIDRec], CAL_LP_FINISHED_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
@@ -207,7 +213,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
                 
       case GEN_ORIG_F
         % returning back to orig freq
-        sendPlayGeneratorCmd(origPlayFreq, PLAY_LEVELS);
+        sendPlayGeneratorCmd(origPlayFreq, playLevels);
         % wait a bit for the change to propagate (to see the origPlayFreq in capture analysis UI)
         schedPause(1, SWITCH_TO_VD_LABEL, mfilename());
         return;
@@ -245,10 +251,10 @@ function result = measureTransferSched(label= 1, schedTask = [])
         printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", recFreqs(freqID)));
 
         % Now switched to VD + mode. We start the generator at first freq and wait for all the changes topropagate through the chain. 1 sec should be enough
-        % The reason for waiting is if no freq change occured and it takes too long for the new PLAY_LEVELS amplitude to propagate, calibration will finish at the old levels of DUT, not of the measured transfer.
+        % The reason for waiting is if no freq change occured and it takes too long for the new playLevels amplitude to propagate, calibration will finish at the old levels of DUT, not of the measured transfer.
         if ~isempty(playFreqs)
           printStr(sprintf("Generating %dHz", playFreqs(1)));
-          sendPlayGeneratorCmd(playFreqs(1), PLAY_LEVELS);
+          sendPlayGeneratorCmd(playFreqs(1), playLevels);
         endif
 
         % after switching to VD we have to wait for the new levels to propagate through the chain. 1 sec should be enough
@@ -262,7 +268,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
             case CAL_VD_LABEL
               % we can resend the first freq generator command even if it was already sent at SWITCH_TO_VD_LABEL section. It's better to have the sections as independent as possible
               printStr(sprintf("Generating %dHz", playFreqs(freqID)));
-              cmdIDPlay = sendPlayGeneratorCmd(playFreqs(freqID), PLAY_LEVELS);
+              cmdIDPlay = sendPlayGeneratorCmd(playFreqs(freqID), playLevels);
 
               printStr(sprintf("Joint-device calibrating VD at %dHz", recFreqs(freqID)));
               if recFreqs(freqID) == origRecFreq
@@ -288,7 +294,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               deleteFile(calFile);
 
               calCmd = sprintf("%s %s %s%d %s %s%s %s%d", CALIBRATE, calFreqReqStr, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT,
-                getMatrixCellsToCmdStr(PLAY_LEVELS, CMD_PLAY_AMPLS_PREFIX), CMD_EXTRA_CIRCUIT_PREFIX, EXTRA_CIRCUIT_VD, CMD_CALRUNS_PREFIX, TRANSF_CAL_RUNS);
+                getMatrixCellsToCmdStr(playLevels, CMD_PLAY_AMPLS_PREFIX), CMD_EXTRA_CIRCUIT_PREFIX, EXTRA_CIRCUIT_VD, CMD_CALRUNS_PREFIX, TRANSF_CAL_RUNS);
 
               cmdIDRec = writeCmd(calCmd, cmdFileRec);
 
