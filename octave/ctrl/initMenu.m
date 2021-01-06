@@ -71,7 +71,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   menu = uimenu (fig, "label", label);
   uimenu(menu, "label", "Pass", "callback", {fCmd, PASS, cmdFile});
   
-  if dirStruct.dir == DIR_REC
+  if dirStruct.direction == DIR_REC
     global COMP_TYPE_REC_SIDE;
     compType = COMP_TYPE_REC_SIDE;
   else
@@ -81,7 +81,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   uimenu(menu, "label", ['Compensate Only ' sideName], "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(compType)], cmdFile});
   uimenu(menu, "label", 'Compensate Joint-Sides', "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFile});
 
-  if dirStruct.dir == DIR_REC
+  if dirStruct.direction == DIR_REC
     calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate/Compensate Capture at Current Level'], 'separator', 'on', "callback", @clbkExactCalibRec);
     calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate/Compensate Capture at Range around Current Level'], "callback", @clbkRangeCalibRec);
   else
@@ -106,11 +106,11 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   dirStruct.fftMenu = uimenu(menu, "label", "Show FFT Chart", 'separator', 'on', "callback", {fCmd, SHOW_FFT, cmdFile});
   dirStruct.fftOffMenu = uimenu(menu, "label", "Close FFT Chart", 'enable', 'off', "callback", {@clbkCmdOff, SHOW_FFT, cmdFile});
 
-  uimenu(menu, "label", ['Edit Config File for ' sideName], 'separator', 'on', "callback", {@clbkEditConfig, ifelse(dirStruct.dir == DIR_REC, 'Rec', 'Play')});
-  uimenu(menu, "label", ['List Available Devices for ' sideName], "callback", {@clbkListDevs, dirStruct.dir ~= DIR_REC});
+  uimenu(menu, "label", ['Edit Config File for ' sideName], 'separator', 'on', "callback", {@clbkEditConfig, ifelse(dirStruct.direction == DIR_REC, 'Rec', 'Play')});
+  uimenu(menu, "label", ['List Available Devices for ' sideName], "callback", {@clbkListDevs, dirStruct.direction ~= DIR_REC});
 
-  uimenu(menu, "label", ['View Logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
-  uimenu(menu, "label", ['Restart ' sideName ' Process'], "callback", {@clbkKillSide, dirStruct.dir, sideName});
+  uimenu(menu, "label", ['View Logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.direction == DIR_REC, 'rec', 'play')});
+  uimenu(menu, "label", ['Restart ' sideName ' Process'], "callback", {@clbkKillSide, dirStruct.direction, sideName});
 end
 
 % killing process PLAY or REC

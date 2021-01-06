@@ -5,7 +5,7 @@ pkg load instrument-control;
 
 more off;
   
-function dirStruct = createDirStruct(dir)
+function dirStruct = createDirStruct(direction)
   dirStruct = struct();
   dirStruct.plotPanels = cell(2);
   dirStruct.axes = cell(2);
@@ -35,7 +35,7 @@ function dirStruct = createDirStruct(dir)
   dirStruct.sourceTxt = NA;
   dirStruct.sinkTxt = NA;
   
-  dirStruct.dir = dir;
+  dirStruct.direction = direction;
   
 end
 
@@ -95,7 +95,7 @@ recStruct = createDirStruct(DIR_REC);
 
 [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
 
-% dir panels
+% direction panels
 DIR_PANEL_HEIGHT = 0.8;
 DIR_PANEL_Y = 1 - DIR_PANEL_HEIGHT;
 % from the top - i.e. from 1

@@ -7,9 +7,9 @@ function updateMenu(dirStruct, info)
   
   curTime = time();
   % checking for each direction independently
-  dir = info.direction;
-  if isempty(lastUpdateTimes{dir}) ||  (curTime > lastUpdateTimes{dir} + UPDATE_INTERVAL)
-    lastUpdateTimes{dir} = curTime;
+  direction = info.direction;
+  if isempty(lastUpdateTimes{direction}) ||  (curTime > lastUpdateTimes{direction} + UPDATE_INTERVAL)
+    lastUpdateTimes{direction} = curTime;
   else
     return;
   end

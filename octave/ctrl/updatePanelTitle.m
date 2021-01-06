@@ -1,6 +1,6 @@
 function updatePanelTitle(dirStruct, info)
   global DIR_REC;
-  dirStr = ifelse(dirStruct.dir == DIR_REC, 'Capture', 'Playback');
+  dirStr = ifelse(dirStruct.direction == DIR_REC, 'Capture', 'Playback');
 
   if isstruct(info)
     rateStr = sprintf(' %d Hz', info.fs);
