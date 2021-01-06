@@ -7,15 +7,15 @@ function sortedStatuses = sortStatuses(statusStruct, orderTemplate)
     idx = find(ismember(orderTemplate, status));
     if isempty(idx)
       idx = 100;
-    endif
+    end
     statuses{end + 1} = status;
     orderInTemplate = [orderInTemplate, idx];
-  endfor
+  end
   
   % sort by idx
   [dummy, sortedOrder ] = sort(orderInTemplate);
   sortedStatuses = statuses(sortedOrder);
-endfunction
+end
 
 %!test 
 %! orderTemplate = {'a', 'b', 'c'};

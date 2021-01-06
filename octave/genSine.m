@@ -19,7 +19,7 @@ function signal = genSine(genFunds, fs, genStartingT, samplesCnt)
       signalCh(signalCh < -1) = -1;
       
       signalCh = transpose(signalCh);
-    endif
+    end
     signal = [signal, signalCh];
-  endfor
-endfunction
+  end
+end

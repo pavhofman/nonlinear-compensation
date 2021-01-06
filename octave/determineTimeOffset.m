@@ -8,16 +8,16 @@ function timeOffset = determineTimeOffset(firstFundPeaksCh, secondFundPeaksCh)
     timeOffset = determineDualToneTimeOffset(firstFundPeaksCh(1:2, :), secondFundPeaksCh(1:2, :));
   else
     error('determineTimeOffset called with rows(fundPeaks) ~= 1 or 2!');
-  endif
-endfunction
+  end
+end
 
 % result = phase 2 - phase 1 within interval <0, 2*pi>
 function shift = getPositivePhaseDiff(ph1, ph2)
   shift = ph2 - ph1;
   if (shift < 0)
     shift += 2 * pi;
-  endif
-endfunction
+  end
+end
 
 
 % single frequency
@@ -31,7 +31,7 @@ function timeOffset = determineSingleToneTimeOffset(firstFundPeaksCh, secondFund
   
   % time offset between current time and calibration time within single period of the signal
   timeOffset = phaseShift/(2 * pi * measFreq);
-endfunction
+end
 
 % Two frequencies
 % Both peaks have two rows
@@ -41,4 +41,4 @@ function timeOffset = determineDualToneTimeOffset(firstFundPeaksCh, secondFundPe
   zeroT1 = determineZeroTime(firstFundPeaksCh);
   zeroT2 = determineZeroTime(secondFundPeaksCh);
   timeOffset = zeroT2 - zeroT1;
-endfunction
+end

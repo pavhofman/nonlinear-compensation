@@ -42,4 +42,4 @@ function [fundPeaksCh, errorMsg] = findFundPeaksCh(x, yc, y)
       end
       fundPeaksCh = [fundPeaksCh; x(idx), y(idx), angle(yc(idx))];
   end
-endfunction
+end

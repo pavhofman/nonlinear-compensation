@@ -17,9 +17,9 @@ function lastCmdID = writeCmd(cmd, cmdFilename, clear = false)
   unlink(tmpFilename);
   if clear
     clearOutBox();
-  endif
+  end
   infoMsg = ['Sent CMD: "' cmd '" to ' cmdFilename];
   printStr(infoMsg);
   writeLog('DEBUG', infoMsg);
   lastCmdID = cmdID;
-endfunction
+end

@@ -4,20 +4,20 @@ function str = mat2strForCmd(mat)
   for rowID = 1:rows(mat);
     if rowID > 1
       str = [str ';'];
-    endif
+    end
     row = mat(rowID, :);
     for colID = 1:columns(row)
       if colID > 1
         str = [str ','];
-      endif
+      end
       item = row(colID);
       % 10 decimal places precision
       itemStr = num2str(item, 10);
       str = [str itemStr];
-    endfor
-  endfor
+    end
+  end
   str = [str ']'];
-endfunction
+end
 
 %!test
 %! mat = [1, 2; 3, 4 + 5i];

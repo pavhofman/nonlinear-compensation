@@ -79,7 +79,7 @@ function result = splitCalibPlaySched(label = 1)
           origPlayFreq = playInfo.measuredPeaks{PLAY_CH_ID}(1, 1);
         else
           origPlayFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
-        endif
+        end
         
         origRecFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
 
@@ -92,9 +92,9 @@ function result = splitCalibPlaySched(label = 1)
             levelCh = 0;
           else
             levelCh = measuredPeaksCh(1, 2);
-          endif
+          end
           origPlayLevels{end + 1} = levelCh;
-        endfor
+        end
         
         % playLevels are measured BEHIND equalizer in play process. When generating, one must take the equalizer into account to reach identical play levels
         % only values for first two channels to fit origPlayLevels
@@ -116,7 +116,7 @@ function result = splitCalibPlaySched(label = 1)
         else
           label = START_LABEL;
           continue;
-        endif
+        end
         
       case START_LABEL
         clearOutBox();
@@ -243,7 +243,7 @@ function result = splitCalibPlaySched(label = 1)
           % done
           label = DONE_LABEL;
           continue;
-        endif
+        end
 
 
       case ABORT
@@ -259,7 +259,7 @@ function result = splitCalibPlaySched(label = 1)
         else
           label = DONE_LABEL;
           continue;
-        endif
+        end
 
       case DONE_LABEL
         % plus restoring IN/OUT switches
@@ -277,7 +277,7 @@ function result = splitCalibPlaySched(label = 1)
         else
           printStr('Split Calibration finished');  
           result = true;
-        endif
+        end
         break;
         
       case ERROR
@@ -288,10 +288,10 @@ function result = splitCalibPlaySched(label = 1)
         result = false;
         break;        
     endswitch
-  endwhile
+  end
   
   % just in case the task was aborted with calib plot zoomed in
   closeCalibPlot();
   removeTask(mfilename(), NAME);
   
-endfunction
+end

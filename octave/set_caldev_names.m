@@ -16,5 +16,5 @@ else
   else
     recCalDevName = [DEVICE_REC_PREFIX num2str(playRecConfig.otherDeviceID)];
     playCalDevName = [DEVICE_PLAY_PREFIX num2str(playRecConfig.playDeviceID)];
-  endif
-endif
+  end
+end

@@ -2,5 +2,5 @@
 function structVar = removeFromStruct(structVar, field)
   if isfield(structVar, field)
     structVar = rmfield(structVar, field);
-  endif
-endfunction
+  end
+end

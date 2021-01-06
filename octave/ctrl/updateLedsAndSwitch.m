@@ -20,13 +20,13 @@ function updateLedsAndSwitch(recInfo, playInfo)
     gpios.out.status = ifelse(~isempty(playInfo) && structContains(playInfo.status, COMPENSATING), SLOW_BLINK, ON);
   else
     gpios.out.status = OFF;
-  endif
+  end
 
   if adapterStruct.in
     gpios.in.status = ifelse(~isempty(recInfo) && structContains(recInfo.status, COMPENSATING), SLOW_BLINK, ON);
   else
     gpios.in.status = OFF;
-  endif
+  end
 
   if any(strcmp(taskFNames, 'splitCalibPlaySched'))
     % splitCalibPlaySched running
@@ -36,7 +36,7 @@ function updateLedsAndSwitch(recInfo, playInfo)
     ctrlActiveStatus = SLOW_BLINK;
   else
     ctrlActiveStatus = ON;
-  endif
+  end
 
   if isAnalysisOK(playInfo) && isAnalysisOK(recInfo)
     % ctrl1 green OK
@@ -46,7 +46,7 @@ function updateLedsAndSwitch(recInfo, playInfo)
   else
     gpios.ctrl2.status = ctrlActiveStatus;
     gpios.ctrl1.status = OFF;
-  endif
+  end
 
 
   % updating LED pins
@@ -61,7 +61,7 @@ function updateLedsAndSwitch(recInfo, playInfo)
     if strcmp(key, 'sw')
       % not LED
       continue;
-    endif
+    end
 
     ledStatus = ledStruct.status;
     if ledStatus <= 1
@@ -73,10 +73,10 @@ function updateLedsAndSwitch(recInfo, playInfo)
     else
       % default just in case
       pinStatus = 0;
-    endif
+    end
 
     setArdPin(ardStruct.ard, ledStruct.pin, value, key, 'TRACE');
-  endfor
+  end
 
 
   % switch handling
@@ -92,7 +92,7 @@ function updateLedsAndSwitch(recInfo, playInfo)
     if isna(gpios.sw.pushedSince)
       % first cycle when pushed, storing pushedSince time
       gpios.sw.pushedSince = time();
-    endif
+    end
   else
     % not pushed
     if ~isna(gpios.sw.pushedSince)
@@ -107,15 +107,15 @@ function updateLedsAndSwitch(recInfo, playInfo)
         else
           writeLog('DEBUG', 'Button pushed short - running exactCalibRecSched');
           exactCalibRecSched();
-        endif
+        end
       else
         writeLog('DEBUG', 'Button pushed while tasks running - aborting');
         abortLastTask();
-      endif
-    endif % just released
-  endif % not pushed
+      end
+    end % just released
+  end % not pushed
 
-endfunction
+end
 
 function result = isAnalysisOK(info)
   global ANALYSING;
@@ -127,10 +127,10 @@ function result = isAnalysisOK(info)
         result = true;
         % ending
         return;
-      endif
-    endif
-  endif
+      end
+    end
+  end
 
   % not found or failed result
   result = false;
-endfunction
+end

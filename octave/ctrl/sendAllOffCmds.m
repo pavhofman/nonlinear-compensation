@@ -14,9 +14,9 @@ function cmdIDs = sendAllOffCmds()
   if isfield(playInfo.status, GENERATING)
     cmdIDPlay = sendStopGeneratorCmd();
     cmdIDs = [cmdIDs, cmdIDPlay];
-  endif
+  end
   if isfield(recInfo.status, CALIBRATING)
     cmdIDRec = writeCmd([CALIBRATE ' ' 'off'], cmdFileRec);
     cmdIDs = [cmdIDs, cmdIDRec];
-  endif
-endfunction
+  end
+end

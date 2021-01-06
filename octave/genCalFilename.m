@@ -11,18 +11,18 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
   for i = 1:length(freqs)
     % for now rounding freqs to int value
     freqsPart = [freqsPart,  int2str(round(freqs(i))), '_'];
-  endfor
+  end
   
   filename = ['cal_' freqsPart 'FS' int2str(fs)];
   
   % wrap single-device devSpecs
   if rows(devSpecs) == 1
     devSpecs = {devSpecs};
-  endif
+  end
   for id = 1:rows(devSpecs)
     devSpec = devSpecs{id};
     filename = [filename '_' devSpec{1} '_CH' int2str(devSpec{2})];
-  endfor
+  end
   
   %% TODO - for now ignoring chMode in calfile names (the current implementation is incorrect)
   % adding channel mode
@@ -30,13 +30,13 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
 
   if length(extraCircuit) > 0
     filename = [filename '_' extraCircuit];
-  endif
+  end
   
   % suffix
   filename = [filename '.dat'];
 
   filename = getFilePath(filename, dataDir);
-endfunction
+end
 
 % devSpec: rows of cells {devName, chID}
 function devSpecs = createCalFileDevSpecs(compType, playChannelID, channelID, playCalDevName, recCalDevName)
@@ -52,7 +52,7 @@ function devSpecs = createCalFileDevSpecs(compType, playChannelID, channelID, pl
     case COMP_TYPE_REC_SIDE
       devSpecs = {recCalDevName, channelID};
   endswitch
-endfunction
+end
 
 
 %!test

@@ -3,7 +3,7 @@ function cmdStr = getGeneratorCmdStr(genFunds)
   global CMD_CHANNEL_FUND_PREFIX;
   
   cmdStr = [GENERATE ' ' getMatrixCellsToCmdStr(genFunds, CMD_CHANNEL_FUND_PREFIX)];
-endfunction
+end
 
 %!test
 %! global GENERATE;

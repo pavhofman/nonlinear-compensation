@@ -9,11 +9,11 @@ function harmAmplsStr = buildHarmAmplsStr(values, harmCnt)
     else
       % entered in dB, passed in absolute values
       harmAmpl = db2mag(harmAmpl);
-    endif
+    end
     harmAmpls = [harmAmpls, harmAmpl];
-  endfor
+  end
   harmAmplsStr = [CMD_AMPLS_PREFIX mat2strForCmd(harmAmpls)];
-endfunction
+end
 
 %!test
 %! harmCnt = 3;

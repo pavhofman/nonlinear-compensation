@@ -6,12 +6,12 @@ function calFreqReq = getConstrainedLevelCalFreqReq(midAmpl, freq, analysedChID,
   freqReqLimitedAmpl = [freq, minAmpl, maxAmpl];
   if includeMidAmpl
     freqReqLimitedAmpl = [freqReqLimitedAmpl, midAmpl];
-  endif
+  end
 
   freqReqAnyAmpl = [freq, NA, NA];
   
   calFreqReq = {freqReqAnyAmpl, freqReqLimitedAmpl};
   if analysedChID == 1
     calFreqReq = flip(calFreqReq);
-  endif
-endfunction
+  end
+end

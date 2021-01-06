@@ -33,7 +33,7 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     if ~isempty(calFreqReq)
       % filling calFreqReq for each channel by copying last channel values up to channelCnt - must be columns!
       calFreqReq(end + 1: channelCnt) = calFreqReq{end};
-    endif
+    end
     
     % default = PLAY_CH_ID
     playChannelID = findNumInCmd(cmd, CMD_CHANNEL_ID_PREFIX, PLAY_CH_ID);
@@ -54,7 +54,7 @@ elseif (strcmp(cmd{1}, CALIBRATE))
     % clearing calibration buffer
     restartCal = true;
     showFFTCfg.restartAvg = 1;
-  endif
+  end
 
 elseif (strcmp(cmd{1}, COMPENSATE))
   % comp calDeviceName extraCircuit  
@@ -85,7 +85,7 @@ elseif strcmp(cmd{1}, DISTORT)
     distortHarmAmpls = findAmplsInCmd(cmd, CMD_AMPLS_PREFIX, defaultValue = [1e-06, 1e-06], defaultMsg = 'No distortion harmonic levels found in command, using 2nd@-120dB, 3rd@-120dB');
     % enable distortion
     addStatus(DISTORTING);
-  endif
+  end
   % distorting completes command immediately
   cmdDoneID = cmdID;
 
@@ -113,8 +113,8 @@ elseif (strcmp(cmd{1}, READFILE))
     if ~isempty(sourceStruct.file)
       % start reading file inputFile
       source 'start_reading_file.m';
-    endif
-  endif
+    end
+  end
   % processing READFILE completes the command immediately
   cmdDoneID = cmdID;
 
@@ -125,7 +125,7 @@ elseif (strcmp(cmd{1}, RECORD))
   else
     % start/restart recodring samples to memory
     source 'start_recording.m';
-  endif
+  end
   % processing WRITEFILE completes the command immediately
   cmdDoneID = cmdID;
 
@@ -136,7 +136,7 @@ elseif (strcmp(cmd{1}, STORE_RECORDED))
   sinkStruct.(MEMORY_SINK).file = findStringInCmd(cmd, CMD_FILEPATH_PREFIX, NA, 'No sink audio file found in command STORE_RECORDED');
   if ~isempty(sinkStruct.(MEMORY_SINK).file)
     source 'store_recorded_data.m';
-  endif
+  end
   % processing WRITEFILE completes the command immediately
   cmdDoneID = cmdID;
   
@@ -149,7 +149,7 @@ elseif strcmp(cmd{1}, SHOW_FFT)
     showFFTCfg.numAvg = findNumInCmd(cmd, CMD_FFTAVG_PREFIX, 0);
     showFFTCfg.fftSize = findNumInCmd(cmd, CMD_FFTSIZE_PREFIX, 2^16);
     showFFTCfg.restartAvg = 1;    
-  endif
+  end
   % processing SHOWFFT completes the command immediately
   cmdDoneID = cmdID;
 
@@ -169,10 +169,10 @@ elseif strcmp(cmd{1}, GENERATE)
     % keep analysis running all the time (without generating distortion peaks)
     addStatus(ANALYSING);
     showFFTCfg.restartAvg = 1;
-  endif
+  end
   % generating completes command immediately
   cmdDoneID = cmdID;
 
-endif
+end
 % clear new command
 cmd = cellstr(NO_CMD);

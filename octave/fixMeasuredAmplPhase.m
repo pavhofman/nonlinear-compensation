@@ -5,5 +5,5 @@ function [ampl, phaseShift] = fixMeasuredAmplPhase(ampl, phaseShift)
     ampl = -ampl;
     % inverting phase
     phaseShift += pi;
-  endif
-endfunction
+  end
+end

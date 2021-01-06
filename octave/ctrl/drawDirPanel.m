@@ -45,7 +45,7 @@ function dirStruct = drawDirPanel(fig, x, y, width, height, title, dirStruct, cm
   statusTxts = cell(STATUS_TXT_CNT, 1);  
   for i = 1:STATUS_TXT_CNT
     [statusTxts{i}, statusTxtY] = drawStatusTxt(i, panel, devPanelY - 0.04, TXT_FIELD_HEIGHT);
-  endfor
+  end
   dirStruct.statusTxts = statusTxts;
 
   % relative height of the channel block (plot, detailTxt)
@@ -56,7 +56,7 @@ function dirStruct = drawDirPanel(fig, x, y, width, height, title, dirStruct, cm
   
   dirStruct.detailTxts{1} = drawDetailTxt(1, 0.14, 0.35, channelHeight, panel);
   dirStruct.detailTxts{2} = drawDetailTxt(2, 0.50, 0.35, channelHeight, panel);  
-endfunction
+end
 
 function dirStruct = drawChannelPlot(channelID, x, width, height, title, panel, dirStruct)
   plotPanel = uipanel(panel, 
@@ -64,7 +64,7 @@ function dirStruct = drawChannelPlot(channelID, x, width, height, title, panel, 
             "position", [x, 0, width, height]);
   dirStruct.plotPanels{channelID} = plotPanel;
   dirStruct.calPlots{channelID} = initPlot(plotPanel);  
-endfunction
+end
 
 function detailTxt = drawDetailTxt(channelID, x, width, height, panel, dirStruct)
     detailTxt = uicontrol (panel,
@@ -73,7 +73,7 @@ function detailTxt = drawDetailTxt(channelID, x, width, height, panel, dirStruct
             "horizontalalignment", "left",
             "verticalalignment", "top",
             "position", [x, 0, width, height]);
-endfunction
+end
 
 
 function [statusTxt, y] = drawStatusTxt(id, panel, topY, fieldHeight)
@@ -86,7 +86,7 @@ function [statusTxt, y] = drawStatusTxt(id, panel, topY, fieldHeight)
             "verticalalignment", "top",
             "position", [0.01, y, 1, fieldHeight]
             );
-endfunction
+end
 
 
 function [plotStruct] = initPlot(plotPanel)
@@ -121,6 +121,6 @@ function [plotStruct] = initPlot(plotPanel)
   plotStruct.lastLine = lastLine;
   % patch for calibration level range
   plotStruct.rangePatch = rangePatch;
-endfunction
+end
 
 

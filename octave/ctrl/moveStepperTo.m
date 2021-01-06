@@ -15,4 +15,4 @@ function moveStepperTo(stepperID, steps)
   % stepper move will cause level change - peaks history must be reset
   global adapterStruct;
   adapterStruct.resetPrevMeasPeaks = true;
-endfunction
+end

@@ -6,7 +6,7 @@ if direction == DIR_PLAY
       if any(find (equalizer ~= 1))
         buffer = buffer .* equalizer;
         buffer = fixClipping(buffer);
-      endif
+      end
 
     case MODE_SINGLE
       % zeroing the other of KEEP_CHANNEL_ID
@@ -23,7 +23,7 @@ if direction == DIR_PLAY
       if any(find (equalizer ~= 1))
         buffer = buffer .* equalizer;
         buffer = fixClipping(buffer);
-      endif
+      end
   endswitch
 else
   % DIR_REC
@@ -32,7 +32,7 @@ else
       % only equalizing if non-ones
       if any(find (equalizer ~= 1))
         buffer = buffer .* equalizer;
-      endif
+      end
       % KEEP_CHANNEL_ID = equalized KEEP_CHANNEL_ID - equalized the other channel
       subtractedChannelID = getTheOtherChannelID(KEEP_CHANNEL_ID);
       finalSamples = buffer(:, KEEP_CHANNEL_ID) - buffer(:, subtractedChannelID);
@@ -41,4 +41,4 @@ else
       % the other channel has zeros - no need to calibrate/compensate
       buffer(:, subtractedChannelID) = 0;
   endswitch
-endif
+end

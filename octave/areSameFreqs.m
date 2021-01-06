@@ -6,15 +6,15 @@ function result  = areSameFreqs(peaksCh1, peaksCh2)
   if isempty(peaksCh1) || isempty(peaksCh2)
     result = false;
     return;
-  endif
+  end
   % same freqs
   if ~isequal(round(peaksCh1(:, 1) * MAX_DIFF_MULTIPLIER), round(peaksCh2(:, 1) * MAX_DIFF_MULTIPLIER))
     % different freqs
     result = false;
   else
     result = true;
-  endif
-endfunction
+  end
+end
 
 
 %!test

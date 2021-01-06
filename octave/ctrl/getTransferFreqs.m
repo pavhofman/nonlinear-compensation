@@ -10,10 +10,10 @@ function freqs = getTransferFreqs(fundFreq, fs, nonInteger)
   else
     % integer Hz FFT frequency measurement works precisely
     limit = 1;
-  endif
+  end
 
   % only single frequency supported for now
   cnt = min(MAX_TRANSFER_FREQS, floor((limit * fs/2 - 1) / fundFreq));
   writeLog('DEBUG', 'Generating %d transfer freqs for fundFreq %f and fs %d', cnt, fundFreq, fs);
   freqs = linspace(fundFreq, fundFreq * cnt, cnt);
-endfunction
+end

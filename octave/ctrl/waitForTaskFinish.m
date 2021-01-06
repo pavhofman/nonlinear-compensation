@@ -7,7 +7,7 @@ function waitForTaskFinish(taskFNameToRun, okLabel, failLabel, callingFName);
   schedTask.runFunc = true;
   schedTask.result = NA;
   schedTasksQueue{end + 1} = schedTask;
-endfunction
+end
 
 % determine label
 function schedTask = decideLabel(taskFNameToRun, callingFName, okLabel, failLabel, schedTask)
@@ -29,11 +29,11 @@ function schedTask = decideLabel(taskFNameToRun, callingFName, okLabel, failLabe
       schedTask.newLabel = okLabel;
     else
       schedTask.newLabel = failLabel;
-    endif
+    end
   else
     % keep waiting, no label
     schedTask.newLabel = NA;
     % keeping taskFNameToRun so that result can be passed to this task in runScheduledTask()
     schedTask.taskFName = taskFNameToRun;
-  endif
-endfunction
+  end
+end

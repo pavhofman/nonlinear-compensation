@@ -5,4 +5,4 @@ function execRelaysAdapter(label)
   updateAdapterPanel();
 
   updateRelays();
-endfunction
+end

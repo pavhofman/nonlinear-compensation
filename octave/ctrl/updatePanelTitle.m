@@ -6,8 +6,8 @@ function updatePanelTitle(dirStruct, info)
     rateStr = sprintf(' %d Hz', info.fs);
   else
     rateStr = '';
-  endif
+  end
 
   title = sprintf('%s %s', dirStr, rateStr);
   setFieldTitle(dirStruct.panel, title);
-endfunction
+end

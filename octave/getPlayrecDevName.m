@@ -5,6 +5,6 @@ function prDeviceName = getPlayrecDevName(deviceID)
       prDeviceName = devs(id).name;
       return;
     end
-  endfor
+  end
   prDeviceName = 'Unknown';
 end

@@ -29,15 +29,15 @@ if ~isempty(distortHarmAmpls)
       buffer(:, channelID) = bufferCh;
       % one channel already means OK
       result = RUNNING_OK_RESULT;
-    endif
-  endfor
+    end
+  end
   % clipping to <-1, 1>
   buffer(buffer > 1) = 1;
   buffer(buffer < -1) = -1;
   
   if result == FAILING_RESULT
     msg = 'No channels distorted due to no fundamentals';
-  endif
+  end
   setStatusResult(DISTORTING, result);
   setStatusMsg(DISTORTING, msg);
-endif
+end

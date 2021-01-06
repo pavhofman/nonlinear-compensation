@@ -6,6 +6,6 @@ function changed = setEnabled(items, enable)
     if enable ~= isEnabled
       set(item, 'enable', ifelse(enable, 'on', 'off'));
       changed = true;
-    endif
-  endfor
-endfunction
+    end
+  end
+end

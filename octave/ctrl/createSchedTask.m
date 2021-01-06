@@ -6,4 +6,4 @@ function s = createSchedTask(fname, getNextPointerFunc, abortFunc = @() [])
   s.newLabel = NA;
   s.taskFName = fname;
   s.abortFunc = abortFunc;
-endfunction
+end

@@ -4,5 +4,5 @@ function stopAll()
   if any(strcmp(argv(), 'all'))
     % killing the parent process
     kill(getppid(), 15)
-  endif
-endfunction
+  end
+end

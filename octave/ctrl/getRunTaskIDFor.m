@@ -6,6 +6,6 @@ function foundID = getRunTaskIDFor(taskFName)
     if isRunTask(item) && strcmp(item.taskFName, taskFName)
       foundID = id;
       break;
-    endif
-  endfor
-endfunction
+    end
+  end
+end

@@ -15,14 +15,14 @@ function clbkGenerate(src, data, title, cmdFile)
       else
         genFunds = buildGenFunds(values, CHANNELS, FREQS);
         cmd = getGeneratorCmdStr(genFunds);
-      endif
+      end
       % sending command      
       writeCmd(cmd, cmdFile, true);
-    endif
+    end
   catch err
     warndlg(err.message);
-  end_try_catch
-endfunction
+  end
+end
 
 function prompt = getPrompt(channelCnt, freqCnt)
   prompt = cell();
@@ -30,10 +30,10 @@ function prompt = getPrompt(channelCnt, freqCnt)
     for freqID = 1:freqCnt
       prompt{end + 1} = ['CH' num2str(channelID) ': Frequency ' num2str(freqID) ' (Hz)'];
       prompt{end + 1} = ['CH' num2str(channelID) ': Amplitude ' num2str(freqID) ' (<-1, 1>)'];
-    endfor
-  endfor
+    end
+  end
   prompt{end + 1} = 'Command String: e.g. #CH#[2000,0.4;3000,0.5] [2000,-0.4;3000,-0.5]';
-endfunction
+end
 
 function rowscols = getRowscols(channelCnt, freqCnt)
   persistent FIELD_LENGTH = 10;
@@ -41,10 +41,10 @@ function rowscols = getRowscols(channelCnt, freqCnt)
   for channelID = 1:channelCnt
     for freqID = 1:freqCnt
       rowscols = [rowscols; 1, FIELD_LENGTH; 1, FIELD_LENGTH];
-    endfor
-  endfor
+    end
+  end
   rowscols = [rowscols; 1, 40];
-endfunction
+end
 
 function defaults = getDefaults(channelCnt, freqCnt)
   defaults = cell();
@@ -55,16 +55,16 @@ function defaults = getDefaults(channelCnt, freqCnt)
         defaultValue = '0';
       else
         defaultValue = '';
-      endif
+      end
       % freq
       defaults{end + 1} = defaultValue;
       % ampl
       defaults{end + 1} = defaultValue;
-    endfor
-  endfor
+    end
+  end
   defaults{end + 1} = '';
 
   % default - 1000Hz 0.9
   defaults{1} = '1000';
   defaults{2} = '0.9';
-endfunction
+end

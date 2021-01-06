@@ -37,7 +37,7 @@ function dirStruct = createDirStruct(dir)
   
   dirStruct.dir = dir;
   
-endfunction
+end
 
 global cmdFileRec;
 cmdFileRec = getFilePath(CMD_FILE_REC, commDir);
@@ -77,7 +77,7 @@ function doExit()
   doQuit = true;
   % the DeleteBtn stops all processes
   stopAll();
-endfunction
+end
 
 % create figure and panel on it
 fig = figure(
@@ -208,8 +208,8 @@ while (~doQuit)
       lastDisplayedRecInfoTime = recInfo.time;
     else
       writeLog('TRACE', 'Skipped displaying recInfo');
-    endif
-  endif
+    end
+  end
 
 
   do
@@ -227,8 +227,8 @@ while (~doQuit)
       lastDisplayedPlayInfoTime = playInfo.time;
     else
       writeLog('TRACE', 'Skipped displaying playInfo');
-    endif
-  endif
+    end
+  end
 
   drawnow();
-endwhile
+end

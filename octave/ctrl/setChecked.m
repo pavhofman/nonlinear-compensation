@@ -5,5 +5,5 @@ function changed = setChecked(chbox, value)
     % change
     set(chbox, 'value', value);
     changed = true;
-  endif
-endfunction
+  end
+end

@@ -13,4 +13,4 @@ function availDevs = getPlayrecDevs(isPlayback)
       availDevs(end + 1) = dev;
     end
   end
-endfunction
+end

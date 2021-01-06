@@ -31,4 +31,4 @@ function compenSignal = genCompenReference(fundLevelsCh, distortPeaksCh, measure
   compenSignal = sum(compenSignals, 1);
   % output in rows
   compenSignal = transpose(compenSignal);
-endfunction
+end

@@ -8,5 +8,5 @@ function calPeaks = removeOutdatedCalPeaks(calPeaks, timestamp)
   if ~isempty(outdatedRowIDs)
     writeLog('INFO', "Removing outdated rows IDs: %s", num2str(outdatedRowIDs));
     calPeaks(outdatedRowIDs, :) = [];
-  endif
-endfunction
+  end
+end

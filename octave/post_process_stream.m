@@ -6,7 +6,7 @@ if direction == DIR_REC
       if any(find (equalizer ~= 1))
         buffer = buffer .* equalizer;
         buffer = fixClipping(buffer);
-      endif
+      end
 
     case MODE_SINGLE
       % both channels same samples
@@ -18,7 +18,7 @@ if direction == DIR_REC
       % only equalizing if non-ones
       if any(find (equalizer ~= 1))
         buffer = buffer .* equalizer;
-      endif
+      end
       % inverted channel
       invChannelID = getTheOtherChannelID(KEEP_CHANNEL_ID);
       % should not clip, but if equalizer too aggressive...
@@ -28,4 +28,4 @@ if direction == DIR_REC
       buffer = repmat(finalSamples, 1, 2);
 
   endswitch
-endif
+end

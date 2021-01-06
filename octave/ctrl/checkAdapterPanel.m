@@ -6,5 +6,5 @@ function schedTask = checkAdapterPanel(nextLabel, abortLabel, errorLabel, schedT
     adapterStruct.switchesSet = false;
     % and continuing
     schedTask.newLabel = nextLabel;
-  endif
-endfunction
+  end
+end

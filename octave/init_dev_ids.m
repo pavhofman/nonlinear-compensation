@@ -19,8 +19,8 @@ function devName = readOtherDevFromConfig(direction)
   else
     source(sprintf('%s%sconfigPlay.conf', confDir, filesep()));
     devName = playRecConfig.playDevice;
-  endif
-endfunction
+  end
+end
 
 % Reading executive device ID from the other side
 % The other side ID is read from other dev ID file created by the other side.
@@ -37,4 +37,4 @@ catch err
   % converting to device ID - needs which may be missing the already open device.
   playRecConfig.otherDeviceID = getPlayrecDevID(otherDev, direction == DIR_REC);
   % if playrec list does not contain the ID, we cannot continue anyway, no reason to catch an error thrown by getPlayrecDevID
-end_try_catch
+end

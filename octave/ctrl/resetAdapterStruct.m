@@ -8,11 +8,11 @@ function resetAdapterStruct(recoverInOut = true)
   if ~isfield(adapterStruct, 'prevOut')
     % stack of values
     adapterStruct.prevOut = cell();
-  endif
+  end
 
   if ~isfield(adapterStruct, 'prevIn')
     adapterStruct.prevIn = cell();
-  endif
+  end
 
   % in/out recovery
   if recoverInOut &&  ~isempty(adapterStruct.prevOut)
@@ -22,7 +22,7 @@ function resetAdapterStruct(recoverInOut = true)
   else
     % default
     adapterStruct.out = false; % OUT OFF
-  endif
+  end
 
   if recoverInOut &&  ~isempty(adapterStruct.prevIn)
     adapterStruct.in = adapterStruct.prevIn{end};
@@ -31,7 +31,7 @@ function resetAdapterStruct(recoverInOut = true)
   else
     % default
     adapterStruct.in = false; % IN CALIB
-  endif
+  end
 
   % other switches defaults
   adapterStruct.calibLPF = false; % VD
@@ -43,4 +43,4 @@ function resetAdapterStruct(recoverInOut = true)
   adapterStruct.switchesSet = false;
   % flag indicating change in switches
   adapterStruct.switchesChanged = false;
-endfunction
+end

@@ -7,7 +7,7 @@ function addTask(taskFName, label)
   if isempty(taskFNames)
     % new task series
     clearOutBox();
-  endif
+  end
   
   taskFNames(end + 1) = taskFName;
   taskLabels(end + 1) = label;
@@ -15,4 +15,4 @@ function addTask(taskFName, label)
 
   % showing ABORT btn
   setVisible(abortTasksBtn, true);
-endfunction
+end

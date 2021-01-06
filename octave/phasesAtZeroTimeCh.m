@@ -14,5 +14,5 @@ function distortPeaksCh = phasesAtZeroTimeCh(fundPeaksCh, distortPeaksCh)
     % zero-time phase distortion = distortion phase - phase accumulated in timeOffset
     zeroTimeDistortPhase = distortPhase - 2 * pi * distortFreq * timeOffset;
     distortPeaksCh(i, 3) = zeroTimeDistortPhase;
-  endfor
-endfunction
+  end
+end

@@ -10,4 +10,4 @@ function result = exactCalibRecSched(label = 1)
   ];
 
   result = calibRecSched(label, SINGLE_STEP, mfilename(), 'Exact-Level Calibrating REC Side');
-endfunction
+end

@@ -11,12 +11,12 @@ function abortStepper()
     ardStruct.ard.relMoveTo(stepperID, 0);
     % stepper params are not valid now, resetting
     steppers{stepperID} = initStepperStruct(stepperID);
-  endif
+  end
 
   % resetting all non-initialized steppers to clear possible abort of non-running stepper but before initialization finished
   for stepperID = 1:length(steppers)
     if ~steppers{stepperID}.initialized
       steppers{stepperID} = initStepperStruct(stepperID);
-    endif
-  endfor
-endfunction
+    end
+  end
+end

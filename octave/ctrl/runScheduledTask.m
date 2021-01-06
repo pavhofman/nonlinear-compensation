@@ -30,14 +30,14 @@ function runScheduledTask(recInfo, playInfo);
       for taskID = taskIDs
         task = schedTasksQueue{taskID};
         task.abortFunc();
-      endfor
+      end
 
       % removing the aborted tasks from the queue
       schedTasksQueue(taskIDs(2:end)) = [];
-    endif
+    end
     % resetting flag taskFNameToAbort
     taskFNameToAbort = '';
-  endif % task abort
+  end % task abort
 
   % loop all scheduled tasks
   for id = 1:length(schedTasksQueue)
@@ -45,7 +45,7 @@ function runScheduledTask(recInfo, playInfo);
     if isempty(task.newLabel)
       % determine new label for current time and received infos, passing scheduledItem
       task = task.getNextPointer(curTime, recInfo, playInfo, task);
-    endif
+    end
     newLabel = task.newLabel;
     taskFName = task.taskFName;
     
@@ -63,18 +63,18 @@ function runScheduledTask(recInfo, playInfo);
         resultItemID = getRunTaskIDFor(taskFName);
         if ~isempty(resultItemID)
           schedTasksQueue{resultItemID}.result = result;
-        endif
-      endif
+        end
+      end
 
       if ~task.keepInQueue
         % add id of this task for removal
         idsToRemove = [idsToRemove, id];
-      endif
-    endif
-  endfor
+      end
+    end
+  end
   % removing already executed tasks
   schedTasksQueue(idsToRemove) = [];
-endfunction
+end
 
 % returns row of task ids
 function foundIDs = getTaskIDs(taskFName, idsToSkip)
@@ -85,7 +85,7 @@ function foundIDs = getTaskIDs(taskFName, idsToSkip)
       task = schedTasksQueue{id};
       if strcmp(task.taskFName, taskFName)
         foundIDs = [foundIDs, id];
-      endif
-    endif
-  endfor
-endfunction
+      end
+    end
+  end
+end

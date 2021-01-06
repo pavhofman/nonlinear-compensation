@@ -59,7 +59,7 @@ function buffer = readWritePlayrec(playBuffer, cycleLength, periodSize, fs, rest
     if(restart || ~playrec('isInitialised'))
         if (playrec('isInitialised'))
           playrec('reset');
-        endif
+        end
         writeLog('INFO', 'Initialising playrec to use sample rate: %d, recDeviceID: %d , playDeviceID: %d\n', fs, recDeviceID, playDeviceID);
         playrec('init', fs, playDeviceID, recDeviceID, 2, 2, periodSize, 0.3, 0.3);
         if(~playrec('isInitialised'))
@@ -82,7 +82,7 @@ function buffer = readWritePlayrec(playBuffer, cycleLength, periodSize, fs, rest
       writeLog('TRACE', 'Sleeping for %f', sleepTime);
     else
       writeLog('WARN', 'XRUN - Sleeping only for %f', sleepTime);
-    endif
+    end
     % blocking read on recording side
     playrec('block', pageNumList(1));
     buffer = playrec('getRec', pageNumList(1));

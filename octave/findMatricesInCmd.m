@@ -9,17 +9,17 @@ function funds = findMatricesInCmd(cmd, prefix, defaultValue = cell(), defaultMs
     if ~isempty(fundStr)
       fundCh = eval(fundStr);
       funds{end + 1} = fundCh;
-    endif
-  endfor
+    end
+  end
   
   if isempty(funds)
     % did not find any
     funds = defaultValue;
     if ~isempty(defaultMsg)
       writeLog('DEBUG', defaultMsg);
-    endif
-  endif
-endfunction
+    end
+  end
+end
 
 
 %!test

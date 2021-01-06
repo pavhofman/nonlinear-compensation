@@ -4,6 +4,6 @@ function abortLastTask()
   
   if ~isempty(taskFNames)
     taskFNameToAbort = taskFNames{end};
-  endif
-endfunction
+  end
+end
 

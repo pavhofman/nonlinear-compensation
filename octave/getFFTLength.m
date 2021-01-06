@@ -20,4 +20,4 @@ function newLength = getFFTLength(fs, measuredPeaksCh, maxSamples)
   % bestBinFreq = newBinFreqs(:, minID);
   % errorDetFreqs = abs(bestBinFreq - freqs);
   % dbError = 20*log10(errorDetFreqs ./ freqs);
-endfunction
+end

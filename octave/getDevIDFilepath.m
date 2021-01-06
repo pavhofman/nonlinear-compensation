@@ -8,5 +8,5 @@ function filename = getDevIDFilepath(direction)
     filename = getFilePath('play_main_dev_id.dat', commDir);
   else
     filename = getFilePath('rec_main_dev_id.dat', commDir);
-  endif
-endfunction
+  end
+end

@@ -21,14 +21,14 @@ function [playFreqs, recFreqs] = getMissingTransferFreqs(playFundFreq, recFundFr
       else
         writeLog('DEBUG', 'Transfer file %s too old, deleting', transferFile);
         deleteFile(transferFile);
-      endif
+      end
     else
       writeLog('DEBUG', 'Transfer file %s not found', transferFile);
-    endif
+    end
     % missing or too old, missing freq
     idsToKeep = [idsToKeep, freqID];
-  endfor
+  end
 
   playFreqs = allPlayFreqs(idsToKeep);
   recFreqs = allRecFreqs(idsToKeep);
-endfunction
+end

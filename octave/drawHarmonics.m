@@ -5,7 +5,7 @@ function drawHarmonics(x, y, label, plotID, plotsCnt, use_ylim = [-150 0], use_x
   skip = 1;
   while x(skip) < 10
       skip++;
-  endwhile
+  end
   % semilogx requires values > 0
   x(x <= 0) = 10^-10;
   semilogx(x(skip:end), y(skip:end), 'linewidth', 1.5, 'color', 'black');
@@ -19,9 +19,9 @@ function drawHarmonics(x, y, label, plotID, plotsCnt, use_ylim = [-150 0], use_x
   xt = get(gca,'XTick');
   set(gca,'XTickLabel', sprintf('%.0f|',xt))
   addlistener(gca, 'xlim', @logXTickZoomHandler)
-endfunction
+end
 
 function logXTickZoomHandler(h)
   xt = get(h,'XTick');
   set(h,'XTickLabel', sprintf('%4.0f|',xt))
-endfunction
+end

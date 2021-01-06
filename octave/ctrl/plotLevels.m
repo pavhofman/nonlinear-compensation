@@ -4,14 +4,14 @@ function plotLevels(line, x, y)
     shownX = get(line, 'XData');    
     if ~isequal(shownX, x)
       set(line, 'XData', x);
-    endif
+    end
     shownY = get(line, 'YData');
     if ~isequal(shownY, y)
       set(line, 'YData', y);
-    endif
+    end
     setVisible(line, true);
   else
     % hide
     setVisible(line, false);
-  endif
-endfunction
+  end
+end

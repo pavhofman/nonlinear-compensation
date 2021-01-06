@@ -5,4 +5,4 @@ function filepath = getTransferFilename(freq, extCircuit)
   % floating point freq is supported - rounding for now
   filename = sprintf('transfer_%d_%s.dat', round(freq), extCircuit);
   filepath = getFilePath(filename, transfDir);
-endfunction
+end

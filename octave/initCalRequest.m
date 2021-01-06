@@ -7,4 +7,4 @@ function request = initCalRequest(calFreqReq, compType, playChannelID, playAmpls
   request.calRuns = calRuns;
   % current playback ampls generating the calibrated signal on rec side. Real values passed only in compType COMP_TYPE_JOINT!
   request.playAmpls = playAmpls;
-endfunction
+end

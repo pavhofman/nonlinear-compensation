@@ -7,7 +7,7 @@ function waitForCmdDone(cmdDoneIDs, nextLabel, timeout, timeoutLabel, callingFNa
   schedTask = createSchedTask(callingFName, fGetLabel);
   schedTask.remainingCmdIDs = cmdDoneIDs;
   schedTasksQueue{end + 1} = schedTask;
-endfunction
+end
 
 % determine label: if recInfo or playInfo has cmdDoneID, return nextLabel. If timout reached, return timeoutLabel
 function schedTask = decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, recInfo, playInfo, schedTask)
@@ -20,14 +20,14 @@ function schedTask = decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, 
   elseif curTime > reqTime
     % timeout occured
     schedTask.newLabel = timeoutLabel;
-  endif
+  end
   % else keep waiting
-endfunction
+end
 
 function cmdDoneID = getCmdDoneID(info)
   if ~isempty(info)
     cmdDoneID = info.cmdDoneID;
   else
     cmdDoneID = NA;
-  endif
-endfunction
+  end
+end

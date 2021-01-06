@@ -24,8 +24,8 @@ function schedTask = checkSwitchesAndStepper(recInfo, playInfo, nextLabel, abort
     else
       % no switches change, directly to checking stepper
       checkingStepper = true;
-    endif
-  endif
+    end
+  end
 
   % checking for CHANGE_PROPAGATION_DELAY
   if ~isempty(lastCheckTime)
@@ -38,8 +38,8 @@ function schedTask = checkSwitchesAndStepper(recInfo, playInfo, nextLabel, abort
       % not yet
       checkingStepper = false;
       writeLog('TRACE', 'Waiting for switch change propagation');
-    endif
-  endif
+    end
+  end
 
   if checkingStepper
     if checkStepper(adapterStruct, recInfo, playInfo)
@@ -48,6 +48,6 @@ function schedTask = checkSwitchesAndStepper(recInfo, playInfo, nextLabel, abort
       % resetting flag
       checkingStepper = false;
       writeLog('DEBUG', 'Finished task');
-    endif
-  endif
-endfunction
+    end
+  end
+end

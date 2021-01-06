@@ -35,7 +35,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
     allFundPeaks = cell(channelCnt, MAX_RUNS);
     allDistortPeaks = cell(channelCnt, MAX_RUNS);
     prevFundPeaks = cell(channelCnt, 1);
-  endif
+  end
 
   runID += 1;
   writeLog('DEBUG', 'Measuring calibration peaks for run ID %d', runID);
@@ -51,7 +51,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
     % empty, will calculate for each channel in loop
     fundPeaks = cell(channelCnt, 1);
     distortPeaks = cell(channelCnt, 1);
-  endif
+  end
 
 
   for channelID = activeChannelIDs
@@ -74,7 +74,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
       % already calculated before the loop by all-channels FFT
       fundPeaksCh = fundPeaks{channelID};
       distortPeaksCh = distortPeaks{channelID};
-    endif
+    end
 
 
     % default value
@@ -98,7 +98,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
     else
       % all checks OK, this run is OK
       checksOK = true;
-    endif
+    end
 
     % remember for next round - using peaks calculated by analysis which uses the same procedure
     prevFundPeaks{channelID} = fundPeaksCh;
@@ -114,7 +114,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
         % time shift distortPeaks to zero phase of fundPeaks
         distortPeaksCh = phasesAtZeroTimeCh(fundPeaksCh, distortPeaksCh);
         % now distortPeaksCh are zero-time based.
-      endif
+      end
       % store peaks of this run to persistent variable
       % some allXXXPeaks lines will stay empty, but calculateAvgPeaks() ignores them
       allFundPeaks{channelID, runID} = fundPeaksCh;
@@ -131,8 +131,8 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
       writeLog('DEBUG', 'Checks failed: This round fundPeaksCh: %s', disp(fundPeaksCh));
       writeLog('DEBUG', 'Checks failed: Prev. round prevFundPeaksCh: %s', disp(prevFundPeaksCh));
       result = FAILING_RESULT;
-    endif
-  endfor
+    end
+  end
   
   % runPeaks are updated, now checking RUN conditions
   if any(correctRunsCounter(activeChannelIDs) < calRequest.calRuns) && runID < MAX_RUNS
@@ -165,15 +165,15 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
         [calFileStructs(channelID)] = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, playAmplsCh, timestamp, false);
       else
         writeLog('WARN', 'No fundaments found for channel ID %d, not storing its calibration file', channelID);
-      endif
-    endfor
+      end
+    end
     
     if chMode ~= MODE_SINGLE && channelCnt >= 2
       % at least two channels, we can measure/store avg. fund phase theOtherChID vs. ANALYSED_CH_ID
       avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks);
     else
       avgPhaseDiffs = NA;
-    endif
+    end
     
     % store calfile, update avgPhaseDiffs if required
     for channelID = activeChannelIDs
@@ -183,10 +183,10 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
         if ~isna(avgPhaseDiffs)
           writeLog('DEBUG', 'Updating the newly-added rows to be stored to %s with non-zero avg phase difference of %s', calFile, disp(avgPhaseDiffs));
           calRec.peaks = updatePhaseDiffsInPeaks(calRec.peaks, avgPhaseDiffs, calFileStruct.addedRowIDs);
-        endif
+        end
         writeLog('INFO', 'Storing avg phase difference to newly-added rows in calfiles');
         save(calFile, 'calRec');
-    endfor
+    end
 
     global FINISHED_RESULT;
     result = FINISHED_RESULT;
@@ -196,7 +196,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
     msg = 'Timed out without freqs';
     global FAILED_RESULT;
     result = FAILED_RESULT;
-  endif
+  end
   
   % reset values for next calibration
   runID = 0;
@@ -205,7 +205,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
   allDistortPeaks = cell(channelCnt, MAX_RUNS);
   lastRunID = runID;
   lastCorrectRunsCounter = correctRunsCounter;  
-endfunction
+end
 
 % have fundPeaksCh levels within range of calFreqsCh?
 % calFreqsCh, fundPeaksCh - never empty, always same freqs, sorted by freqs!
@@ -229,13 +229,13 @@ function result = checkCorrectLevels(calFreqReqCh, fundPeaksCh)
           % too large
           result = false;
           return;
-        endif
-      endif
-    endif
-  endfor
+        end
+      end
+    end
+  end
   % found no problem, check OK
   result = true;
-endfunction
+end
 
 % determines average phase diffs between analysed and the other channels.
 % avgPhaseDiffs = row vector, diff for each fundament
@@ -252,12 +252,12 @@ function avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks)
       % both have a peak, both same freqs, store the phase diff
       % NOTE - phases are not generally in <-pi, +pi> range which will produce nonsense when averaging. Averaging complex numbers instead      
       phaseDiffsC{end + 1} = exp(i * fundPeaksChAn(:, 3)) ./ exp(i * fundPeaksChOther(:, 3));
-    endif
-  endfor
+    end
+  end
   % remove first row to avoid transitions - same as for averaging peaks
   if length(phaseDiffsC) > 1
     phaseDiffsC(1) = [];
-  endif
+  end
   
   % cell array cannot be averaged -> converting to properly oriented matrix
   phaseDiffsC = transpose(cell2mat(phaseDiffsC));
@@ -266,8 +266,8 @@ function avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks)
     avgPhaseDiffs = mean(angle(phaseDiffsC));
   else
     avgPhaseDiffs = [0, 0];
-  endif
-endfunction
+  end
+end
 
 % averaging fundPeaks amplitude, distortPeaks all for each frequency
 % allXXXPeaksCh - cell array(1, MAX_RUNS) of peaks matrices
@@ -284,14 +284,14 @@ function [avgFundPeaksCh, avgDistortPeaksCh] = detAveragePeaks(allFundPeaksCh, a
     avgFundPeaksCh = calculateAvgPeaks(mergedFundPeaksCh, runsCnt);
   else
     avgFundPeaksCh = [];  
-  endif
+  end
   
   if hasAnyPeak(mergedDistortPeaksCh)
     avgDistortPeaksCh = calculateAvgPeaks(mergedDistortPeaksCh, runsCnt);
   else
     avgDistortPeaksCh = [];  
-  endif
-endfunction
+  end
+end
 
 % merging all rows of non-empty peaks matrices in allPeaksCh to single matrix. 
 % first DROP_CAL_RUNS non-empty peaks matrices are skipped - could contain dirty transitional values
@@ -306,16 +306,16 @@ function [mergedPeaksCh, runsCnt] = mergePeaks(allPeaksCh)
   % remove first DROP_CAL_RUNS items - may contain transitional non-stable data
   if size(allPeaksCh, 2) > DROP_CAL_RUNS
     allPeaksCh(:, 1:DROP_CAL_RUNS) = [];
-  endif
+  end
   
   runsCnt = size(allPeaksCh, 2);
   for runID = 1 : runsCnt
     runPeaksCh = allPeaksCh{runID};
     if ~isempty(runPeaksCh)
       mergedPeaksCh = [mergedPeaksCh; runPeaksCh];
-    endif
-  endfor
-endfunction
+    end
+  end
+end
 
 
 % return average peaks for each frequency found in mergedPeaksCh
@@ -352,9 +352,9 @@ function avgPeaksCh = calculateAvgPeaks(mergedPeaksCh, runsCnt);
         avgPeaksCh = [avgPeaksCh; avgPeak];
       else
         writeLog('WARN', 'Distort freq %d occured only %d out of %d runs, below the required min count %d, not being included in avgPeaksCh', freq, valuesCnt, minRequiredCnt, runsCnt);
-      endif
-    endif
-  endfor
+      end
+    end
+  end
   % sorting by freq ASC
   avgPeaksCh = sortrows(avgPeaksCh, 1);
-endfunction
+end

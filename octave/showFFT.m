@@ -10,6 +10,6 @@ function showFFT(series, label, plotID, fs, plotsCnt, fundFreq=0)
     if ~isempty(distortPeaks{channelID})
       fprintf('Distort Peaks:\n');
       fprintf('%8.2f Hz, %7.2f dB, %7.2f dg\n', transpose(convertPeaksToPrintable(distortPeaks{channelID})));
-    endif
-  endfor
-endfunction
+    end
+  end
+end

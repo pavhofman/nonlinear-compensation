@@ -33,7 +33,7 @@ function result = setVDLevelSched(label = 1)
         if isempty(adapterStruct.maxAmplDiff)
           % default value
           adapterStruct.maxAmplDiff = db2mag(-80);
-        endif
+        end
 
         waitForAdapterAdjust('Set switches for calibration through VD', 
           adapterStruct, DONE_LABEL, ABORT, ERROR, mfilename());
@@ -59,7 +59,7 @@ function result = setVDLevelSched(label = 1)
         else
           printStr('Setting VD level finished');
           result = true;
-        endif
+        end
         break;
         
       case ERROR
@@ -70,8 +70,8 @@ function result = setVDLevelSched(label = 1)
         result = false;
         break;        
     endswitch
-  endwhile
+  end
 
   removeTask(mfilename(), NAME);
   
-endfunction
+end

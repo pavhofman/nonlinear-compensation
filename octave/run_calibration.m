@@ -6,7 +6,7 @@ if (currentSize < calBufferSize)
   % not enough data, cannot run calibration
   if (statusContains(CALIBRATING))
     setStatusResult(CALIBRATING, NOT_FINISHED_RESULT);
-  endif
+  end
 else
   % purging old samples from analysis buffer to cut calBuffer to calBufferSize
   calBuffer = calBuffer(currentSize - calBufferSize + 1: end, :);
@@ -31,14 +31,14 @@ else
         % which often is not the case
         % Nevertheless relading calfiles makes no damage, let's keep it here
         reloadCalFiles = true;
-      endif
+      end
             
       if calRequest.contCal || (~isResultOK(result) && ~isempty(calRequest.calFreqReq));
         % restarting calibration if continuous calibration OR some calibration frequency/level was requested  while calibration failed (i.e. freqs or levels not reached)
         restartCal = true;
       else
         source 'stop_calibration.m';
-      endif
-    endif
-  endif
-endif
+      end
+    end
+  end
+end

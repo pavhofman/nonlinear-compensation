@@ -12,13 +12,13 @@ function genFunds = buildGenFunds(values, channelCnt, freqCnt)
       ampl = sscanf(values{id}, '%f');
       if ~isempty(freq) &&  ~isempty(ampl)
         fundsCh = [fundsCh; freq, ampl];
-      endif
-    endfor
+      end
+    end
     if ~isempty(fundsCh)
       genFunds{end + 1} = fundsCh;
-    endif
-  endfor
-endfunction
+    end
+  end
+end
 
 %!test
 %! channelCnt = 2;

@@ -38,17 +38,17 @@ function result = checkStepper(adapterStruct, recInfo, playInfo)
               resetStepperTries(stepperID);
               result = true;
               return;
-            endif % 0 steps
-          endif % req levels
-        endif % levels stable
-      endif % new recTime
-    endif % stepper not running
+            end % 0 steps
+          end % req levels
+        end % levels stable
+      end % new recTime
+    end % stepper not running
   else % requested levels
     writeLog('DEBUG', "No stepper level adjustment requested");
     result = true;
     return;
-  endif % requested levels
-endfunction
+  end % requested levels
+end
 
 function result = areLevelsStable(measPeaksCh, stepperID)
   global adapterStruct;
@@ -63,7 +63,7 @@ function result = areLevelsStable(measPeaksCh, stepperID)
     prevMeasPeaks = cell();
     % clearing the flag
     adapterStruct.resetPrevMeasPeaks = false;
-  endif
+  end
 
   if isempty(measPeaksCh)
     % no measured peaks, restarting history
@@ -83,16 +83,16 @@ function result = areLevelsStable(measPeaksCh, stepperID)
         if ~result
           % no reason to continue
           break;
-        endif
-      endfor
+        end
+      end
 
       % removing oldest item
       prevMeasPeaks(1) = [];
-    endif
+    end
     % adding new peaks for next round
     prevMeasPeaks{end + 1} = measPeaksCh;
-  endif
-endfunction
+  end
+end
 
 function result = areReqLevels(reqLevels, measLevels, maxAmplDiff)
   % simple difference check, no ratios
@@ -100,7 +100,7 @@ function result = areReqLevels(reqLevels, measLevels, maxAmplDiff)
   result =  isempty(differentAmplIDs);
   writeLog('DEBUG', 'req: %f meas: %f, diff: %f, maxDiff %f => result %d',
     reqLevels(1), measLevels(1), abs(reqLevels(1) - measLevels(1)), maxAmplDiff, result);
-endfunction
+end
 
 function resetStepperIfNotConverging(stepperID)
   global steppers;
@@ -110,17 +110,17 @@ function resetStepperIfNotConverging(stepperID)
   if steppers{stepperID}.attempts > MAX_STEPPER_ATTEMPTS
     steppers{stepperID} = initStepperStruct(stepperID);
     writeLog('WARNING', 'Stepper [%d] reached max attempts %d, its history was reset', stepperID, MAX_STEPPER_ATTEMPTS);
-  endif
-endfunction
+  end
+end
 
 function resetStepperTries(stepperID)
   global steppers;
   steppers{stepperID}.attempts = 0;
   writeLog('DEBUG', 'Zeroed stepper [%d] attempts', stepperID);
-endfunction
+end
 
 function incStepperTries(stepperID)
   global steppers;
   steppers{stepperID}.attempts += 1;
   writeLog('DEBUG', 'Incremented stepper [%d] attempts to %d', stepperID, steppers{stepperID}.attempts);
-endfunction
+end

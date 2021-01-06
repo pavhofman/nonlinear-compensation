@@ -22,13 +22,13 @@ function writeLog(level, msg, varargin)
       fid = logPath;      
     else
       fid = fopen(logPath, 'a');
-    endif
+    end
     
     fdisp(fid, line);
     
     if ~isnumeric(logPath)
       fclose(fid);
     end
-  endif
+  end
   %toc()
-endfunction
+end

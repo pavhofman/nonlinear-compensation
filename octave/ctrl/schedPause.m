@@ -5,11 +5,11 @@ function schedPause(timeout, nextLabel, callingFName)
   reqTime = time() + timeout;
   fGetLabel = @(curTime, recInfo, playInfo, schedTask) nextLabelWhen(curTime,  reqTime, nextLabel, schedTask);
   schedTasksQueue{end + 1} =  createSchedTask(callingFName, fGetLabel);
-endfunction
+end
 
 % determine label with respect to current time vs. required time
 function schedTask = nextLabelWhen(curTime,  reqTime, nextLabel, schedTask)
   if curTime > reqTime
     schedTask.newLabel = nextLabel;
-  endif
-endfunction
+  end
+end

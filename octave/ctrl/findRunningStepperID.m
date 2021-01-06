@@ -6,9 +6,9 @@ function stepperID = findRunningStepperID()
     if stepper.running
       stepperID = stepper.ID;
       return;
-    endif
-  endfor
+    end
+  end
 
   % did not find any
   stepperID = [];
-endfunction
+end

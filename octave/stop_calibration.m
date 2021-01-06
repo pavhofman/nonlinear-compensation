@@ -5,4 +5,4 @@ cmdDoneID = cmdID;
 
 if numfields(statusStruct) == 0
   cmd = {PASS};
-endif
+end

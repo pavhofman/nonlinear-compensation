@@ -4,4 +4,4 @@ function keepInOutSwitches()
   % stacking the values
   adapterStruct.prevOut{end + 1} = adapterStruct.out;
   adapterStruct.prevIn{end + 1} = adapterStruct.in;
-endfunction
+end

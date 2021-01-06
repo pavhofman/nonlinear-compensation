@@ -7,8 +7,8 @@ function freqs = getFreqs(peaksCh)
     freqs(freqs == 0) = [];
   else
     freqs = [];
-  endif
-endfunction
+  end
+end
 
 %!test
 %! peaksCh = [1000, 0.5, 0.5; 2000, 0.4, 0.4];

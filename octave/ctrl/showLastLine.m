@@ -8,10 +8,10 @@ function showLastLine()
     curLevels = get(plotStruct.curLine, 'YData');
     if ~isempty(curLevels)
       updateLevelsLine(curLevels, plotStruct.lastLine, 0.5);
-    endif
+    end
     % zooming
     lowerYLim = min(curLevels)  - 0.5;
     upperYLim = min(curLevels)  + 0.5;
     set(plotStruct.axis, 'ylim', [lowerYLim, upperYLim]);
-  endfor
-endfunction
+  end
+end

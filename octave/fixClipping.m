@@ -9,7 +9,7 @@ function samples = fixClipping(samples)
     clippedCnt += cnt;
     writeLog('DEBUG', 'Clipped %d positive samples', cnt);
     samples(clippedIDs) = 1;
-  endif
+  end
 
   % negative
   clippedIDs = find(samples < -1);
@@ -18,7 +18,7 @@ function samples = fixClipping(samples)
     clippedCnt += cnt;
     writeLog('DEBUG', 'Clipped %d negative samples', cnt);
     samples(clippedIDs) = -1;
-  endif
-endfunction
+  end
+end
     
   

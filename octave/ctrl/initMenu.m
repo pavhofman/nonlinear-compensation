@@ -31,7 +31,7 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   % array of menu items related to calibration start/stop - used to enable/disable all at once
   recStruct.calOnMenus = [cell2mat(calOnMenusPlay), cell2mat(calOnMenusRec), cell2mat(calOnMenusTasks)];
   recStruct.calOffMenus = [cell2mat(calOffMenusPlay), cell2mat(calOffMenusRec), cell2mat(calOffMenusTasks)];
-endfunction
+end
 
 function clbkDeleteCalFiles(src, data)
   global dataDir;
@@ -40,8 +40,8 @@ function clbkDeleteCalFiles(src, data)
     filename = files{idx};
     writeLog('DEBUG', 'Deleting calibration file %s', filename);
     delete(filename);
-  endfor
-endfunction
+  end
+end
 
 function clbkRemeasureTransfers(src, data)
   global maxTransferAge;
@@ -49,7 +49,7 @@ function clbkRemeasureTransfers(src, data)
   maxTransferAge = 0;
   % calling scheduler-enabled calibration
   measureTransferSched();
-endfunction
+end
 
 function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdFile, label, sideName)
   global COMPENSATE;
@@ -77,7 +77,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   else
     global COMP_TYPE_PLAY_SIDE;
     compType = COMP_TYPE_PLAY_SIDE;
-  endif
+  end
   uimenu(menu, "label", ['Compensate Only ' sideName], "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(compType)], cmdFile});
   uimenu(menu, "label", 'Compensate Joint-Sides', "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFile});
 
@@ -86,7 +86,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
     calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate/Compensate Capture at Range around Current Level'], "callback", @clbkRangeCalibRec);
   else
     calOnMenus{end+1} = uimenu(menu, "label", ['Split-Calibrate/Compensate Playback'], 'separator', 'on', "callback", @clbkSplitCalibPlay);
-  endif
+  end
   calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate Only ' sideName ': Single Run'], "callback", {@clbkCalib, compType, false});
   calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate Only ' sideName ': Continuously'], "callback", {@clbkCalib, compType, true});
   calOffMenus{end+1} = uimenu(menu, "label", "Stop Calibrating", 'enable', 'off', "callback", @clbkCalibOff);
@@ -111,7 +111,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
 
   uimenu(menu, "label", ['View Logs for ' sideName], 'separator', 'on', "callback", {@clbkViewLogfile, ifelse(dirStruct.dir == DIR_REC, 'rec', 'play')});
   uimenu(menu, "label", ['Restart ' sideName ' Process'], "callback", {@clbkKillSide, dirStruct.dir, sideName});
-endfunction
+end
 
 % killing process PLAY or REC
 function clbkKillSide(src, data, direction, sideName)
@@ -123,9 +123,9 @@ function clbkKillSide(src, data, direction, sideName)
   else
     global recInfo;
     pid = recInfo.pid;
-  endif
+  end
   killProcess(pid, sideName);
-endfunction
+end
 
 % killing process PLAY or REC
 function killProcess(pid, sideName)
@@ -134,19 +134,19 @@ function killProcess(pid, sideName)
 
   writeLog('DEBUG', 'Sending signal %d to process %s', SIGNAL, sideName);
   kill(pid, SIGNAL);
-endfunction
+end
 
 function clbkViewLogfile(src, data, logName)
   global logDir;
 
   open(sprintf("%s%s%s.log", logDir, filesep(), logName));
-endfunction
+end
 
 function clbkEditConfig(src, data, dirSuffix)
   global confDir;
 
   open(sprintf("%s%sconfig%s.conf", confDir, filesep(), dirSuffix));
-endfunction
+end
 
 function clbkViewVersion(src, data)
   global binDir;
@@ -155,7 +155,7 @@ function clbkViewVersion(src, data)
   gitCmd = sprintf("%s%sgit_version.sh > %s 2>&1", binDir, filesep(), TMP_FILE);
   system (gitCmd);
   open(TMP_FILE);
-endfunction
+end
 
 function clbkUpdateGit(src, data)
   global binDir;
@@ -164,7 +164,7 @@ function clbkUpdateGit(src, data)
   gitCmd = sprintf("%s%sgit_update.sh > %s  2>&1", binDir, filesep(), TMP_FILE);
   system (gitCmd);
   open(TMP_FILE);
-endfunction
+end
 
 function clbkListDevs(src, data, isPlayback)
   global currDir;
@@ -179,4 +179,4 @@ function clbkListDevs(src, data, isPlayback)
   fclose(fid);
 
   open(TMP_FILE);
-endfunction
+end

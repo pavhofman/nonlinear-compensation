@@ -10,7 +10,7 @@ function info = buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks,
   info.status = statusStruct;
   for [val, statusItem ] = statusStruct
     info = addStatusDetails(statusItem, info);
-  endfor
+  end
   
   info.chMode = chMode;
   info.equalizer = equalizer;
@@ -34,7 +34,7 @@ function info = buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks,
   info.direction = direction;
   % current process PID is needed for restarting/monitoring from CTRL
   info.pid = getpid();
-endfunction
+end
 
 
 % adding details for each status item, if any
@@ -62,4 +62,4 @@ function info = addStatusDetails(status, info)
       info.distortHarmAmpls = distortHarmAmpls;
       
   endswitch
-endfunction
+end

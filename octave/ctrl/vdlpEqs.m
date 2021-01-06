@@ -19,4 +19,4 @@ function [output] = vdlpEqs(t, distortF, amplA, phaseA, amplD, phaseD, fundGainV
   sineLP = sineD_LP + sineA_LP;
   % column vector
   output = [sineVD; sineLP];
-endfunction
+end

@@ -6,10 +6,10 @@ function clbkReadFile(src, data, cmdFile)
   if isnumeric(taskFName)
     % nothing selected, exiting
     return;
-  endif
+  end
   
   fPath = [fDir taskFName];
   cmd = [READFILE ' ' CMD_FILEPATH_PREFIX fPath];
   % sending command
   writeCmd(cmd, cmdFile, true);
-endfunction
+end

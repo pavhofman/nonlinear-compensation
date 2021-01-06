@@ -5,4 +5,4 @@ if ~isempty(recordedData)
   writeLog('INFO', 'Written %d samples to %s, closed', rows(recordedData), filePath);
   % stop recording
   source 'stop_recording.m';    
-endif
+end

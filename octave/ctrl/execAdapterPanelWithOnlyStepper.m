@@ -3,4 +3,4 @@ function execAdapterPanelWithOnlyStepper(label)
   global adapterStruct;
   adapterStruct.label = label;
   updateAdapterPanel();
-endfunction
+end

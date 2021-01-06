@@ -30,7 +30,7 @@ if direction == DIR_PLAY
 else
   cmdFile = getFilePath(CMD_FILE_REC, commDir);
   zeromqPort = ZEROMQ_PORT_REC;
-endif
+end
 
 source 'init_dev_ids.m';
 
@@ -40,7 +40,7 @@ if direction == DIR_PLAY
 else
   % support for non-integer frequencies on rec side - depends if the same device is used on playback side
   nonInteger = (playRecConfig.recDeviceID ~= playRecConfig.otherDeviceID);
-endif
+end
 
 global fs;
 fs = playRecConfig.sampleRate;
@@ -58,7 +58,7 @@ else
   maxAmplDiff = MAX_AMPL_DIFF_INTEGER;
   % integer Hz, i.e. FFT at INTEGER_FS_FFT_MULTIPLE*fs length
   calBufferSize = INTEGER_FS_FFT_MULTIPLE * fs;
-endif
+end
 
 % default initial command - PASS
 
@@ -71,7 +71,7 @@ if sourceStruct.src == PLAYREC_SRC
   cmd = cellstr(PASS);
 else
   cmd = cellstr(PAUSE);
-endif
+end
 
 % command ID
 cmdID = NA;
@@ -144,14 +144,14 @@ while(true)
       cmd = lines;
     else
       cmd = lines(2:end);
-    endif
+    end
     deleteFile(cmdFile);
-  endif;
+  end;
 
   % process new command if any
   if (!strcmp(cmd, NO_CMD))
     source 'run_process_cmd.m';  
-  endif
+  end
 
 %  printf('Status: \n');
 %  disp(status);
@@ -163,7 +163,7 @@ while(true)
     writeLog('DEBUG', 'Paused');
     % next cycle
     continue;
-  endif
+  end
 
   % not stopped, will need data
   source 'read_data.m';
@@ -177,11 +177,11 @@ while(true)
 
     % ones
     equalizer = ones(1, channelCnt);
-  endif
+  end
 
   if (statusContains(GENERATING))
     source 'run_generator.m';
-  endif
+  end
   
 
   source 'pre_process_stream.m';
@@ -191,7 +191,7 @@ while(true)
     %id = tic();
     source 'run_analysis.m';
     %printf('Analysis took %f\n', toc(id));
-  endif
+  end
 
   % calibration - updating calBuffer in every cycle
   source 'run_calibration.m';
@@ -203,11 +203,11 @@ while(true)
   else
     % for all other statuses - clear compenCalFiles
     compenCalFiles = cell(columns(buffer), 1);
-  endif
+  end
 
   if statusContains(DISTORTING)
     source 'run_distortion.m';
-  endif
+  end
   
   
   source 'post_process_stream.m';
@@ -215,15 +215,15 @@ while(true)
   % recording to memory if enabled
   if structContains(sinkStruct, MEMORY_SINK)
     source 'record_data.m';
-  endif
+  end
     
   if showFFTCfg.enabled
     % should show FFT figure for this direction
     showFFTFigure(buffer, fs, direction)
-  endif
+  end
 
   if useZeroMQ
     sendInfo(buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks, fs, direction, cmdDoneID, compenCalFiles, reloadCalFiles,
       sourceStruct, sinkStruct, showFFTCfg, chMode, equalizer, nonInteger, playCalDevName, recCalDevName), zeromqPort);
-  endif
-endwhile
+  end
+end

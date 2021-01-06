@@ -49,17 +49,17 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
       curDistortPeak =  playDistortPeaksCh(playDistortPeaksCh(:, 1) == distortFreq, :);
     else
       curDistortPeak = [];
-    endif
+    end
 
     if isempty(distortPeakVD) || isempty(distortPeakLP)
       % some distortPeaks at distortFreq unknown, skipping calculation for this distortFreq
       % if incremental mode, using the peak being currently compensated instead
       if ~isempty(curDistortPeak)
         distortPeaksDCh = [distortPeaksDCh; curDistortPeak];
-      endif
+      end
       % go to next frequency
       continue;
-    endif
+    end
     
     % VD params
     distortAmplVD = abs(distortPeakVD);
@@ -115,10 +115,10 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
       % converting back to polar coordinates
       amplD = abs(sumC);
       phaseD = angle(sumC);
-    endif
+    end
 
     distortPeaksDCh = [distortPeaksDCh; [distortFreq, amplD, phaseD]];
-  endfor
+  end
 
   % building calfile peaks
   fundPeaksACh = [fundFreq, fundAmplVD, 0];
@@ -138,7 +138,7 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
   % the PLAY-side peaks are calculated for current play-side samplerate
   global playInfo;
   saveNewCalFile(playInfo.fs, fundPeaksDCh, distortPeaksDCh, NA, playChID, chMode, COMP_TYPE_PLAY_SIDE, timestamp);
-endfunction
+end
 
 function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, chMode, compType, timestamp)
   global recInfo;
@@ -149,7 +149,7 @@ function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, ch
   deleteFile(calFile);  
   saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, NA, timestamp);
   writeLog('INFO', 'Saved calculated split calibration into %s', calFile);
-endfunction
+end
 
 % of not found, returns empty
 function distortPeak = getDistortPeakForFreq(freq, peaksRow, distortFreqs)
@@ -161,5 +161,5 @@ function distortPeak = getDistortPeakForFreq(freq, peaksRow, distortFreqs)
     distortPeak = peaksRow(PEAKS_START_IDX + freqID - 1);
   else
     distortPeak = [];
-  endif  
-endfunction
+  end
+end

@@ -29,11 +29,11 @@ unwind_protect_cleanup
   % cleaning even when Ctrl+C
   if exist('fig', 'var') && isfigure(fig)
     close (fig);
-  endif
+  end
   if exist('recSock', 'var')
     zmq_close(recSock);
-  endif
+  end
   if exist('playSock', 'var')
     zmq_close(playSock);
-  endif
+  end
 end_unwind_protect

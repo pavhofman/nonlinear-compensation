@@ -3,8 +3,8 @@ function arr = addItemToRow(arr, item)
   if ~any(arr == item)
     % does not contain yet
     arr = [arr, item];
-  endif
-endfunction
+  end
+end
 
 
 %!test

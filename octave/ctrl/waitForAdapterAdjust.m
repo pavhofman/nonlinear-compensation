@@ -5,4 +5,4 @@ function waitForAdapterAdjust(title, adapterStruct, nextLabel, abortLabel, error
   global schedTasksQueue;
   fGetLabel = @(curTime, recInfo, playInfo, schedTask) adapterStruct.checkFunc(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask);
   schedTasksQueue{end + 1} =  createSchedTask(callingFName, fGetLabel, adapterStruct.abortFunc);
-endfunction;
+end;

@@ -6,4 +6,4 @@ function cmdID = sendStopGeneratorCmd()
   printStr(sprintf('Generator Off'));
   cmdID = writeCmd([GENERATE ' ' 'off'], cmdFilePlay);
 
-endfunction
+end

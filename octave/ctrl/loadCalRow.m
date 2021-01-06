@@ -8,9 +8,9 @@ function [peaksRow, distortFreqs] = loadCalRow(calFile)
     msg = sprintf('Calfile %s does not have any peaks rows, unsupported operation, exiting.', calFile);
     writeLog('ERROR', msg);
     error(msg);
-  endif
+  end
   
   % calfile used in this method should have only one row, but for safety using the first one
   peaksRow = peaks(1, :);
   distortFreqs = calRec.distortFreqs;
-endfunction
+end

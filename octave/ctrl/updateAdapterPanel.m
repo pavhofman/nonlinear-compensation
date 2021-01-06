@@ -26,7 +26,7 @@ function updateAdapterPanel(init = false)
     switchesChanged |= setRadio(adapterStruct.lpfRGroup, radio);
     % LPF1/2 - enabled when no tasks
     setEnabled([adapterStruct.lpf1Radio, adapterStruct.lpf2Radio], adapterStruct.hasRelays && noTasksRunning);
-  endif
+  end
 
   %   reqLevel enabled only when no task running
   % not checking changed status
@@ -38,12 +38,12 @@ function updateAdapterPanel(init = false)
     switchesChanged |= setRadio(adapterStruct.vdRGroup, radio);
     % VD1/2 - enabled when no tasks
     setEnabled([adapterStruct.vd1Radio, adapterStruct.vd2Radio], adapterStruct.hasRelays && noTasksRunning);
-  endif
+  end
 
   adapterStruct.switchesChanged |= ~init && switchesChanged;
   % CONTINUE button
   if adapterStruct.hasContButton
     % showing confirmation/continue button if some switch change detected (incl. changed nonempty label), i.e. manual action required
     setVisible(adapterStruct.contBtn, ~init && (switchesChanged  || newLabelShown));
-  endif
-endfunction
+  end
+end

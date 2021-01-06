@@ -11,11 +11,11 @@ function clbkCalib(src, data, compType, contCalib, extraCmd = '')
     cmd = [cmd ' ' CMD_CONT_PREFIX '1'];
     % continuous calibration shows plot line with last measured values (values of curLine)
     showLastLine();
-  endif
+  end
 
   if ~isempty(extraCmd)
     cmd = [cmd ' ' extraCmd];
-  endif
+  end
   
   writeCmd(cmd, cmdFileRec);
-endfunction
+end

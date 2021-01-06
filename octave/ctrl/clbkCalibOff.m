@@ -6,4 +6,4 @@ function clbkCalibOff(src, data)
   clbkCmdOff(src, data, CALIBRATE, cmdFileRec);
 
   closeCalibPlot();
-endfunction
+end

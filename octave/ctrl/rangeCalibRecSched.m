@@ -25,4 +25,4 @@ function result = rangeCalibRecSched(label = 1)
   ];
 
   result = calibRecSched(label, MULTI_STEPS, mfilename(), 'Range-Calibrating REC Side');
-endfunction
+end

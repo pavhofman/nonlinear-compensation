@@ -9,4 +9,4 @@ function request = initCompRequest(compType, playChannelID, extraCircuit)
   global recCalDevName;
   request.playCalDevName = playCalDevName;
   request.recCalDevName = recCalDevName;
-endfunction
+end

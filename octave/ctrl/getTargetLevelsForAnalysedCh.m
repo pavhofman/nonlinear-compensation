@@ -3,5 +3,5 @@ function targetLevels = getTargetLevelsForAnalysedCh(analysedAmpl, analysedChID)
   targetLevels = [NA, analysedAmpl];
   if analysedChID == 1
     targetLevels = flip(targetLevels);
-  endif
-endfunction
+  end
+end

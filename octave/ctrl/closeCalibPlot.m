@@ -8,5 +8,5 @@ function closeCalibPlot()
     setVisible(plotStruct.rangePatch, false);
     % resetting plot scale
     set(plotStruct.axis, 'ylim', [-20,0]);    
-  endfor
-endfunction
+  end
+end

@@ -8,4 +8,4 @@ elseif sourceStruct.src == FILE_SRC
 else
   sourceStruct.name = 'None';
   setStatus(PAUSED);
-endif
+end

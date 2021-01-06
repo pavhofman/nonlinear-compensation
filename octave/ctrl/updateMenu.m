@@ -12,7 +12,7 @@ function updateMenu(dirStruct, info)
     lastUpdateTimes{dir} = curTime;
   else
     return;
-  endif
+  end
     
   % setting distortion menu items visibility
   if isfield(info, 'distortHarmAmpls') && ~isempty(info.distortHarmAmpls)
@@ -21,14 +21,14 @@ function updateMenu(dirStruct, info)
   else
     setEnabled(dirStruct.distortOnMenu, true);
     setEnabled(dirStruct.distortOffMenu, false);
-  endif
+  end
   
   % setting generation menu items visibility
   if isfield(info, 'genFunds') && ~isempty(info.genFunds)
     setEnabled(dirStruct.genOffMenu, true);
   else
     setEnabled(dirStruct.genOffMenu, false);
-  endif
+  end
   
   global DIR_REC;
   if info.direction == DIR_REC
@@ -45,13 +45,13 @@ function updateMenu(dirStruct, info)
         % calibration not running
         setEnabled(dirStruct.calOnMenus, true);
         setEnabled(dirStruct.calOffMenus, false);
-      endif
+      end
     else
       % no analysis succcessful, cannot run calibration
       setEnabled(dirStruct.calOnMenus, false);
       setEnabled(dirStruct.calOffMenus, false);
-    endif
-  endif
+    end
+  end
   
   global FILE_SRC;
   if info.sourceStruct.src == FILE_SRC
@@ -59,7 +59,7 @@ function updateMenu(dirStruct, info)
     setEnabled(dirStruct.readfileOffMenu, true);
   else
     setEnabled(dirStruct.readfileOffMenu, false);
-  endif
+  end
   
   global MEMORY_SINK;  
   if structContains(info.sinkStruct, MEMORY_SINK)
@@ -69,7 +69,7 @@ function updateMenu(dirStruct, info)
   else
     setEnabled(dirStruct.recordOffMenu, false);
     setEnabled(dirStruct.storeRecordedMenu, false);
-  endif
+  end
   
   if info.showingFFT
     setEnabled(dirStruct.fftMenu, false);
@@ -77,5 +77,5 @@ function updateMenu(dirStruct, info)
   else
     setEnabled(dirStruct.fftMenu, true);
     setEnabled(dirStruct.fftOffMenu, false);    
-  endif
-endfunction
+  end
+end

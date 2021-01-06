@@ -126,7 +126,7 @@ function result = calibRecSched(label, steps, schedFilename, name)
         else
           % will continue after calibration
           nextLabel = COMP_REC_LABEL;
-        endif
+        end
 
 
         % determining compensation type - rec-side if compensation running on PLAY side, otherwise joint-sides
@@ -173,7 +173,7 @@ function result = calibRecSched(label, steps, schedFilename, name)
         else
           printStr('Range-calibrating REC side finished');  
           result = true;
-        endif
+        end
         break;
         
       case ERROR
@@ -184,10 +184,10 @@ function result = calibRecSched(label, steps, schedFilename, name)
         result = false;
         break;        
     endswitch
-  endwhile
+  end
   
   % just in case the task was aborted with calib plot zoomed in
   closeCalibPlot();
   removeTask(schedFilename, name);
   
-endfunction
+end

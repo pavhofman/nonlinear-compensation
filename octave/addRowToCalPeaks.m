@@ -21,10 +21,10 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
       distortFreqs = [distortFreqs, peakFreq];
       % add column of NAs (values for this new freq are missing in the existing peak rows
       allDPeaksC = [allDPeaksC, NA(rows(allDPeaksC), 1)];
-    endif
+    end
     freqID = find(distortFreqs == peakFreq);
     freqIDs = [freqIDs, freqID];
-  endfor
+  end
   
   % prepare row of NA for each freq
   dPeaksC = NA(1, length(distortFreqs));
@@ -34,7 +34,7 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
     freqID = freqIDs(rowID);
     % store the complex value of peak at freqID position of dPeaksC
     dPeaksC(freqID) = peak(2) * exp(i * peak(3));
-  endfor
+  end
   
   if ~isempty(allDPeaksC)
     % sorting allDPeaksC by freqs:
@@ -59,7 +59,7 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
     
     % put allDPeaksC back to calPeaks
     calPeaks = [calPeaks(:, 1:PEAKS_START_IDX - 1), allDPeaksC];
-  endif
+  end
   
   % build new complPeak line
   complPeak = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC, playAmplsCh);
@@ -75,7 +75,7 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
   if ~isempty(sameRowIDs)
     writeLog('INFO', "Removing existing close-amplitude rows IDs: %s", num2str(sameRowIDs));
     calPeaks(sameRowIDs, :) = [];
-  endif
+  end
 
 
   % add the newly created row to the end
@@ -94,7 +94,7 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
     % found index of all-NA collumn, remove from peaks and freqs
     calPeaks(:, zeroColIDs) = [];
     distortFreqs(:, zeroColIDs - PEAKS_START_IDX + 1) = [];
-  endif
+  end
   
   % sort rows by fundAmpl1 (at position AMPL_IDX)
   calPeaks = sortrows(calPeaks, AMPL_IDX);
@@ -102,4 +102,4 @@ function [calPeaks, distortFreqs, addedRowIDs] = addRowToCalPeaks(fundPeaksCh, d
   % HACK: addedRowIDs determined by its timestamp
   % row-vector needed - transposing
   addedRowIDs = transpose(find(calPeaks(:, 1) == timestamp));
-endfunction
+end

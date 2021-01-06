@@ -2,12 +2,12 @@
 function [y, i, j] = uniqueWithTol(x, tolerance, varargin)
   if size(x, 1) == 1
     x = x(:);
-  endif
+  end
 
   if nargin < 2 || isempty(tolerance) || tolerance == 0
       [y, i, j] = unique(x,varargin{:});
       return;
-  endif
+  end
 
   [y, i, j] = unique(x, varargin{:});
   if size(x, 2) > 1
@@ -16,7 +16,7 @@ function [y, i, j] = uniqueWithTol(x, tolerance, varargin)
       [~, jo] = sort(io);
       i = i(io);
       j = jo(j);
-  endif
+  end
 
   difference = sum(abs(diff(y, 1, 1)), 2);
   isTol = [true; difference > tolerance];
@@ -24,4 +24,4 @@ function [y, i, j] = uniqueWithTol(x, tolerance, varargin)
   bin = cumsum(isTol);
   j = bin(j);
   i = i(isTol);
-endfunction
+end

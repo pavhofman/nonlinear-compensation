@@ -4,5 +4,5 @@ function changed = setFieldColor(field, newColor)
   if ~isequal(shownColor, newColor)
     set(field, 'foregroundcolor', newColor);
     changed = true;
-  endif
-endfunction
+  end
+end

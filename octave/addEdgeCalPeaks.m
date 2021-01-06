@@ -36,7 +36,7 @@ function calPeaks = addEdgeCalPeaks(calPeaks)
   complOnePeaks = [calPeaks(end, 1 : PLAY_AMPL_IDX - 1), oneFundAmpls, onePeaks];
   
   calPeaks = [complZeroPeaks; calPeaks; complOnePeaks];  
-endfunction
+end
 
 % create row of edge dPeaksC, for each distortFreq, check value at rowID (used for finding minimum as well as maximum)
 function dPeaksC = getEdgePeaks(allDPeaksC, rowID, valueForNA)
@@ -50,11 +50,11 @@ function dPeaksC = getEdgePeaks(allDPeaksC, rowID, valueForNA)
     else
       % did not find, using valueForNA
       peak = valueForNA;
-    endif
+    end
     % adding
     dPeaksC = [dPeaksC, peak];
-  endfor
-endfunction
+  end
+end
 
 
 %!test

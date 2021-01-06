@@ -13,7 +13,7 @@ function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = ana
       % resetting all relevant persistent vars
       analysisBuffer = [];
       % TODO - persistent vars in genCompensationPeaks should be cleared too!
-    endif
+    end
 
 
   channelCnt = columns(buffer);
@@ -51,7 +51,7 @@ function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = ana
     % advance time of measuredPeaks relative to the start of buffer which is located at the end of analysisBuffer [analysisBuffer [ buffer]]
     for channelID = activeChIDs
       advanceTs{channelID} = (rows(analysisBuffer) - rows(buffer))/fs;
-    endfor
+    end
 
     if nonInteger
       for channelID = activeChIDs
@@ -64,12 +64,12 @@ function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = ana
               measuredPeaksCh = findOneTonePeaks(measuredPeaksCh, analysisBuffer(:, channelID), fs);
             else
               measuredPeaksCh = findTwoTonePeaks(measuredPeaksCh, analysisBuffer(:, channelID), fs);
-            endif
+            end
             measuredPeaks{channelID} = measuredPeaksCh;
-          endif
-        endif
-      endfor
-    endif
+          end
+        end
+      end
+    end
 
     hasAnyChannelPeaks = false;
     % each channel handled separately
@@ -84,25 +84,25 @@ function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = ana
           % removing rows with ampl < MIN_DISTORT_LEVEL
           if ~isempty(distortPeaksCh)
             distortPeaksCh(distortPeaksCh(:, 2) < MIN_DISTORT_LEVEL, :) = [];
-          endif
+          end
         else
           % not generating compen peaks
           fundLevelsCh = [];
           distortPeaksCh = [];
           calFile = '';
-        endif
+        end
       else
         writeLog('DEBUG', 'Did not find any fundaments, channel ID %d PASSING', channelID);
         % not generating compen peaks
         fundLevelsCh = [];
         distortPeaksCh = [];
         calFile = '';
-      endif        
+      end
       fundLevels{channelID} = fundLevelsCh;
       distortPeaks{channelID} = distortPeaksCh;
       global compenCalFiles;
       compenCalFiles{channelID} = calFile;
-    endfor
+    end
     
     if hasAnyChannelPeaks
       % one channel is enough for OK
@@ -110,11 +110,11 @@ function [measuredPeaks, advanceTs, fundLevels, distortPeaks, result, msg] = ana
     else
       msg = 'No fundamentals in any channel found';
       result = FAILED_RESULT;
-    endif
+    end
     % finished OK
     return;
-  endif
-endfunction
+  end
+end
 
 function measuredPeaksCh = findOneTonePeaks(measuredPeaksCh, analysisBufferCh, fs)
   persistent PI2 = 2 * pi;
@@ -140,8 +140,8 @@ function measuredPeaksCh = findOneTonePeaks(measuredPeaksCh, analysisBufferCh, f
     % non-integer fundamental freq found
     [ampl, phaseShift] = fixMeasuredAmplPhase(p(2), p(3));
     measuredPeaksCh = [p(1), ampl, phaseShift];
-  endif
-endfunction
+  end
+end
 
 function measuredPeaksCh = findTwoTonePeaks(measuredPeaksCh, analysisBufferCh, fs)
   persistent PI2 = 2 * pi;
@@ -175,8 +175,8 @@ function measuredPeaksCh = findTwoTonePeaks(measuredPeaksCh, analysisBufferCh, f
     % second fundamental
     [ampl, phaseShift] = fixMeasuredAmplPhase(p(5), p(6));
     measuredPeaksCh = [measuredPeaksCh; p(4), ampl, phaseShift];
-  endif
-endfunction
+  end
+end
 
 
 function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measuredPeaksCh, fs, compRequest, channelID, chMode, channelCnt, reloadCalFiles);
@@ -216,12 +216,12 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
         % beware - interpl used for interpolation does not work with NA values. We have to interpolate/fill the missing values here
         if find(isna(complAllPeaksCh))
           complAllPeaksCh = fillMissingCalPeaks(complAllPeaksCh);
-        endif
+        end
         % storing to persistent vars
         distortFreqs{channelID} = distortFreqsCh;
         complAllPeaks{channelID} = complAllPeaksCh;
         calFiles{channelID} = calFile;
-      endif
+      end
     
       % interpolating
       if ~isempty(complAllPeaks{channelID})
@@ -233,13 +233,13 @@ function [fundLevelsCh, distortPeaksCh, calFile] = genCompensationPeaks(measured
         global direction;
         if compRequest.compType == COMP_TYPE_JOINT && direction == DIR_PLAY
           complAllPeaksCh = scalePeaksToPlayAmpls(complAllPeaksCh);
-        endif
+        end
         [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs{channelID}, complAllPeaksCh);
         calFile = calFiles{channelID};
-      endif
-    endif
-  endif
-endfunction
+      end
+    end
+  end
+end
 
 % distortion peaks in complAllPeaksCh are scaled at ratio playAmpl/fundAmpl
 function complAllPeaksCh = scalePeaksToPlayAmpls(complAllPeaksCh)
@@ -258,7 +258,7 @@ function complAllPeaksCh = scalePeaksToPlayAmpls(complAllPeaksCh)
   complAllPeaksCh(knownPlayRowIDs, AMPL_IDX:end) = complAllPeaksCh(knownPlayRowIDs, AMPL_IDX:end) .* scales;
   % must be sorted by AMPL_IDX for interpolation - order can have changed after scaling
   complAllPeaksCh = sortrows(complAllPeaksCh, AMPL_IDX);
-endfunction
+end
 
 function [distortFreqsCh, calPeaksCh, calFile] = loadPeaks(freqs, fs, channelID, chMode, compRequest)
   % values for no signal/no calfile
@@ -280,7 +280,7 @@ function [distortFreqsCh, calPeaksCh, calFile] = loadPeaks(freqs, fs, channelID,
       writeLog('WARN', 'Calib file %s has only outdated cal peaks, channel ID %d PASSING', calFile, channelID);
       calFile = '';
       return;
-    endif
+    end
 
     % adding edge rows for interpolation (not stored in the calfile)
     calPeaksCh = addEdgeCalPeaks(calRec.peaks);
@@ -296,8 +296,8 @@ function [distortFreqsCh, calPeaksCh, calFile] = loadPeaks(freqs, fs, channelID,
     writeLog('WARN', 'Did not find calib file %s, channel ID %d PASSING', calFile, channelID);
     calFile = '';
     return;
-  endif
-endfunction
+  end
+end
 
 
 function [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs, complAllPeaks)
@@ -323,7 +323,7 @@ function [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, chan
     peaksAtLevel = interp1(levels, allDPeaksC , currentLevel, 'linear', 'extrap');
     peaksAtLevel = transpose(peaksAtLevel);
     distortPeaksCh = [transpose(distortFreqs), abs(peaksAtLevel), angle(peaksAtLevel)];
-  endif
+  end
   % since currentPeaksCh are already interpolated to current level, fundLevels = measuredPeaksCh (without phase info)
   fundLevelsCh = measuredPeaksCh(:, 1:2);
-endfunction
+end

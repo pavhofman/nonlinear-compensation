@@ -3,5 +3,5 @@ function otherChannelID = getTheOtherChannelID(channelID)
     otherChannelID = 2;
   else
     otherChannelID = 1;
-  endif
-endfunction
+  end
+end

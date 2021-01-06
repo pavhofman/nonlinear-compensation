@@ -93,7 +93,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         else
           origPlayFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
           playLevels = DEFAULT_PLAY_LEVELS;
-        endif
+        end
         
         origRecFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
         
@@ -114,12 +114,12 @@ function result = measureTransferSched(label= 1, schedTask = [])
             writeLog('INFO', msg);
             printStr(msg);
             break;
-          endif
+          end
 
           % going to VD, but starting generating orig freq (f0) first to let stepper adjust to correct level
           label = GEN_ORIG_F;
           continue;
-        endif % empty LPF recFreqs
+        end % empty LPF recFreqs
         
         % for restoration at the end
         keepInOutSwitches();
@@ -161,7 +161,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         if ~isempty(recFreqs)
           printStr(sprintf("Generating %dHz", recFreqs(1)));
           sendPlayGeneratorCmd(recFreqs(1), playLevels);
-        endif
+        end
 
         schedPause(1, CAL_LP_LABEL, mfilename());
         return;
@@ -207,7 +207,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               label = CAL_LP_LABEL;
               continue;
             endswitch              
-        endwhile % LPF freqs
+        end % LPF freqs
         label = GEN_ORIG_F;
         continue;
                 
@@ -229,7 +229,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         if isempty(playFreqs)
           label = ALL_OFF_LABEL;
           continue;
-        endif
+        end
 
         % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
         lpFundAmpl = loadRecAmplFromTransfer(origRecFreq, EXTRA_CIRCUIT_LP1);
@@ -255,7 +255,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         if ~isempty(playFreqs)
           printStr(sprintf("Generating %dHz", playFreqs(1)));
           sendPlayGeneratorCmd(playFreqs(1), playLevels);
-        endif
+        end
 
         % after switching to VD we have to wait for the new levels to propagate through the chain. 1 sec should be enough
         schedPause(1, CAL_VD_LABEL, mfilename());
@@ -286,7 +286,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
                 % regular (= short) timeout
                 timeout = AUTO_TIMEOUT;
                 closeCalibPlot();
-              endif
+              end
               % deleting the calib file should it exist - always clean calibration
               global recInfo;
               calFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID,
@@ -317,7 +317,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               continue;
           endswitch
           
-        endwhile
+        end
         label = ALL_OFF_LABEL;
         % goto label - next loop
         continue;
@@ -335,7 +335,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         else
           label = DONE_LABEL;
           continue;
-        endif
+        end
 
       case DONE_LABEL
         if ~isempty(getRunTaskIDFor(mfilename()))
@@ -347,7 +347,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
           resetAdapterStruct();
           waitForAdapterAdjust('Restore switches', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
           return;
-        endif
+        end
 
       case FINISH_DONE_LABEL
         % clearing the label
@@ -359,7 +359,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         else
           msg = 'Measuring transfer finished';
           result = true;
-        endif
+        end
         
         printStr(msg);
         writeLog('INFO', msg);
@@ -376,10 +376,10 @@ function result = measureTransferSched(label= 1, schedTask = [])
         break;
         
     endswitch
-  endwhile
+  end
 
   removeTask(mfilename(), NAME);
-endfunction
+end
 
 function moveCalToTransferFile(calFile, freq, fs, playChID, analysedChID, extraCircuit)
   [peaksRow, distortFreqs] = loadCalRow(calFile);
@@ -400,7 +400,7 @@ function moveCalToTransferFile(calFile, freq, fs, playChID, analysedChID, extraC
   
   % deleting the calFile - useless now
   deleteFile(calFile);
-endfunction
+end
 
 function ampl = loadRecAmplFromTransfer(freq, extraCircuit)
   global AMPL_IDX;
@@ -411,4 +411,4 @@ function ampl = loadRecAmplFromTransfer(freq, extraCircuit)
 
   peaksRow = transfRec.peaksRow;
   ampl = peaksRow(1, AMPL_IDX);
-endfunction
+end

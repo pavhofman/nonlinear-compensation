@@ -5,7 +5,7 @@ function [buffer, fs, sourceStruct] = readFileData(fs, sourceStruct, chanList, c
   if (restart)
     allSamples = [];
     readPtr = 1;
-  endif
+  end
 
   if (isempty(allSamples))
     [allSamples, fs] = audioreadAndCut(sourceStruct.file, chanList);
@@ -14,8 +14,8 @@ function [buffer, fs, sourceStruct] = readFileData(fs, sourceStruct, chanList, c
     % only start timing when waiting required
     if doWait
       tic();
-    endif
-  endif
+    end
+  end
   
   cnt = fs * cycleLength;
 
@@ -28,15 +28,15 @@ function [buffer, fs, sourceStruct] = readFileData(fs, sourceStruct, chanList, c
     % crossing boundary, repetition
     newPtr -= length(allSamples);
     buffer = [allSamples(readPtr:end, :); allSamples(1:newPtr, :)];
-  endif
+  end
   sourceStruct.filePos = newPtr/fs;
   readPtr = newPtr + 1;
   
   if doWait
     % emulating samplerate timing
     waitRemainingTime(length(buffer)/fs);
-  endif
-endfunction
+  end
+end
 
 function waitRemainingTime(bufferTime)
   delay = toc();
@@ -47,6 +47,6 @@ function waitRemainingTime(bufferTime)
     sleepTime = bufferTime - delay;
     writeLog('TRACE', "Sleeping in readFileData for %f", sleepTime);
     pause(sleepTime);
-  endif  
+  end
   tic();
-endfunction
+end

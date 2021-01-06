@@ -25,7 +25,7 @@ function displayInfo(info, dirStruct)
     
   updateSourceField(dirStruct.sourceTxt, info.sourceStruct);
   updateSinkField(dirStruct.sinkTxt, info.sinkStruct);
-endfunction
+end
 
 function updateSourceField(sourceTxt, sourceStruct)
   global PLAYREC_SRC;
@@ -36,10 +36,10 @@ function updateSourceField(sourceTxt, sourceStruct)
     str = ['FILE ' str];
     if ~isna(sourceStruct.filePos)
       str = [str ' ' num2str(ceil(sourceStruct.filePos)) '/' num2str(ceil(sourceStruct.fileLength)) 's'];
-    endif
-  endif
+    end
+  end
   setFieldString(sourceTxt, str);
-endfunction
+end
 
 function updateSinkField(sinkTxt, sinkStruct)
   global PLAYREC_SINK;
@@ -51,12 +51,12 @@ function updateSinkField(sinkTxt, sinkStruct)
     else      
       if ~isna(detailsStruct.recLength)
         str = [str ' ' num2str(ceil(detailsStruct.recLength)) 's'];
-      endif
-    endif
+      end
+    end
     lines{end + 1} = str;
-  endfor
+  end
   setFieldString(sinkTxt, lines);
-endfunction
+end
 
 
 function updateStatusTxts(dirStruct, info)
@@ -75,7 +75,7 @@ function updateStatusTxts(dirStruct, info)
   if statusCnt > txtCnt
     writeLog('WARN', 'Too many statuses to show in statusTXT fields, showing only first %d', txtCnt);
     statusCnt = txtCnt;
-  endif
+  end
 
   for id = 1 : statusCnt;
     status = sortedStatuses{id};
@@ -84,7 +84,7 @@ function updateStatusTxts(dirStruct, info)
     statusVal = statusStruct.(status);    
     if isfield(statusVal, 'msg') && ~isempty(statusVal.msg)
       statusToShow = [statusToShow ': ' statusVal.msg];
-    endif
+    end
     setFieldString(dirStruct.statusTxts{id}, statusToShow);
 
     if isfield(statusVal, 'result')
@@ -93,18 +93,18 @@ function updateStatusTxts(dirStruct, info)
         color = GREEN;
       else
         color = RED;
-      endif
+      end
     else
       % indiferent color
       color = BLACK;
-    endif
+    end
     setFieldColor(dirStruct.statusTxts{id}, color);
-  endfor
+  end
   % clear the rest
   for id = statusCnt + 1:txtCnt
     setFieldString(dirStruct.statusTxts{id}, '');
-  endfor
-endfunction
+  end
+end
 
 function statusToShow = getStatusToShow(status, info)
   global COMPENSATING;
@@ -118,7 +118,7 @@ function statusToShow = getStatusToShow(status, info)
       case CALIBRATING
         statusToShow = [statusToShow ' ' getCompTypeStr(info.calRequest)];
     endswitch
-endfunction
+end
 
 function typeStr = getCompTypeStr(compRequest)
   global COMP_TYPE_JOINT;
@@ -138,8 +138,8 @@ function typeStr = getCompTypeStr(compRequest)
   
   if ~isempty(compRequest.extraCircuit)
     typeStr = [typeStr ' (' compRequest.extraCircuit ')'];
-  endif
-endfunction
+  end
+end
 
     
 function [detailsCh1, detailsCh2] = getStatusDetails(info)  
@@ -154,8 +154,8 @@ function [detailsCh1, detailsCh2] = getStatusDetails(info)
     detailsCh1 = addDetails(1, status, info, detailsCh1);
     detailsCh2 = addDetails(2, status, info, detailsCh2);
     ++id;
-  endfor  
-endfunction
+  end
+end
 
 % formatting strings for details of channelID
 function details = addDetails(channelID, status, info, details)
@@ -168,7 +168,7 @@ function details = addDetails(channelID, status, info, details)
   % empty line before second+ statuses
   if ~isempty(details)
     details{end + 1} = '';
-  endif
+  end
   
   switch(status)
     case GENERATING
@@ -192,7 +192,7 @@ function details = addDetails(channelID, status, info, details)
         details{end + 1} = 'Compen. Distorts:';
         if ~isempty(info.compenCalFiles{channelID})
           details{end + 1} = info.compenCalFiles{channelID};
-        endif
+        end
         peaks = sortrows(info.distortPeaks{channelID}, -2);
         % replacing log ampl values
         peaks(:, 2) = floor(20*log10(abs(peaks(:, 2))) * COMP_DECIMALS_MULTIPLIER)/COMP_DECIMALS_MULTIPLIER;
@@ -204,15 +204,15 @@ function details = addDetails(channelID, status, info, details)
             fundFreq = fundPeaksCh(1, 1);
           else
             fundFreq = NA;
-          endif
+          end
           
           % log values changed, recalculating/generatingg string details
           compDetails{info.direction, channelID} = addLogPeaksStr(peaks, COMP_DECIMALS, {}, info.nonInteger, fundFreq);
           compAmpls{info.direction, channelID} = peaks(:, 2);
-        endif
+        end
         % adding comp details
         details = [details, compDetails{info.direction, channelID}];
-      endif
+      end
       
     case ANALYSING
       details{end + 1} = 'Measured Funds:';
@@ -228,9 +228,9 @@ function details = addDetails(channelID, status, info, details)
             calFreqRow = calFreqReqCh(id, :);
             % append all rows to details
             details = {details{:}, getCalFreqStrs(calFreqRow){:}};
-          endfor
-        endif
-      endif
+          end
+        end
+      end
 
     case DISTORTING
       distortHarmAmpls = info.distortHarmAmpls;
@@ -241,13 +241,13 @@ function details = addDetails(channelID, status, info, details)
           if ~isna(level)
             level = 20 * log10(level);
             details{end + 1} = ['Harmonics ' num2str(id + 1) ': ' num2str(level) 'dB'];
-          endif
-        endfor
-      endif
+          end
+        end
+      end
 
   endswitch
   
-endfunction
+end
 
 function strs = getCalFreqStrs(calFreqRow)
   strs = cell();
@@ -256,21 +256,21 @@ function strs = getCalFreqStrs(calFreqRow)
   if columns(calFreqRow) >= 4 && ~isna(calFreqRow(1, 4))
     % exact level
     str = [str '@' num2str(20*log10(calFreqRow(1, 4)), FORMAT) 'dB'];
-  endif
+  end
   strs{end + 1} = str;
 
   if ~isna(calFreqRow(1, 2))
     str = [' <' num2str(20*log10(calFreqRow(1, 2)), FORMAT) ', ' num2str(20*log10(calFreqRow(1, 3)), FORMAT) '> dB'];
     strs{end + 1} = str;
-  endif
-endfunction
+  end
+end
 
 function str = addPeaksStr(peaksCh, logDecimals, str, nonInteger)
   if ~isempty(peaksCh)
     peaksCh(:, 2) = 20*log10(abs(peaksCh(:, 2)));
     str = addLogPeaksStr(peaksCh, logDecimals, str, nonInteger);
-  endif
-endfunction
+  end
+end
 
 function str = addLogPeaksStr(peaksCh, logDecimals, str, nonInteger, fundFreq = NA)
   % consts
@@ -292,7 +292,7 @@ function str = addLogPeaksStr(peaksCh, logDecimals, str, nonInteger, fundFreq = 
       str{end + 1} = ['... + ' num2str(cnt - id + 1) ' peaks'];
       % quit loop
       break
-    endif
+    end
     
     peak = peaksCh(id, :);
     % adding only peaks with freq > 0 (i.e. real values)
@@ -305,16 +305,16 @@ function str = addLogPeaksStr(peaksCh, logDecimals, str, nonInteger, fundFreq = 
         str{end + 1} = sprintf(harmPeakFmt, harmID, freq, width, logDecimals, ampl);
       else
         str{end + 1} = sprintf(peakFmt, freq, width, logDecimals, ampl);
-      endif              
-    endif
+      end
+    end
     
-  endwhile
-endfunction
+  end
+end
 
 function decimalsStr = getFreqDecimals(nonInteger)
   if nonInteger
     decimalsStr = '.3';
   else
     decimalsStr = '.0';
-  endif
-endfunction
+  end
+end

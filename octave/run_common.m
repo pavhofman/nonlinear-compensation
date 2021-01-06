@@ -5,20 +5,20 @@ crash_dumps_octave_core(false);
 
 if ~exist(dataDir, 'dir')
   mkdir(dataDir);
-endif
+end
 
 if ~exist(logDir, 'dir')
   mkdir(logDir);
-endif
+end
 
 if ~exist(commDir, 'dir')
   mkdir(commDir);
-endif
+end
 
 if ~exist(transfDir, 'dir')
   mkdir(transfDir);
-endif
+end
 
 if ~exist(confDir, 'dir')
   mkdir(confDir);
-endif
+end

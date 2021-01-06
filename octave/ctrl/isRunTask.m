@@ -3,5 +3,5 @@ function result = isRunTask(schedTask)
     result = true;    
   else
     result = false;
-  endif
-endfunction
+  end
+end

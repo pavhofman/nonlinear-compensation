@@ -29,7 +29,7 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(fftLength, sam
     if rows(fundPeaksCh) == 0
       % error, will PASS
       writeLog('DEBUG', "Did not find any fundPeaks in channelID %d", channelID);
-    endif
+    end
 
     % generating distortion peaks
     if (genDistortPeaks && hasAnyPeak(fundPeaksCh))
@@ -44,24 +44,24 @@ function [fundPeaks, distortPeaks, errorMsg, x, y] = getHarmonics(fftLength, sam
         distortPeaksCh(:, 1) = distortPeaksCh(:, 1) * fs / fftLength;
         % storing
         distortPeaks{channelID} = double(distortPeaksCh);
-      endif
-    endif
+      end
+    end
 
     if ~isempty(fundPeaksCh)
       % converting bin ID to Hz
       fundPeaksCh(:, 1) = fundPeaksCh(:, 1) * fs / fftLength;
       % storing. Must use double! Result of time() converted to single returns incorrect time.
       fundPeaks{channelID} = double(fundPeaksCh);
-    endif
+    end
 
     if rows(fundPeaksCh) > 2
       writeLog('DEBUG', "Found fundPeaks for channel ID %d: %s", channelID, disp(fundPeaksCh));
       writeLog('DEBUG', "That is more than 2 supported, will send no fund peaks");
       fundPeaksCh = [];
-    endif
-  endfor
+    end
+  end
  
   if genDistortPeaks
     writeLog('TRACE', 'Determined distortion peaks: %s', disp(distortPeaks));
-  endif
-endfunction
+  end
+end

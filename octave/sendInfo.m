@@ -10,4 +10,4 @@ function sendInfo(info, zeromqPort)
   writeLog('TRACE', "Sending info: %d bytes, ID %d", length(ser), info.id);
   zmq_send (sock, ser, ZMQ_DONTWAIT);  
   id += 1;
-endfunction
+end

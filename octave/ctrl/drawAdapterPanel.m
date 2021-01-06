@@ -156,7 +156,7 @@ function drawAdapterPanel(fig, x, y, width, height)
   % setting initial values - in INIT mode
   updateAdapterPanel(true);
 
-endfunction
+end
 
 function clbkSetOut(src, data)
   global adapterStruct;
@@ -164,7 +164,7 @@ function clbkSetOut(src, data)
   % this control is enabled only when having relays
   updateRelays();
   updateAdapterPanel();
-endfunction
+end
 
 function clbkSetVdlp(src, data)
   global adapterStruct;
@@ -173,7 +173,7 @@ function clbkSetVdlp(src, data)
   % this control is enabled only when having relays
   updateRelays();
   updateAdapterPanel();
-endfunction
+end
 
 function clbkSetLpf(src, data)
   global adapterStruct;
@@ -182,7 +182,7 @@ function clbkSetLpf(src, data)
   % this control is enabled only when having relays
   updateRelays();
   updateAdapterPanel();
-endfunction
+end
 
 function clbkSetVd(src, data)
   global adapterStruct;
@@ -191,7 +191,7 @@ function clbkSetVd(src, data)
   % this control is enabled only when having relays
   updateRelays();
   updateAdapterPanel();
-endfunction
+end
 
 function clbkSetIn(src, data)
   global adapterStruct;
@@ -200,7 +200,7 @@ function clbkSetIn(src, data)
   % this control is enabled only when having relays
   updateRelays();
   updateAdapterPanel();
-endfunction
+end
 
 function clbkAdapterContinue(src, data)
   global adapterStruct;
@@ -209,7 +209,7 @@ function clbkAdapterContinue(src, data)
   % clearing msgBox
   adapterStruct.label = '';
   updateAdapterPanel();
-endfunction
+end
 
 function clbkSetVDLevel(src, data)
   % checks
@@ -222,7 +222,7 @@ function clbkSetVDLevel(src, data)
   elseif value > 0
     warndlg('VD level must be < 0dB');
     return;
-  endif
+  end
 
   global adapterStruct;
   adapterStruct.reqLevels = db2mag(value);
@@ -231,4 +231,4 @@ function clbkSetVDLevel(src, data)
   updateAdapterPanel();
   % adjusting the stepper
   setVDLevelSched();
-endfunction
+end

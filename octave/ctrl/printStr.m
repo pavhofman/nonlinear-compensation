@@ -3,7 +3,7 @@ function printStr(msg, varargin)
   contents = get(outBox, 'string');
   if (rows(contents) == 0)
     contents = {};
-  endif
+  end
   if nargin() > 1
     % formatting message
     msg = sprintf(msg, varargin{:});
@@ -12,4 +12,4 @@ function printStr(msg, varargin)
   % prepending at the beginning to avoid having to scroll to end manually
   contents = [msg; contents];
   set(outBox, 'string', contents);
-endfunction
+end

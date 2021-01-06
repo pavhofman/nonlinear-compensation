@@ -14,4 +14,4 @@ function stepper = initStepperStruct(stepperID)
   stepper.running = false;
   % number of attempts to adjust to one level. Zeroed after reaching the level in checkStepper.
   stepper.attempts = 0;
-endfunction
+end

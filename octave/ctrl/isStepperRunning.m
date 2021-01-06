@@ -10,10 +10,10 @@ function result = isStepperRunning(stepperID)
       writeLog('DEBUG', "Stepper [%d] finished at internal position %d", stepperID, position);
       % resetting flag
       steppers{stepperID}.running = false;
-    endif
+    end
     result = ~finished;
   else
     % not even started
     result = false;
-  endif
-endfunction
+  end
+end

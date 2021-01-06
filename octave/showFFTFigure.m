@@ -17,7 +17,7 @@ function showFFTFigure(samples, fs, direction)
       side = 'Capture';
     else
       side = 'Playback';
-    endif
+    end
   
     showFFTCfg.fig = figure('numbertitle', 'off', 'name', [side ' side FFT']);
     set(showFFTCfg.fig, 'DeleteFcn', @(h, e) closeFFTFigure());
@@ -96,9 +96,9 @@ function showFFTFigure(samples, fs, direction)
       set(fftLine(i), 'YData', 20*log10(yavg(i,:)));
     end
   end
-endfunction
+end
 
 function logXTickZoomHandler(h)
   xt = get(h,'XTick');
   set(h,'XTickLabel', sprintf('%4.0f|',xt))
-endfunction
+end

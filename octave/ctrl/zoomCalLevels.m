@@ -28,7 +28,7 @@ function zoomCalLevels(calFreqReq, targetLevels)
         lowerYLim = min(targetLevelsCh)  - DIFF_FROM_MID_DB;
         upperYLim = min(targetLevelsCh)  + DIFF_FROM_MID_DB;
         set(plotStruct.axis, 'ylim', [lowerYLim, upperYLim]);
-      endif
+      end
 
       % updating target levels, if any
       if ~isna(targetLevelsCh)
@@ -38,14 +38,14 @@ function zoomCalLevels(calFreqReq, targetLevels)
       else
         % none, hide
         setVisible(plotStruct.lastLine, false);
-      endif
+      end
       
-    endfor
-  endif
-endfunction
+    end
+  end
+end
 
 % true if any freq in calFreqReqCh has specified min/max amplitudes (i.e. level limits)
 function result = hasLimits(calFreqReqCh)
   result = any(isna(calFreqReqCh(:, 2)));
-endfunction
+end
 

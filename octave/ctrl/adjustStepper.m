@@ -17,7 +17,7 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
   % checking status from previous adjustments
   if steppers{stepperID}.backlashCleared && steppers{stepperID}.calibrated
     steppers{stepperID}.initialized = true;
-  endif
+  end
 
 
   if ~steppers{stepperID}.backlashCleared
@@ -32,7 +32,7 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
     steppers{stepperID}.lastSteps = 0;
     newSteps = BACKLASH_STEPS;
     return;
-  endif
+  end
 
   playAmpl = playInfo.measuredPeaks{PLAY_CH_ID}(1, 2);
   recAmpl = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 2);
@@ -56,8 +56,8 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
     else
       % no change in direction, keeping backlash coeff from previous
       lastBacklashCoeff = steppers{stepperID}.moves(end, 3);
-    endif
-  endif
+    end
+  end
 
   % all params of new move row are available now
   newMove = [steppers{stepperID}.lastSteps, lastRatio, lastBacklashCoeff];
@@ -75,8 +75,8 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
       steppers{stepperID}.lastPos0 = NA;
       writeLog('DEBUG', 'stepper.moves reached max %d rows, kept only min last %d rows in stepper.moves, reset lastPos0 in new step calculation',
         MAX_MOVES, MIN_MOVES);
-    endif
-  endif
+    end
+  end
 
 
   if ~steppers{stepperID}.calibrated
@@ -86,7 +86,7 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
     if newStepIdx == length(INIT_STEPS)
       % will use last init value, next round will be calibrated
       steppers{stepperID}.calibrated = true;
-    endif
+    end
   else
     % already initialized, adjusting for the required level
     % for now only one req level
@@ -106,12 +106,12 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
     estPos0 = estCurPos - offsets(end);
 
     newSteps  = calculateNewStep(stepperID, reqTransfer, estPos0);
-  endif
+  end
   % moving new steps
   if newSteps ~= 0
     moveStepperTo(stepperID, newSteps);
-  endif
-endfunction
+  end
+end
 
 function newSteps = calculateNewStep(stepperID, reqTransfer, estPos0)
   persistent INIT_BACKLASH = 20;
@@ -168,7 +168,7 @@ function newSteps = calculateNewStep(stepperID, reqTransfer, estPos0)
     safeBacklash = round(backlash * 0.3);
     newSteps = ifelse(newSteps > 0, newSteps + safeBacklash, newSteps - safeBacklash);
     writeLog('DEBUG', 'Stepper [%d] direction will change, adding safe backlash %d steps', stepperID, safeBacklash);
-  endif
+  end
 
   % lower limit MIN_STEPS to avoid tiny steps
   newSteps = ifelse(newSteps > 0, max(newSteps, MIN_STEPS), min(newSteps, -MIN_STEPS));
@@ -176,7 +176,7 @@ function newSteps = calculateNewStep(stepperID, reqTransfer, estPos0)
 
   % keeping for lower/upper bounds in next run
   steppers{stepperID}.lastPos0 = pos0;
-endfunction
+end
 
 % fitting equations
 function [ratios] = fitEqs(x, pos0, backlash)
@@ -187,4 +187,4 @@ function [ratios] = fitEqs(x, pos0, backlash)
   % avoiding division by zero
   pos(pos == 0) = 0.001;
   ratios = pos(2:end) ./ pos(1:end-1);
-endfunction
+end

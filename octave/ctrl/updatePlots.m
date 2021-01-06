@@ -15,7 +15,7 @@ function updatePlots(dirStruct, info)
         calLevels = loadCalLevels(calFile);
       else
         calLevels = [];
-      endif
+      end
       
       % store levels for next run        
       allCalLevels{direction, channelID} = calLevels;
@@ -28,10 +28,10 @@ function updatePlots(dirStruct, info)
       if columns(calLevels) == 2
         calX = [calX; calX + CH_DISTANCE_X];
         calY = [calLevels(:, 1); calLevels(:, 2)];
-      endif
+      end
 
       plotLevels(plotStruct.calLine, calX, calY);
-    endif
+    end
     
     % determine current levels
     curLevels = [];
@@ -40,15 +40,15 @@ function updatePlots(dirStruct, info)
       if ~isempty(measuredPeaksCh)
         curLevels = info.measuredPeaks{channelID}(:, 2);
         curLevels = 20*log10(curLevels);
-      endif
-    endif
+      end
+    end
     
     % plotting current levels
     if ~isempty(curLevels)
       updateLevelsLine(curLevels, plotStruct.curLine, 1);
-    endif
-  endfor
-endfunction
+    end
+  end
+end
 
 function levels = loadCalLevels(calFile)
   global AMPL_IDX;  % = index of fundAmpl1
@@ -56,7 +56,7 @@ function levels = loadCalLevels(calFile)
     writeLog('WARN', 'The calfile %s does not exist, cannot load into cal plot!', calFile);
     levels = [];
     return;
-  endif
+  end
   load(calFile);
   if length(calRec.fundFreqs) == 2
     % skipping auxiliary first and last rows
@@ -65,7 +65,7 @@ function levels = loadCalLevels(calFile)
   else
     % only fund1 ampl column
     levels = calRec.peaks(2:end - 1, AMPL_IDX);
-  endif
+  end
   % in dB
   levels = 20*log10(levels);
-endfunction
+end

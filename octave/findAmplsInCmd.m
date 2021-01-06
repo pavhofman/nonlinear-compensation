@@ -9,17 +9,17 @@ function ampls = findAmplsInCmd(cmd, prefix, defaultValue = [], defaultMsg = '')
     amplStr = sscanf(str, [prefix '%s']);
     if ~isempty(amplStr)
       ampls = eval(amplStr);
-    endif
-  endfor
+    end
+  end
   
   if isempty(ampls)
     % did not find any
     ampls = defaultValue;
     if ~isempty(defaultMsg)
       writeLog('DEBUG', defaultMsg);
-    endif
-  endif
-endfunction
+    end
+  end
+end
 
 
 %!test

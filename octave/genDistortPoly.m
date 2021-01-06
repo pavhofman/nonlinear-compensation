@@ -10,12 +10,12 @@ function distortPoly = genDistortPoly(distortHarmAmpls)
     if harmAmpl > 0
       poly = harmAmpl * chebyshevpoly(1, id + 1);
       distortPoly = addPoly(poly, distortPoly);
-    endif
-  endfor
-endfunction
+    end
+  end
+end
 
 function wholePoly = addPoly(poly, wholePoly)
   % prepending poly with zeros to fit wholePoly length
   poly = [zeros(1, length(wholePoly) - length(poly)), poly];
   wholePoly += poly;
-endfunction
+end

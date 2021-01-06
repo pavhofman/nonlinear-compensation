@@ -2,5 +2,5 @@
 function structVar = addFieldToStruct(structVar, field)
   if ~isfield(structVar, field)
     structVar.(field) = struct();
-  endif
-endfunction
+  end
+end

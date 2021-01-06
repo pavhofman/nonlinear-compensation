@@ -13,9 +13,9 @@ function clbkJointCalib(src, data, contCalib)
       playAmpls{end + 1} = transpose(measuredPeaksCh(:, 2));
     else
       playAmpls{end + 1} = [];
-    endif
-  endfor
+    end
+  end
   
   extraCmd = getMatrixCellsToCmdStr(playAmpls, CMD_PLAY_AMPLS_PREFIX);  
   clbkCalib(src, data, COMP_TYPE_JOINT, contCalib, extraCmd);
-endfunction
+end

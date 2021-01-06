@@ -57,10 +57,10 @@ function [distortPeaksCh] = getDistortionProductsCh(fundPeaks, x, yc, y, binwidt
           % ignore frequencies waker than MIN_LEVEL
           || (y(idx) < MIN_DISTORT_LEVEL)
           continue
-        endif
+        end
         distortPeaksCh = [distortPeaksCh; x(idx), y(idx), arg(yc(idx))];                
-      endfor
-    endfor
-  endif
+      end
+    end
+  end
   distortPeaksCh = unique(distortPeaksCh, 'rows');
-endfunction
+end

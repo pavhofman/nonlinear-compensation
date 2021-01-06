@@ -2,4 +2,4 @@
 function setStatusResult(status, result)
   global statusStruct;
   statusStruct.(status).result = result;
-endfunction
+end

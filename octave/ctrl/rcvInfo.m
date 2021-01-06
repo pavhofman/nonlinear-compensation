@@ -12,9 +12,9 @@ function info = rcvInfo(sock)
       % 0 = blocking mode
       data = zmq_recv (sock, 50000, 0);
       info = bytea2var(data);
-    endif
+    end
   catch err
     writeLog('ERROR', err.message);
-  end_try_catch
+  end
 
-endfunction
+end

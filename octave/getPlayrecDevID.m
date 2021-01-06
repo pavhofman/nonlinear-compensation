@@ -8,10 +8,10 @@ function devID = getPlayrecDevID(devName, playback)
     if index(devs(id).name, devName) && ifelse(playback, devs(id).outputChans, devs(id).inputChans)
       devID = devs(id).deviceID;
       return;
-    endif
-  endfor
+    end
+  end
   % not found, probably already open
   msg = sprintf('Unknown closed PlayRec device name %s for %s', devName, ifelse(playback, 'playback', 'capture'));
   writeLog('ERROR', msg);
   error(msg);
-endfunction
+end

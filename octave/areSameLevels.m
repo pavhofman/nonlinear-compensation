@@ -3,12 +3,12 @@ function result  = areSameLevels(peaksCh1, peaksCh2, maxAmplRatioDiff)
   if isempty(peaksCh1) || isempty(peaksCh2) || ~isequal(peaksCh1(:, 1), peaksCh2(:, 1))
     result = false;
     return;
-  endif
+  end
   ampls = peaksCh1(:, 2);
   prevAmpls = peaksCh2(:, 2);
   differentAmplIDs = find(abs(1 - ampls ./ prevAmpls) > maxAmplRatioDiff);
   result =  isempty(differentAmplIDs);
-endfunction
+end
 
 
 %!test

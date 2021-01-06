@@ -5,9 +5,9 @@ function str = getMatrixCellsToCmdStr(matCells, cmdPrefix)
     mat = matCells{channelID};
     matStr = mat2strForCmd(mat);
     str = [str ' ' cmdPrefix matStr];
-  endfor
+  end
   str = strtrim(str);
-endfunction
+end
 
 %!test
 %! global CMD_CALFREQS_PREFIX;

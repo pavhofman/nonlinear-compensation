@@ -6,10 +6,10 @@ function clbkStoreRec(src, data, cmdFile)
   if isnumeric(taskFName)
     % nothing selected, exiting
     return;
-  endif
+  end
   
   fPath = [fDir taskFName];
   cmd = [STORE_RECORDED ' ' CMD_FILEPATH_PREFIX fPath];
   % sending command
   writeCmd(cmd, cmdFile, true);
-endfunction
+end

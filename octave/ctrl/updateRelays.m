@@ -9,15 +9,15 @@ function updateRelays()
   if adapterStruct.has2LPFs
     % LPF1 = relay off = false, LPF2 = on = true
     changed |= setArdPin(ardStruct.ard, ardStruct.lpfPin,  adapterStruct.lpf == 2, 'Relay LPF1/LPF2');
-  endif
+  end
 
   if adapterStruct.has2VDs
     % VD1 = relay off = false, VD2 = on = true
     changed |= setArdPin(ardStruct.ard, ardStruct.vdPin,  adapterStruct.vd == 2, 'Relay VD1/VD2');
-  endif
+  end
 
   % switches are set now
   adapterStruct.switchesSet = true;
   % flag for change
   adapterStruct.switchesChanged |= changed;
-endfunction
+end

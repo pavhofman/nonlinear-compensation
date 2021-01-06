@@ -6,14 +6,14 @@ function value = findNumInCmd(cmd, prefix, defaultValue = [], defaultMsg = '');
     value = sscanf(str, [prefix '%f+%f']);
     if ~isempty(value)
       return;
-    endif
-  endfor
+    end
+  end
   % did not find any
   value = defaultValue;
   if ~isempty(defaultMsg)
     writeLog('DEBUG', defaultMsg);
-  endif
-endfunction
+  end
+end
 
 
 %!test

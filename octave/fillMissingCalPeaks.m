@@ -26,8 +26,8 @@ function calPeaks = fillMissingCalPeaks(calPeaks)
       else
         % the sequence is broken
         break;
-      endif
-    endfor
+      end
+    end
     % all rows above rowID are already fixed
     % now interpolation of the remaining lower rows - limiting up to rowID
     missingPeaksIDsInCol = missingPeaksIDsInCol(1:rowID);
@@ -37,8 +37,8 @@ function calPeaks = fillMissingCalPeaks(calPeaks)
     peaksAtLevels = interp1(knownLevels, knownPeaks, missingLevels, 'linear', 'extrap');
     % insert interpolated values into complAllPeaks
     calPeaks(find(missingPeaksIDsInCol), colID) = peaksAtLevels;
-  endfor
-endfunction
+  end
+end
 
 %!test
 %! calPeaks = [1 0 0 0.1 1 1;...

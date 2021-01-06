@@ -12,5 +12,5 @@ function removeTask(taskFName, label)
     % hiding ABORT btn
     global abortTasksBtn;
     setVisible(abortTasksBtn, false);
-  endif
-endfunction
+  end
+end

@@ -1,7 +1,7 @@
 % check if array arr contains item. Does not work for cell arrays!!
 function result = containsItem(arr, item)
   result = any(arr == item);  
-endfunction
+end
 
 
 %!test

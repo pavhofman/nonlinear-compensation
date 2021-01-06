@@ -8,7 +8,7 @@ function complPeak = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC, playAmplsC
   
   % fundPhaseDiff is added later on, zeros here
   complPeak = [timestamp, [NA, NA], playAmplsCh, transpose(fundAmpls), dPeaksC];
-endfunction
+end
 
 %!test
 %! timestamp = 5;

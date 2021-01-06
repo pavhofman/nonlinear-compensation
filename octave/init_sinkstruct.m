@@ -2,6 +2,6 @@ global sinkStruct;
 sinkStruct = struct();
 if exist('sink', 'var')
   sinkStruct = addFieldToStruct(sinkStruct, sink);
-endif
+end
 % init sinkNames
 source 'init_sinknames.m';

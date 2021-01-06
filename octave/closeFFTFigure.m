@@ -2,7 +2,7 @@ function closeFFTFigure()
   global showFFTCfg;
   if ~isna(showFFTCfg.fig) && isfigure(showFFTCfg.fig)
     close(showFFTCfg.fig);
-  endif
+  end
   showFFTCfg.fig = NA;
   showFFTCfg.enabled = false;
-endfunction
+end

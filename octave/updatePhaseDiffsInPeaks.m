@@ -8,8 +8,8 @@ function calPeaks = updatePhaseDiffsInPeaks(calPeaks, avgPhaseDiffs, addedRowIDs
   
   for rowID = addedRowIDs
     calPeaks(rowID, [PHASEDIFF_IDX PHASEDIFF_IDX+1]) = avgPhaseDiffs;
-  endfor
-endfunction
+  end
+end
 
 
 %!test

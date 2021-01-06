@@ -6,6 +6,6 @@ function changed = setVisible(items, visible)
     if visible ~= isVisible
       set(item, 'visible', ifelse(visible, 'on', 'off'));
       changed = true;
-    endif
-  endfor
-endfunction
+    end
+  end
+end

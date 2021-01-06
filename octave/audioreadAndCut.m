@@ -11,4 +11,4 @@ function [audiodata, fs] = audioreadAndCut(sourceFile, chanList=[], skipFromStar
         % all channels, cut only
         audiodata = audiodata(offset + 1:end - offset, :);
     end
-endfunction
+end

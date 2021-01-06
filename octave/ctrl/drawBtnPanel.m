@@ -44,10 +44,10 @@ function drawBtnPanel(fig, x, y, width, height)
                                   %'backgroundcolor', 'yellow',
                                   'callback', @clbkExactCalibRec,
                                   'position', [splitBtnX + BTN_WIDTH + CLEARANCE,  BTN_Y, BTN_WIDTH, BTN_HEIGHT]);
-endfunction
+end
 
 function clbkLoopSplitCalib(src, data)
   % just setting the global variable
   global loopSplitCalib;
   loopSplitCalib = get(src, 'value');
-endfunction
+end

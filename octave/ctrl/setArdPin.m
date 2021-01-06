@@ -14,5 +14,5 @@ function changed = setArdPin(ard, pin, status, name, logLevel='DEBUG')
     % storing
     statuses.(pin) = status;
     changed = true;
-  endif
-endfunction
+  end
+end

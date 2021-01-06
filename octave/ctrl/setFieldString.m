@@ -4,5 +4,5 @@ function changed = setFieldString(field, newText)
   if ~isequal(shownText, newText)
     set(field, 'string', newText);
     changed = true;
-  endif
-endfunction
+  end
+end

@@ -6,5 +6,5 @@ function channelIDs = getActiveChannelIDs(chMode, channelCnt)
     % removing the inactive channel
     global KEEP_CHANNEL_ID;
     channelIDs(getTheOtherChannelID(KEEP_CHANNEL_ID)) = [];
-  endif
-endfunction
+  end
+end

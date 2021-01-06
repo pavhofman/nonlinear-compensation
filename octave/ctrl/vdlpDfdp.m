@@ -29,4 +29,4 @@ function output = vdlpDfdp(t, distortF, amplA, phaseA, amplD, phaseD, fundGainVD
   
   % column vector
   output = [dfdpVD; dfdpLP];
-endfunction
+end

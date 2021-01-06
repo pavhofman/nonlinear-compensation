@@ -8,4 +8,4 @@ function [gain, phaseShift] = detTransferFromTransferFile(freq, extCircuit)
 
   peaksRow = transfRec.peaksRow;
   [gain, phaseShift] = detTransfer(peaksRow);  
-endfunction
+end

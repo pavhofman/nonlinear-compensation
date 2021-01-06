@@ -20,7 +20,7 @@ function zeroT = determineZeroTime(peaksCh)
     % one-tone, nothing to compute, zeroTime was before starting the last incomplete period
     zeroT = phaseTime1;
     return;
-  endif
+  end
 
   % generating vector of times when freq1 has zero phase. In reality this was in past, but we can turn time around and generate positive time
   % the first zero phase is at phaseTime1, and then every period1
@@ -54,8 +54,8 @@ function zeroT = determineZeroTime(peaksCh)
     zeroT *=  peaksCh(1, 1) / origPeaksCh(1, 1);
   else
     zeroT = [];
-  endif
-endfunction
+  end
+end
 
 
 % details from peaksCh
@@ -70,11 +70,11 @@ function details = getDetails(peaksCh)
   for freqID = 1:rows(phases)
     if phases(freqID) < 0
       phases(freqID) += PI2;
-    endif    
-  endfor
+    end
+  end
   phaseTimes = periods .* phases ./ PI2;
   details = [freqs, periods, phaseTimes];
-endfunction
+end
 
 
 %!function peaksCh = genPeaksCh(freqs, T)
@@ -84,7 +84,7 @@ endfunction
 %! phases = 2 * pi * timesToZero ./ periods;
 %! ampls = repmat(0.9, rows(freqs), 1);
 %! peaksCh = [freqs, ampls, phases];
-%!endfunction
+%!end
 %! 
 %!function [periodsToZeroT, periodsInT] = checkZeroT(zeroT, T, peaksCh)
 %!  periods = 1./peaksCh(:, 1);
@@ -93,13 +93,13 @@ endfunction
 %!  periodsToZeroT = (zeroT - phaseTimes)./periods;
 %!  % periods from the beginning to point zeroT (T - zeroT) - must be int!
 %!  periodsInT = (T - zeroT)./periods;
-%!endfunction
+%!end
 %! 
 %! Checking integer value with tolerance tol
 %!function result = checkInt(val, tol)
 %!   results = abs(round(val) - val) < tol;
 %!   result = all(results);
-%!endfunction
+%!end
 %!
 %!test
 %! T = 15.48415358045152; 

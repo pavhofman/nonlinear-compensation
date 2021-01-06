@@ -6,4 +6,4 @@ function lpFundAmpl = loadCalFundAmpl(freq, fs, playChID, analysedChID, playCalD
   calFile = genCalFilename(freq, fs, COMP_TYPE_JOINT, playChID, analysedChID, playCalDevName, recCalDevName, MODE_DUAL, extraCircuit);
   [peaksRow, distortFreqs] = loadCalRow(calFile);
   lpFundAmpl = peaksRow(1, AMPL_IDX);
-endfunction
+end

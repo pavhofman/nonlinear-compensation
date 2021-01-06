@@ -4,5 +4,5 @@ function changed = setFieldTitle(field, newText)
   if ~isequal(shownText, newText)
     set(field, 'title', newText);
     changed = true;
-  endif
-endfunction
+  end
+end

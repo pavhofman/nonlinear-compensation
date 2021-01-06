@@ -4,7 +4,7 @@ function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, p
   if ~isempty(distortPeaksCh)
     rowIDs = distortPeaksCh(:, 1) == 0;
     distortPeaksCh(rowIDs, :) = [];
-  endif
+  end
   
   %% calFile line contains exactly 2 fundpeaks, therefore fundPeaksCh must contain so many rows!!
   fundPeaksCh = padWithZeros(fundPeaksCh, 2);
@@ -23,11 +23,11 @@ function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, p
       distortFreqs = transpose(distortPeaksCh(:, 1));
       % build new/first complPeak line - convert peaks to complex numbers and transpose
       dPeaksC = transpose(distortPeaksCh(:, 2) .* exp(i * distortPeaksCh(:, 3)));
-    endif
+    end
     calPeaks = buildCalPeakRow(timestamp, fundPeaksCh, dPeaksC, playAmplsCh);
     % new calfile, always 1 row
     addedRowIDs = 1;
-  endif
+  end
 
   calRec.fundFreqs = transpose(fundPeaksCh(:, 1));
   calRec.distortFreqs = distortFreqs;
@@ -43,11 +43,11 @@ function calFileStruct = saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, p
   if doSave
     save(calFile, 'calRec');
     writeLog('INFO', 'Stored calRec into calfile %s', calFile);
-  endif
-endfunction
+  end
+end
 
 
 % pad peaksCh with zero rows up to rowsCnt
 function peaksCh = padWithZeros(peaksCh, rowsCnt)
   peaksCh = [peaksCh; zeros(rowsCnt - rows(peaksCh), 3)];
-endfunction
+end

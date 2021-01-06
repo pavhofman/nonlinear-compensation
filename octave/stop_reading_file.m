@@ -5,7 +5,7 @@ if exist('playRecConfig', 'var')
 else
   % no reading
   sourceStruct.src = NA;
-endif
+end
 
 sourceStruct.filePos = NA;
 sourceStruct.fileLength = NA;

@@ -117,22 +117,22 @@ function initAdapterStruct()
 
       adapterStruct.updateIOFunc = @(recInfo, playInfo) updateLedsAndSwitch(recInfo, playInfo);
 
-    endif % stepper adapter type
-  endif % adapter has arduino
-endfunction
+    end % stepper adapter type
+  end % adapter has arduino
+end
 
 function updateNoArduinoAdapterPanel(title)
   global adapterStruct;
   adapterStruct.label = title;
   updateAdapterPanel();
-endfunction
+end
 
 function initArduino()
   global ardStruct;
   ardStruct = initArdStruct();
   global steppers;
   steppers = cell();
-endfunction
+end
 
 function ardStruct = initArdStruct()
   ardStruct = struct();
@@ -148,8 +148,8 @@ function ardStruct = initArdStruct()
     kill(getppid(), 15);
     % exiting
     error("No arduino found");
-  end_try_catch
-endfunction
+  end
+end
 
 function stepperStruct = initStepper(ard, stepperID, p1, p2, p3, p4)
   ard.initStepperType4(stepperID, p1, p2, p3, p4);
@@ -157,17 +157,17 @@ function stepperStruct = initStepper(ard, stepperID, p1, p2, p3, p4)
   % 0 accel = acceleration off
   ard.setAccel(stepperID, 0);
   stepperStruct = initStepperStruct(stepperID);
-endfunction
+end
 
 
 function abortAdapterPanel()
   % empty
-endfunction
+end
 
 function abortAdapterPanelWithStepper()
   abortAdapterPanel();
   abortStepper();
-endfunction
+end
 
 function emptyFunc()
-endfunction
+end

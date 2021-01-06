@@ -10,10 +10,10 @@ function cmdID = sendPlayGeneratorCmd(freq, playLevels, playEqualizer = NA)
       levels = playLevels{channelID} / playEqualizer(channelID);
     else
       levels = playLevels{channelID};
-    endif
+    end
     genFundCh = [freq, levels];
     genFund{end + 1} = genFundCh;
-  endfor
+  end
   
   cmdID = writeCmd(getGeneratorCmdStr(genFund), cmdFilePlay);
-endfunction
+end

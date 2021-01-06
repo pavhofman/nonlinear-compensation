@@ -11,4 +11,4 @@ function [gain, phaseShift] = detTransfer(peaksRow)
   gain = fundAmpl/playAmpl;
   
   phaseShift = peaksRow(1, PHASEDIFF_IDX);  
-endfunction
+end
