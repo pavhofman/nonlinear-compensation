@@ -1,44 +1,44 @@
 % building info struct from global variables
-function info = buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks, fs, direction, cmdDoneID, compenCalFiles, reloadCalFiles,
+function infoStruct = buildInfo(channelCnt, statusStruct, measuredPeaks, distortPeaks, fs, direction, cmdDoneID, compenCalFiles, reloadCalFiles,
     sourceStruct, sinkStruct, showFFTCfg, chMode, equalizer, nonInteger, playCalDevName, recCalDevName)
-  info = struct();
+  infoStruct = struct();
 
-  info.id = NA;
-  info.time = time();
+  infoStruct.id = NA;
+  infoStruct.time = time();
 
-  info.channelCnt = channelCnt;
-  info.status = statusStruct;
+  infoStruct.channelCnt = channelCnt;
+  infoStruct.status = statusStruct;
   for [val, statusItem ] = statusStruct
-    info = addStatusDetails(statusItem, info);
+    infoStruct = addStatusDetails(statusItem, infoStruct);
   end
   
-  info.chMode = chMode;
-  info.equalizer = equalizer;
+  infoStruct.chMode = chMode;
+  infoStruct.equalizer = equalizer;
   
-  info.measuredPeaks = measuredPeaks;
-  info.distortPeaks = distortPeaks;
-  info.compenCalFiles = compenCalFiles;
-  info.reloadCalFiles = reloadCalFiles;
+  infoStruct.measuredPeaks = measuredPeaks;
+  infoStruct.distortPeaks = distortPeaks;
+  infoStruct.compenCalFiles = compenCalFiles;
+  infoStruct.reloadCalFiles = reloadCalFiles;
   
-  info.sourceStruct = sourceStruct;
-  info.sinkStruct = sinkStruct;
+  infoStruct.sourceStruct = sourceStruct;
+  infoStruct.sinkStruct = sinkStruct;
 
-  info.playCalDevName = playCalDevName;
-  info.recCalDevName = recCalDevName;
+  infoStruct.playCalDevName = playCalDevName;
+  infoStruct.recCalDevName = recCalDevName;
 
-  info.showingFFT = showFFTCfg.enabled;
+  infoStruct.showingFFT = showFFTCfg.enabled;
 
-  info.fs = fs;
-  info.cmdDoneID = cmdDoneID;
-  info.nonInteger = nonInteger;
-  info.direction = direction;
+  infoStruct.fs = fs;
+  infoStruct.cmdDoneID = cmdDoneID;
+  infoStruct.nonInteger = nonInteger;
+  infoStruct.direction = direction;
   % current process PID is needed for restarting/monitoring from CTRL
-  info.pid = getpid();
+  infoStruct.pid = getpid();
 end
 
 
 % adding details for each status item, if any
-function info = addStatusDetails(status, info)
+function infoStruct = addStatusDetails(status, infoStruct)
   global GENERATING;
   global CALIBRATING;
   global DISTORTING;
@@ -47,19 +47,19 @@ function info = addStatusDetails(status, info)
   switch status
     case GENERATING
       global genFunds;
-      info.genFunds = genFunds;
+      infoStruct.genFunds = genFunds;
       
     case CALIBRATING
       global calRequest;
-      info.calRequest = calRequest;
+      infoStruct.calRequest = calRequest;
 
     case COMPENSATING
       global compRequest;
-      info.compRequest = compRequest;
+      infoStruct.compRequest = compRequest;
       
     case DISTORTING
       global distortHarmAmpls;
-      info.distortHarmAmpls = distortHarmAmpls;
+      infoStruct.distortHarmAmpls = distortHarmAmpls;
       
   endswitch
 end

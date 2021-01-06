@@ -1,14 +1,14 @@
-% Updating corresponding calPlots based on info. Reads fundamental amplitudes from calFiles, updates only calLines in dirStruct.
-function updatePlots(dirStruct, info)
+% Updating corresponding calPlots based on infoStruct. Reads fundamental amplitudes from calFiles, updates only calLines in dirStruct.
+function updatePlots(dirStruct, infoStruct)
   global CH_DISTANCE_X;
   persistent calFiles = cell(2, 2);
   persistent allCalLevels = cell(2, 2);
   
-  direction = info.direction;
+  direction = infoStruct.direction;
   for channelID = 1:2
     plotStruct = dirStruct.calPlots{channelID};
-    calFile = info.compenCalFiles{channelID};
-    if ~strcmp(calFiles{direction, channelID}, calFile) || info.reloadCalFiles
+    calFile = infoStruct.compenCalFiles{channelID};
+    if ~strcmp(calFiles{direction, channelID}, calFile) || infoStruct.reloadCalFiles
       % change from last run or explicit request to reload calfiles
       if ~isempty(calFile)
         % plot calfile levels
@@ -35,10 +35,10 @@ function updatePlots(dirStruct, info)
     
     % determine current levels
     curLevels = [];
-    if iscell(info.measuredPeaks)
-      measuredPeaksCh = info.measuredPeaks{channelID};
+    if iscell(infoStruct.measuredPeaks)
+      measuredPeaksCh = infoStruct.measuredPeaks{channelID};
       if ~isempty(measuredPeaksCh)
-        curLevels = info.measuredPeaks{channelID}(:, 2);
+        curLevels = infoStruct.measuredPeaks{channelID}(:, 2);
         curLevels = 20*log10(curLevels);
       end
     end

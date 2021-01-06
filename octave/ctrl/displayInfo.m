@@ -1,30 +1,30 @@
-function displayInfo(info, dirStruct)
-  %info.id = NA;
-  %info.time = time();
-  %info.status = statusStruct;
-  %info.measuredPeaks = measuredPeaks;
-  %info.distortPeaks = distortPeaks;
-  %info.genAmpl = genAmpl;
-  %info.genFreq = genFreq;
-  %info.fs = fs;
-  %info.cmdDoneID;
-  %info.compenCalFiles = compenCalFiles;
-  %info.calFreqs;
-  %info.direction = direction;
+function displayInfo(infoStruct, dirStruct)
+  %infoStruct.id = NA;
+  %infoStruct.time = time();
+  %infoStruct.status = statusStruct;
+  %infoStruct.measuredPeaks = measuredPeaks;
+  %infoStruct.distortPeaks = distortPeaks;
+  %infoStruct.genAmpl = genAmpl;
+  %infoStruct.genFreq = genFreq;
+  %infoStruct.fs = fs;
+  %infoStruct.cmdDoneID;
+  %infoStruct.compenCalFiles = compenCalFiles;
+  %infoStruct.calFreqs;
+  %infoStruct.direction = direction;
 
-  updatePanelTitle(dirStruct, info);
-  updateStatusTxts(dirStruct, info);
-  updateMenu(dirStruct, info);
+  updatePanelTitle(dirStruct, infoStruct);
+  updateStatusTxts(dirStruct, infoStruct);
+  updateMenu(dirStruct, infoStruct);
 
-  [detailsCh1, detailsCh2] = getStatusDetails(info);
+  [detailsCh1, detailsCh2] = getStatusDetails(infoStruct);
   setFieldString(dirStruct.detailTxts{1}, detailsCh1);
   setFieldString(dirStruct.detailTxts{2}, detailsCh2);
   
-  updatePlots(dirStruct, info);
-  %disp(info);
+  updatePlots(dirStruct, infoStruct);
+  %disp(infoStruct);
     
-  updateSourceField(dirStruct.sourceTxt, info.sourceStruct);
-  updateSinkField(dirStruct.sinkTxt, info.sinkStruct);
+  updateSourceField(dirStruct.sourceTxt, infoStruct.sourceStruct);
+  updateSinkField(dirStruct.sinkTxt, infoStruct.sinkStruct);
 end
 
 function updateSourceField(sourceTxt, sourceStruct)
@@ -59,14 +59,14 @@ function updateSinkField(sinkTxt, sinkStruct)
 end
 
 
-function updateStatusTxts(dirStruct, info)
+function updateStatusTxts(dirStruct, infoStruct)
   persistent GREEN = [0, 0.5, 0];
   persistent RED = [0.5, 0, 0];
   persistent BLACK = [0, 0, 0];
   
   statusStr = cell();
   
-  statusStruct = info.status;
+  statusStruct = infoStruct.status;
   global TXT_STATUS_ORDER;
   sortedStatuses = sortStatuses(statusStruct, TXT_STATUS_ORDER);
   
@@ -79,7 +79,7 @@ function updateStatusTxts(dirStruct, info)
 
   for id = 1 : statusCnt;
     status = sortedStatuses{id};
-    statusToShow = getStatusToShow(status, info);
+    statusToShow = getStatusToShow(status, infoStruct);
     
     statusVal = statusStruct.(status);    
     if isfield(statusVal, 'msg') && ~isempty(statusVal.msg)
@@ -106,17 +106,17 @@ function updateStatusTxts(dirStruct, info)
   end
 end
 
-function statusToShow = getStatusToShow(status, info)
+function statusToShow = getStatusToShow(status, infoStruct)
   global COMPENSATING;
   global CALIBRATING;
   
   statusToShow = status;
   switch(status)
       case COMPENSATING
-        statusToShow = [statusToShow ' ' getCompTypeStr(info.compRequest)];
+        statusToShow = [statusToShow ' ' getCompTypeStr(infoStruct.compRequest)];
         
       case CALIBRATING
-        statusToShow = [statusToShow ' ' getCompTypeStr(info.calRequest)];
+        statusToShow = [statusToShow ' ' getCompTypeStr(infoStruct.calRequest)];
     endswitch
 end
 
@@ -142,8 +142,8 @@ function typeStr = getCompTypeStr(compRequest)
 end
 
     
-function [detailsCh1, detailsCh2] = getStatusDetails(info)  
-  statusStruct = info.status;
+function [detailsCh1, detailsCh2] = getStatusDetails(infoStruct)
+  statusStruct = infoStruct.status;
   global DETAILS_STATUS_ORDER;
   sortedStatuses = sortStatuses(statusStruct, DETAILS_STATUS_ORDER);
   
@@ -151,14 +151,14 @@ function [detailsCh1, detailsCh2] = getStatusDetails(info)
   detailsCh2 = cell();
   for id = 1 : length(sortedStatuses)
     status = sortedStatuses{id};
-    detailsCh1 = addDetails(1, status, info, detailsCh1);
-    detailsCh2 = addDetails(2, status, info, detailsCh2);
+    detailsCh1 = addDetails(1, status, infoStruct, detailsCh1);
+    detailsCh2 = addDetails(2, status, infoStruct, detailsCh2);
     ++id;
   end
 end
 
 % formatting strings for details of channelID
-function details = addDetails(channelID, status, info, details)
+function details = addDetails(channelID, status, infoStruct, details)
   global GENERATING;
   global COMPENSATING;
   global ANALYSING;
@@ -174,7 +174,7 @@ function details = addDetails(channelID, status, info, details)
     case GENERATING
       % showing generator freq and amplitude
       details{end + 1} = 'Gen. Frequencies:';
-      details = addPeaksStr(abs(info.genFunds{channelID}), 3, details, info.nonInteger);
+      details = addPeaksStr(abs(infoStruct.genFunds{channelID}), 3, details, infoStruct.nonInteger);
     
     case COMPENSATING
       % consts
@@ -187,18 +187,18 @@ function details = addDetails(channelID, status, info, details)
 
 
       % sorting distortPeaks by amplitude
-      peaks = info.distortPeaks{channelID};
+      peaks = infoStruct.distortPeaks{channelID};
       if ~isempty(peaks)
         details{end + 1} = 'Compen. Distorts:';
-        if ~isempty(info.compenCalFiles{channelID})
-          details{end + 1} = info.compenCalFiles{channelID};
+        if ~isempty(infoStruct.compenCalFiles{channelID})
+          details{end + 1} = infoStruct.compenCalFiles{channelID};
         end
-        peaks = sortrows(info.distortPeaks{channelID}, -2);
+        peaks = sortrows(infoStruct.distortPeaks{channelID}, -2);
         % replacing log ampl values
         peaks(:, 2) = floor(20*log10(abs(peaks(:, 2))) * COMP_DECIMALS_MULTIPLIER)/COMP_DECIMALS_MULTIPLIER;
-        if ~isequal(peaks(:, 2), compAmpls{info.direction, channelID})          
+        if ~isequal(peaks(:, 2), compAmpls{infoStruct.direction, channelID})
           % determining fundamental frequency for harmonic ID calculation in addLogPeaksStr
-          fundPeaksCh = info.measuredPeaks{channelID};
+          fundPeaksCh = infoStruct.measuredPeaks{channelID};
           % showing harmonic ID makes sense only for one fundamental freq
           if rows(fundPeaksCh) == 1            
             fundFreq = fundPeaksCh(1, 1);
@@ -207,19 +207,19 @@ function details = addDetails(channelID, status, info, details)
           end
           
           % log values changed, recalculating/generatingg string details
-          compDetails{info.direction, channelID} = addLogPeaksStr(peaks, COMP_DECIMALS, {}, info.nonInteger, fundFreq);
-          compAmpls{info.direction, channelID} = peaks(:, 2);
+          compDetails{infoStruct.direction, channelID} = addLogPeaksStr(peaks, COMP_DECIMALS, {}, infoStruct.nonInteger, fundFreq);
+          compAmpls{infoStruct.direction, channelID} = peaks(:, 2);
         end
         % adding comp details
-        details = [details, compDetails{info.direction, channelID}];
+        details = [details, compDetails{infoStruct.direction, channelID}];
       end
       
     case ANALYSING
       details{end + 1} = 'Measured Funds:';
-      details = addPeaksStr(info.measuredPeaks{channelID}, 4, details, info.nonInteger);
+      details = addPeaksStr(infoStruct.measuredPeaks{channelID}, 4, details, infoStruct.nonInteger);
       
     case CALIBRATING
-      calFreqReq = info.calRequest.calFreqReq;
+      calFreqReq = infoStruct.calRequest.calFreqReq;
       if ~isempty(calFreqReq)
         calFreqReqCh = calFreqReq{channelID};
         if ~isempty(calFreqReqCh)
@@ -233,7 +233,7 @@ function details = addDetails(channelID, status, info, details)
       end
 
     case DISTORTING
-      distortHarmAmpls = info.distortHarmAmpls;
+      distortHarmAmpls = infoStruct.distortHarmAmpls;
       if ~isempty(distortHarmAmpls)
         details{end + 1} = 'Distortion Levels Added:';
         for id = 1:length(distortHarmAmpls)

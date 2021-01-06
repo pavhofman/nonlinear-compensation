@@ -117,10 +117,10 @@ function updateLedsAndSwitch(recInfo, playInfo)
 
 end
 
-function result = isAnalysisOK(info)
+function result = isAnalysisOK(infoStruct)
   global ANALYSING;
-  if ~isempty(info) && isfield(info.status, ANALYSING)
-    statusVal = info.status.(ANALYSING);
+  if ~isempty(infoStruct) && isfield(infoStruct.status, ANALYSING)
+    statusVal = infoStruct.status.(ANALYSING);
     if isfield(statusVal, 'result')
       result = statusVal.result;
       if isResultOK(result)

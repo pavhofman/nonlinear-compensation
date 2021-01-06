@@ -24,9 +24,9 @@ function schedTask = decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, 
   % else keep waiting
 end
 
-function cmdDoneID = getCmdDoneID(info)
-  if ~isempty(info)
-    cmdDoneID = info.cmdDoneID;
+function cmdDoneID = getCmdDoneID(infoStruct)
+  if ~isempty(infoStruct)
+    cmdDoneID = infoStruct.cmdDoneID;
   else
     cmdDoneID = NA;
   end

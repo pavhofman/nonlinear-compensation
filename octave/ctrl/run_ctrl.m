@@ -197,10 +197,10 @@ while (~doQuit)
     localRecInfo = rcvInfo(recSock);
   until isempty(localRecInfo) || localRecInfo.time > time() - MAX_INFO_AGE
   if isempty(localRecInfo)
-    writeLog('TRACE', 'Empty rec info');
+    writeLog('TRACE', 'Empty rec infoStruct');
   else
     recInfo = localRecInfo;
-    writeLog('TRACE', 'Processing rec info with ID %d', recInfo.id);
+    writeLog('TRACE', 'Processing rec infoStruct with ID %d', recInfo.id);
 
     % displaying
     if lastDisplayedRecInfoTime + MIN_INFO_DISPLAY_INTERVAL < recInfo.time
@@ -216,10 +216,10 @@ while (~doQuit)
     localPlayInfo = rcvInfo(playSock);
   until isempty(localPlayInfo) || localPlayInfo.time > time() - MAX_INFO_AGE
   if isempty(localPlayInfo)
-    writeLog('TRACE', 'Empty play info');
+    writeLog('TRACE', 'Empty play infoStruct');
   else
     playInfo = localPlayInfo;
-    writeLog('TRACE', 'Processing play info with ID %d', playInfo.id);
+    writeLog('TRACE', 'Processing play infoStruct with ID %d', playInfo.id);
 
     % displaying
     if lastDisplayedPlayInfoTime + MIN_INFO_DISPLAY_INTERVAL < playInfo.time

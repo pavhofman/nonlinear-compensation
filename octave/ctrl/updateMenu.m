@@ -1,4 +1,4 @@
-function updateMenu(dirStruct, info)
+function updateMenu(dirStruct, infoStruct)
   % running only once a second
   persistent UPDATE_INTERVAL = 1;
   % for each direction
@@ -7,7 +7,7 @@ function updateMenu(dirStruct, info)
   
   curTime = time();
   % checking for each direction independently
-  direction = info.direction;
+  direction = infoStruct.direction;
   if isempty(lastUpdateTimes{direction}) ||  (curTime > lastUpdateTimes{direction} + UPDATE_INTERVAL)
     lastUpdateTimes{direction} = curTime;
   else
@@ -15,7 +15,7 @@ function updateMenu(dirStruct, info)
   end
     
   % setting distortion menu items visibility
-  if isfield(info, 'distortHarmAmpls') && ~isempty(info.distortHarmAmpls)
+  if isfield(infoStruct, 'distortHarmAmpls') && ~isempty(infoStruct.distortHarmAmpls)
     setEnabled(dirStruct.distortOnMenu, false);
     setEnabled(dirStruct.distortOffMenu, true);
   else
@@ -24,20 +24,20 @@ function updateMenu(dirStruct, info)
   end
   
   % setting generation menu items visibility
-  if isfield(info, 'genFunds') && ~isempty(info.genFunds)
+  if isfield(infoStruct, 'genFunds') && ~isempty(infoStruct.genFunds)
     setEnabled(dirStruct.genOffMenu, true);
   else
     setEnabled(dirStruct.genOffMenu, false);
   end
   
   global DIR_REC;
-  if info.direction == DIR_REC
+  if infoStruct.direction == DIR_REC
     % setting calibration menu items visibility/enabled
     global ANALYSING;
-    if isfield(info.status, ANALYSING) && isResultOK(info.status.(ANALYSING).result)
+    if isfield(infoStruct.status, ANALYSING) && isResultOK(infoStruct.status.(ANALYSING).result)
       % analysis running successfully
       global CALIBRATING;
-      if isfield(info.status, CALIBRATING)
+      if isfield(infoStruct.status, CALIBRATING)
         % calibration running
         setEnabled(dirStruct.calOnMenus, false);
         setEnabled(dirStruct.calOffMenus, true);
@@ -54,7 +54,7 @@ function updateMenu(dirStruct, info)
   end
   
   global FILE_SRC;
-  if info.sourceStruct.src == FILE_SRC
+  if infoStruct.sourceStruct.src == FILE_SRC
     % is running from file
     setEnabled(dirStruct.readfileOffMenu, true);
   else
@@ -62,7 +62,7 @@ function updateMenu(dirStruct, info)
   end
   
   global MEMORY_SINK;  
-  if structContains(info.sinkStruct, MEMORY_SINK)
+  if structContains(infoStruct.sinkStruct, MEMORY_SINK)
     % is recording
     setEnabled(dirStruct.recordOffMenu, true);
     setEnabled(dirStruct.storeRecordedMenu, true);
@@ -71,7 +71,7 @@ function updateMenu(dirStruct, info)
     setEnabled(dirStruct.storeRecordedMenu, false);
   end
   
-  if info.showingFFT
+  if infoStruct.showingFFT
     setEnabled(dirStruct.fftMenu, false);
     setEnabled(dirStruct.fftOffMenu, true);
   else
