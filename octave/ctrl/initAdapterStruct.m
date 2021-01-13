@@ -139,8 +139,7 @@ function ardStruct = initArdStruct()
   try
     ardStruct.ard = findArduino('ttyACM');
     % found, returning
-    return;
-  catch err
+  catch
     writeLog('ERROR', 'No arduino adapter found, cannot continue');
     h = errordlg('No arduino adapter found, quitting all CleanSine processes');
     uiwait(h);
