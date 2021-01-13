@@ -18,13 +18,13 @@ function initAdapterStruct()
 
   adapterStruct.hasRelays = false;
   adapterStruct.hasStepper = false;
-  adapterStruct.hasContButton = false;
+  adapterStruct.useContButton = false;
   adapterStruct.updateIOFunc = @(recInfo, playInfo) emptyFunc();
 
   if ~adapterHasArduino
     % switches as well as VD are manually operated - displaying only info window
       % mechanical switches, no stepper
-    adapterStruct.hasContButton = true;
+    adapterStruct.useContButton = true;
 
     adapterStruct.execFunc = @(title) updateNoArduinoAdapterPanel(title);
     adapterStruct.checkFunc = @(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask)...
@@ -52,7 +52,7 @@ function initAdapterStruct()
       % switches are manually operated - displaying only info window. VD operated by a stepper
       steppers{1} = initStepper(ardStruct.ard, 1, 6, 9, 8, 7);
       % simple info window with switch positions
-      adapterStruct.hasContButton = true;
+      adapterStruct.useContButton = true;
       adapterStruct.execFunc = @(title) execAdapterPanelWithOnlyStepper(title);
 
     elseif strcmp(firmware, 'CleanSine-1.0')

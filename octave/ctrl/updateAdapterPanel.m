@@ -42,7 +42,7 @@ function updateAdapterPanel(init = false)
 
   adapterStruct.switchesChanged |= ~init && switchesChanged;
   % CONTINUE button
-  if adapterStruct.hasContButton
+  if adapterStruct.useContButton
     % showing confirmation/continue button if some switch change detected (incl. changed nonempty label), i.e. manual action required
     setVisible(adapterStruct.contBtn, ~init && (switchesChanged  || newLabelShown));
   end
