@@ -6,12 +6,12 @@ function initAdapterStruct()
 
   resetAdapterStruct();
 
-  % defaults
+  % all fields (defaults)
   adapterStruct.has2VDs = false;
   adapterStruct.has2LPFs = false;
 
   % LPF1/2 & VD1/2 not modified by resetAdapterStruct, defining init values here
-  adapterStruct.lpf = 1; % 1 = LPF1, 2 = LPF2 if has2LPFs
+  adapterStruct.lpf = 1; % 1 = LPF1, 2 = LPF2 if has 2 LPFs
   adapterStruct.vd = 1; % 1 = VD1, 2 = VD2 if has2VDs
   adapterStruct.vdForSplitting = 1;
   adapterStruct.vdForInput = 1;
@@ -19,6 +19,10 @@ function initAdapterStruct()
   adapterStruct.hasRelays = false;
   adapterStruct.hasStepper = false;
   adapterStruct.useContButton = false;
+  % all functions
+  adapterStruct.execFunc = @(title) emptyFunc();
+  adapterStruct.checkFunc = @(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask) emptyFunc();
+  adapterStruct.abortFunc = @() emptyFunc();
   adapterStruct.updateIOFunc = @(recInfo, playInfo) emptyFunc();
 
   if ~adapterHasArduino
@@ -34,8 +38,16 @@ function initAdapterStruct()
   else
     % all other adapter types with arduino/at least one stepper
     global ardStruct;
+    ardStruct = struct();
+    % all fields
+    ardStruct.ard = findArduinoOrExit();
+    ardStruct.outPin = NA;
+    ardStruct.calibLPFPin = NA;
+    ardStruct.inPin = NA;
+    ardStruct.lpfPin = NA;
+
     global steppers;
-    initArduino();
+    steppers = cell();
 
     % same for all stepper adapters
     adapterStruct.hasStepper = true;
@@ -114,7 +126,6 @@ function initAdapterStruct()
       ardStruct.ard._configurePin(gpios.sw.pin,'Pullup');
 
       adapterStruct.execFunc = @(title) execRelaysAdapter(title);
-
       adapterStruct.updateIOFunc = @(recInfo, playInfo) updateLedsAndSwitch(recInfo, playInfo);
 
     end % stepper adapter type
@@ -127,17 +138,9 @@ function updateNoArduinoAdapterPanel(title)
   updateAdapterPanel();
 end
 
-function initArduino()
-  global ardStruct;
-  ardStruct = initArdStruct();
-  global steppers;
-  steppers = cell();
-end
-
-function ardStruct = initArdStruct()
-  ardStruct = struct();
+function ard = findArduinoOrExit()
   try
-    ardStruct.ard = findArduino('ttyACM');
+    ard = findArduino('ttyACM');
     % found, returning
   catch
     writeLog('ERROR', 'No arduino adapter found, cannot continue');
