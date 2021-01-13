@@ -3,7 +3,7 @@ function updateRelays()
   global ardStruct;
 
   changed = setArdPin(ardStruct.ard, ardStruct.outPin, adapterStruct.out, 'Relay OFF/OUT');
-  changed |= setArdPin(ardStruct.ard, ardStruct.calibLPFPin, adapterStruct.calibLPF, 'Relay VD/LPF');
+  changed |= setArdPin(ardStruct.ard, ardStruct.vdLpfPin, adapterStruct.vdLpf, 'Relay VD/LPF');
   changed |= setArdPin(ardStruct.ard, ardStruct.inPin, adapterStruct.in, 'Relay CALIB/IN');
 
   % LPF1 = relay off = false, LPF2 = on = true

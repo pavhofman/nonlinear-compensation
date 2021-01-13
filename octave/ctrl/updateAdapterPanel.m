@@ -16,10 +16,10 @@ function updateAdapterPanel(init = false)
   setEnabled([adapterStruct.dutInRadio, adapterStruct.calInRadio], noTasksRunning && adapterStruct.hasRelays);
 
 
-  radio = ifelse(adapterStruct.calibLPF, adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio);
+  radio = ifelse(adapterStruct.vdLpf, adapterStruct.vdLpfRadio, adapterStruct.calibVdRadio);
   switchesChanged |= setRadio(adapterStruct.calibVdlpRGroup, radio);
   % calibration VD/LPF - enabled when no tasks and switched to calibration
-  setEnabled([adapterStruct.calibLpfRadio, adapterStruct.calibVdRadio], noTasksRunning && ~adapterStruct.in && adapterStruct.hasRelays);
+  setEnabled([adapterStruct.vdLpfRadio, adapterStruct.calibVdRadio], noTasksRunning && ~adapterStruct.in && adapterStruct.hasRelays);
 
   if adapterStruct.has2LPFs
     radio = ifelse(adapterStruct.lpf == 1, adapterStruct.lpf1Radio, adapterStruct.lpf2Radio);

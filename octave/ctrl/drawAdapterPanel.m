@@ -65,7 +65,7 @@ function drawAdapterPanel(fig, x, y, width, height)
                                'selectionchangedfcn', @clbkSetVdlp,
                                'position', [calibVdlpRGroupX, 0, CALIB_VDLP_RGROUP_WIDTH, 1]);
 
-  adapterStruct.calibLpfRadio = uicontrol (adapterStruct.calibVdlpRGroup,
+  adapterStruct.vdLpfRadio = uicontrol (adapterStruct.calibVdlpRGroup,
             'style', 'radiobutton',
             'string', 'LPF',
             'units', 'normalized',
@@ -169,7 +169,7 @@ end
 function clbkSetVdlp(src, data)
   global adapterStruct;
   radio = get(src, 'selectedobject');
-  adapterStruct.calibLPF = radio == adapterStruct.calibLpfRadio;
+  adapterStruct.vdLpf = radio == adapterStruct.vdLpfRadio;
   % this control is enabled only when having relays
   updateRelays();
   updateAdapterPanel();

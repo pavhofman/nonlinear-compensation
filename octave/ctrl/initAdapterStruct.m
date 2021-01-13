@@ -42,7 +42,7 @@ function initAdapterStruct()
     % all fields
     ardStruct.ard = findArduinoOrExit();
     ardStruct.outPin = NA;
-    ardStruct.calibLPFPin = NA;
+    ardStruct.vdLpfPin = NA;
     ardStruct.inPin = NA;
     ardStruct.lpfPin = NA;
 
@@ -74,7 +74,7 @@ function initAdapterStruct()
       steppers{1} = initStepper(ardStruct.ard, 1, 6, 9, 8, 7);
       % relays pins
       ardStruct.outPin = 'D15';
-      ardStruct.calibLPFPin = 'D10';
+      ardStruct.vdLpfPin = 'D10';
       ardStruct.inPin = 'D16';
       ardStruct.lpfPin = 'D14'; % LPF 1/2
       adapterStruct.execFunc = @(title) execRelaysAdapter(title);
@@ -92,7 +92,7 @@ function initAdapterStruct()
 
       % relays pins
       ardStruct.outPin = 'D10';
-      ardStruct.calibLPFPin = 'D14';
+      ardStruct.vdLpfPin = 'D14';
       ardStruct.inPin = 'D15';
       ardStruct.lpfPin = 'D16'; % LPF 1/2
       ardStruct.vdPin = 'D18'; % VD1/2

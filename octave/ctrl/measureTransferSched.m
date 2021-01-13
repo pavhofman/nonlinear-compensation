@@ -126,7 +126,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         % OUT must be off because the task will generate auxiliary signals
         % adapterStruct.out = false; % OUT off
         adapterStruct.in = false; % CALIB IN
-        adapterStruct.calibLPF = true; % LPF
+        adapterStruct.vdLpf = true; % LPF
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for LPF measurement with output channel %d and input channel %d', PLAY_CH_ID, ANALYSED_CH_ID),
@@ -236,7 +236,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
 
         % adapterStruct.out = false;
         adapterStruct.in = false; % CALIB
-        adapterStruct.calibLPF = false; % VD
+        adapterStruct.vdLpf = false; % VD
         % LPF + transfer measurement - VD for splitting
         adapterStruct.vd = adapterStruct.vdForSplitting;
         adapterStruct.reqLevels = lpFundAmpl;

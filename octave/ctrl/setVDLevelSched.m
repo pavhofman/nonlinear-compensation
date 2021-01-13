@@ -25,7 +25,7 @@ function result = setVDLevelSched(label = 1)
         keepInOutSwitches();
 
         adapterStruct.in = false; % CALIB IN
-        adapterStruct.calibLPF = false; % VD
+        adapterStruct.vdLpf = false; % VD
         % VD as currently selected
 
         % adapterStruct.reqLevels already set from the txt input

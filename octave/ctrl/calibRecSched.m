@@ -69,7 +69,7 @@ function result = calibRecSched(label, steps, schedFilename, name)
 
         % OUT unchanged
         adapterStruct.in = false; % CALIB IN
-        adapterStruct.calibLPF = false; % VD
+        adapterStruct.vdLpf = false; % VD
         % VD for input level
         adapterStruct.vd = adapterStruct.vdForInput;
 
