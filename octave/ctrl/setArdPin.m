@@ -1,5 +1,10 @@
 % setting pin  e.g. 'D5' to status (0, 1). Param name used for loggging, at level logLevel
 function changed = setArdPin(ard, pin, status, name, logLevel='DEBUG')
+  if isna(pin)
+    changed = false;
+    return;
+  end
+
   % empty matrix [pin1, status1; pin2, status2]
   persistent statuses = struct();
 
