@@ -44,21 +44,29 @@ cmdFileRec = getFilePath(CMD_FILE_REC, commDir);
 global cmdFilePlay;
 cmdFilePlay = getFilePath(CMD_FILE_PLAY, commDir);
 
-global POS_X = 100;
-global POS_Y = 100;
+global POS_X;
+POS_X = 100;
+global POS_Y;
+POS_Y = 100;
 
-global WIDTH = 1000;
-global HEIGHT = 600;
+global WIDTH;
+WIDTH = 1000;
+global HEIGHT;
+HEIGHT = 600;
 
 
-global DIR_PANEL_REL_WIDTH = 0.5;
+global DIR_PANEL_REL_WIDTH;
+DIR_PANEL_REL_WIDTH = 0.5;
 
-global CH_DISTANCE_X = 0.3
+global CH_DISTANCE_X;
+CH_DISTANCE_X = 0.3;
 
 global doQuit;
 doQuit = false;
 
-global ABORT = -1;
+global ABORT;
+ABORT = -1;
+
 % list of currently running task functions
 global taskFNames;
 taskFNames = {};
