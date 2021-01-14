@@ -27,6 +27,8 @@ function initAdapterStruct()
   adapterStruct.abortFunc = @() emptyFunc();
   adapterStruct.updateIOFunc = @(recInfo, playInfo) emptyFunc();
 
+  adapterStruct.defaultOut = false;
+
   global ardStruct;
   ardStruct = struct();
   % all fields
@@ -141,6 +143,8 @@ function initAdapterStruct()
         % 2 steppers VD1/VD2: VD1 for +line in DAC/ADC levels @BAL and DAC level @SE,
         % VD2 for -line in DAC/ADC levels @BAL and ADC level @SE
         adapterStruct.has2VDs = true;
+        % no OUT relay, always ON
+        adapterStruct.defaultOut = true;
 
         % initial mode - SE for now
         adapterStruct.modeSE = true;
@@ -164,6 +168,8 @@ function initAdapterStruct()
 
     end % stepper adapter type
   end % adapter has arduino
+  adapterStruct.out = adapterStruct.defaultOut;
+
 end
 
 function updateNoArduinoAdapterPanel(title)

@@ -21,7 +21,7 @@ function resetAdapterStruct(recoverInOut = true)
     adapterStruct.prevOut(end) = [];
   else
     % default
-    adapterStruct.out = false; % OUT OFF
+    adapterStruct.out = adapterStruct.defaultOut;
   end
 
   if recoverInOut &&  ~isempty(adapterStruct.prevIn)
