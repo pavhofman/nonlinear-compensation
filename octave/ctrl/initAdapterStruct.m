@@ -15,6 +15,8 @@ function initAdapterStruct()
   adapterStruct.vd = 1; % 1 = VD1, 2 = VD2 if has2VDs
   adapterStruct.vdForSplitting = 1;
   adapterStruct.vdForInput = 1;
+  % by default adapters are SE
+  adapterStruct.modeSE = true;
 
   adapterStruct.hasRelays = false;
   adapterStruct.hasStepper = false;
@@ -24,6 +26,19 @@ function initAdapterStruct()
   adapterStruct.checkFunc = @(recInfo, playInfo, nextLabel, abortLabel, errorLabel, schedTask) emptyFunc();
   adapterStruct.abortFunc = @() emptyFunc();
   adapterStruct.updateIOFunc = @(recInfo, playInfo) emptyFunc();
+
+  global ardStruct;
+  ardStruct = struct();
+  % all fields
+  ardStruct.ard = NA;
+  ardStruct.outPin = NA;
+  ardStruct.vdLpfPin = NA;
+  ardStruct.inPin = NA;
+  ardStruct.lpfPin = NA;
+  ardStruct.balSePin = NA; % OFF = Bal, ON = SE (corresponds to adapterStruct.modeSE)
+  ardStruct.groundPlusPin = NA; % ON = OUT plus line grounded
+  ardStruct.groundMinusPin = NA; % ON = OUT minus line grounded
+
 
   if ~adapterHasArduino
     % switches as well as VD are manually operated - displaying only info window
@@ -37,14 +52,7 @@ function initAdapterStruct()
     adapterStruct.abortFunc = @() abortAdapterPanel();
   else
     % all other adapter types with arduino/at least one stepper
-    global ardStruct;
-    ardStruct = struct();
-    % all fields
     ardStruct.ard = findArduinoOrExit();
-    ardStruct.outPin = NA;
-    ardStruct.vdLpfPin = NA;
-    ardStruct.inPin = NA;
-    ardStruct.lpfPin = NA;
 
     global steppers;
     steppers = cell();
@@ -127,6 +135,32 @@ function initAdapterStruct()
 
       adapterStruct.execFunc = @(title) execRelaysAdapter(title);
       adapterStruct.updateIOFunc = @(recInfo, playInfo) updateLedsAndSwitch(recInfo, playInfo);
+    elseif strcmp(firmware, 'CleanSine-bal')
+        % relays, 1 LPF, bal/SE
+        adapterStruct.hasRelays = true;
+        % 2 steppers VD1/VD2: VD1 for +line in DAC/ADC levels @BAL and DAC level @SE,
+        % VD2 for -line in DAC/ADC levels @BAL and ADC level @SE
+        adapterStruct.has2VDs = true;
+
+        % initial mode - SE for now
+        adapterStruct.modeSE = true;
+
+        % second VD used for calibration at input level - for SE mode!
+        adapterStruct.vdForSplitting = 1;
+        adapterStruct.vdForInput = 2;
+        steppers{1} = initStepper(ardStruct.ard, 1, 6, 19, 8, 7);
+        steppers{2} = initStepper(ardStruct.ard, 2, 2, 5, 4, 3);
+
+        % relays pins
+        ardStruct.vdLpfPin = 'D10';
+        ardStruct.inPin = 'D14';
+        ardStruct.vdPin = 'A0'; % VD1/2
+        ardStruct.balSePin = 'A2'; % OFF = Bal, ON = SE
+        ardStruct.groundPlusPin = 'D15'; % ON = OUT +line grounded
+        ardStruct.groundMinusPin = 'D16'; % ON = OUT -line grounded
+
+        % LEDs, switches - not supported for now
+        adapterStruct.execFunc = @(title) execRelaysAdapter(title);
 
     end % stepper adapter type
   end % adapter has arduino
