@@ -170,6 +170,10 @@ function initAdapterStruct()
   end % adapter has arduino
   adapterStruct.out = adapterStruct.defaultOut;
 
+  % initial setting relays if needed
+  updateRelays();
+
+
 end
 
 function updateNoArduinoAdapterPanel(title)
