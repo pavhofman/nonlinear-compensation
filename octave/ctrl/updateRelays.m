@@ -12,6 +12,9 @@ function updateRelays()
   % VD1 = relay off = false, VD2 = on = true
   changed |= setArdPin(ardStruct.ard, ardStruct.vdPin,  adapterStruct.vd == 2, 'Relay VD1/VD2');
 
+  % BAL = relay off, SE = relay on
+  changed |= setArdPin(ardStruct.ard, ardStruct.balSePin,  adapterStruct.modeSE, 'Relay BAL/SE');
+
   % switches are set now
   adapterStruct.switchesSet = true;
   % flag for change
