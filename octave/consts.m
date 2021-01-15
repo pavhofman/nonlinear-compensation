@@ -154,18 +154,6 @@ global MODE_DUAL_SE = 1;
 % dual/balanced/separate L, R
 global MODE_DUAL_BAL = 2;
 
-% id of channel to keep in MODE_VIRT_BAL and MODE_SINGLE
-% LEFT
-global KEEP_CHANNEL_ID = 1;
-
-% balanced - PLAY: L = -R(equalized), R = R
-%            REC: R = R - L(equalized)/2, L = R - L(equalized)/2
-global MODE_VIRT_BAL = 3;
-% single channel - PLAY: KEEP_CHANNEL_ID = KEEP_CHANNEL_ID, the other chan = 0
-%                  REC: KEEP_CHANNEL_ID = KEEP_CHANNEL_ID - the other, the other chan = KEEP_CHANNEL_ID - the other
-global MODE_SINGLE = 4;
-
-
 global showFFTCfg = struct();
 showFFTCfg.fig = NA;
 showFFTCfg.enabled = false;
@@ -248,8 +236,8 @@ global MAX_FREQ_DIFF_DECIMALS = 2;
 
 
 % ID of output channel used for split calibration
-% the most logical setting is using the same channel as in MODE_SINGLE and MODE_BALANCED
-global PLAY_CH_ID = KEEP_CHANNEL_ID;
+% LEFT
+global PLAY_CH_ID = 1;
 
 % analysed input ch goes through LPF or VD, the other input channel is direct
 % LEFT

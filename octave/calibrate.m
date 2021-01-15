@@ -19,7 +19,6 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
   global FAILING_RESULT;
   global RUNNING_OK_RESULT;
   
-  global MODE_SINGLE;
   global INTEGER_FS_FFT_MULTIPLE;
   
   persistent correctRunsCounter = zeros(channelCnt, 1);
@@ -168,7 +167,7 @@ function [result, lastRunID, lastCorrectRunsCounter, msg] = calibrate(calBuffer,
       end
     end
     
-    if chMode ~= MODE_SINGLE && channelCnt >= 2
+    if channelCnt >= 2
       % at least two channels, we can measure/store avg. fund phase theOtherChID vs. ANALYSED_CH_ID
       avgPhaseDiffs = detAveragePhaseDiffs(allFundPeaks);
     else
