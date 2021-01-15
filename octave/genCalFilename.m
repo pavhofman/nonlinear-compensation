@@ -10,10 +10,10 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
   freqsPart = '';
   for i = 1:length(freqs)
     % for now rounding freqs to int value
-    freqsPart = [freqsPart,  int2str(round(freqs(i))), '_'];
+    freqsPart = sprintf('%s%d_', freqsPart,  round(freqs(i)));
   end
   
-  filename = ['cal_' freqsPart 'FS' int2str(fs)];
+  filename = sprintf('cal_%sFS%d', freqsPart, fs);
   
   % wrap single-device devSpecs
   if rows(devSpecs) == 1
@@ -21,19 +21,18 @@ function [filename, devSpecs] = genCalFilename(freqs, fs, compType, playChannelI
   end
   for id = 1:rows(devSpecs)
     devSpec = devSpecs{id};
-    filename = [filename '_' devSpec{1} '_CH' int2str(devSpec{2})];
+    filename = sprintf('%s_%s_CH%d', filename, devSpec{1}, devSpec{2});
   end
   
-  %% TODO - for now ignoring chMode in calfile names (the current implementation is incorrect)
   % adding channel mode
-  %filename = [filename '_M' num2str(chMode)];
+  filename = sprintf('%s_M%d', filename, chMode);
 
   if length(extraCircuit) > 0
-    filename = [filename '_' extraCircuit];
+    filename = sprintf('%s_%s', filename, extraCircuit);
   end
   
   % suffix
-  filename = [filename '.dat'];
+  filename = sprintf('%s.dat', filename);
 
   filename = getFilePath(filename, dataDir);
 end
@@ -71,12 +70,12 @@ end
 %! channelID = 1;
 %! chMode = 1;
 %! extraCircuit = 'filter1';
-%! expected = '/tmp/cal_1000_2000_FS48000_play8_CH2_rec8_CH1_filter1.dat';
+%! expected = '/tmp/cal_1000_2000_FS48000_play8_CH2_rec8_CH1_M1_filter1.dat';
 %! assert(expected, genCalFilename(freqs, fs, compType, playChannelID, channelID, 'play8', 'rec8', chMode, extraCircuit));
 %!
 %! compType = COMP_TYPE_REC_SIDE;
 %! playChannelID = NA;
 %! channelID = 1;
 %! extraCircuit = '';
-%! expected = '/tmp/cal_1000_2000_FS48000_rec8_CH1.dat';
+%! expected = '/tmp/cal_1000_2000_FS48000_rec8_CH1_M1.dat';
 %! assert(expected, genCalFilename(freqs, fs, compType, playChannelID, channelID, '', 'rec8', chMode, extraCircuit));
