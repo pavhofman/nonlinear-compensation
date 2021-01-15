@@ -19,7 +19,7 @@ function [x, yc, nfft] = computeFFT(samples, fftLength, window_name = 'rect')
           [data, winweight] = applyWindow(data, flattopwin(nfft));
       otherwise
           error(sprintf('unknown window %s\n', window_name));
-  endswitch
+  end
   nffto2 = (nfft / 2) + 1;
   x = double(fftLength/2) * linspace(0, 1, nffto2);
   yc = fft(data)(1:nffto2, :) / (nffto2 * winweight);

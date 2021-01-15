@@ -61,5 +61,5 @@ function infoStruct = addStatusDetails(status, infoStruct)
       global distortHarmAmpls;
       infoStruct.distortHarmAmpls = distortHarmAmpls;
       
-  endswitch
+  end
 end

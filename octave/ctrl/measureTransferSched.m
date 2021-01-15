@@ -194,7 +194,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               
               label = CAL_LP_LABEL;
               continue;
-            endswitch              
+            end
         end % LPF freqs
         label = GEN_ORIG_F;
         continue;
@@ -303,7 +303,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               ++freqID;
               label = CAL_VD_LABEL;
               continue;
-          endswitch
+          end
           
         end
         label = ALL_OFF_LABEL;
@@ -363,7 +363,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         result = false;
         break;
         
-    endswitch
+    end
   end
 
   removeTask(mfilename(), NAME);

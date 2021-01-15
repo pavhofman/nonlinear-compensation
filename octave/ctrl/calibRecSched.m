@@ -168,7 +168,7 @@ function result = calibRecSched(label, steps, schedFilename, name)
         errordlg(msg);
         result = false;
         break;        
-    endswitch
+    end
   end
   
   % just in case the task was aborted with calib plot zoomed in

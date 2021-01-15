@@ -117,7 +117,7 @@ function statusToShow = getStatusToShow(status, infoStruct)
         
       case CALIBRATING
         statusToShow = [statusToShow ' ' getCompTypeStr(infoStruct.calRequest)];
-    endswitch
+    end
 end
 
 function typeStr = getCompTypeStr(compRequest)
@@ -134,7 +134,7 @@ function typeStr = getCompTypeStr(compRequest)
     
     case COMP_TYPE_REC_SIDE
       typeStr = 'Only Capture';
-  endswitch
+  end
   
   if ~isempty(compRequest.extraCircuit)
     typeStr = [typeStr ' (' compRequest.extraCircuit ')'];
@@ -245,7 +245,7 @@ function details = addDetails(channelID, status, infoStruct, details)
         end
       end
 
-  endswitch
+  end
   
 end
 

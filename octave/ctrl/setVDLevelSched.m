@@ -69,7 +69,7 @@ function result = setVDLevelSched(label = 1)
         errordlg(msg);
         result = false;
         break;        
-    endswitch
+    end
   end
 
   removeTask(mfilename(), NAME);

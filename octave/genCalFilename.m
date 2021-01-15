@@ -50,7 +50,7 @@ function devSpecs = createCalFileDevSpecs(compType, playChannelID, channelID, pl
       devSpecs = {playCalDevName, channelID};
     case COMP_TYPE_REC_SIDE
       devSpecs = {recCalDevName, channelID};
-  endswitch
+  end
 end
 
 

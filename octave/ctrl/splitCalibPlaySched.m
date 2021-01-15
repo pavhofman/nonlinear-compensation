@@ -288,7 +288,7 @@ function result = splitCalibPlaySched(label = 1)
         errordlg(msg);
         result = false;
         break;        
-    endswitch
+    end
   end
   
   % just in case the task was aborted with calib plot zoomed in
