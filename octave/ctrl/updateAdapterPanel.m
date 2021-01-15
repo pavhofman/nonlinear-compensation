@@ -33,7 +33,7 @@ function updateAdapterPanel(init = false)
   setEnabled(adapterStruct.vdLevel, noTasksRunning);
 
   % 2 VDs switchable only in SE mode
-  if adapterStruct.has2VDs && adapterStruct.modeSE
+  if adapterStruct.has2VDs && adapterStruct.isSE
     radio = ifelse(adapterStruct.vd == 1, adapterStruct.vd1Radio, adapterStruct.vd2Radio);
     switchesChanged |= setRadio(adapterStruct.vdRGroup, radio);
     % VD1/2 - enabled when no tasks

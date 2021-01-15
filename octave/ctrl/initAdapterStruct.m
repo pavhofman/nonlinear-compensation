@@ -15,8 +15,9 @@ function initAdapterStruct()
   adapterStruct.vd = 1; % 1 = VD1, 2 = VD2 if has2VDs
   adapterStruct.vdForSplitting = 1;
   adapterStruct.vdForInput = 1;
-  % by default adapters are SE
-  adapterStruct.modeSE = true;
+  global chMode;
+  global MODE_DUAL_SE;
+  adapterStruct.isSE = (chMode == MODE_DUAL_SE);
 
   adapterStruct.hasRelays = false;
   adapterStruct.hasStepper = false;
@@ -30,6 +31,7 @@ function initAdapterStruct()
   adapterStruct.defaultOut = false;
 
   global ardStruct;
+
   ardStruct = struct();
   % all fields
   ardStruct.ard = NA;
@@ -37,7 +39,7 @@ function initAdapterStruct()
   ardStruct.vdLpfPin = NA;
   ardStruct.inPin = NA;
   ardStruct.lpfPin = NA;
-  ardStruct.balSePin = NA; % OFF = Bal, ON = SE (corresponds to adapterStruct.modeSE)
+  ardStruct.balSePin = NA; % OFF = Bal, ON = SE (corresponds to adapterStruct.isSE)
   ardStruct.groundPlusPin = NA; % ON = OUT plus line grounded
   ardStruct.groundMinusPin = NA; % ON = OUT minus line grounded
 
@@ -145,9 +147,6 @@ function initAdapterStruct()
         adapterStruct.has2VDs = true;
         % no OUT relay, always ON
         adapterStruct.defaultOut = true;
-
-        % initial mode - SE for now
-        adapterStruct.modeSE = true;
 
         % second VD used for calibration at input level - for SE mode!
         adapterStruct.vdForSplitting = 1;

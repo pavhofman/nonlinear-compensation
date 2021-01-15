@@ -124,14 +124,14 @@ function drawAdapterPanel(fig, x, y, width, height)
   adapterStruct.vdRGroup = uibuttongroup (ctrlPanel ,
                                'units', 'normalized',
                                'selectionchangedfcn', @clbkSetVd,
-                               'visible', ifelse(adapterStruct.has2VDs && adapterStruct.modeSE, 'on', 'off'),
+                               'visible', ifelse(adapterStruct.has2VDs && adapterStruct.isSE, 'on', 'off'),
                                'position', [vdRGroupX, 0, VD_RGROUP_WIDTH, 1]);
 
   adapterStruct.vd1Radio = uicontrol (adapterStruct.vdRGroup,
             'style', 'radiobutton',
             'string', 'VD1',
             'units', 'normalized',
-            'visible', ifelse(adapterStruct.has2VDs && adapterStruct.modeSE, 'on', 'off'),
+            'visible', ifelse(adapterStruct.has2VDs && adapterStruct.isSE, 'on', 'off'),
             'enable', ifelse(isna(ardStruct.vdPin), 'off', 'on'),
             'Position', [0, 0, 0.5, 1]);
 
@@ -139,7 +139,7 @@ function drawAdapterPanel(fig, x, y, width, height)
             'style', 'radiobutton',
             'string', 'VD2',
             'units', 'normalized',
-            'visible', ifelse(adapterStruct.has2VDs && adapterStruct.modeSE, 'on', 'off'),
+            'visible', ifelse(adapterStruct.has2VDs && adapterStruct.isSE, 'on', 'off'),
             'enable', ifelse(isna(ardStruct.vdPin), 'off', 'on'),
             'Position', [0.5, 0, 0.5, 1]);
 

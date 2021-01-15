@@ -148,11 +148,14 @@ global COMP_TYPE_PLAY_SIDE = 1;
 global COMP_TYPE_REC_SIDE = 2;
 
 % operation modes
-% values = index of corresponding radio buttons in CTRL!
 % dual/unbalanced/separate L, R
 global MODE_DUAL_SE = 1;
 % dual/balanced/separate L, R
+% only balanced adapter supports this mode!
 global MODE_DUAL_BAL = 2;
+
+% default mode
+global chMode = MODE_DUAL_SE;
 
 global showFFTCfg = struct();
 showFFTCfg.fig = NA;
@@ -202,9 +205,6 @@ global FILE_CHAN_LIST = [];
 useZeroMQ = true;
 
 global MIN_LOG_LEVEL = 'DEBUG';
-
-% default mode
-global chMode = MODE_DUAL_SE;
 
 % calibration runs for averaging
 global CAL_RUNS = 15;
