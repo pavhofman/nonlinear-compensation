@@ -2,8 +2,8 @@ if (strcmp(cmd{1}, PAUSE))
   setStatus(PAUSED);
   
 elseif (strcmp(cmd{1}, SET_MODE))
-  % default = MODE_DUAL
-  chMode = findNumInCmd(cmd, CMD_MODE_PREFIX, MODE_DUAL);
+  % default = MODE_DUAL_SE
+  chMode = findNumInCmd(cmd, CMD_MODE_PREFIX, MODE_DUAL_SE);
   writeLog('INFO', 'Switched to mode %d', chMode);
 
   % calfiles are specific for each mode - reloading at change

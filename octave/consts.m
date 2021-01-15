@@ -150,16 +150,16 @@ global COMP_TYPE_REC_SIDE = 2;
 % operation modes
 % values = index of corresponding radio buttons in CTRL!
 % dual/unbalanced/separate L, R
-global MODE_DUAL = 1;
-% id of channel to keep in MODE_BAL and MODE_SINGLE
+global MODE_DUAL_SE = 1;
+% id of channel to keep in MODE_VIRT_BAL and MODE_SINGLE
 % LEFT
 global KEEP_CHANNEL_ID = 1;
 
 % balanced - PLAY: L = -R(equalized), R = R
 %            REC: R = R - L(equalized)/2, L = R - L(equalized)/2
-global MODE_BAL = 2;
-% single channel - PLAY: L = 0, R = R
-%                  REC: R = R - L, L = R - L
+global MODE_VIRT_BAL = 2;
+% single channel - PLAY: KEEP_CHANNEL_ID = KEEP_CHANNEL_ID, the other chan = 0
+%                  REC: KEEP_CHANNEL_ID = KEEP_CHANNEL_ID - the other, the other chan = KEEP_CHANNEL_ID - the other
 global MODE_SINGLE = 3;
 
 
@@ -213,7 +213,7 @@ useZeroMQ = true;
 global MIN_LOG_LEVEL = 'DEBUG';
 
 % default mode
-global chMode = MODE_DUAL;
+global chMode = MODE_DUAL_SE;
 
 % calibration runs for averaging
 global CAL_RUNS = 15;

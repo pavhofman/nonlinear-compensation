@@ -35,7 +35,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
   global CMD_PLAY_AMPLS_PREFIX;
   global COMP_TYPE_JOINT;
 
-  global MODE_DUAL;
+  global MODE_DUAL_SE;
   global ABORT;
   
   % current frequency of calibration
@@ -148,8 +148,8 @@ function result = measureTransferSched(label= 1, schedTask = [])
         global SET_MODE;
         global CMD_MODE_PREFIX;
         
-        % setting MODE_DUAL on both sides
-        cmdStr = [SET_MODE ' ' CMD_MODE_PREFIX num2str(MODE_DUAL)];
+        % setting MODE_DUAL_SE on both sides
+        cmdStr = [SET_MODE ' ' CMD_MODE_PREFIX num2str(MODE_DUAL_SE)];
         cmdIDPlay = writeCmd(cmdStr, cmdFilePlay);
         cmdIDRec = writeCmd(cmdStr, cmdFileRec);
         waitForCmdDone([cmdIDPlay, cmdIDRec], WAIT_FOR_LP_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
@@ -179,7 +179,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               % deleting the calib file should it exist - always clean calibration
               global recInfo;
               calFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID,
-                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL_SE, EXTRA_CIRCUIT_LP1);
               deleteFile(calFile);
 
               % safety measure - requesting calibration only at current rec freq (no level known, unfortunately)
@@ -198,7 +198,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               % removing the other channel calfile - useless
               global recInfo;
               otherCalFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID),
-                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL_SE, EXTRA_CIRCUIT_LP1);
               deleteFile(otherCalFile);
               
               % next frequency
@@ -290,7 +290,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               % deleting the calib file should it exist - always clean calibration
               global recInfo;
               calFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID,
-                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_VD);
+                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL_SE, EXTRA_CIRCUIT_VD);
               deleteFile(calFile);
 
               calCmd = sprintf("%s %s %s%d %s %s%s %s%d", CALIBRATE, calFreqReqStr, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT,
@@ -308,7 +308,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
               % removing useless calfile for the other channel
               global recInfo;
               otherCalFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID),
-                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_VD);
+                recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL_SE, EXTRA_CIRCUIT_VD);
               deleteFile(otherCalFile);
               
               % next frequency

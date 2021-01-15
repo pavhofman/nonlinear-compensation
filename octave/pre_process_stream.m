@@ -1,7 +1,7 @@
 % pre-processing samples for current mode
 if direction == DIR_PLAY
   switch chMode
-    case MODE_DUAL
+    case MODE_DUAL_SE
       % only equalizing if non-ones
       if any(find (equalizer ~= 1))
         buffer = buffer .* equalizer;
@@ -13,7 +13,7 @@ if direction == DIR_PLAY
       zeroChannelID = getTheOtherChannelID(KEEP_CHANNEL_ID);
       buffer(:, zeroChannelID) = 0;
 
-    case MODE_BAL
+    case MODE_VIRT_BAL
       % equalizing, balancing
       % inverted channel
       invChannelID = getTheOtherChannelID(KEEP_CHANNEL_ID);

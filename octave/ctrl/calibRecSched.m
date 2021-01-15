@@ -23,7 +23,7 @@ function result = calibRecSched(label, steps, schedFilename, name)
   global COMPENSATE;
   global CMD_COMP_TYPE_PREFIX;
 
-  global MODE_DUAL;
+  global MODE_DUAL_SE;
   global ABORT;
   
  
@@ -84,8 +84,8 @@ function result = calibRecSched(label, steps, schedFilename, name)
         global SET_MODE;
         global CMD_MODE_PREFIX;
         
-        % setting MODE_DUAL on both sides
-        cmdStr = [SET_MODE ' ' CMD_MODE_PREFIX num2str(MODE_DUAL)];
+        % setting MODE_DUAL_SE on both sides
+        cmdStr = [SET_MODE ' ' CMD_MODE_PREFIX num2str(MODE_DUAL_SE)];
         cmdIDPlay = writeCmd(cmdStr, cmdFilePlay);
         cmdIDRec = writeCmd(cmdStr, cmdFileRec);
         waitForCmdDone([cmdIDPlay, cmdIDRec], ADJ_LABEL, AUTO_TIMEOUT, ERROR, schedFilename);

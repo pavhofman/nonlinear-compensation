@@ -1,7 +1,7 @@
 % post-processing samples for current mode - rec side
 if direction == DIR_REC
   switch chMode
-    case MODE_DUAL
+    case MODE_DUAL_SE
       % only equalizing if non-ones
       if any(find (equalizer ~= 1))
         buffer = buffer .* equalizer;
@@ -13,7 +13,7 @@ if direction == DIR_REC
       subtractedChannelID = getTheOtherChannelID(KEEP_CHANNEL_ID);
       buffer(:, subtractedChannelID) = buffer(:, KEEP_CHANNEL_ID);
 
-    case MODE_BAL
+    case MODE_VIRT_BAL
       % equalizing, balancing
       % only equalizing if non-ones
       if any(find (equalizer ~= 1))

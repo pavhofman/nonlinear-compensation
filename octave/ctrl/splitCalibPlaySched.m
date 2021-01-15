@@ -37,7 +37,7 @@ function result = splitCalibPlaySched(label = 1)
   global COMP_TYPE_JOINT;
   global COMP_TYPE_PLAY_SIDE;
 
-  global MODE_DUAL;
+  global MODE_DUAL_SE;
   global ABORT;
   
   persistent lpFundAmpl = NA;
@@ -146,10 +146,10 @@ function result = splitCalibPlaySched(label = 1)
         % deleting the calib file should it exist - always clean calibration
         global recInfo;
         calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID,
-          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL_SE, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);
         calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID),
-          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_LP1);
+          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL_SE, EXTRA_CIRCUIT_LP1);
         deleteFile(calFile);
         
         % safety measure - requesting calibration only at curFreq
@@ -198,10 +198,10 @@ function result = splitCalibPlaySched(label = 1)
         % deleting the calib file should it exist - always clean calibration
         global recInfo;
         calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID,
-          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_VD);
+          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL_SE, EXTRA_CIRCUIT_VD);
         deleteFile(calFile);
         calFile = genCalFilename(origRecFreq, fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID),
-          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL, EXTRA_CIRCUIT_VD);
+          recInfo.playCalDevName, recInfo.recCalDevName, MODE_DUAL_SE, EXTRA_CIRCUIT_VD);
         deleteFile(calFile);
 
         calCmd = [CALIBRATE ' ' calFreqReqStr  ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_VD];
@@ -220,7 +220,7 @@ function result = splitCalibPlaySched(label = 1)
         global playInfo;
         % split-calibration supports incremental mode on playback side
         playDistortPeaksCh = playInfo.distortPeaks{PLAY_CH_ID};
-        calculateSplitCal(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1, recInfo.nonInteger, playDistortPeaksCh);
+        calculateSplitCal(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, MODE_DUAL_SE, EXTRA_CIRCUIT_VD, EXTRA_CIRCUIT_LP1, recInfo.nonInteger, playDistortPeaksCh);
 
         % going to the next label. This could be processed in one label, but separating split calibration from play-side compensation makes the code cleaner
         label = COMP_PLAY_LABEL;
