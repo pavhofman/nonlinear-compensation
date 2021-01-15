@@ -151,16 +151,19 @@ global COMP_TYPE_REC_SIDE = 2;
 % values = index of corresponding radio buttons in CTRL!
 % dual/unbalanced/separate L, R
 global MODE_DUAL_SE = 1;
+% dual/balanced/separate L, R
+global MODE_DUAL_BAL = 2;
+
 % id of channel to keep in MODE_VIRT_BAL and MODE_SINGLE
 % LEFT
 global KEEP_CHANNEL_ID = 1;
 
 % balanced - PLAY: L = -R(equalized), R = R
 %            REC: R = R - L(equalized)/2, L = R - L(equalized)/2
-global MODE_VIRT_BAL = 2;
+global MODE_VIRT_BAL = 3;
 % single channel - PLAY: KEEP_CHANNEL_ID = KEEP_CHANNEL_ID, the other chan = 0
 %                  REC: KEEP_CHANNEL_ID = KEEP_CHANNEL_ID - the other, the other chan = KEEP_CHANNEL_ID - the other
-global MODE_SINGLE = 3;
+global MODE_SINGLE = 4;
 
 
 global showFFTCfg = struct();

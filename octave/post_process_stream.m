@@ -1,7 +1,7 @@
 % post-processing samples for current mode - rec side
 if direction == DIR_REC
   switch chMode
-    case MODE_DUAL_SE
+    case {MODE_DUAL_SE, MODE_DUAL_BAL}
       % only equalizing if non-ones
       if any(find (equalizer ~= 1))
         buffer = buffer .* equalizer;
