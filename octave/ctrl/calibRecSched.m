@@ -6,7 +6,7 @@
 function result = calibRecSched(label, steps, schedFilename, name)
   result = NA;
   % init section
-  [CHECKING_LABEL, START_LABEL, MODE_LABEL, ADJ_LABEL, CAL_LABEL,...
+  [CHECKING_LABEL, START_LABEL, ADJ_LABEL, CAL_LABEL,...
       COMP_REC_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
 
   persistent AUTO_TIMEOUT = 10;
@@ -22,8 +22,6 @@ function result = calibRecSched(label, steps, schedFilename, name)
   global CALIBRATE;
   global COMPENSATE;
   global CMD_COMP_TYPE_PREFIX;
-
-  global MODE_DUAL_SE;
   global ABORT;
   
  
@@ -76,21 +74,8 @@ function result = calibRecSched(label, steps, schedFilename, name)
         adapterStruct.reqLevels = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for CH%d calibration through VD', ANALYSED_CH_ID),
-          adapterStruct, MODE_LABEL, ABORT, ERROR, schedFilename);
+          adapterStruct, ADJ_LABEL, ABORT, ERROR, schedFilename);
         return;
-
-      case MODE_LABEL
-        
-        global SET_MODE;
-        global CMD_MODE_PREFIX;
-        
-        % setting MODE_DUAL_SE on both sides
-        cmdStr = [SET_MODE ' ' CMD_MODE_PREFIX num2str(MODE_DUAL_SE)];
-        cmdIDPlay = writeCmd(cmdStr, cmdFilePlay);
-        cmdIDRec = writeCmd(cmdStr, cmdFileRec);
-        waitForCmdDone([cmdIDPlay, cmdIDRec], ADJ_LABEL, AUTO_TIMEOUT, ERROR, schedFilename);
-        return;
-        
 
       case ADJ_LABEL
         % params for this step
