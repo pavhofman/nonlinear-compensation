@@ -155,7 +155,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         return;
         
       case {CAL_LP_LABEL, CAL_LP_FINISHED_LABEL}
-        % calibrating LPF connection at freq harmonics
+        % calibrating LPF path at freq harmonics
         while freqID <= length(playFreqs)
           switch label
             case CAL_LP_LABEL
@@ -170,7 +170,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
                 recInfo.playCalDevName, recInfo.recCalDevName, chMode, EXTRA_CIRCUIT_LP1);
               deleteFile(calFile);
 
-              % safety measure - requesting calibration only at current rec freq (no level known, unfortunately)
+              % safety measure - requesting calibration only at current rec freq
               calFreqReqStr = getCalFreqReqStr({[recFreqs(freqID), NA, NA]});
               calCmd = sprintf("%s %s %s%d %s %s%s %s%d", CALIBRATE, calFreqReqStr, CMD_COMP_TYPE_PREFIX, COMP_TYPE_JOINT,
                 getMatrixCellsToCmdStr(playLevels, CMD_PLAY_AMPLS_PREFIX), CMD_EXTRA_CIRCUIT_PREFIX, EXTRA_CIRCUIT_LP1, CMD_CALRUNS_PREFIX, TRANSF_CAL_RUNS);
@@ -238,7 +238,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
       case GEN_LABEL
         printStr(sprintf("Joint-device calibrating VD at all harmonic frequencies of %dHz:", recFreqs(freqID)));
 
-        % Now switched to VD + mode. We start the generator at first freq and wait for all the changes topropagate through the chain. 1 sec should be enough
+        % Now switched to VD + mode. We start the generator at first freq and wait for all the changes to propagate through the chain. 1 sec should be enough
         % The reason for waiting is if no freq change occured and it takes too long for the new playLevels amplitude to propagate, calibration will finish at the old levels of DUT, not of the measured transfer.
         if ~isempty(playFreqs)
           printStr(sprintf("Generating %dHz", playFreqs(1)));
@@ -250,7 +250,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         return;
 
       case {CAL_VD_LABEL, CAL_VD_FINISHED_LABEL}
-        % calibrating LPF connection at freq harmonics
+        % calibrating VD path at freq harmonics
         while freqID <= length(playFreqs)
           switch label
             case CAL_VD_LABEL
