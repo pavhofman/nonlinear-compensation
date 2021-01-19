@@ -31,7 +31,7 @@ function drawAdapterPanel(fig, x, y, width, height)
                              'string', 'OUT DUT',
                              'value', 0,
                              'verticalalignment', 'middle',
-                             'enable', ifelse(isna(ardStruct.outPin), 'off', 'on'),
+                             'enable', ifelse(isempty(ardStruct.outPin), 'off', 'on'),
                              'callback', @clbkSetOut,
                              'position', [0, 0, OUT_CHCKBX_WIDTH, 1]);
 
@@ -47,7 +47,7 @@ function drawAdapterPanel(fig, x, y, width, height)
             'style', 'radiobutton',
             'string', 'IN DUT',
             'units', 'normalized',
-            'enable', ifelse(isna(ardStruct.inPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.inPin), 'off', 'on'),
             'Position', [0, 0, 0.5, 1]);
 
 
@@ -55,7 +55,7 @@ function drawAdapterPanel(fig, x, y, width, height)
             'style', 'radiobutton',
             'string', 'IN Calib',
             'units', 'normalized',
-            'enable', ifelse(isna(ardStruct.inPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.inPin), 'off', 'on'),
             'Position', [0.5, 0, 0.5, 1]);
 
 
@@ -70,14 +70,14 @@ function drawAdapterPanel(fig, x, y, width, height)
             'style', 'radiobutton',
             'string', 'LPF',
             'units', 'normalized',
-            'enable', ifelse(isna(ardStruct.vdLpfPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.vdLpfPin), 'off', 'on'),
             'Position', [0, 0, 0.5, 1]);
 
   adapterStruct.calibVdRadio = uicontrol (adapterStruct.calibVdlpRGroup,
             'style', 'radiobutton',
             'string', 'VD',
             'units', 'normalized',
-            'enable', ifelse(isna(ardStruct.vdLpfPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.vdLpfPin), 'off', 'on'),
             'Position', [0.5, 0, 0.5, 1]);
 
 
@@ -108,7 +108,7 @@ function drawAdapterPanel(fig, x, y, width, height)
             'string', 'LPF1',
             'units', 'normalized',
             'visible', ifelse(adapterStruct.has2LPFs, 'on', 'off'),
-            'enable', ifelse(isna(ardStruct.lpfPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.lpfPin), 'off', 'on'),
             'Position', [0, 0, 0.5, 1]);
 
   adapterStruct.lpf2Radio = uicontrol (adapterStruct.lpfRGroup,
@@ -116,7 +116,7 @@ function drawAdapterPanel(fig, x, y, width, height)
             'string', 'LPF2',
             'units', 'normalized',
             'visible', ifelse(adapterStruct.has2LPFs, 'on', 'off'),
-            'enable', ifelse(isna(ardStruct.lpfPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.lpfPin), 'off', 'on'),
             'Position', [0.5, 0, 0.5, 1]);
 
   VD_RGROUP_WIDTH = 0.15;
@@ -132,7 +132,7 @@ function drawAdapterPanel(fig, x, y, width, height)
             'string', 'VD1',
             'units', 'normalized',
             'visible', ifelse(adapterStruct.has2VDs && adapterStruct.isSE, 'on', 'off'),
-            'enable', ifelse(isna(ardStruct.vdPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.vdPin), 'off', 'on'),
             'Position', [0, 0, 0.5, 1]);
 
   adapterStruct.vd2Radio = uicontrol (adapterStruct.vdRGroup,
@@ -140,7 +140,7 @@ function drawAdapterPanel(fig, x, y, width, height)
             'string', 'VD2',
             'units', 'normalized',
             'visible', ifelse(adapterStruct.has2VDs && adapterStruct.isSE, 'on', 'off'),
-            'enable', ifelse(isna(ardStruct.vdPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.vdPin), 'off', 'on'),
             'Position', [0.5, 0, 0.5, 1]);
 
   BTN_WIDTH = 0.05;

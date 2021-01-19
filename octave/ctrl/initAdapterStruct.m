@@ -4,8 +4,6 @@ function initAdapterStruct()
   global adapterStruct;
   adapterStruct = struct();
 
-  resetAdapterStruct();
-
   % all fields (defaults)
   adapterStruct.has2VDs = false;
   adapterStruct.has2LPFs = false;
@@ -30,18 +28,19 @@ function initAdapterStruct()
 
   adapterStruct.defaultOut = false;
 
-  global ardStruct;
+  resetAdapterStruct();
 
+  global ardStruct;
   ardStruct = struct();
   % all fields
-  ardStruct.ard = NA;
-  ardStruct.outPin = NA;
-  ardStruct.vdLpfPin = NA;
-  ardStruct.inPin = NA;
-  ardStruct.lpfPin = NA;
-  ardStruct.balSePin = NA; % OFF = Bal, ON = SE (corresponds to adapterStruct.isSE)
-  ardStruct.groundPlusPin = NA; % ON = OUT plus line grounded
-  ardStruct.groundMinusPin = NA; % ON = OUT minus line grounded
+  ardStruct.ard = struct();
+  ardStruct.outPin = '';
+  ardStruct.vdLpfPin = '';
+  ardStruct.inPin = '';
+  ardStruct.lpfPin = '';
+  ardStruct.balSePin = ''; % OFF = Bal, ON = SE (corresponds to adapterStruct.isSE)
+  ardStruct.groundPlusPin = ''; % ON = OUT plus line grounded
+  ardStruct.groundMinusPin = ''; % ON = OUT minus line grounded
 
 
   if ~adapterHasArduino

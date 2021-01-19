@@ -1,6 +1,6 @@
 % setting pin  e.g. 'D5' to status (0, 1). Param name used for loggging, at level logLevel
 function changed = setArdPin(ard, pin, status, name, logLevel='DEBUG')
-  if isna(pin)
+  if isempty(pin)
     changed = false;
     return;
   end
