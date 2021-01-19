@@ -16,6 +16,9 @@ function initAdapterStruct()
   global chMode;
   global MODE_DUAL_SE;
   adapterStruct.isSE = (chMode == MODE_DUAL_SE);
+  adapterStruct.groundPlus = false;
+  % default - SE always grounded -
+  adapterStruct.groundMinus = adapterStruct.isSE;
 
   adapterStruct.hasRelays = false;
   adapterStruct.hasStepper = false;
