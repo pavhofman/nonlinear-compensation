@@ -155,6 +155,7 @@ global MODE_DUAL_SE = 1;
 global MODE_DUAL_BAL = 2;
 
 % default mode
+% must be the same for all processes!
 global chMode = MODE_DUAL_SE;
 
 global showFFTCfg = struct();
