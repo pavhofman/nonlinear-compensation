@@ -46,8 +46,8 @@ function result = setBalVDLevelsSched(label = 1)
         adapterStruct.stepperToMove = 1;
         adapterStruct.reqVDLevel = adapterStruct.reqBalVDLevels(1);
         % grounded minus line
-        adapterStruct.groundPlus = false;
-        adapterStruct.groundMinus = true;
+        adapterStruct.gndPlus = false;
+        adapterStruct.gndMinus = true;
         waitForAdapterAdjust('Set switches for plus-line level measurement through VD1',
           adapterStruct, ADJUST_MINUS, ABORT, ERROR, mfilename());
         return;
@@ -57,8 +57,8 @@ function result = setBalVDLevelsSched(label = 1)
         adapterStruct.stepperToMove = 2;
         adapterStruct.reqVDLevel = adapterStruct.reqBalVDLevels(2);
         % grounded plus line
-        adapterStruct.groundPlus = true;
-        adapterStruct.groundMinus = false;
+        adapterStruct.gndPlus = true;
+        adapterStruct.gndMinus = false;
         waitForAdapterAdjust('Set switches for minus-line level measurement through VD2',
           adapterStruct, DONE_LABEL, ABORT, ERROR, mfilename());
         return;

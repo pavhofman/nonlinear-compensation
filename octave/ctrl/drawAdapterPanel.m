@@ -155,7 +155,7 @@ function drawAdapterPanel(fig, x, y, width, height)
             'value', 0,
             'units', 'normalized',
             'visible', ifelse(adapterStruct.isSE, 'off', 'on'),
-            'enable', ifelse(isempty(ardStruct.groundPlusPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.gndPlusPin), 'off', 'on'),
             'callback', @clbkSetGndPlus,
             'Position', [0, 0, 0.5, 1]);
 
@@ -165,7 +165,7 @@ function drawAdapterPanel(fig, x, y, width, height)
             'value', 0,
             'units', 'normalized',
             'visible', ifelse(adapterStruct.isSE, 'off', 'on'),
-            'enable', ifelse(isempty(ardStruct.groundMinusPin), 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.gndMinusPin), 'off', 'on'),
             'callback', @clbkSetGndMinus,
             'Position', [0.5, 0, 0.5, 1]);
 
@@ -195,14 +195,14 @@ end
 
 function clbkSetGndPlus(src, data)
   global adapterStruct;
-  adapterStruct.groundPlus = get(src, 'value');
+  adapterStruct.gndPlus = get(src, 'value');
   % this control is enabled only when having relays
   updateRelays();
 end
 
 function clbkSetGndMinus(src, data)
   global adapterStruct;
-  adapterStruct.groundMinus = get(src, 'value');
+  adapterStruct.gndMinus = get(src, 'value');
   % this control is enabled only when having relays
   updateRelays();
 end

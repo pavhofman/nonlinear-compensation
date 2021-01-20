@@ -39,8 +39,8 @@ function initAdapterStruct()
   ardStruct.inPin = '';
   ardStruct.lpfPin = '';
   ardStruct.balSePin = ''; % OFF = Bal, ON = SE (corresponds to adapterStruct.isSE)
-  ardStruct.groundPlusPin = ''; % ON = OUT plus line grounded
-  ardStruct.groundMinusPin = ''; % ON = OUT minus line grounded
+  ardStruct.gndPlusPin = ''; % ON = OUT plus line grounded
+  ardStruct.gndMinusPin = ''; % ON = OUT minus line grounded
 
 
   if ~adapterHasArduino
@@ -158,8 +158,8 @@ function initAdapterStruct()
         ardStruct.inPin = 'D14';
         ardStruct.vdPin = 'A0'; % VD1/2
         ardStruct.balSePin = 'A2'; % OFF = Bal, ON = SE
-        ardStruct.groundPlusPin = 'D15'; % ON = OUT +line grounded
-        ardStruct.groundMinusPin = 'D16'; % ON = OUT -line grounded
+        ardStruct.gndPlusPin = 'D15'; % ON = OUT +line grounded
+        ardStruct.gndMinusPin = 'D16'; % ON = OUT -line grounded
 
         % LEDs, switches - not supported for now
         adapterStruct.execFunc = @(title) execRelaysAdapter(title);
