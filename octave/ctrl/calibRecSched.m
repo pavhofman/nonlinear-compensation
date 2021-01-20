@@ -55,7 +55,7 @@ function result = calibRecSched(label, steps, schedFilename, name)
         % loading current values from analysis
         fs = recInfo.fs;
         origFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
-        origRecLevel = recInfo.measuredPeaks{ANALYSED_CH_ID}(:, 2);
+        origRecLevel = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 2);
 
         label = START_LABEL;
         continue;
@@ -71,7 +71,9 @@ function result = calibRecSched(label, steps, schedFilename, name)
         % VD for input level
         adapterStruct.vd = adapterStruct.vdForInput;
 
-        adapterStruct.reqLevels = []; % no stepper adjustment
+        % reqLevel: one amplitude only
+        % If empty, no stepper adjustment
+        adapterStruct.reqVDLevel = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for CH%d calibration through VD', ANALYSED_CH_ID),
           adapterStruct, ADJ_LABEL, ABORT, ERROR, schedFilename);
@@ -84,12 +86,12 @@ function result = calibRecSched(label, steps, schedFilename, name)
 
         printStr('Calibrating REC side at CH%d level - adj %f, maxAmplDiff %f', ANALYSED_CH_ID, adjustment, maxAmplDiff);
         
-        adapterStruct.reqLevels = (1 + adjustment) * origRecLevel;
+        adapterStruct.reqVDLevel = (1 + adjustment) * origRecLevel;
         % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
         adapterStruct.maxAmplDiff = maxAmplDiff * 0.9;
 
         % including mid ampl only for exact value
-        calFreqReq = getConstrainedLevelCalFreqReq(adapterStruct.reqLevels, origFreq, ANALYSED_CH_ID, adapterStruct.maxAmplDiff, adjustment == 0);
+        calFreqReq = getConstrainedLevelCalFreqReq(adapterStruct.reqVDLevel, origFreq, ANALYSED_CH_ID, adapterStruct.maxAmplDiff, adjustment == 0);
 
         % zooming calibration levels + plotting the range so that user can adjust precisely
         % target level = orig Rec level (not the increased range)

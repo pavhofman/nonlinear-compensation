@@ -127,7 +127,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         % adapterStruct.out = false; % OUT off
         adapterStruct.in = false; % CALIB IN
         adapterStruct.vdLpf = true; % LPF
-        adapterStruct.reqLevels = []; % no stepper adjustment
+        adapterStruct.reqVDLevel = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for LPF measurement with output channel %d and input channel %d', PLAY_CH_ID, ANALYSED_CH_ID),
           adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
@@ -227,7 +227,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         adapterStruct.vdLpf = false; % VD
         % LPF + transfer measurement - VD for splitting
         adapterStruct.vd = adapterStruct.vdForSplitting;
-        adapterStruct.reqLevels = lpFundAmpl;
+        adapterStruct.reqVDLevel = lpFundAmpl;
         % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
         adapterStruct.maxAmplDiff = MAX_AMPL_DIFF * 0.9;
         waitForAdapterAdjust(

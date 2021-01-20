@@ -226,7 +226,7 @@ function clbkSetVDLevel(src, data)
   end
 
   global adapterStruct;
-  adapterStruct.reqLevels = db2mag(value);
+  adapterStruct.reqVDLevel = db2mag(value);
   adapterStruct.switchesSet = true;
   % just in case
   updateAdapterPanel();

@@ -28,7 +28,7 @@ function result = setVDLevelSched(label = 1)
         adapterStruct.vdLpf = false; % VD
         % VD as currently selected
 
-        % adapterStruct.reqLevels already set from the txt input
+        % adapterStruct.reqVDLevel already set from the txt input
 
         if isempty(adapterStruct.maxAmplDiff)
           % default value

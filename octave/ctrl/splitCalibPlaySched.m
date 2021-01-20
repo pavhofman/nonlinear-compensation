@@ -130,7 +130,7 @@ function result = splitCalibPlaySched(label = 1)
         % OUT unchanged
         adapterStruct.in = false; % CALIB IN
         adapterStruct.vdLpf = true; % LPF
-        adapterStruct.reqLevels = []; % no stepper adjustment
+        adapterStruct.reqVDLevel = []; % no stepper adjustment
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for CH%d LPF calibration', ANALYSED_CH_ID), adapterStruct, WAIT_FOR_LP_LABEL, ABORT, ERROR, mfilename());
         return;
@@ -173,7 +173,7 @@ function result = splitCalibPlaySched(label = 1)
         % LPF + transfer measurement - VD for splitting
         adapterStruct.vd = adapterStruct.vdForSplitting;
 
-        adapterStruct.reqLevels = lpFundAmpl;
+        adapterStruct.reqVDLevel = lpFundAmpl;
         % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
         adapterStruct.maxAmplDiff = MAX_AMPL_DIFF * 0.9;
         waitForAdapterAdjust(

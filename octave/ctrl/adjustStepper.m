@@ -1,4 +1,4 @@
-function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
+function newSteps = adjustStepper(stepperID, reqLevel, recInfo, playInfo)
   % const - init steps to gain calibration moves
   persistent BACKLASH_STEPS = 150;
   persistent INIT_STEPS = [0, 400, -200, 600];
@@ -90,7 +90,7 @@ function newSteps = adjustStepper(stepperID, reqLevels, recInfo, playInfo)
   else
     % already initialized, adjusting for the required level
     % for now only one req level
-    reqTransfer = reqLevels(1)/playAmpl;
+    reqTransfer = reqLevel/playAmpl;
 
     % estimating pos0 for setting regression bound <-10%, +10%>
     % using current amplitude in direct channel as max. amplitude of analyzed channel

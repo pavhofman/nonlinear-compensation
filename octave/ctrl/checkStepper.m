@@ -8,7 +8,7 @@ function result = checkStepper(adapterStruct, recInfo, playInfo)
   result = false;
 
   % CONTINUE button pressed, checking stepper
-  if ~isempty(adapterStruct.reqLevels) % requested specific levels
+  if ~isempty(adapterStruct.reqVDLevel) % requested specific levels
     if ~isStepperRunning(stepperID) % stepper is not moving (not yet or no more), it makes sense to measure level
       recInfoID = recInfo.id;
       if recInfoID ~= lastRecInfoID
@@ -20,7 +20,7 @@ function result = checkStepper(adapterStruct, recInfo, playInfo)
         measPeaksCh = recInfo.measuredPeaks{ANALYSED_CH_ID};
 
         if areLevelsStable(measPeaksCh, stepperID)
-          if areReqLevels(adapterStruct.reqLevels, measPeaksCh(:, 2), adapterStruct.maxAmplDiff)
+          if isReqLevel(adapterStruct.reqVDLevel, measPeaksCh(1, 2), adapterStruct.maxAmplDiff)
             writeLog('DEBUG', "Stepper [%d] at required position", stepperID);
             resetStepperTries(stepperID);
             result = true;
@@ -31,7 +31,7 @@ function result = checkStepper(adapterStruct, recInfo, playInfo)
             % sometimes stepper params are estimated incorrectly, stepper does not converge to the required level and keeps oscillating around
             % if too many stepper., re-initialize stepper to run stepper calibration again
             resetStepperIfNotConverging(stepperID);
-            steps = adjustStepper(stepperID, adapterStruct.reqLevels, recInfo, playInfo);
+            steps = adjustStepper(stepperID, adapterStruct.reqVDLevel, recInfo, playInfo);
             incStepperTries(stepperID);
             if steps == 0
               writeLog('DEBUG', "Stepper [%d] calculated 0 steps, yet no exactly at position, cannot do better", stepperID);
@@ -94,12 +94,11 @@ function result = areLevelsStable(measPeaksCh, stepperID)
   end
 end
 
-function result = areReqLevels(reqLevels, measLevels, maxAmplDiff)
+function result = isReqLevel(reqLevel, measLevel, maxAmplDiff)
   % simple difference check, no ratios
-  differentAmplIDs = find(abs(reqLevels - measLevels) > maxAmplDiff);
-  result =  isempty(differentAmplIDs);
+  result =  abs(reqLevel - measLevel) < maxAmplDiff;
   writeLog('DEBUG', 'req: %f meas: %f, diff: %f, maxDiff %f => result %d',
-    reqLevels(1), measLevels(1), abs(reqLevels(1) - measLevels(1)), maxAmplDiff, result);
+    reqLevel, measLevel, abs(reqLevel - measLevel), maxAmplDiff, result);
 end
 
 function resetStepperIfNotConverging(stepperID)
