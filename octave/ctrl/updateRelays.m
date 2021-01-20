@@ -24,5 +24,8 @@ function updateRelays()
     adapterStruct.switchesSet = true;
     % flag for change
     adapterStruct.switchesChanged |= changed;
+    if changed && adapterStruct.adapterPanelDrawn
+      updateAdapterPanel();
+    end
   end
 end

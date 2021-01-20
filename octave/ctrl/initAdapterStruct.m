@@ -168,6 +168,8 @@ function initAdapterStruct()
   end % adapter has arduino
   adapterStruct.out = adapterStruct.defaultOut;
 
+  % checked in updateRelays() to call updateAdapterPanel
+  adapterStruct.adapterPanelDrawn = false;
   % initial setting relays if needed
   updateRelays();
 

@@ -156,6 +156,7 @@ function drawAdapterPanel(fig, x, y, width, height)
 
   % setting initial values - in INIT mode
   updateAdapterPanel(true);
+  adapterStruct.adapterPanelDrawn = true;
 
 end
 
@@ -164,7 +165,6 @@ function clbkSetOut(src, data)
   adapterStruct.out = get(src, 'value');
   % this control is enabled only when having relays
   updateRelays();
-  updateAdapterPanel();
 end
 
 function clbkSetVdlp(src, data)
@@ -173,7 +173,6 @@ function clbkSetVdlp(src, data)
   adapterStruct.vdLpf = radio == adapterStruct.vdLpfRadio;
   % this control is enabled only when having relays
   updateRelays();
-  updateAdapterPanel();
 end
 
 function clbkSetLpf(src, data)
@@ -182,7 +181,6 @@ function clbkSetLpf(src, data)
   adapterStruct.lpf = ifelse(radio == adapterStruct.lpf1Radio, 1, 2);
   % this control is enabled only when having relays
   updateRelays();
-  updateAdapterPanel();
 end
 
 function clbkSetVd(src, data)
@@ -191,7 +189,6 @@ function clbkSetVd(src, data)
   adapterStruct.vd = ifelse(radio == adapterStruct.vd1Radio, 1, 2);
   % this control is enabled only when having relays
   updateRelays();
-  updateAdapterPanel();
 end
 
 function clbkSetIn(src, data)
@@ -200,7 +197,6 @@ function clbkSetIn(src, data)
   adapterStruct.in = radio == adapterStruct.dutInRadio;
   % this control is enabled only when having relays
   updateRelays();
-  updateAdapterPanel();
 end
 
 function clbkAdapterContinue(src, data)
