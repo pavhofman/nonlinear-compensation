@@ -90,7 +90,7 @@ function drawAdapterPanel(fig, x, y, width, height)
       'verticalalignment', 'middle',
       'tooltipstring', 'Enter required VD level in dB < 0',
       'visible', ifelse(adapterStruct.hasStepper, 'on', 'off'),
-      'callback', @clbkSetVDLevel,
+      'callback', ifelse(adapterStruct.isSE, @clbkSetVDLevel, @clbkSetBalVDLevels),
       'position', [vdLevelX, 0, VD_LEVEL_WIDTH, 0.95]);
 
 
@@ -248,16 +248,25 @@ function clbkAdapterContinue(src, data)
   updateAdapterPanel();
 end
 
-function clbkSetVDLevel(src, data)
-  % checks
-  str = get(src, 'String');
+% return: if OK: value = number, if error: value = NA
+function value = parseSingleNumber(str)
   value = str2double(str);
   if isnan(value)
       set(src, 'String',' 0.');
       warndlg('VD level must be numerical in dB');
-      return;
+      value = NA;
   elseif value > 0
     warndlg('VD level must be < 0dB');
+    value = NA;
+  end
+end
+
+function clbkSetVDLevel(src, data)
+  % checks
+  str = strtrim(get(src, 'String'));
+  value = parseSingleNumber(str);
+  if isna(value)
+    % error
     return;
   end
 
@@ -268,4 +277,43 @@ function clbkSetVDLevel(src, data)
   updateAdapterPanel();
   % adjusting the stepper
   setVDLevelSched();
+end
+
+function clbkSetBalVDLevels(src, data)
+  % checks
+  str = strtrim(get(src, 'String'));
+  strs = strsplit(str, {' ', ','});
+  if length(strs) < 1 || length(strs) > 2
+    % error
+    warndlg('VD levels must be one or two numbers, separated by comma, in dB');
+    return;
+  else
+    % correct count
+    value1 = parseSingleNumber(strs{1});
+    if isna(value1)
+      return;
+    end
+    % first number OK
+    dbValue1 = db2mag(value1);
+
+    global adapterStruct;
+    if length(strs) == 1
+      % one number, same for both + and -
+      adapterStruct.reqBalVDLevels = [dbValue1, dbValue1];
+    else
+      % 2 numbers
+      value2 = parseSingleNumber(strs{2});
+      if isna(value2)
+        return;
+      end
+      % both OK, using both
+      adapterStruct.reqBalVDLevels = [dbValue1, db2mag(value2)];
+    end
+  end
+
+  adapterStruct.switchesSet = true;
+  % just in case
+  updateAdapterPanel();
+  % adjusting the steppers
+  setBalVDLevelsSched();
 end
