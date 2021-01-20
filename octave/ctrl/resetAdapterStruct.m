@@ -44,6 +44,10 @@ function resetAdapterStruct(recoverInOut = true)
   % flag indicating change in switches
   adapterStruct.switchesChanged = false;
 
+  adapterStruct.groundPlus = false;
+  % default - SE always grounded -
+  adapterStruct.groundMinus = adapterStruct.isSE;
+
   % ID of stepper to operate in checkStepper
   adapterStruct.stepperToMove = [];
 end
