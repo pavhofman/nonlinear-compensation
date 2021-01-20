@@ -40,6 +40,14 @@ function updateAdapterPanel(init = false)
     setEnabled([adapterStruct.vd1Radio, adapterStruct.vd2Radio], adapterStruct.hasRelays && noTasksRunning);
   end
 
+  % Gnd+/- switchable only in BAL mode
+  if ~adapterStruct.isSE
+    switchesChanged |= setChecked(adapterStruct.gndPlusCheckbox, adapterStruct.groundPlus);
+    switchesChanged |= setChecked(adapterStruct.gndMinusCheckbox, adapterStruct.groundMinus);
+    % enabled when no tasks
+    setEnabled([adapterStruct.gndPlusCheckbox, adapterStruct.gndMinusCheckbox], adapterStruct.hasRelays && noTasksRunning);
+  end
+
   adapterStruct.switchesChanged |= ~init && switchesChanged;
   % CONTINUE button
   if adapterStruct.useContButton

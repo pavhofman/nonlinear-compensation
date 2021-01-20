@@ -143,6 +143,32 @@ function drawAdapterPanel(fig, x, y, width, height)
             'enable', ifelse(isempty(ardStruct.vdPin), 'off', 'on'),
             'Position', [0.5, 0, 0.5, 1]);
 
+
+  adapterStruct.gndPMGroup = uibuttongroup (ctrlPanel ,
+                               'units', 'normalized',
+                               'visible', ifelse(adapterStruct.isSE, 'off', 'on'),
+                               'position', [vdRGroupX, 0, VD_RGROUP_WIDTH, 1]);
+
+  adapterStruct.gndPlusCheckbox = uicontrol (adapterStruct.gndPMGroup,
+            'style', 'checkbox',
+            'string', 'G+',
+            'value', 0,
+            'units', 'normalized',
+            'visible', ifelse(adapterStruct.isSE, 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.groundPlusPin), 'off', 'on'),
+            'callback', @clbkSetGndPlus,
+            'Position', [0, 0, 0.5, 1]);
+
+  adapterStruct.gndMinusCheckbox = uicontrol (adapterStruct.gndPMGroup,
+            'style', 'checkbox',
+            'string', 'G-',
+            'value', 0,
+            'units', 'normalized',
+            'visible', ifelse(adapterStruct.isSE, 'off', 'on'),
+            'enable', ifelse(isempty(ardStruct.groundMinusPin), 'off', 'on'),
+            'callback', @clbkSetGndMinus,
+            'Position', [0.5, 0, 0.5, 1]);
+
   BTN_WIDTH = 0.05;
   btnX = vdRGroupX + VD_RGROUP_WIDTH + CLEARANCE;
   adapterStruct.contBtn = uicontrol (ctrlPanel ,
@@ -163,6 +189,20 @@ end
 function clbkSetOut(src, data)
   global adapterStruct;
   adapterStruct.out = get(src, 'value');
+  % this control is enabled only when having relays
+  updateRelays();
+end
+
+function clbkSetGndPlus(src, data)
+  global adapterStruct;
+  adapterStruct.groundPlus = get(src, 'value');
+  % this control is enabled only when having relays
+  updateRelays();
+end
+
+function clbkSetGndMinus(src, data)
+  global adapterStruct;
+  adapterStruct.groundMinus = get(src, 'value');
   % this control is enabled only when having relays
   updateRelays();
 end
