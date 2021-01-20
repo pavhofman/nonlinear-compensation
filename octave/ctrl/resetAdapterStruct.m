@@ -43,4 +43,7 @@ function resetAdapterStruct(recoverInOut = true)
   adapterStruct.switchesSet = false;
   % flag indicating change in switches
   adapterStruct.switchesChanged = false;
+
+  % ID of stepper to operate in checkStepper
+  adapterStruct.stepperToMove = [];
 end

@@ -3,7 +3,11 @@ function result = checkStepper(adapterStruct, recInfo, playInfo)
   persistent lastRecInfoID = 0;
 
   % using stepper for the currently selected voltage divider
-  stepperID = adapterStruct.vd;
+  if ~isempty(adapterStruct.stepperToMove)
+    stepperID = adapterStruct.stepperToMove;
+  else
+    stepperID = adapterStruct.vd;
+  end
 
   result = false;
 
