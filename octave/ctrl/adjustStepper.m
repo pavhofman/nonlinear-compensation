@@ -96,6 +96,14 @@ function newSteps = adjustStepper(stepperID, reqLevel, recInfo, playInfo)
     % using current amplitude in direct channel as max. amplitude of analyzed channel
     % precise value is not important
     recDirectAmpl = recInfo.measuredPeaks{getTheOtherChannelID(ANALYSED_CH_ID)}(1, 2);
+
+    global adapterStruct;
+    if adapterStruct.gndPlus || adapterStruct.gndMinus
+      % One of the nalyzed lines is grounded, the analyzed amplitude is only one half compared to recDirectAmpl
+      % Therefore recDirectAmpl must be halved to get correct position estimate
+      recDirectAmpl /= 2;
+    end
+
     % estimated current position of analysed CH
     estCurPos = EST_TOTAL_STEPS * recAmpl/recDirectAmpl;
     % getting back to zero position
