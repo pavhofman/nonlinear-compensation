@@ -156,7 +156,7 @@ global MODE_DUAL_BAL = 2;
 
 % default mode
 % must be the same for all processes!
-global chMode = MODE_DUAL_SE;
+global chMode = MODE_DUAL_BAL;
 
 global showFFTCfg = struct();
 showFFTCfg.fig = NA;
@@ -237,12 +237,12 @@ global MAX_FREQ_DIFF_DECIMALS = 2;
 
 
 % ID of output channel used for split calibration
-% LEFT
-global PLAY_CH_ID = 1;
+% RIGHT
+global PLAY_CH_ID = 2;
 
 % analysed input ch goes through LPF or VD, the other input channel is direct
-% LEFT
-global ANALYSED_CH_ID = 1;
+% RIGHT
+global ANALYSED_CH_ID = 2;
 
 global EXTRA_CIRCUIT_VD = 'vd';
 global EXTRA_CIRCUIT_LP1 = 'lp1';  
