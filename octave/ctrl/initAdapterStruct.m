@@ -176,9 +176,9 @@ function initAdapterStruct()
 
 end
 
-function updateNoArduinoAdapterPanel(title)
+function updateNoArduinoAdapterPanel(label)
   global adapterStruct;
-  adapterStruct.label = title;
+  adapterStruct.label = label;
   updateAdapterPanel();
 end
 
