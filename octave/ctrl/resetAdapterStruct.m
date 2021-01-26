@@ -35,8 +35,10 @@ function resetAdapterStruct(recoverInOut = true)
 
   % other switches defaults
   adapterStruct.vdLpf = false; % VD
-  % single value
+
   adapterStruct.reqVDLevel = [];
+  adapterStruct.reqBalVDLevels = [];
+  adapterStruct.curBalLevels = [];
   adapterStruct.maxAmplDiff = [];
 
   % flag for indicating that phase of setting switches is finished

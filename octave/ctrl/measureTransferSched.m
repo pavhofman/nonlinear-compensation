@@ -3,15 +3,16 @@
 % result: NA = not finished yet, false = error/failed, true = finished OK
 function result = measureTransferSched(label= 1, schedTask = [])
   result = NA;
-  persistent NAME = 'Measuring LPF & VD Transfer';
+  persistent NAME = 'Measuring LPF&VD Transfer';
   
   % init section
-  [START_LABEL, PASS_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, GEN_ORIG_F, SWITCH_TO_VD_LABEL,...
-    GEN_LABEL, CAL_VD_LABEL, CAL_VD_FINISHED_LABEL, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
+  [START_LABEL, PASS_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, CAL_LP_FINISHED_LABEL, GEN_ORIG_F, WAIT_STABLE_LP, MEASURE_LP_LEVEL, SWITCH_TO_VD_LABEL,...
+    ADJUST_VD_SE, ADJUST_VD_BAL, GEN_LABEL, CAL_VD_LABEL, CAL_VD_FINISHED_LABEL, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
   
   persistent AUTO_TIMEOUT = 20;
   % manual calibration timeout - enough time to adjust the level into the range limits
   persistent MANUAL_TIMEOUT = 500;
+  persistent STABILIZATION_TIMEOUT = 1000;
 
   % analysed input ch goes through LPF or VD, the other input channel is direct
   global ANALYSED_CH_ID;
@@ -62,8 +63,9 @@ function result = measureTransferSched(label= 1, schedTask = [])
   persistent TRANSF_CAL_RUNS = 30;
 
   global adapterStruct;
+  global recInfo;
 
-  persistent lpFundAmpl = NA;
+  persistent reqSEVDLevel = NA;
   persistent wasAborted = false;
   
   while true
@@ -72,7 +74,6 @@ function result = measureTransferSched(label= 1, schedTask = [])
       case START_LABEL
         
         global playInfo;
-        global recInfo;
 
         clearOutBox();
 
@@ -97,7 +98,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         
         origRecFreq = recInfo.measuredPeaks{ANALYSED_CH_ID}(1, 1);
         
-        % LPF measurement starts at last measured freq. We need values for fundamental freq in order to determine lpFundAmpl to align VD to same value
+        % LPF measurement starts at last measured freq.
         [playFreqs, recFreqs] = getMissingTransferFreqs(origPlayFreq, origRecFreq, fs, EXTRA_CIRCUIT_LP1, recInfo.nonInteger);
         freqID = 1;
         
@@ -128,6 +129,7 @@ function result = measureTransferSched(label= 1, schedTask = [])
         adapterStruct.in = false; % CALIB IN
         adapterStruct.vdLpf = true; % LPF
         adapterStruct.reqVDLevel = []; % no stepper adjustment
+        adapterStruct.reqBalVDLevels = [];
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for LPF measurement with output channel %d and input channel %d', PLAY_CH_ID, ANALYSED_CH_ID),
           adapterStruct, PASS_LABEL, ABORT, ERROR, mfilename());
@@ -165,7 +167,6 @@ function result = measureTransferSched(label= 1, schedTask = [])
 
               printStr(sprintf("Joint-device calibrating/measuring LPF at %dHz", recFreqs(freqID)));
               % deleting the calib file should it exist - always clean calibration
-              global recInfo;
               calFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID,
                 recInfo.playCalDevName, recInfo.recCalDevName, chMode, EXTRA_CIRCUIT_LP1);
               deleteFile(calFile);
@@ -184,32 +185,56 @@ function result = measureTransferSched(label= 1, schedTask = [])
               moveCalToTransferFile(calFile, recFreqs(freqID), fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_LP1);
 
               % removing the other channel calfile - useless
-              global recInfo;
               otherCalFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID),
                 recInfo.playCalDevName, recInfo.recCalDevName, chMode, EXTRA_CIRCUIT_LP1);
               deleteFile(otherCalFile);
-              
+
               % next frequency
               ++freqID;
-              
               label = CAL_LP_LABEL;
-              continue;
+              % continue;
             end
         end % LPF freqs
         label = GEN_ORIG_F;
-        continue;
+        % continue;
                 
       case GEN_ORIG_F
         % returning back to orig freq
         sendPlayGeneratorCmd(origPlayFreq, playLevels);
-        % wait a bit for the change to propagate (to see the origPlayFreq in capture analysis UI)
-        schedPause(1, SWITCH_TO_VD_LABEL, mfilename());
+        % wait a bit for the change to propagate
+        schedPause(0.5, WAIT_STABLE_LP, mfilename());
         return;
+
+      case WAIT_STABLE_LP
+        writeLog('DEBUG', 'Waiting for stable LP levels');
+        % possible change in levels, requesting reset of historic peaks
+        adapterStruct.resetPrevMeasPeaks = true;
+        waitForStableLevels(MEASURE_LP_LEVEL, STABILIZATION_TIMEOUT, ABORT, mfilename());
+        return;
+
+      case MEASURE_LP_LEVEL
+        % back at fundamental - must measure levels for req VD setting
+        if adapterStruct.isSE
+          % SE mode - VD must be set to measured amplitude
+          % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
+          % here we can either wait for stabilized new frequency (waitForStableLevels picks the old data for larger buffers)
+          % or can read measured amplitude for the origRecFreq - safer
+          reqSEVDLevel = loadRecAmplFromTransfer(origRecFreq, EXTRA_CIRCUIT_LP1);
+          label = SWITCH_TO_VD_LABEL;
+          % continue
+        else
+          % balanced mode requires measuring +/- level at first frequency to adjust VD
+          % measureBalLevelsSched stores the measured results to adapterStruct.curBalLevels
+          % (same format as adapterStruct.reqBalVDLevels)
+          % after tasked finished - will jump to CAL_LP_LEBEL - therefore next frequency must be set
+          ++freqID;
+          waitForTaskFinish('measureBalLevelsSched', SWITCH_TO_VD_LABEL, ABORT, mfilename());
+          return;
+        end
 
       case SWITCH_TO_VD_LABEL
         % VD calibration
         % loading recFreqs for VD
-        global recInfo;
         [playFreqs, recFreqs] = getMissingTransferFreqs(origPlayFreq, origRecFreq, fs, EXTRA_CIRCUIT_VD, recInfo.nonInteger);
         writeLog('DEBUG', 'Missing transfer recFreqs for %s: %s', EXTRA_CIRCUIT_VD, disp(recFreqs));
         freqID = 1;
@@ -218,21 +243,32 @@ function result = measureTransferSched(label= 1, schedTask = [])
           label = ALL_OFF_LABEL;
           continue;
         end
-
-        % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
-        lpFundAmpl = loadRecAmplFromTransfer(origRecFreq, EXTRA_CIRCUIT_LP1);
-
+        % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
+        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF * 0.8;
         % adapterStruct.out = false;
         adapterStruct.in = false; % CALIB
         adapterStruct.vdLpf = false; % VD
+
+        if adapterStruct.isSE
+          label = ADJUST_VD_SE;
+        else
+          label = ADJUST_VD_BAL;
+        end
+        % continue
+
+      case ADJUST_VD_SE
         % LPF + transfer measurement - VD for splitting
         adapterStruct.vd = adapterStruct.vdForSplitting;
-        adapterStruct.reqVDLevel = lpFundAmpl;
-        % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
-        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF * 0.9;
+        adapterStruct.reqVDLevel = reqSEVDLevel;
         waitForAdapterAdjust(
           sprintf('Change switch to VD calibration. Adjust captured level to %s for channel %d', getAdapterLevelRangeStr(adapterStruct), ANALYSED_CH_ID),
           adapterStruct, GEN_LABEL, ABORT, ERROR, mfilename());
+        return;
+
+      case ADJUST_VD_BAL
+        % curBalLevels set by measureBalLevelsSched
+        adapterStruct.reqBalVDLevels = adapterStruct.curBalLevels;
+        waitForTaskFinish('setBalVDLevelsSched', GEN_LABEL, ABORT, mfilename());
         return;
 
       case GEN_LABEL
@@ -262,6 +298,11 @@ function result = measureTransferSched(label= 1, schedTask = [])
               if recFreqs(freqID) == origRecFreq
                 % VD at fundament (origFreq) should be calibrated close to the LPF level
                 % amplitude-constrained calibration
+
+                % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
+                % VD should be already set at this level by ADJUST_VD_SE/ADJUST_VD_BAL
+                lpFundAmpl = loadRecAmplFromTransfer(origRecFreq, EXTRA_CIRCUIT_LP1);
+
                 calFreqReq = getConstrainedLevelCalFreqReq(lpFundAmpl, origRecFreq, ANALYSED_CH_ID, MAX_AMPL_DIFF, true);
                 calFreqReqStr = getCalFreqReqStr(calFreqReq);
                 % much more time for manual level adjustment
@@ -276,7 +317,6 @@ function result = measureTransferSched(label= 1, schedTask = [])
                 closeCalibPlot();
               end
               % deleting the calib file should it exist - always clean calibration
-              global recInfo;
               calFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, ANALYSED_CH_ID,
                 recInfo.playCalDevName, recInfo.recCalDevName, chMode, EXTRA_CIRCUIT_VD);
               deleteFile(calFile);
@@ -294,7 +334,6 @@ function result = measureTransferSched(label= 1, schedTask = [])
               moveCalToTransferFile(calFile, recFreqs(freqID), fs, PLAY_CH_ID, ANALYSED_CH_ID, EXTRA_CIRCUIT_VD);
 
               % removing useless calfile for the other channel
-              global recInfo;
               otherCalFile = genCalFilename(recFreqs(freqID), fs, COMP_TYPE_JOINT, PLAY_CH_ID, getTheOtherChannelID(ANALYSED_CH_ID),
                 recInfo.playCalDevName, recInfo.recCalDevName, chMode, EXTRA_CIRCUIT_VD);
               deleteFile(otherCalFile);
@@ -302,18 +341,18 @@ function result = measureTransferSched(label= 1, schedTask = [])
               % next frequency
               ++freqID;
               label = CAL_VD_LABEL;
-              continue;
+              % continue;
           end
           
         end
         label = ALL_OFF_LABEL;
         % goto label - next loop
-        continue;
+        % continue;
 
       case ABORT
         wasAborted= true;
         label = ALL_OFF_LABEL;
-        continue;
+        % continue;
 
       case ALL_OFF_LABEL
         cmdIDs = sendAllOffCmds();
@@ -322,14 +361,14 @@ function result = measureTransferSched(label= 1, schedTask = [])
           return;
         else
           label = DONE_LABEL;
-          continue;
+          % continue;
         end
 
       case DONE_LABEL
         if ~isempty(getRunTaskIDFor(mfilename()))
           % called from waitForFunction scheduler (i.e. from split-calibration task) - not showing the final switchWindow
           label = FINISH_DONE_LABEL;
-          continue;
+          % continue;
         else
           % plus restoring IN/OUT switches
           resetAdapterStruct();

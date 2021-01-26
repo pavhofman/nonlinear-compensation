@@ -5,7 +5,8 @@
 function result = splitCalibPlaySched(label = 1)
   result = NA;
   % init section
-  [CHECKING_LABEL, START_LABEL, SWITCH_TO_LPF_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, SWITCH_TO_VD_LABEL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
+  [CHECKING_LABEL, START_LABEL, SWITCH_TO_LPF_LABEL, WAIT_FOR_LP_LABEL, CAL_LP_LABEL, MEASURE_LEVELS, SWITCH_TO_VD_LABEL, ADJUST_VD_SE, ...
+      ADJUST_VD_BAL, WAIT_FOR_VD_LABEL, CAL_VD_LABEL, SPLIT_CAL_LABEL, COMP_PLAY_LABEL, ...
       CHECK_LOOPING, ALL_OFF_LABEL, DONE_LABEL, FINISH_DONE_LABEL, ERROR] = enum();
   
   persistent NAME = 'Split-Calibrating PLAY Side';
@@ -116,7 +117,7 @@ function result = splitCalibPlaySched(label = 1)
           return;
         else
           label = START_LABEL;
-          continue;
+          % continue;
         end
         
       case START_LABEL
@@ -124,13 +125,14 @@ function result = splitCalibPlaySched(label = 1)
         % for restoration at the end
         keepInOutSwitches();
         label = SWITCH_TO_LPF_LABEL;
-        continue;
+        % continue;
 
       case SWITCH_TO_LPF_LABEL
         % OUT unchanged
         adapterStruct.in = false; % CALIB IN
         adapterStruct.vdLpf = true; % LPF
         adapterStruct.reqVDLevel = []; % no stepper adjustment
+        adapterStruct.reqBalVDLevels = [];
         adapterStruct.maxAmplDiff = [];
         waitForAdapterAdjust(sprintf('Set switches for CH%d LPF calibration', ANALYSED_CH_ID), adapterStruct, WAIT_FOR_LP_LABEL, ABORT, ERROR, mfilename());
         return;
@@ -158,30 +160,55 @@ function result = splitCalibPlaySched(label = 1)
         calCmd = [CALIBRATE ' ' calFreqReqStr ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT) ' ' getMatrixCellsToCmdStr(origPlayLevels, CMD_PLAY_AMPLS_PREFIX) ' ' CMD_EXTRA_CIRCUIT_PREFIX EXTRA_CIRCUIT_LP1];
         cmdIDRec = writeCmd(calCmd, cmdFileRec);
         % calibrating VD
-        waitForCmdDone([cmdIDRec], SWITCH_TO_VD_LABEL, AUTO_TIMEOUT, ERROR, mfilename());
+        waitForCmdDone([cmdIDRec], MEASURE_LEVELS, AUTO_TIMEOUT, ERROR, mfilename());
         return;
-        
-      case SWITCH_TO_VD_LABEL
-        % we need to read the filter fund level in order to calibrate fundamental to the same level as close as possible for calculation of the splittting
-        % persistent variable, also used in next step CAL_VD_LABEL
+
+      case MEASURE_LEVELS
         global recInfo;
         lpFundAmpl = loadCalFundAmpl(origRecFreq, fs, PLAY_CH_ID, ANALYSED_CH_ID, recInfo.playCalDevName, recInfo.recCalDevName, EXTRA_CIRCUIT_LP1);
+        if adapterStruct.isSE
+          % SE mode - VD must be set to measured amplitude, that is already stored in lpFundAmpl
+          label = SWITCH_TO_VD_LABEL;
+          % continue
+        else
+          % balanced mode requires measuring +/- level at first frequency to adjust VD
+          % measureBalLevelsSched stores the measured results to adapterStruct.curBalLevels
+          % (same format as adapterStruct.reqBalVDLevels)
+          waitForTaskFinish('measureBalLevelsSched', SWITCH_TO_VD_LABEL, ABORT, mfilename());
+          return;
+        end
 
-        % OUT unchanged
+      case SWITCH_TO_VD_LABEL
+        % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
+        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF * 0.5;
+
         adapterStruct.in = false; % CALIB
         adapterStruct.vdLpf = false; % VD
-        % LPF + transfer measurement - VD for splitting
-        adapterStruct.vd = adapterStruct.vdForSplitting;
+        % relays are set in ADJUST_VD_XXX steps
+        if adapterStruct.isSE
+          label = ADJUST_VD_SE;
+        else
+          label = ADJUST_VD_BAL;
+        end
+        % continue
 
+      case ADJUST_VD_SE
+        % LPF + transfer measurement use VD = vdForSplitting
+        adapterStruct.vd = adapterStruct.vdForSplitting;
         adapterStruct.reqVDLevel = lpFundAmpl;
-        % level needs to be set slightly more precisely than calibration request to account for possible tiny level drift before calibration
-        adapterStruct.maxAmplDiff = MAX_AMPL_DIFF * 0.9;
         waitForAdapterAdjust(
           sprintf('Change switch to VD calibration. For first freq adjust captured level to %s for channel %d', getAdapterLevelRangeStr(adapterStruct), ANALYSED_CH_ID),
           adapterStruct, WAIT_FOR_VD_LABEL, ABORT, ERROR, mfilename());
         return;
 
+      case ADJUST_VD_BAL
+        % curBalLevels set by measureBalLevelsSched
+        adapterStruct.reqBalVDLevels = adapterStruct.curBalLevels;
+        waitForTaskFinish('setBalVDLevelsSched', WAIT_FOR_VD_LABEL, ABORT, mfilename());
+        return;
+
       case WAIT_FOR_VD_LABEL
+        % TODO - really required?
         % after switching LPF -> VD we have to wait for the new distortions to propagate through the chain. 1 sec should be enough
         schedPause(1, CAL_VD_LABEL, mfilename());
         return;
@@ -225,8 +252,7 @@ function result = splitCalibPlaySched(label = 1)
 
         % going to the next label. This could be processed in one label, but separating split calibration from play-side compensation makes the code cleaner
         label = COMP_PLAY_LABEL;
-        continue;
-        
+        % continue;
 
       case COMP_PLAY_LABEL
         printStr(sprintf('Compensating PLAY side'));
@@ -243,14 +269,13 @@ function result = splitCalibPlaySched(label = 1)
         else
           % done
           label = DONE_LABEL;
-          continue;
+          % continue;
         end
-
 
       case ABORT
         wasAborted= true;
         label = ALL_OFF_LABEL;
-        continue;
+        % continue;
 
       case ALL_OFF_LABEL
         cmdIDs = sendAllOffCmds();
@@ -259,7 +284,7 @@ function result = splitCalibPlaySched(label = 1)
           return;
         else
           label = DONE_LABEL;
-          continue;
+          % continue;
         end
 
       case DONE_LABEL
