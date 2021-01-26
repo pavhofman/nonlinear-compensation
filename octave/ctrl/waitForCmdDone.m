@@ -19,6 +19,7 @@ function schedTask = decideLabelFor(curTime,  reqTime, nextLabel, timeoutLabel, 
     schedTask.newLabel = nextLabel;
   elseif curTime > reqTime
     % timeout occured
+    writeLog('WARN', 'Task timed out');
     schedTask.newLabel = timeoutLabel;
   end
   % else keep waiting

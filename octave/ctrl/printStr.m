@@ -8,7 +8,7 @@ function printStr(msg, varargin)
     % formatting message
     msg = sprintf(msg, varargin{:});
   end
-
+  writeLog('DEBUG', 'OutBox message: %s', msg);
   % prepending at the beginning to avoid having to scroll to end manually
   contents = [msg; contents];
   set(outBox, 'string', contents);

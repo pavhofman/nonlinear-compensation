@@ -26,8 +26,10 @@ function schedTask = decideLabel(taskFNameToRun, callingFName, okLabel, failLabe
     schedTask.keepInQueue = false;
     % with result:
     if schedTask.result
+      writeLog('DEBUG', 'Task %s finished OK', taskFNameToRun);
       schedTask.newLabel = okLabel;
     else
+      writeLog('DEBUG', 'Task %s failed', taskFNameToRun);
       schedTask.newLabel = failLabel;
     end
   else
