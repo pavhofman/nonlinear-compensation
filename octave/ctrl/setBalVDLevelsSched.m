@@ -64,18 +64,21 @@ function result = setBalVDLevelsSched(label = 1)
         return;
 
       case ABORT
-        wasAborted= true;
+        writeLog('DEBUG', 'ABORTED!');
+        wasAborted = true;
         label = DONE_LABEL;
 
       case DONE_LABEL
-        % restoring switches
-        resetAdapterStruct();
+        writeLog('DEBUG', 'DONE_LABEL, wasAborted: %d', wasAborted);
+        % restoring switches - without restoring IN/OUT
+        resetAdapterStruct(false);
         % returning to VD1 which is for balanced VD
         adapterStruct.vd = 1;
         waitForAdapterAdjust('Restore switches', adapterStruct, FINISH_DONE_LABEL, FINISH_DONE_LABEL, ERROR, mfilename());
         return;
 
       case FINISH_DONE_LABEL
+        writeLog('DEBUG', 'FINISH_DONE_LABEL, wasAborted: %d', wasAborted);
         % clearing the label
         adapterStruct.label = '';
         updateAdapterPanel();

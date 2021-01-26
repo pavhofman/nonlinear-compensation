@@ -42,7 +42,7 @@ function result = setVDLevelSched(label = 1)
       case ABORT
         wasAborted= true;
         label = DONE_LABEL;
-        continue;
+        % continue;
 
       case DONE_LABEL
         % plus restoring IN/OUT switches
