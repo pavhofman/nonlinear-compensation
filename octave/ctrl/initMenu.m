@@ -14,7 +14,8 @@ function [playStruct, recStruct] = initMenu(fig, playStruct, recStruct);
   calOnMenusTasks{end+1} = uimenu(jointSidesMenu, "label", "Calibrate Joint-Sides: Continuously", "callback", {@clbkJointCalib, true});
   calOffMenusTasks{end+1} = uimenu(jointSidesMenu, "label", "Stop Calibrating", 'separator', 'on', 'enable', 'off', "callback", @clbkCalibOff);
 
-  uimenu(jointSidesMenu, "label", "Re-Measure LPF/VD Transfer", 'separator', 'on', 'callback', @clbkRemeasureTransfers);
+  global MAX_TRANSFER_FREQS;
+  uimenu(jointSidesMenu, "label", sprintf("Re-Measure LPF/VD Transfer (max. %d harmonics)", MAX_TRANSFER_FREQS), 'separator', 'on', 'callback', @clbkRemeasureTransfers);
 
 
   controlMenu = uimenu (fig, "label", "C&ontrol");
