@@ -196,7 +196,7 @@ while(true)
   % calibration - updating calBuffer in every cycle
   source 'run_calibration.m';
 
-    if (statusContains(COMPENSATING))
+  if (statusContains(COMPENSATING))
     %id = tic();
     source 'run_compensation.m';
     %printf('Compensation took %f\n', toc(id));

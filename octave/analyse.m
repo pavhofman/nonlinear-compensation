@@ -295,24 +295,23 @@ function [distortFreqsCh, calPeaksCh, calFile] = loadPeaks(freqs, fs, channelID,
   else
     writeLog('WARN', 'Did not find calib file %s, channel ID %d PASSING', calFile, channelID);
     calFile = '';
-    return;
   end
 end
 
 
-function [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs, complAllPeaks)
+function [fundLevelsCh, distortPeaksCh] = interpolatePeaks(measuredPeaksCh, channelID, distortFreqs, complAllPeaksCh)
   % calPeaks: time, fundPhaseDiff1, fundPhaseDiff2, playFundAmpl1, playFundAmpl2, fundAmpl1, fundAmpl2, f1, f2, f3...... where f1, f2,... are distortion freqs in the same order as freqs
   % WARN: ALL peaks must be known (no NA values!)
   global AMPL_IDX;  % = index of fundAmpl1
   global PEAKS_START_IDX; 
   distortPeaksCh = [];
   
-  allDPeaksC = complAllPeaks(:, PEAKS_START_IDX:end);
+  allDPeaksC = complAllPeaksCh(:, PEAKS_START_IDX:end);
   if ~isempty(allDPeaksC) 
     % the actual interpolation
     
     % levels = AMPL_IDX column
-    levels = complAllPeaks(:, AMPL_IDX);
+    levels = complAllPeaksCh(:, AMPL_IDX);
     
     % amplitude of first fundamental
     currentLevel = measuredPeaksCh(1, 2);  
