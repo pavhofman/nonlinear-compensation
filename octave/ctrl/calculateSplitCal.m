@@ -40,8 +40,8 @@ function calculateSplitCal(fundFreq, fs, playChID, analysedRecChID, chMode, vdNa
     distortFreq = N * fundFreq;
     % only freqs available for LPF and VD can be calculated
     % TODO - skipping missing distortFreqs in LPF/VD rows!
-    distortPeakVD = getDistortPeakForFreq(distortFreq, peaksVDRow, distortVDFreqs);
-    distortPeakLP = getDistortPeakForFreq(distortFreq, peaksLPRow, distortLPFreqs);
+    distortPeakVD = getDistortPeaksForFreq(distortFreq, peaksVDRow, distortVDFreqs);
+    distortPeakLP = getDistortPeaksForFreq(distortFreq, peaksLPRow, distortLPFreqs);
     
     % for incremental update
     if ~isempty(playDistortPeaksCh)
@@ -149,17 +149,4 @@ function saveNewCalFile(fs, fundPeaksCh, distortPeaksCh, playChID, channelID, ch
   deleteFile(calFile);  
   saveCalFile(fundPeaksCh, distortPeaksCh, fs, calFile, NA, timestamp);
   writeLog('INFO', 'Saved calculated split calibration into %s', calFile);
-end
-
-% of not found, returns empty
-function distortPeak = getDistortPeakForFreq(freq, peaksRow, distortFreqs)
-  global PEAKS_START_IDX;
-  % index of freq in distortFreqs
-  % support for nonInteger freqs
-  freqID = find(round(distortFreqs) == round(freq));
-  if ~isempty(freqID)
-    distortPeak = peaksRow(PEAKS_START_IDX + freqID - 1);
-  else
-    distortPeak = [];
-  end
 end
