@@ -186,6 +186,8 @@ while(true)
 
   source 'pre_process_stream.m';
  
+  % added white noise (for testing purposes)
+  %buffer(:, PLAY_CH_ID) += 0.00000316 * (2*rand(rows(buffer), 1) - 1);
 
   if (statusContains(ANALYSING))
     %id = tic();
