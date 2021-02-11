@@ -20,6 +20,7 @@ if ~isempty(distortHarmAmpls)
       scaledLevels(existIDs) = distortHarmAmpls(existIDs) / avgAmpl;
       
       distortPoly = genDistortPoly(scaledLevels);
+%      writeLog('DEBUG', 'Dist. polynomial for CH%d: %s', channelID, disp(distortPoly));
 
       % distorting with distortPoly
       bufferCh = polyval(distortPoly, bufferCh);
