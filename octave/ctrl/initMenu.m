@@ -83,6 +83,7 @@ function [dirStruct, calOnMenus, calOffMenus] = initDirMenu(fig, dirStruct, cmdF
   uimenu(menu, "label", 'Compensate Joint-Sides', "callback", {fCmd, [COMPENSATE ' ' CMD_COMP_TYPE_PREFIX num2str(COMP_TYPE_JOINT)], cmdFile});
 
   if dirStruct.direction == DIR_REC
+    calOnMenus{end+1} = uimenu(menu, "label", ['Poly-Compensate'], 'separator', 'on', "callback", {@clbkPolyCompensate, dirStruct.direction, cmdFile});
     calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate/Compensate Capture at Current Level'], 'separator', 'on', "callback", @clbkExactCalibRec);
     calOnMenus{end+1} = uimenu(menu, "label", ['Calibrate/Compensate Capture at Range around Current Level'], "callback", @clbkRangeCalibRec);
   else
