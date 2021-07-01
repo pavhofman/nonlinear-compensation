@@ -221,7 +221,7 @@ global PEAKS_START_IDX = 8;
 global PHASEDIFF_IDX = 2;
 
 % maximum age of distortion peak row in calibration file to be kept for interpolation (unless removed due to replace_tolerace)
-global MAX_CALIB_ROW_AGE = 10 * 60;  % secs
+global MAX_CALIB_ROW_AGE = 100 * 60;  % secs
 
 % fund amplitude within +/- AMPL_TO_REPLACE_TOLERANCE considered same
 global AMPL_TO_REPLACE_TOLERANCE = db2mag(0.01);
