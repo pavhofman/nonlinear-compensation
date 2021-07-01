@@ -92,6 +92,7 @@ elseif strcmp(cmd{1}, DISTORT)
 elseif (strcmp(cmd{1}, PASS))
   addStatus(PASSING);
   removeFromStatus(COMPENSATING);
+  removeFromStatus(POLYCOMPENSATING);
   % keep analysis running all the time (without generating distortion peaks)
   addStatus(ANALYSING);
   compRequest = NA;
@@ -171,6 +172,24 @@ elseif strcmp(cmd{1}, GENERATE)
     showFFTCfg.restartAvg = 1;
   end
   % generating completes command immediately
+  cmdDoneID = cmdID;
+
+elseif strcmp(cmd{1}, POLYCOMP)
+  % polycomp BASE64_BYTE2VAR(piecewise polynomial)
+  addStatus(POLYCOMPENSATING);
+  removeFromStatus(PASSING);
+  addStatus(ANALYSING);
+
+  % parsing pp
+  ppStr = cmd{2};
+  ppSer = base64_decode(ppStr);
+  % used in run_polycompensation
+  % converting back from double to uint8
+  pp = bytea2var(uint8(ppSer));
+  writeLog('DEBUG', "Received compensating polynom: %s", disp(pp));
+  showFFTCfg.restartAvg = 1;
+  % compensating completes command immediately
+  % TODO - really?
   cmdDoneID = cmdID;
 
 end

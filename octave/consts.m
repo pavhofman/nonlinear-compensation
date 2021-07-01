@@ -22,6 +22,7 @@ global STORE_RECORDED = 'storerec';
 
 % set mode + mode value
 global SET_MODE = 'mode';
+global POLYCOMP = 'polycomp';
 
 NO_CMD = '';
 
@@ -31,6 +32,7 @@ global PASSING = 'Passing';
 global CALIBRATING = 'Calibrating';
 global ANALYSING = 'Analysing';
 global COMPENSATING = 'Compensating';
+global POLYCOMPENSATING = 'Poly-Compensating';
 global DISTORTING = 'Distorting';
 global GENERATING = 'Generating';
 
@@ -40,7 +42,8 @@ GENERATING
 PASSING
 ANALYSING
 DISTORTING
-COMPENSATING 
+COMPENSATING
+POLYCOMPENSATING
 CALIBRATING 
 };
 

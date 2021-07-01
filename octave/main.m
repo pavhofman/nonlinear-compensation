@@ -207,6 +207,13 @@ while(true)
     compenCalFiles = cell(columns(buffer), 1);
   end
 
+  if (statusContains(POLYCOMPENSATING))
+    %id = tic();
+    source 'run_polycompensation.m';
+    %printf('Compensation took %f\n', toc(id));
+  end
+
+
   if statusContains(DISTORTING)
     source 'run_distortion.m';
   end
